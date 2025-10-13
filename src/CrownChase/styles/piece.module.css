@@ -6,6 +6,10 @@
   transition: all 0.2s ease;
   position: relative;
   user-select: none;
+  border-radius: 50%;
+  font-size: 2.5vw !important;
+  -webkit-text-stroke: 0.1vw #4c1d95;
+  box-shadow: 0 0.2vw 0.4vw rgba(0, 0, 0, 0.2);
 }
 
 .pieceCircle {
@@ -89,18 +93,46 @@
   box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
 }
 
-.pieceCaptainIndicator {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background: gold;
-  color: #000;
-  border-radius: 50%;
-  width: 15px;
-  height: 15px;
-  font-size: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
+.pieceRed {
+  border: 0.2vw solid #a02c1f !important;
+}
+
+.pieceBlue {
+  border: 0.2vw solid #1c6392 !important;
+}
+
+.captain {
+  background: radial-gradient(circle, #f39c12, #e67e22);
+  border-color: #f1c40f;
+  box-shadow: 0 0.3vw 0.6vw rgba(241, 196, 15, 0.4);
+}
+
+.checker {
+  background: radial-gradient(circle, #95a5a6, #7f8c8d);
+  border-color: #bdc3c7;
+}
+
+.jumper {
+  background: radial-gradient(circle, #ba68c8, #9c27b0);
+  border-color: #c3c53a;
+  animation: jumperBounce 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes jumperBounce {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-0.2vw); }
+}
+
+.killer {
+  background: radial-gradient(circle, #4c1d95, #2d1b69);
+  border-color: #e74c3c;
+  box-shadow: 0 0.3vw 0.6vw rgba(231, 76, 60, 0.4);
+}
+
+.king {
+  background: radial-gradient(circle, #fff176, #c3c53a);
+  border-color: #9c27b0;
+  box-shadow: 0 0.4vw 0.8vw rgba(156, 39, 176, 0.3);
+  transform: scale(1.05);
+  -webkit-text-stroke: 0vw #4c1d95;
 }

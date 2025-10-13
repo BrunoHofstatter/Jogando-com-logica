@@ -157,6 +157,24 @@ function StopJogo({ randomNumber, difficulty }: JogoStopProps) {
     return () => clearInterval(interval);
   }, [showGame, pararJogo]);
 
+  // Add Enter key listener to trigger STOP action
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === 'Enter' && !pararJogo && showGame) {
+        event.preventDefault();
+        setPararJogo(true);
+      }
+    };
+
+    if (!pararJogo && showGame) {
+      document.addEventListener('keydown', handleKeyPress);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [pararJogo, showGame]);
+
   return (
     <div className="jogoStop">
       <div className="stopBorder">

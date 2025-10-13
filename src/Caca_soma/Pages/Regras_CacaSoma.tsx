@@ -19,7 +19,7 @@ function CacaSomaRegras() {
         <div className={styles.boxRegras}>
           <ul className={styles.regras}>
             <li>
-              <h3>Um número vai ser sorteado</h3>
+              <h3>Clique em INICIAR para sortear um número</h3>
               <img
                 src={`${import.meta.env.BASE_URL}ComoJogarStop1.png`}
                 className={`${styles.como} ${styles.c1}`}
@@ -30,10 +30,10 @@ function CacaSomaRegras() {
                 src={`${import.meta.env.BASE_URL}ComoJogarStop2.png`}
                 className={`${styles.como} ${styles.c2}`}
               />
-              <h3>Regra 2: Ganhe os tabuleiros pequenos</h3>
+              <h3>Escolha 2 ou 3 numeros que somem ao número sorteado</h3>
             </li>
             <li>
-              <h3>Regra 3: A jogada decide o próximo tabuleiro</h3>
+              <h3>Quem fizer mais rápido, ganha 1 ponto</h3>
               <div className={styles.c3Box}>
                 <img
                   src={`${import.meta.env.BASE_URL}ComoJogarStop3.png`}
@@ -46,7 +46,7 @@ function CacaSomaRegras() {
                 src={`${import.meta.env.BASE_URL}ComoJogarStop4.png`}
                 className={`${styles.como} ${styles.c4}`}
               />
-              <h3>Regra 4: Ganhe o jogo final</h3>
+              <h3>Quem chegar em 5 pontos primero vence</h3>
             </li>
           </ul>
         </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import styles from "../styles/design.module.css"; // CSS Modules
 import Timer from "./timer";
 
@@ -14,7 +14,8 @@ interface Prop {
   quantos: number;
   setQuantos: (x: number) => void;
   sorteado: number;
-  onTimeUpdate?: (tempo: number) => void; // Add time update callback
+  onTimeUpdate?: (tempo: number) => void;
+  onOkayChange?: (okayFn: () => void) => void; // Pass okay function to parent
 }
 
 function Tabuleiro({
@@ -30,13 +31,15 @@ function Tabuleiro({
   setQuantos,
   sorteado,
   onTimeUpdate,
+  onOkayChange,
 }: Prop) {
   // 10x10 matrix filled with false
   const [board, setBoard] = useState(
     Array.from({ length: 10 }, () => Array(10).fill(0))
   );
 
-  const okay = () => {
+  // Create the submit turn function that can be passed to parent
+  const okay = useCallback(() => {
     if (quantos >= 2) {
       // Capture current soma value before resetting
       const currentSoma = soma;
@@ -54,7 +57,14 @@ function Tabuleiro({
       mudarJogar();
       mudarRodada();
     }
-  };
+  }, [quantos, soma, sorteado, setQuantos, mudarSoma, mudarClicar, mudarJogar, mudarRodada]);
+
+  // Pass the okay function to parent when it changes
+  useEffect(() => {
+    if (onOkayChange) {
+      onOkayChange(okay);
+    }
+  }, [onOkayChange, okay]);
 
   useEffect(() => {
     if (qualRodada === 0) {
@@ -118,9 +128,7 @@ function Tabuleiro({
           ))
         )}
       </div>
-      <div>
-        <button onClick={() => okay()}>OK</button>
-      </div>
+      
     </>
   );
 }

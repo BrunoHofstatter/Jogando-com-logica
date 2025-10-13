@@ -103,7 +103,7 @@
 }
 
 .button {
-  border: 0.8vw solid #dcdf45;
+  border: 0.8vw solid #c1c424;
   background: radial-gradient(circle, #7c3aed, #5b21b6);
   border-radius: 7vw;
   box-sizing: border-box;
@@ -116,7 +116,7 @@
   text-align: center;
   padding: 0.3vw 2.5vw 2vw 2.5vw;
   line-height: 1;
-  box-shadow: inset 0 0 3vw #00000070;
+  box-shadow: inset 0 0 1vw #dcdf45ff;
   cursor: pointer;
   margin-bottom: 2vw;
   transition: all 0.5s ease;
@@ -125,11 +125,10 @@
 
 
 .button:hover {
-  border: 0.8vw solid #d7da5d;
-  background: radial-gradient(circle, #a855f7, #7c3aed);
+  border: 0.8vw solid #c1c424;
+  background: radial-gradient(circle, #8041ec, #672cc5);
   transform: scale(1.07) translateY(-1dvh);
-  -webkit-text-stroke: 0.42vw #4c1d95;
-  box-shadow: 0 0 2vw rgba(168, 85, 247, 0.5);
+  -webkit-text-stroke: 0.42vw #5725a1;
 }
 
 /* Mobile responsive */
@@ -175,7 +174,7 @@
   position: fixed;
   bottom: 2vw;
   right: 2vw;
-  border: 0.2vw solid #6b46c1;  /* Purple border */
+  border: 0.2vw solid #2d1b69;  /* Purple border */
   background: radial-gradient(circle, #8b5cf6, #6d28d9);  /* Purple gradient */
   border-radius: 1vw;
   padding: 0.1vw 0.7vw 0.3vw 0.7vw;
@@ -208,8 +207,8 @@
 }
 
 .modalContent {
-  background: radial-gradient(circle, #7c3aed, #5b21b6); /* Purple gradient */
-  border: 0.6vw solid #6b46c1;  /* Purple border */
+  background: radial-gradient(circle, #9d6fee, #8154c9); /* Purple gradient */
+  border: 0.6vw solid #4c1d95;  /* Purple border */
   border-radius: 3.3vw;
   padding: 2vw 3vw;
   margin-top: 5dvh;
@@ -217,7 +216,7 @@
   max-height: 92dvh;
   overflow-y: auto;
   color: #ffffff; /* White text */
-  -webkit-text-stroke: 0.1vw #4c1d95; /* Purple stroke */
+  -webkit-text-stroke: 0.1vw #2d1b69; /* Purple stroke */
   font-size: 1.5vw;
   position: relative;
 }
@@ -229,10 +228,10 @@
   border-radius: 50%;
   padding: 0 0 0.2vw 0;
   background: radial-gradient(circle, #a855f7, #7c3aed); /* Purple gradient */
-  border: 0.3vw solid #6b46c1; /* Purple border */
+  border: 0.3vw solid #4c1d95; /* Purple border */
   width: 4vw;
   height: 4vw;
-  color: #ffffff; /* White text */
+  color: #ffc228; /* White text */
   -webkit-text-stroke: 0.2vw #4c1d95; /* Purple stroke */
   font-size: 2.5vw;
   cursor: pointer;
@@ -252,22 +251,22 @@
 }
 .detailedRules h3{
   color: #fbbf24;
-  -webkit-text-stroke: 0.18vw #6b46c1; 
+  -webkit-text-stroke: 0.18vw #4c1d95; 
   font-size: 2.4vw;
 }
 
 .detailedRules p {
   font-size: 1.8vw;
-  -webkit-text-stroke: 0.13vw #6b46c1; /* Purple stroke */
+  -webkit-text-stroke: 0.14vw #4c1d95; /* Purple stroke */
   margin-bottom: 1.5vw;
-  color: #e9e9e9;
+  color: #fffa68;
 }
 
 .detailedRules h2 {
   font-size: 4vw;
   color: #fbbf24; /* Bright gold text */
 
-  -webkit-text-stroke: 0.25vw #6b46c1;  /* Purple stroke */
+  -webkit-text-stroke: 0.25vw #4c1d95;  /* Purple stroke */
   text-align: center;
   margin-bottom: 2vw;
 }

@@ -17,8 +17,8 @@ const PieceComponent: React.FC<PieceProps> = ({
 }) => {
   const getPlayerColor = (owner: number, isCaptain: boolean = false) => {
     const colors = [
-      "#e74c3c",
-      "#3498db",
+      "radial-gradient(circle, #e74c3c, #c0392b)",  // Red: gradient for player 1
+      "radial-gradient(circle, #5dade2, #2980b9)",  // Blue: gradient for player 2
       "#2ecc71",
       "#f39c12",
       "#9b59b6",
@@ -27,8 +27,13 @@ const PieceComponent: React.FC<PieceProps> = ({
     const baseColor = colors[owner % colors.length];
 
     if (isCaptain) {
-      // Return a darker shade for captains
-      return darkenColor(baseColor, 0.3); // 30% darker
+      // For captains, use a darker gradient
+      if (owner === 0) {
+        return "radial-gradient(circle, #a93226, #922b21)";  // Darker red
+      } else if (owner === 1) {
+        return "radial-gradient(circle, #2c3e50, #1e3a8a)";  // Darker blue
+      }
+      return baseColor;  // Fallback
     }
 
     return baseColor;
@@ -148,7 +153,14 @@ const PieceComponent: React.FC<PieceProps> = ({
         return {
           symbol: "X",
           backgroundColor: getPlayerColor(piece.owner),
-          textColor: "white",
+          textColor: "#fbbf24",
+          shape: "circle",
+        };
+      case "jumper":
+        return {
+          symbol: "O",
+          backgroundColor: getPlayerColor(piece.owner),
+          textColor: "#fbbf24",
           shape: "circle",
         };
     }
@@ -185,17 +197,13 @@ const PieceComponent: React.FC<PieceProps> = ({
 
   return (
     <div
-      className={`${styles.piece} ${
+      className={`${styles.piece} ${piece.owner === 0 ? styles.pieceRed : styles.pieceBlue} ${styles[piece.type] || ''} ${
         display.shape === "square" ? styles.pieceSquare : styles.pieceCircle
-      } ${isSelected ? styles.pieceSelected : ""} ${
-        isSpecial ? styles.pieceSpecial : ""
-      } ${isPromoted ? styles.piecePromoted : ""} ${
-        hasMoved ? styles.pieceMoved : ""
-      } ${piece.type === "barrier" ? styles.pieceBarrier : ""}`}
+      } ${isSelected ? styles.pieceSelected : ""} ${isSpecial ? styles.pieceSpecial : ""} ${isPromoted ? styles.piecePromoted : ""} ${hasMoved ? styles.pieceMoved : ""} ${piece.type === "barrier" ? styles.pieceBarrier : ""}`}
       style={{
         width: display.shape === "square" ? "70%" : "75%",
         height: display.shape === "square" ? "70%" : "75%",
-        backgroundColor: display.backgroundColor,
+        background: display.backgroundColor,
         fontSize: hasValue ? "12px" : "18px",
         color: display.textColor,
       }}

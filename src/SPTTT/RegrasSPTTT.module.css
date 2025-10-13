@@ -272,17 +272,22 @@
   max-height: 100%; /* Allow content to expand but be constrained by parent */
   overflow-y: visible; /* Let the parent handle scrolling */
 }
+.detailedRules h3{
+  color: #dff3fd;
+  -webkit-text-stroke: 0.18vw #0a1929; 
+  font-size: 2.4vw;
+}
 
 .detailedRules p {
   font-size: 1.8vw;
-  color: #29b6f6;
+  color: #78d0f8;
   -webkit-text-stroke: 0.13vw #0a1929;
   margin-bottom: 1.5vw; /* Add some spacing between paragraphs */
 }
 
 .detailedRules h2 {
   font-size: 4vw;
-  color: #78d0f8;
+  color: #3e98ff;
   -webkit-text-stroke: 0.25vw #0a1929;
   text-align: center;
   margin-bottom: 2vw;

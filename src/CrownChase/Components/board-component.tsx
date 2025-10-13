@@ -177,77 +177,30 @@ const Board: React.FC<BoardProps> = ({
     <div className={styles.gamePage}>
       <div className={styles.gameContainer}>
         <div className={styles.gameInfo}>
-          <p className={styles.playerInfo}>
-            Current Player: 
-            <span className={`${styles.playerName} ${gameState.currentPlayer === 0 ? styles.player1 : styles.player2}`}>
-              {currentPlayerName}
+          <div className={styles.currentPlayer}>
+            Turno do Jogador
+            <span className={`${styles.playerIndicator} ${gameState.currentPlayer === 0 ? styles.playerRed : styles.playerBlue}`}>
+              {gameState.currentPlayer === 0 ? '●' : '●'}
             </span>
-          </p>
-          <p className={styles.turnInfo}>Turn: {gameState.turnCount + 1}</p>
-          
-          {gameState.config.energyPerTurn !== undefined ? (
-            <p className={styles.resourceInfo}>Energy Left: {gameState.remainingEnergy || 0}</p>
-          ) : (
-            <p className={styles.resourceInfo}>Moves Left: {gameState.remainingMoves}</p>
-          )}
-          
-          {barriersLeft > 0 && (
-            <p className={styles.resourceInfo}>Barriers Available: {barriersLeft}</p>
-          )}
-          
-          {gameState.lastDiceRoll && (
-            <p className={styles.resourceInfo}>
-              Dice Roll: {Array.isArray(gameState.lastDiceRoll) ? 
-              gameState.lastDiceRoll.join(', ') : gameState.lastDiceRoll}
-            </p>
-          )}
-
-          <div className={styles.scoreDisplay}>
-            {gameState.gameData?.capturedPieces && (
-              <p>Captures: 
-                {Array.from({length: gameState.players}, (_, i) => (
-                  <span key={i} className={styles.scoreItem}>
-                    Player {i + 1}: {gameState.gameData?.capturedPieces[i] || 0}
-                  </span>
-                ))}
-              </p>
-            )}
-            
-            {gameState.gameData?.scores && (
-              <p>Scores: 
-                {Array.from({length: gameState.players}, (_, i) => (
-                  <span key={i} className={styles.scoreItem}>
-                    Player {i + 1}: {gameState.gameData?.scores[i] || 0}
-                  </span>
-                ))}
-              </p>
-            )}
           </div>
 
-          {winResult && (
-            <div className={styles.winDisplay}>
-              <strong>Game Over!</strong><br/>
-              {winResult.winner >= 0 ? (
-                <>Winner: Player {winResult.winner + 1}<br/></>
-              ) : (
-                <>Draw!<br/></>
-              )}
-              Reason: {winResult.reason}
+          <div className={styles.capturesSection}>
+            <div className={styles.captureInfo}>
+              <span className={styles.redIndicator}>●</span>
+              <span>Peças vermelhas capturadas: {gameState.gameData?.capturedPieces?.[0] || 0}</span>
             </div>
-          )}
-
-          {gameState.gameData?.mustCapture && (
-            <div className={styles.mustCapture}>
-              <strong>Must Capture!</strong>
+            <div className={styles.captureInfo}>
+              <span className={styles.blueIndicator}>●</span>
+              <span>Peças azuis capturadas: {gameState.gameData?.capturedPieces?.[1] || 0}</span>
             </div>
-          )}
+          </div>
         </div>
         <div className={styles.boardWrapper}>
         <div 
           className={styles.board}
           style={{
-            gridTemplateColumns: `repeat(${gameState.config.boardWidth}, clamp(2vw,9.5dvh,5vw))`,
-            gridTemplateRows: `repeat(${gameState.config.boardHeight}, clamp(2vw,9.5dvh,5vw))`,
+            gridTemplateColumns: `repeat(${gameState.config.boardWidth}, clamp(2.6vw,12.35dvh,6.5vw))`,
+            gridTemplateRows: `repeat(${gameState.config.boardHeight}, clamp(2.6vw,12.35dvh,6.5vw))`,
           }}
         >
           {gameState.board.map((row, rowIndex) =>
@@ -313,8 +266,9 @@ const Board: React.FC<BoardProps> = ({
             </button>
           ))}
 
-          {availableActions.length === 0 && gameState.gamePhase === "playing" && (
-            <button 
+          {/* Skip turn button hidden as requested */}
+          {/* {availableActions.length === 0 && gameState.gamePhase === "playing" && (
+            <button
               onClick={() => {
                 const skipAction: TurnAction = { type: 'custom', data: { skip: true } };
                 engine.executeAction(gameState, skipAction, gameRules);
@@ -329,7 +283,7 @@ const Board: React.FC<BoardProps> = ({
             >
               Skip Turn
             </button>
-          )}
+          )} */}
         </div>
 
         {selectedSquare && gameState.board[selectedSquare.row][selectedSquare.col] && (

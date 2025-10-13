@@ -12,7 +12,7 @@ function Iniciar({ mudarClicar, clicar, mudarRodada }: prop) {
         }
       }}
     >
-      INICIAR
+      Começar
     </button>
   );
 }

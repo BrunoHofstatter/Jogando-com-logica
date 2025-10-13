@@ -1,8 +1,8 @@
 import Tabuleiro from "../componentes/tabuleiro";
 import Girar from "../componentes/sorteio";
-import Iniciar from "../componentes/iniciar";
-import Timer from "../componentes/timer";
-import { useEffect, useState } from "react";
+
+import GameButton from "../componentes/GameButton";
+import { useEffect, useState, useRef } from "react";
 import styles from "../styles/design.module.css";
 
 function Caca_soma() {
@@ -21,9 +21,26 @@ function Caca_soma() {
 
   const [pontu_1, setPontu_1] = useState(0);
   const [pontu_2, setPontu_2] = useState(0);
+  const [gameOver, setGameOver] = useState(false);
+  const [winner, setWinner] = useState<string | null>(null);
+  const okayFunctionRef = useRef<(() => void) | null>(null);
+
   const addPontu = (qual: boolean) => {
-    if (qual) setPontu_1(pontu_1 + 1);
-    else setPontu_2(pontu_2 + 1);
+    if (qual) {
+      const newScore = pontu_1 + 1;
+      setPontu_1(newScore);
+      if (newScore >= 5) {
+        setGameOver(true);
+        setWinner("Jogador 1");
+      }
+    } else {
+      const newScore = pontu_2 + 1;
+      setPontu_2(newScore);
+      if (newScore >= 5) {
+        setGameOver(true);
+        setWinner("Jogador 2");
+      }
+    }
   };
 
   const [tempo_1, setTempo_1] = useState(0.0);
@@ -67,6 +84,18 @@ function Caca_soma() {
     setPontu_1(0);
     setPontu_2(0);
     setQualRodada(0);
+    setGameOver(false);
+    setWinner(null);
+  };
+
+  const onStartGame = () => {
+    if (clicar) {
+      mudarClicar();
+    }
+  };
+
+  const handleOkayChange = (okayFn: () => void) => {
+    okayFunctionRef.current = okayFn;
   };
 
   return (
@@ -86,10 +115,12 @@ function Caca_soma() {
           </div>
 
           <div className={styles.botaoIni}>
-            <Iniciar
-              mudarClicar={mudarClicar}
+            <GameButton
               clicar={clicar}
-              mudarRodada={mudarRodada}
+              jogar={jogar}
+              gameOver={gameOver}
+              onStartGame={onStartGame}
+              onSubmit={okayFunctionRef.current || undefined}
             />
           </div>
         </div>
@@ -99,7 +130,7 @@ function Caca_soma() {
 
           <div className={styles.playersRow}>
             <div className={styles.playerSection}>
-              <div className={styles.playerLabel}>Jogador 1</div>
+              <div className={`${styles.playerLabel} ${qualRodada % 2 === 0 ? styles.playerLabelActive : ''}`}>Jogador 1</div>
               <div className={styles.playerInfoRow}>
                 <div className={styles.playerInfo}>
                   <span className={styles.infoLabel}>Pontos:</span>
@@ -113,14 +144,14 @@ function Caca_soma() {
                       : tempo_1 === 10000
                       ? "X"
                       : tempo_1 > 0
-                      ? `${tempo_1}s`
+                      ? `${tempo_1.toFixed(1)}s`
                       : "0.0s"}
                   </span>
                 </div>
               </div>
             </div>
             <div className={styles.playerSection}>
-              <div className={styles.playerLabel}>Jogador 2</div>
+              <div className={`${styles.playerLabel} ${qualRodada % 2 !== 0 ? styles.playerLabelActive : ''}`}>Jogador 2</div>
               <div className={styles.playerInfoRow}>
                 <div className={styles.playerInfo}>
                   <span className={styles.infoLabel}>Pontos:</span>
@@ -134,7 +165,7 @@ function Caca_soma() {
                       : tempo_2 === 10000
                       ? "X"
                       : tempo_2 > 0
-                      ? `${tempo_2}s`
+                      ? `${tempo_2.toFixed(1)}s`
                       : "0.0s"}
                   </span>
                 </div>
@@ -142,9 +173,9 @@ function Caca_soma() {
             </div>
           </div>
 
-          {qualRodada === 10 && (
+          {gameOver && (
             <button className={styles.button} onClick={reiniciar}>
-              REINICIAR
+            Jogar de novo
             </button>
           )}
         </div>
@@ -164,6 +195,7 @@ function Caca_soma() {
           quantos={quantos}
           sorteado={sorteado}
           onTimeUpdate={handleTimeUpdate}
+          onOkayChange={handleOkayChange}
           //styles={styles} // se quiser passar styles para Tabuleiro
         />
       </div>

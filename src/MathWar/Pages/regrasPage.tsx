@@ -21,7 +21,7 @@ function MathWarRegras() {
           
           <ul className={styles.regras}>
             <li>
-              <h3>Regra 1: Como jogar Ultimate Tic-Tac-Toe</h3>
+              <h3>Cada passo gasta 2 de energia, capturar é 4</h3>
               <img
                 src={`${import.meta.env.BASE_URL}ComoJogarStop1.png`}
                 className={`${styles.como} ${styles.c1}`}
@@ -32,10 +32,10 @@ function MathWarRegras() {
                 src={`${import.meta.env.BASE_URL}ComoJogarStop2.png`}
                 className={`${styles.como} ${styles.c2}`}
               />
-              <h3>Regra 2: Ganhe os tabuleiros pequenos</h3>
+              <h3>Peças redondas andam reto,  vão na diagonal</h3>
             </li>
             <li>
-              <h3>Regra 3: A jogada decide o próximo tabuleiro</h3>
+              <h3>A energia é o dado + o valor da peça</h3>
               <div className={styles.c3Box}>
                 <img
                   src={`${import.meta.env.BASE_URL}ComoJogarStop3.png`}
@@ -48,7 +48,7 @@ function MathWarRegras() {
                 src={`${import.meta.env.BASE_URL}ComoJogarStop4.png`}
                 className={`${styles.como} ${styles.c4}`}
               />
-              <h3>Regra 4: Ganhe o jogo final</h3>
+              <h3>Uma peça é o Capitão se ela cair, você perde</h3>
             </li>
           </ul>
         </div>
