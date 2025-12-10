@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { GameState, Position, Piece, TurnAction, GameConfig, GameRules } from '../Logic/types';
+import { useState, useEffect } from 'react';
+import { GameState, Position, Piece, TurnAction, GameConfig, GameRules, WinResult } from '../Logic/types';
 import { GameEngine } from '../Logic/gameEngine';
 import PieceComponent from './piece';
 import styles from '../styles/board.module.css';
+import { VictoryScreen } from './VictoryScreen';
 
 interface BoardProps {
   gameConfig: GameConfig;
@@ -21,12 +22,12 @@ const Board: React.FC<BoardProps> = ({
   const [internalGameState, setInternalGameState] = useState<GameState>(() => 
     engine.initializeGame(gameConfig, gameRules)
   );
-  
+  const [gameOver, setGameOver] = useState(false);
   const gameState = externalGameState || internalGameState;
   const [selectedSquare, setSelectedSquare] = useState<Position | null>(null);
   const [availableActions, setAvailableActions] = useState<TurnAction[]>([]);
   const [highlightedSquares, setHighlightedSquares] = useState<Position[]>([]);
-
+  const [winResult, setWinResult] = useState<WinResult | null>(null);
   useEffect(() => {
     if (selectedSquare) {
       const actions = engine.getAvailableActions(gameState, gameRules, selectedSquare);
@@ -45,6 +46,43 @@ const Board: React.FC<BoardProps> = ({
       setHighlightedSquares([]);
     }
   }, [selectedSquare, gameState]);
+
+  // Check for win conditions
+  useEffect(() => {
+    const result = gameRules.checkWinCondition(gameState);
+    setWinResult(result);
+    if (result && gameState.gamePhase !== "ended") {
+      setGameOver(true);
+      const newState: GameState = {
+        ...gameState,
+        gamePhase: "ended" as const,
+        winner: result.winner
+      };
+      
+      if (onGameStateChange) {
+        onGameStateChange(newState);
+      } else {
+        setInternalGameState(newState);
+      }
+    }
+  }, [gameState]);
+
+  // Handle play again action
+  const handlePlayAgain = () => {
+    const newGameState = engine.initializeGame(gameConfig, gameRules);
+    setGameOver(false);
+    setWinResult(null);
+    setSelectedSquare(null);
+    setAvailableActions([]);
+    setHighlightedSquares([]);
+    
+    if (onGameStateChange) {
+      onGameStateChange(newGameState);
+    } else {
+      setInternalGameState(newGameState);
+    }
+  };
+
 
   const handleSquareClick = (row: number, col: number) => {
     const clickedPosition = { row, col };
@@ -169,16 +207,20 @@ const Board: React.FC<BoardProps> = ({
   };
 
   const currentPlayerName = `Player ${gameState.currentPlayer + 1}`;
-  const winResult = gameRules.checkWinCondition(gameState);
   const currentPlayerData = gameState.playerData?.[gameState.currentPlayer] || {};
   const barriersLeft = currentPlayerData.barriersLeft || 0;
+  const finalWin: WinResult | null = winResult ?? (
+    gameState.gamePhase === "ended" && gameState.winner !== null
+      ? { winner: gameState.winner, reason: "Game Over" }
+      : null
+  );
 
   return (
     <div className={styles.gamePage}>
       <div className={styles.gameContainer}>
-        <div className={styles.gameInfo}>
+        <div className={styles.gameInfo} data-target="gameInfo">
           <div className={styles.currentPlayer}>
-            Turno do Jogador
+            Vez do Jogador
             <span className={`${styles.playerIndicator} ${gameState.currentPlayer === 0 ? styles.playerRed : styles.playerBlue}`}>
               {gameState.currentPlayer === 0 ? '●' : '●'}
             </span>
@@ -186,12 +228,11 @@ const Board: React.FC<BoardProps> = ({
 
           <div className={styles.capturesSection}>
             <div className={styles.captureInfo}>
-              <span className={styles.redIndicator}>●</span>
-              <span>Peças vermelhas capturadas: {gameState.gameData?.capturedPieces?.[0] || 0}</span>
+              
+              <span className={styles.captureText}>Peças <div className={styles.redIndicator}>●</div> capturadas: {gameState.gameData?.capturedPieces?.[0] || 0} </span>
             </div>
             <div className={styles.captureInfo}>
-              <span className={styles.blueIndicator}>●</span>
-              <span>Peças azuis capturadas: {gameState.gameData?.capturedPieces?.[1] || 0}</span>
+              <span className={styles.captureText}>Peças <span className={styles.blueIndicator}>●</span> capturadas: {gameState.gameData?.capturedPieces?.[1] || 0}  </span>
             </div>
           </div>
         </div>
@@ -214,6 +255,8 @@ const Board: React.FC<BoardProps> = ({
               return (
                 <div
                   key={`${rowIndex}-${colIndex}`}
+                  data-square={`${String.fromCharCode(97 + colIndex)}${rowIndex + 1}`}
+                  data-piece={piece ? `${piece.owner === 0 ? 'red' : 'blue'}-${piece.type}` : undefined}
                   className={`${styles.square} ${squareType} ${
                     isObstacle ? styles.squareObstacle : ''
                   } ${isHighlighted ? styles.squareHighlighted : ''} ${
@@ -249,7 +292,7 @@ const Board: React.FC<BoardProps> = ({
             <button 
               onClick={handleDiceRoll}
               className={`${styles.actionButton} ${styles.actionButtonDice}`}
-              disabled={!!winResult}
+              disabled={!!finalWin}
             >
               Roll Dice
             </button>
@@ -260,7 +303,7 @@ const Board: React.FC<BoardProps> = ({
               key={index}
               onClick={() => handleSpecialAction('custom')}
               className={`${styles.actionButton} ${styles.actionButtonCustom}`}
-              disabled={!!winResult}
+              disabled={!!finalWin}
             >
               {action.data?.buttonText || 'Custom Action'}
             </button>
@@ -279,7 +322,7 @@ const Board: React.FC<BoardProps> = ({
                 }
               }}
               className={`${styles.actionButton} ${styles.actionButtonSkip}`}
-              disabled={!!winResult}
+              disabled={!!finalWin}
             >
               Skip Turn
             </button>
@@ -297,8 +340,15 @@ const Board: React.FC<BoardProps> = ({
             <p>Available Actions: {availableActions.length}</p>
           </div>
         )}
+        {finalWin && (
+          <VictoryScreen
+            winner={finalWin.winner}
+            reason={finalWin.reason}
+            onPlayAgain={handlePlayAgain}
+          />
+        )}
       </div>
-    </div>    
+    </div>
   );
 };
 

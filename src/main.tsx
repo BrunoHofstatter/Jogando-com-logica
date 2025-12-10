@@ -7,7 +7,7 @@ const isProd = !window.location.hostname.includes('localhost');
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <BrowserRouter  basename={isProd ? '/Jogando-com-logica' : '/'}>
+    <BrowserRouter  basename={'/'}>
       <App />
     </BrowserRouter>
   </StrictMode>

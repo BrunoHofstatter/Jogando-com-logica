@@ -8,23 +8,13 @@
   max-height: 100dvh;
   overflow: hidden;
   border: 0dvh solid #6b46c1;
-  padding: 1vw;
+  padding: 0vw;
   min-height: 100dvh;
   width: 100vw;
   justify-content: center;
   align-items: center;
   background: radial-gradient(circle, #bd90f0, #9867cf);
-}
-
-.boxBorder {
-  background: radial-gradient(circle, #4c1d95, #39247e);
-  border: 0.4vw solid #c3c53a;
-  border-radius: 4vw;
-  padding: 1vw;
-  text-align: center;
-  width: fit-content;
-  box-sizing: border-box;
-  box-shadow: 0 0 1vw #000a;
+  gap: 0vw;
 }
 
 .boxRegras {
@@ -33,66 +23,27 @@
   align-items: center;
   text-align: center;
   gap: 0vw;
-  border: 0.4vw solid #c3c53a;
+  width: 47%;
   border-radius: 3.3vw;
-  background: radial-gradient(circle, #7c3aed, #5b21b6);
-  padding: 2.2dvh 2.5vw 0.2dvh 0vw;
 }
-
-.regras {
-  display: flex;
-  flex-direction: column;
-  font-size: 3.57143dvh;
+.gameTitle{
+  font-size: clamp(3vw, 10.5dvh, 5.5vw);
+  -webkit-text-stroke: 0.3vw #4c1d95;
   color: #fbbf24;
-  gap: 2.2dvh;
-  -webkit-text-stroke: 0.21429dvh #000000;
 }
-
-.regras li {
-  gap: 2vw;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  margin: 0;
+.preview {
+  height: clamp(30vw, 73dvh, 40vw);
+  transition: all 0.5s ease;
+  animation: pulsePreview 5s infinite;
 }
-
-.regras h3 {
-  font-size: 2vw;
-  padding: 1.8dvh 0;
-  height: fit-content;
-  width: 23vw;
-  border-radius: 1vw;
-  border: 0.4vw solid #2d1b69;
-  display: flex;
-  justify-items: auto;
-  align-items: center;
-  background: radial-gradient(circle, #8b5cf680, #6d28d980);
-  color: #fbbf24;
-  -webkit-text-stroke: 0.15vw #4c1d95;
+@keyframes pulsePreview {
+  0% { transform: scale(0.96) }
+  50% { transform: scale(1) }
+  100% { transform: scale(0.96) }
 }
-
-.como {
-  width: clamp(2vw, 43dvh, 22vw);
-}
-
-.c3 {
-  width: clamp(2vw, 17dvh, 22vw);
-  margin: 0 5vw;
-}
-
-.c2 {
-  width: clamp(2vw, 32dvh, 22vw);
-  margin-right: 5vw;
-  transform: translateX(2vw) scale(1.25) translateY(-1.3dvh);
-}
-
-.c1 .c4 {
-  width: clamp(2vw, 50dvh, 22vw);
-}
-
 .botoes {
-  gap: 3vw;
-  width: 45%;
+  gap: 0vw;
+  width: 47%;
   padding: 0;
   box-sizing: border-box;
   display: flex;
@@ -100,16 +51,17 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+  position:relative;
 }
 
 .button {
-  border: 0.8vw solid #c1c424;
+  border: 1.8dvh solid #c1c424;
   background: radial-gradient(circle, #7c3aed, #5b21b6);
   border-radius: 7vw;
   box-sizing: border-box;
   color: #fbbf24;
   -webkit-text-stroke: 0.42vw #4c1d95;
-  font-size: 9.51vw;
+  font-size: clamp(8.5vw, 20dvh, 11vw);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -118,69 +70,54 @@
   line-height: 1;
   box-shadow: inset 0 0 1vw #dcdf45ff;
   cursor: pointer;
-  margin-bottom: 2vw;
+  margin-bottom: 5vw;
   transition: all 0.5s ease;
 }
 
 
 
 .button:hover {
-  border: 0.8vw solid #c1c424;
+  border: 1.8dvh solid #c1c424;
   background: radial-gradient(circle, #8041ec, #672cc5);
   transform: scale(1.07) translateY(-1dvh);
   -webkit-text-stroke: 0.42vw #5725a1;
 }
 
-/* Mobile responsive */
-@media (max-width: 768px) {
-  .regrasPage {
-    flex-direction: column;
-    padding: 2vw;
-  }
-  
-  .boxBorder {
-    width: 90vw;
-  }
-  
-  .botoes {
-    width: 90vw;
-    margin-top: 3vw;
-  }
-  
-  .button {
-    font-size: 12vw;
-  }
-  
-  .regras h3 {
-    font-size: 3vw;
-    width: 30vw;
-  }
-  
-  .mode-select-rules {
-    font-size: 3vw;
-  }
-  
-  .mode-select-rules label {
-    padding: 1.5vw 2vw;
-  }
-  
-  .mode-select-rules input[type="radio"] {
-    width: 2.5vw;
-    height: 2.5vw;
-  }
+
+
+.tutorialButton{
+  position: absolute;
+  bottom: 4.2dvh;
+  left: 3vw;
+  border: 0.26vw solid #342075;  /* Purple border */
+  background: radial-gradient(circle, #8b5cf6, #6d28d9);  /* Purple gradient */
+  border-radius: 1.7vw;
+  padding: 0.1vw 1vw 0.5vw 1vw;
+  color: #fbbf24; /* Gold text */
+  -webkit-text-stroke: 0.17vw #4c1d95; /* Purple stroke */
+  font-size: clamp(1.5vw, 5dvh, 2.7vw);
+  font-family: "Cherry Bomb One", system-ui;
+  cursor: pointer;
+  transition: all 0.3s;
+  z-index: 10;
+}
+
+.tutorialButton:hover {
+  transform: scale(1.03) translateY(-0.5dvh);
+  background: radial-gradient(circle, #a855f7, #7c3aed); /* Lighter purple */
 }
 
 .detailedRulesButton {
-  position: fixed;
-  bottom: 2vw;
-  right: 2vw;
-  border: 0.2vw solid #2d1b69;  /* Purple border */
+  position: absolute;
+  bottom: 4.2dvh;
+  right: 3vw;
+  border: 0.26vw solid #342075;  /* Purple border */
   background: radial-gradient(circle, #8b5cf6, #6d28d9);  /* Purple gradient */
-  border-radius: 1vw;
-  padding: 0.1vw 0.7vw 0.3vw 0.7vw;
+  border-radius: 1.7vw;
+  padding: 0.1vw 1vw 0.5vw 1vw;
   color: #fbbf24; /* Gold text */
-  -webkit-text-stroke: 0.11vw #4c1d95; /* Purple stroke */
-  font-size: 1.5vw;
+  -webkit-text-stroke: 0.17vw #4c1d95; /* Purple stroke */
+  font-size: clamp(1.5vw, 5dvh, 2.7vw);
   font-family: "Cherry Bomb One", system-ui;
   cursor: pointer;
   transition: all 0.3s;
@@ -222,9 +159,6 @@
 }
 
 .closeButton {
-  position: absolute;
-  top: 1.5dvh;
-  right: 1.5dvh; 
   border-radius: 50%;
   padding: 0 0 0.2vw 0;
   background: radial-gradient(circle, #a855f7, #7c3aed); /* Purple gradient */
@@ -238,6 +172,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 10;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  /* Prevent the button from being affected by scrolling */
+  position: sticky;
+  float: right;
+  margin-top: 0.5vw;
+  margin-right: -1.5vw;
+  top: -1.5vw;
+  right: -1.5vw;
 }
 
 .closeButton:hover {
@@ -251,61 +194,58 @@
 }
 .detailedRules h3{
   color: #fbbf24;
-  -webkit-text-stroke: 0.18vw #4c1d95; 
-  font-size: 2.4vw;
+  -webkit-text-stroke: 0.21vw #421980; 
+  font-size: 3.5vw;
+  margin-top: 4vw;
 }
 
 .detailedRules p {
-  font-size: 1.8vw;
-  -webkit-text-stroke: 0.14vw #4c1d95; /* Purple stroke */
+  font-size: 2.1vw;
+  -webkit-text-stroke: 0.17vw #421980; /* Purple stroke */
   margin-bottom: 1.5vw;
-  color: #fffa68;
+  color: #f5f5a9;
 }
 
 .detailedRules h2 {
-  font-size: 4vw;
+  font-size: 4.5vw;
   color: #fbbf24; /* Bright gold text */
-
-  -webkit-text-stroke: 0.25vw #4c1d95;  /* Purple stroke */
+  -webkit-text-stroke: 0.25vw #421980; /* Purple stroke */
   text-align: center;
   margin-bottom: 2vw;
 }
 
-
-/* Mobile responsive adjustments */
-@media (max-width: 768px) {
-  .detailedRulesButton {
-    font-size: 3.5vw;
-    padding: 1.5vw 2.5vw;
-    bottom: 3vw;
-    right: 3vw;
-    border-radius: 2vw;
-    border-width: 0.3vw;
-  }
-  
-  .modalContent {
-    font-size: 2.8vw;
-    padding: 4vw;
-    max-width: 95%;
-    max-height: 85dvh;
-    margin-top: 3dvh;
-    border-width: 0.8vw;
-  }
-  
-  .closeButton {
-    width: 8vw;
-    height: 8vw;
-    font-size: 5vw;
-    top: 1vw;
-    right: 1vw;
-  }
-  
-  .rulesText {
-    font-size: 3vw;
-  }
-  
-  .detailedRules h2 {
-    font-size: 5.5vw;
-    margin-bottom: 3vw;
-  }
+.rulesSpan{
+  color: #fdd264;
+  font-size: 2.3vw;
+  -webkit-text-stroke: 0.18vw #421980; 
+}
+.rulesStrong{
+  color: #f58a33;
+}
+.detailedRules li{
+  font-size: 1.7vw;
+  -webkit-text-stroke: 0.13vw #421980; /* Purple stroke */
+  color: #f5f5a9;
+}
+.pieceImage{
+  width: 3vw;
+  margin-bottom: 0.6vw;
+}
+.boardImage{
+  width:40vw;
+  padding: 2vw 0vw 0 5vw ;
+}
+.boardDiv{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 4vw;
+}
+.legend{
+  width: 40vw;
+  display: flex;
+  flex-direction: column;
+  gap: 2vw;
+  list-style-type: none;
 }

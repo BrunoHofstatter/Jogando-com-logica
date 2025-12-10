@@ -1,57 +1,36 @@
 import { useState } from "react";
 import styles from "../styles/regras.module.css";
 import { useNavigate } from "react-router-dom";
+import { useTutorialCompleted } from "../Components/DynamicTutorial";
 
 type MandatoryCapture = true | false;
 
 function CrownChaseRegras() {
   const navigate = useNavigate();
- 
+
   const [showDetailedRules, setShowDetailedRules] = useState(false);
-  
+  const [tutorialCompleted, resetTutorial] =
+    useTutorialCompleted("crownchase_v1");
+
   function jogarStop() {
     navigate("/crownchasePg");
   }
-  
+
+  const startTutorial = () => {
+    resetTutorial(); // Clear the "completed" flag
+    navigate("/crownchasePg");
+  };
+
   return (
     <div className={styles.regrasPage}>
       {/* Left Side - Rules */}
-      <div className={styles.boxBorder}>
-        <div className={styles.boxRegras}>
-          
-          <ul className={styles.regras}>
-            <li>
-              <h3>Capture o Rei para ganhar, mas o Rei não pode se mover</h3>
-              <img
-                src={`${import.meta.env.BASE_URL}ComoJogarStop1.png`}
-                className={`${styles.como} ${styles.c1}`}
-              />
-            </li>
-            <li>
-              <img
-                src={`${import.meta.env.BASE_URL}ComoJogarStop2.png`}
-                className={`${styles.como} ${styles.c2}`}
-              />
-              <h3>O assassino pode matar qualquer peça</h3>
-            </li>
-            <li>
-              <h3>O saltador pode pular sobre qualquer peça</h3>
-              <div className={styles.c3Box}>
-                <img
-                  src={`${import.meta.env.BASE_URL}ComoJogarStop3.png`}
-                  className={`${styles.como} ${styles.c3}`}
-                />
-              </div>
-            </li>
-            <li>
-              <img
-                src={`${import.meta.env.BASE_URL}ComoJogarStop4.png`}
-                className={`${styles.como} ${styles.c4}`}
-              />
-              <h3>O saltador só pode matar o Rei</h3>
-            </li>
-          </ul>
-        </div>
+
+      <div className={styles.boxRegras}>
+        <div className={styles.gameTitle}>Caça Coroa</div>
+        <img
+          src={`${import.meta.env.BASE_URL}crownchasePreview.png`}
+          className={styles.preview}
+        />
       </div>
 
       {/* Right Side - Game Controls */}
@@ -59,92 +38,179 @@ function CrownChaseRegras() {
         <button className={styles.button} onClick={jogarStop}>
           <span>Jogar</span>
         </button>
+        <button className={styles.tutorialButton} onClick={startTutorial}>
+          <span>Tutorial</span>
+        </button>
         <button
-        className={styles.detailedRulesButton}
-        onClick={() => setShowDetailedRules(true)}
-      >
-        Regras Completas
-      </button>
-      {showDetailedRules && (
-        <div
-          className={styles.modalOverlay}
-          onClick={() => setShowDetailedRules(false)}
+          className={styles.detailedRulesButton}
+          onClick={() => setShowDetailedRules(true)}
         >
+          Regras
+        </button>
+        {showDetailedRules && (
           <div
-            className={styles.modalContent}
-            onClick={(e) => e.stopPropagation()}
+            className={styles.modalOverlay}
+            onClick={() => setShowDetailedRules(false)}
           >
-            <button
-              className={styles.closeButton}
-              onClick={() => setShowDetailedRules(false)}
+            <div
+              className={styles.modalContent}
+              onClick={(e) => e.stopPropagation()}
             >
-              X
-            </button>
+              <button
+                className={styles.closeButton}
+                onClick={() => setShowDetailedRules(false)}
+              >
+                X
+              </button>
 
-            <div className={styles.detailedRules}>
-              <h2>Como Jogar - Caça Soma</h2>
+              <div className={styles.detailedRules}>
+                <h2>Regras Caça Coroa</h2>
 
-              <h3 className={styles.rulesTitle}>Início da Partida:</h3>
-              <p className={styles.rulesText}>
-                O Jogador 1 começa a partida. O jogo é disputado em rodadas.
-              </p>
+                <h3 className={styles.rulesTitle}>Posição Inicial</h3>
+              <div className={styles.boardDiv}>
+                <img
+                  src={`${import.meta.env.BASE_URL}crownchaseBoard.png`}
+                  className={styles.boardImage}
+                />
+                <ul className={styles.legend}>
+                  <li>
+                    <img
+                      src={`${import.meta.env.BASE_URL}crownchaseJumper.png`}
+                      className={styles.pieceImage}
+                    />{" "}
+                    -{">"} Saltador
+                  </li>
+                  <li>
+                    <img
+                      src={`${import.meta.env.BASE_URL}crownchaseAssassin.png`}
+                      className={styles.pieceImage}
+                    />{" "}
+                    -{">"} Assassino
+                  </li>
+                  <li>
+                    <img
+                      src={`${import.meta.env.BASE_URL}crownchaseKing.png`}
+                      className={styles.pieceImage}
+                    />{" "}
+                    -{">"} Rei
+                  </li>
+                </ul>
+              </div>
 
-              <h3 className={styles.rulesTitle}>Sorteio do Número:</h3>
-              <p className={styles.rulesText}>
-                Em cada rodada, o sistema sorteia um número aleatório (de 3 a
-                150) para o jogador da vez.
-              </p>
+                <h3 className={styles.rulesTitle}>Início da Partida</h3>
+                <p className={styles.rulesText}>
+                  O jogo "Caça Coroa" é disputado em um tabuleiro 5x5.
+                </p>
+                <p className={styles.rulesText}>
+                  Um jogador controla o Rei no canto inferior esquerdo. O outro
+                  jogador controla o Rei no canto superior direito.
+                </p>
 
-              <h3 className={styles.rulesTitle}>Formando a Soma:</h3>
-              <p className={styles.rulesText}>
-                O jogador deve selecionar <strong>2 ou 3 números</strong> da
-                tabela disponível que, quando somados, resultem exatamente no
-                número sorteado.
-              </p>
+                <h3 className={styles.rulesTitle}>Ordem dos Turnos</h3>
+                <p className={styles.rulesText}>
+                  Os jogadores jogam em turnos alternados.
+                </p>
+                <p className={styles.rulesText}>
+                  Em cada turno, o jogador deve mover{" "}
+                  <span className={styles.rulesStrong}>
+                    exatamente uma peça
+                  </span>
+                  .
+                </p>
+                <p className={styles.rulesText}>
+                  Cada movimento conta como uma ação.
+                </p>
 
-              <h3 className={styles.rulesTitle}>Ação:</h3>
-              <p className={styles.rulesText}>
-                O jogador clica em "Iniciar" para começar a rodada, seleciona os
-                números na tabela e depois clica em "Enviar" para submeter a sua
-                resposta.
-              </p>
 
-              <h3 className={styles.rulesTitle}>Sequência de Turnos:</h3>
-              <p className={styles.rulesText}>
-                O Jogador 2 recebe então um novo número sorteado e repete o
-                processo, tentando formar a sua própria soma.
-              </p>
+                <h3 className={styles.rulesTitle}> Rei </h3>
+                <p className={styles.rulesText}>
+                  <span className={styles.rulesSpan}>Movimento:</span> Não pode
+                  se mover.
+                </p>
+                <p className={styles.rulesText}>
+                  <span className={styles.rulesSpan}>Captura:</span> Se for
+                  capturado, o jogo acaba imediatamente.
+                </p>
 
-              <h3 className={styles.rulesTitle}>Números Usados:</h3>
-              <p className={styles.rulesText}>
-                Os números utilizados em somas corretas são{" "}
-                <strong>riscados da tabela</strong> e não podem ser usados
-                novamente por nenhum jogador no restante da partida.
-              </p>
+                <h3 className={styles.rulesTitle}>
+                  Assassino 
+                </h3>
+                <p className={styles.rulesText}>
+                  <span className={styles.rulesSpan}>Movimento:</span> Move{" "}
+                  <span className={styles.rulesStrong}>1 casa</span> em qualquer
+                  direção (horizontal, vertical ou diagonal).
+                </p>
+                <p className={styles.rulesText}>
+                  <span className={styles.rulesSpan}>Captura:</span> Captura
+                  entrando na casa ocupada por uma peça inimiga.
+                </p>
+                <p className={styles.rulesText}>
+                  Pode capturar qualquer peça,{" "}
+                  <span className={styles.rulesStrong}>inclusive o Rei</span>.
+                </p>
+                <p className={styles.rulesText}>
+                  <span className={styles.rulesSpan}>Restrição:</span> Não pode
+                  pular sobre outras peças.
+                </p>
 
-              <h3 className={styles.rulesTitle}>
-                Pontuação e Vencedor da Rodada:
-              </h3>
-              <p className={styles.rulesText}>
-                A cada rodada, o jogador que encontrar e enviar uma soma correta
-                em <strong>menos tempo</strong> vence a rodada e ganha{" "}
-                <strong>1 ponto</strong>.
-              </p>
+                <h3 className={styles.rulesTitle}>
+                  Saltador 
+                </h3>
+                <p className={styles.rulesText}>
+                  <span className={styles.rulesSpan}>Movimento Básico:</span>{" "}
+                  Move <span className={styles.rulesStrong}>1 casa</span> em
+                  linha reta (horizontal ou vertical) para uma casa vazia.
+                </p>
+                <p className={styles.rulesText}>
+                  <span className={styles.rulesSpan}>Salto:</span> Pula{" "}
+                  <span className={styles.rulesStrong}>exatamente 1 peça</span>{" "}
+                  adjacente (aliada ou inimiga) em linha reta, aterrissando duas
+                  casas adiante.
+                </p>
+                <p className={styles.rulesText}>
+                  A casa de destino no salto deve estar{" "}
+                  <span className={styles.rulesStrong}>
+                    vazia ou conter o Rei inimigo
+                  </span>
+                  .
+                </p>
+                <p className={styles.rulesText}>
+                  <span className={styles.rulesSpan}>Captura:</span> Saltadores{" "}
+                  <span className={styles.rulesStrong}>
+                    só podem capturar o Rei
+                  </span>{" "}
+                  e não podem capturar outras peças.
+                </p>
+                <p className={styles.rulesText}>
+                  <span className={styles.rulesSpan}>Restrição:</span> Não
+                  existe multi-salto em um mesmo turno.
+                </p>
 
-              <h3 className={styles.rulesTitle}>Vencendo o Jogo:</h3>
-              <p className={styles.rulesText}>
-                O jogo termina quando um jogador alcançar{" "}
-                <strong>5 pontos</strong>.
-              </p>
-              <p className={styles.rulesText}>
-                Esse jogador será declarado o vencedor da partida.
-              </p>
+                <h3 className={styles.rulesTitle}>
+                  Regras de Movimento Gerais
+                </h3>
+                <p className={styles.rulesText}>
+                  Nenhuma peça pode ocupar uma casa já ocupada por uma peça
+                  aliada.
+                </p>
+                <p className={styles.rulesText}>
+                  Apenas os Jumpers podem saltar sobre peças.
+                </p>
+                <p className={styles.rulesText}>
+                  Um movimento termina quando a peça chega ao destino permitido.
+                </p>
+
+                <h3 className={styles.rulesTitle}>Fim de Jogo</h3>
+                <p className={styles.rulesText}>
+                  O jogo acaba imediatamente quando um Rei é capturado.
+                </p>
+                <p className={styles.rulesText}>
+                  O jogador que capturar o Rei adversário é o vencedor.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-        
-        
+        )}
       </div>
     </div>
   );

@@ -1,57 +1,33 @@
 import { useState } from "react";
 import styles from "../styles/regras.module.css";
 import { useNavigate } from "react-router-dom";
+import { useTutorialCompleted } from "../Components/DynamicTutorial";
 
 type MandatoryCapture = true | false;
 
 function MathWarRegras() {
   const navigate = useNavigate();
   const [showDetailedRules, setShowDetailedRules] = useState(false);
- 
-  
+  const [tutorialCompleted, resetTutorial] = useTutorialCompleted("mathwar_v1");
+
   function jogarStop() {
     navigate("/mathwarPg");
   }
-  
+  const startTutorial = () => {
+    resetTutorial(); // Clear the "completed" flag
+    navigate("/mathwarPg");
+  };
+
   return (
     <div className={styles.regrasPage}>
       {/* Left Side - Rules */}
-      <div className={styles.boxBorder}>
-        <div className={styles.boxRegras}>
-          
-          <ul className={styles.regras}>
-            <li>
-              <h3>Cada passo gasta 2 de energia, capturar é 4</h3>
-              <img
-                src={`${import.meta.env.BASE_URL}ComoJogarStop1.png`}
-                className={`${styles.como} ${styles.c1}`}
-              />
-            </li>
-            <li>
-              <img
-                src={`${import.meta.env.BASE_URL}ComoJogarStop2.png`}
-                className={`${styles.como} ${styles.c2}`}
-              />
-              <h3>Peças redondas andam reto,  vão na diagonal</h3>
-            </li>
-            <li>
-              <h3>A energia é o dado + o valor da peça</h3>
-              <div className={styles.c3Box}>
-                <img
-                  src={`${import.meta.env.BASE_URL}ComoJogarStop3.png`}
-                  className={`${styles.como} ${styles.c3}`}
-                />
-              </div>
-            </li>
-            <li>
-              <img
-                src={`${import.meta.env.BASE_URL}ComoJogarStop4.png`}
-                className={`${styles.como} ${styles.c4}`}
-              />
-              <h3>Uma peça é o Capitão se ela cair, você perde</h3>
-            </li>
-          </ul>
-        </div>
+
+      <div className={styles.boxRegras}>
+        <div className={styles.gameTitle}>Guerra Matemática</div>
+        <img
+          src={`${import.meta.env.BASE_URL}mathwarPreview.png`}
+          className={styles.preview}
+        />
       </div>
 
       {/* Right Side - Game Controls */}
@@ -59,13 +35,17 @@ function MathWarRegras() {
         <button className={styles.button} onClick={jogarStop}>
           <span>Jogar</span>
         </button>
+        <button className={styles.tutorialButton} onClick={startTutorial}>
+          <span>Tutorial</span>
+        </button>
+        <button
+          className={styles.detailedRulesButton}
+          onClick={() => setShowDetailedRules(true)}
+        >
+          Regras
+        </button>
       </div>
-      <button
-        className={styles.detailedRulesButton}
-        onClick={() => setShowDetailedRules(true)}
-      >
-        Regras Completas
-      </button>
+
       {showDetailedRules && (
         <div
           className={styles.modalOverlay}
@@ -83,62 +63,179 @@ function MathWarRegras() {
             </button>
 
             <div className={styles.detailedRules}>
-              <h2>Como Jogar - Caça Soma</h2>
+              <h2>Regras Guerra Matemática</h2>
 
-              <h3 className={styles.rulesTitle}>Início da Partida:</h3>
-              <p className={styles.rulesText}>
-                O Jogador 1 começa a partida. O jogo é disputado em rodadas.
-              </p>
+              <h3 className={styles.rulesTitle}>Posição Inicial</h3>
+              <div className={styles.boardDiv}>
+                <img
+                  src={`${import.meta.env.BASE_URL}mathwarBoard.png`}
+                  className={styles.boardImage}
+                />
+                <ul className={styles.legend}>
+                  <li>
+                    <img
+                      src={`${import.meta.env.BASE_URL}mathwarNormal.png`}
+                      className={styles.pieceImage}
+                    />{" "}
+                    -{">"} Peça Soma redonda
+                  </li>
+                  <li>
+                    <img
+                      src={`${import.meta.env.BASE_URL}mathwarSquare.png`}
+                      className={styles.pieceImage}
+                    />{" "}
+                    -{">"} Peça Soma quadrada
+                  </li>
+                  <li>
+                    <img
+                      src={`${import.meta.env.BASE_URL}mathwarCaptain.png`}
+                      className={styles.pieceImage}
+                    />{" "}
+                    -{">"} Capitão - pode ser Soma quadrada ou redonda
+                  </li>
+                </ul>
+              </div>
 
-              <h3 className={styles.rulesTitle}>Sorteio do Número:</h3>
+              <h3 className={styles.rulesTitle}>Objetivo</h3>
               <p className={styles.rulesText}>
-                Em cada rodada, o sistema sorteia um número aleatório (de 3 a
-                150) para o jog da vez.
-              </p>
-
-              <h3 className={styles.rulesTitle}>Formando a Soma:</h3>
-              <p className={styles.rulesText}>
-                O jog deve selecionar <strong>2 ou 3 números</strong> da
-                tabela disponível que, quando somados, resultem exatamente no
-                número sorteado.
-              </p>
-
-              <h3 className={styles.rulesTitle}>Ação:</h3>
-              <p className={styles.rulesText}>
-                O jog clica em "Iniciar" para começar a rodada, seleciona os
-                números na tabela e depois clica em "Enviar" para submeter a sua
-                resposta.
-              </p>
-
-              <h3 className={styles.rulesTitle}>Sequência de Turnos:</h3>
-              <p className={styles.rulesText}>
-                O Jogador 2 recebe então um novo número sorteado e repete o
-                processo, tentando formar a sua própria soma.
-              </p>
-
-              <h3 className={styles.rulesTitle}>Números Usados:</h3>
-              <p className={styles.rulesText}>
-                Os números utilizados em somas corretas são{" "}
-                <strong>riscados da tabela</strong> e não podem ser usados
-                novamente por nenhum jog no restante da partida.
-              </p>
-
-              <h3 className={styles.rulesTitle}>
-                Pontuação e Vencedor da Rodada:
-              </h3>
-              <p className={styles.rulesText}>
-                A cada rodada, o jog que encontrar e enviar uma soma correta
-                em <strong>menos tempo</strong> vence a rodada e ganha{" "}
-                <strong>1 ponto</strong>.
-              </p>
-
-              <h3 className={styles.rulesTitle}>Vencendo o Jogo:</h3>
-              <p className={styles.rulesText}>
-                O jogo termina quando um jog alcançar{" "}
-                <strong>5 pontos</strong>.
+                O objetivo do jogo é capturar a peça{" "}
+                <span className={styles.rulesStrong}>Capitão</span> do oponente.
               </p>
               <p className={styles.rulesText}>
-                Esse jog será declarado o vencedor da partida.
+                Se o Capitão for capturado, o jogador que o capturou vence{" "}
+                <span className={styles.rulesStrong}>imediatamente</span>.
+              </p>
+
+              <h3 className={styles.rulesTitle}>Preparação e Peças</h3>
+
+              <p className={styles.rulesText}>
+                Cada jogador começa com 10 peças divididas em dois tipos: 8
+                peças Soma redondas e 2 peças Soma quadradas.
+              </p>
+
+              <p className={styles.rulesSpan}>
+                Valores das Peças (Permanentes)
+              </p>
+              <p className={styles.rulesText}>
+                Cada peça recebe permanentemente um valor numérico de +2 a +4,
+                utilizado no cálculo da Energia.
+              </p>
+              <p className={styles.rulesText}>
+                Distribuição dos valores por jogador:
+              </p>
+              <ul>
+                <li>
+                  <span className={styles.rulesStrong}>4 peças</span> com valor
+                  +2
+                </li>
+                <li>
+                  <span className={styles.rulesStrong}>3 peças</span> com valor
+                  +3
+                </li>
+                <li>
+                  <span className={styles.rulesStrong}>3 peças</span> com valor
+                  +4
+                </li>
+              </ul>
+
+              <p className={styles.rulesSpan}>O Capitão</p>
+              <p className={styles.rulesText}>
+                Uma peça é selecionada{" "}
+                <span className={styles.rulesStrong}>aleatoriamente</span> entre
+                as peças da fileira de trás para ser o Capitão.
+              </p>
+              <p className={styles.rulesText}>
+                O Capitão é marcado com uma cor de destaque e uma marca amarela.
+              </p>
+              <p className={styles.rulesText}>
+                Tanto as peças Soma quanto as peças Quadradas podem ser
+                Capitães.
+              </p>
+
+              <h3 className={styles.rulesTitle}>Turnos e Cálculo de Energia</h3>
+
+              <p className={styles.rulesSpan}>Ordem dos Turnos</p>
+              <p className={styles.rulesText}>
+                Os jogadores jogam em turnos alternados. Em cada turno, o
+                jogador deve mover{" "}
+                <span className={styles.rulesStrong}>exatamente uma peça</span>.
+              </p>
+
+              <p className={styles.rulesSpan}>Rolagem de Dados (Automática)</p>
+              <p className={styles.rulesText}>
+                No início de cada turno, o sistema rola{" "}
+                <span className={styles.rulesStrong}>
+                  2 dados de 5 faces (2d5)
+                </span>
+                , gerando um resultado de 2 a 10.
+              </p>
+
+              <p className={styles.rulesSpan}>Cálculo da Energia</p>
+              <p className={styles.rulesText}>
+                A Energia disponível para o turno é calculada com a peça
+                escolhida e o resultado dos dados.
+              </p>
+              <p className={styles.rulesText}>
+                Energia Total = Valor da peça (2–4) + Valor dos dados.
+              </p>
+              <blockquote className={styles.rulesText}>
+                Exemplo: Dados = 7, Peça = +4. Energia Total = 11.
+              </blockquote>
+
+              <p className={styles.rulesSpan}>Gasto de Energia</p>
+              <p className={styles.rulesText}>
+                A Energia é gasta para mover e capturar:
+              </p>
+              <ul>
+                <li>
+                  <span className={styles.rulesStrong}>Movimento:</span> Cada
+                  passo = 2 de Energia.
+                </li>
+                <li>
+                  <span className={styles.rulesStrong}>Captura:</span> Entrar em
+                  casa ocupada por peça inimiga = +2 de Energia (além do custo
+                  do passo).
+                </li>
+              </ul>
+
+              <p className={styles.rulesText}>
+                ⚠️ A Energia não acumula para o próximo turno.
+              </p>
+              <p className={styles.rulesText}>
+                ⚠️ Após realizar uma captura, o turno do jogador termina
+                imediatamente.
+              </p>
+
+              <h3 className={styles.rulesTitle}>Movimento das Peças</h3>
+
+              <p className={styles.rulesText}>
+                Nenhuma peça pode pular sobre outras peças.
+              </p>
+              <p className={styles.rulesText}>
+                Nenhuma peça pode ocupar uma casa já ocupada por uma peça
+                aliada.
+              </p>
+
+              <p className={styles.rulesSpan}>Peça Soma redonda </p>
+              <p className={styles.rulesText}>
+                <span className={styles.rulesSpan}>Movimento:</span> Move-se
+                apenas ortogonalmente (horizontalmente ou verticalmente). Não
+                pode se mover na diagonal.
+              </p>
+
+              <p className={styles.rulesSpan}>Peça Soma quadrada </p>
+              <p className={styles.rulesText}>
+                <span className={styles.rulesSpan}>Movimento:</span> Move-se
+                apenas diagonalmente. Não pode se mover ortogonalmente.
+              </p>
+
+              <h3 className={styles.rulesTitle}>Fim de Jogo</h3>
+              <p className={styles.rulesText}>
+                A única forma de vencer é{" "}
+                <span className={styles.rulesStrong}>
+                  capturar o Capitão inimigo
+                </span>
+                .
               </p>
             </div>
           </div>

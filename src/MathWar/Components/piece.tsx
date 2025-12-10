@@ -17,28 +17,50 @@ const PieceComponent: React.FC<PieceProps> = ({
 }) => {
   const getPlayerColor = (owner: number, isCaptain: boolean = false) => {
     const colors = [
-      "#e74c3c", // Player 0 - red
-      "#3498db", // Player 1 - blue
-      "#2ecc71", // Player 2 - green
-      "#f39c12", // Player 3 - orange
-      "#9b59b6", // Player 4 - purple
-      "#e67e22", // Player 5 - dark orange
+      "radial-gradient(circle, #e74c3c, #c0392b)",  // Red: gradient for player 1
+      "radial-gradient(circle, #5dade2, #2980b9)",  // Blue: gradient for player 2
+      "#2ecc71",
+      "#f39c12",
+      "#9b59b6",
+      "#e67e22",
     ];
-
-    const captainColors = [
-      "#ceb01eff", // Player 0 - red
-      "#3e009aff", // Player 1 - blue
-      "#2ecc71", // Player 2 - green
-      "#f39c12", // Player 3 - orange
-      "#9b59b6", // Player 4 - purple
-      "#e67e22", // Player 5 - dark orange
-    ];
+    const baseColor = colors[owner % colors.length];
 
     if (isCaptain) {
-      return captainColors[owner % captainColors.length];
+      // For captains, use a darker gradient
+      if (owner === 0) {
+        return "radial-gradient(circle,rgb(231, 117, 60),rgb(192, 100, 43))";  // Darker red
+      } else if (owner === 1) {
+        return "radial-gradient(circle,rgb(159, 129, 230),rgb(149, 82, 203))";  // Darker blue
+      }
+      return baseColor;  // Fallback
     }
 
-    return colors[owner % colors.length];
+    return baseColor;
+  };
+
+  // Helper function to darken a hex color
+  const darkenColor = (color: string, amount: number): string => {
+    let usePound = false;
+
+    if (color[0] === "#") {
+      color = color.slice(1);
+      usePound = true;
+    }
+
+    const num = parseInt(color, 16);
+    let r = (num >> 16) + amount * 255;
+    let g = ((num >> 8) & 0x00ff) + amount * 255;
+    let b = (num & 0x0000ff) + amount * 255;
+
+    r = Math.min(Math.max(0, r), 255);
+    g = Math.min(Math.max(0, g), 255);
+    b = Math.min(Math.max(0, b), 255);
+
+    return (
+      (usePound ? "#" : "") +
+      (b | (g << 8) | (r << 16)).toString(16).padStart(6, "0")
+    );
   };
 
   const getPieceDisplay = () => {
@@ -61,21 +83,19 @@ const PieceComponent: React.FC<PieceProps> = ({
           shape: "circle",
         };
 
-      case "sumDiag":
-        const isCaptain = piece.data?.isCaptain;
-        return {
-          symbol: `+${piece.value || 0}`, // Different symbol to indicate diagonal movement
-          backgroundColor: getPlayerColor(piece.owner, isCaptain),
-          textColor: isCaptain ? "black" : "white", // Black text for better contrast on light captain colors
-          shape: "square", // Square shape to distinguish from circular sum pieces
-        };
-
       case "sum":
         return {
-          symbol: `+${piece.value || 0}`,
-          backgroundColor: getPlayerColor(piece.owner, piece.data?.isCaptain),
-          textColor: piece.data?.isCaptain ? "black" : "white", // Black text for better contrast on light captain colors
+          symbol: `+${piece.value || 0}`, // Show value with + sign
+          backgroundColor: getPlayerColor(piece.owner, isCaptain),
+          textColor: "white",
           shape: "circle",
+        };
+      case "sumDiag":
+        return {
+          symbol: `+${piece.value || 0}`, // Show value with + sign
+          backgroundColor: getPlayerColor(piece.owner, isCaptain),
+          textColor: "white",
+          shape: "square",
         };
 
       case "king":
@@ -140,7 +160,14 @@ const PieceComponent: React.FC<PieceProps> = ({
         return {
           symbol: "X",
           backgroundColor: getPlayerColor(piece.owner),
-          textColor: "white",
+          textColor: "#fbbf24",
+          shape: "circle",
+        };
+      case "jumper":
+        return {
+          symbol: "O",
+          backgroundColor: getPlayerColor(piece.owner),
+          textColor: "#fbbf24",
           shape: "circle",
         };
     }
@@ -162,9 +189,7 @@ const PieceComponent: React.FC<PieceProps> = ({
     if (piece.owner >= 0) {
       title += ` (Player ${piece.owner + 1})`;
     }
-    if (hasValue) {
-      title += ` - Value: ${piece.value}`;
-    }
+  
     if (isPromoted) {
       title += " - Promoted";
     }
@@ -179,17 +204,13 @@ const PieceComponent: React.FC<PieceProps> = ({
 
   return (
     <div
-      className={`${styles.piece} ${
+      className={`${styles.piece} ${piece.owner === 0 ? styles.pieceRed : styles.pieceBlue} ${styles[piece.type] || ''} ${
         display.shape === "square" ? styles.pieceSquare : styles.pieceCircle
-      } ${isSelected ? styles.pieceSelected : ""} ${
-        isSpecial ? styles.pieceSpecial : ""
-      } ${isPromoted ? styles.piecePromoted : ""} ${
-        hasMoved ? styles.pieceMoved : ""
-      } ${piece.type === "barrier" ? styles.pieceBarrier : ""}`}
+      } ${isSelected ? styles.pieceSelected : ""} ${isSpecial ? styles.pieceSpecial : ""} ${isPromoted ? styles.piecePromoted : ""} ${hasMoved ? styles.pieceMoved : ""} ${piece.type === "barrier" ? styles.pieceBarrier : ""}`}
       style={{
         width: display.shape === "square" ? "70%" : "75%",
         height: display.shape === "square" ? "70%" : "75%",
-        backgroundColor: display.backgroundColor,
+        background: display.backgroundColor,
         fontSize: hasValue ? "12px" : "18px",
         color: display.textColor,
       }}
@@ -203,12 +224,12 @@ const PieceComponent: React.FC<PieceProps> = ({
     >
       {/* Main piece symbol */}
       <div className={styles.pieceContent}>
-        <div style={{ fontSize: hasValue ? "18px" : "inherit" }}>
+        <div >
           {display.symbol}
         </div>
 
         {/* Show value for Math War pieces */}
-        {hasValue && <div className={styles.pieceValue}></div>}
+        
       </div>
 
       {/* Captain indicator */}

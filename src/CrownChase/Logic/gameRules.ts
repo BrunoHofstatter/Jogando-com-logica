@@ -303,10 +303,42 @@ executeAction: (state: GameState, action: TurnAction): boolean => {
   // No winner yet - both kings are still on the board
   return null;
 },
-  getActionsForPiece: function (state: GameState, position: Position): unknown {
-    throw new Error('Function not implemented.');
+  onGameStart: (state: GameState): void => {
+    // Initialize captured pieces tracking
+    state.gameData.capturedPieces = [0, 0]; // [player0_captures, player1_captures]
   },
+
+  onTurnStart: (state: GameState): void => {
+    // Reset moves for the new turn
+    state.remainingMoves = state.config.movesPerTurn;
+  },
+
+
+  onAfterAction: (state: GameState, action: TurnAction): void => {
+    // Track captured pieces
+    if (action.capturedPiece && action.type === 'capture') {
+      const capturer = state.currentPlayer;
+      if (!state.gameData.capturedPieces) {
+        state.gameData.capturedPieces = [0, 0];
+      }
+      state.gameData.capturedPieces[capturer]++;
+    }
+  },
+
+
+
+  shouldEndTurn: (state: GameState, action: TurnAction): boolean => {
+    // In Crown Chase, each action ends the turn
+    return true;
+  },
+
+  getActionsForPiece: function (state: GameState, position: Position): unknown {
+    // This function should return piece-specific actions if needed
+    return [];
+  },
+
   shouldPromotePiece: function (state: GameState, piece: Piece, to: Position): unknown {
-    throw new Error('Function not implemented.');
+    // Crown Chase doesn't have piece promotion
+    return false;
   }
 };

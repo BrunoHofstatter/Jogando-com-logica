@@ -1,82 +1,632 @@
 .manualPage {
-  min-height: 100vh;
-  padding: 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  max-width: 86vw;
+  margin: 0 auto;
+  padding: 2vw 1vw;
+  color: #eee;
+  -webkit-text-stroke: clamp(0.06vw, 0.1vw, 0.6vw) #000000;
+  line-height: 1.6;
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Cherry+One&display=swap");
+
+.manualPage header {
+  text-align: center;
+  margin-bottom: 4vw;
+  padding: 0;
+  background: transparent;
+  color: white;
+  -webkit-text-stroke: clamp(0.06vw, 0.12vw, 0.6vw) #000000;
+}
+
+.manualPage h1 {
+  margin: 2vw 0 0 0;
+  font-size: 5vw;
+  font-family: "Cherry Bomb One", system-ui;
+  font-weight: 400;
+  -webkit-text-stroke: clamp(0.06vw, 0.3vw, 0.6vw) #000000;
+}
+
+.manualPage h2 {
+  color: white;
+  -webkit-text-stroke: clamp(0.07vw, 0.27vw, 0.6vw) #000000;
+  margin-top: 2.5vw;
+  padding-bottom: 2vw;
+  border-bottom: 0.12vw solid #eaeaea;
+  font-size: 3.6vw;
+}
+
+.manualPage h3 {
+  color: white;
+  -webkit-text-stroke: clamp(0.06vw, 0.2vw, 0.6vw) #000000;
+  margin: 1.5vw 0 1.3vw;
+  font-size: 2.5vw;
+}
+
+.manualPage p {
+  margin-bottom: 1vw;
+  color: white;
+  font-size: 1.7vw;
+  -webkit-text-stroke: clamp(0.05vw, 0.14vw, 0.6vw) #000000;
+}
+
+.manualPage strong {
+  font-weight: 600;
+  font-size: 1.9vw;
+  color: white;
+  -webkit-text-stroke: clamp(0.055vw, 0.1vw, 0.6vw) #000000;
+}
+
+.manualPage em {
+  font-style: italic;
+  color: white;
+  -webkit-text-stroke: clamp(0.045vw, 0.11vw, 0.6vw) #000000;
+}
+
+.manualPage ul {
+  padding-left: 3vw;
+  margin: 1vw 0;
+  font-size: 1.6vw;
+  -webkit-text-stroke: clamp(0.05vw, 0.125vw, 0.6vw) #000000;
+}
+
+.manualPage li {
+  margin-bottom: 0.75vw;
+  position: relative;
+  padding-left: 0.5vw;
   color: white;
 }
 
-.title {
-  text-align: center;
-  font-size: 3rem;
-  margin-bottom: 2rem;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+.manualPage li:before {
+  color: #3498db;
+  font-weight: bold;
+  position: absolute;
+  left: 0;
 }
 
-.content {
-  max-width: 900px;
-  margin: 0 auto;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+/* New class for game detail lists */
+.gameDetails {
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 1vw 1.5vw;
+  border-radius: 0.5vw;
+  margin: 1vw 0;
 }
 
-.section {
-  margin-bottom: 2rem;
-  padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 15px;
-  border-left: 4px solid rgba(255, 255, 255, 0.3);
+.gameDetails li {
+  margin-bottom: 0.5vw;
 }
 
-.section h2 {
-  font-size: 1.8rem;
-  margin-bottom: 1rem;
-  color: #ffd700;
+.gameDetails li:before {
+  color: #2980b9;
 }
 
-.section p {
-  font-size: 1.1rem;
-  line-height: 1.6;
-  margin-bottom: 0.5rem;
+/* Scroll to top button */
+.scrollTopButton {
+  position: fixed;
+  top: 1vw;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(52, 152, 219, 0.3);
+  color: black;
+  border: 0.2vw solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  width: 5vw;
+  height: 5vw;
+  font-size: 4vw;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0.12vw 0.6vw rgba(0, 0, 0, 0.2);
 }
 
-.gameList {
-  list-style: none;
-  padding-left: 0;
+.scrollTopButton.visible {
+  opacity: 1;
+  visibility: visible;
 }
 
-.gameList li {
-  font-size: 1.1rem;
-  line-height: 1.8;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+.scrollTopButton:hover {
+  background-color: rgba(52, 152, 219, 0.6);
+  transform: translateX(-50%) scale(1.1);
 }
 
-.gameList li:last-child {
-  border-bottom: none;
+/* Rules button for game sections */
+.rulesButton {
+  position: absolute;
+  top: 2vw;
+  right: 2vw;
+  color: white;
+  border: 0.2vw solid black;
+  padding: 0vw 1vw 0.2vw 1vw;
+  border-radius: 2vw;
+  cursor: pointer;
+  font-size: 1.4vw;
+  transition: all 0.3s ease;
+  box-shadow: 0 0.12vw 0.5vw rgba(0, 0, 0, 0.2);
+  -webkit-text-stroke: clamp(0.06vw, 0.1vw, 0.6vw) #000000;
+  z-index: 10;
 }
 
-.gameList li strong {
-  color: #ffd700;
+.rulesButton:hover {
+  background-color: rgba(41, 128, 185, 1);
+  transform: translateY(-0.12vw);
+  box-shadow: 0 0.25vw 0.75vw rgba(0, 0, 0, 0.3);
 }
 
+/* Game content layout with image */
+.descriptionWithImage {
+  display: flex;
+  gap: 2vw;
+  align-items: flex-start;
+}
+
+.preview {
+  width: 30vw;
+  height: auto;
+  border-radius: 1vw;
+  object-fit: contain;
+}
+
+/* Card styles for game sections */
+.gameSection {
+  border-radius: 3vw;
+  padding: 2vw;
+  margin-bottom: 2.5vw;
+  box-shadow: 0 0.12vw 0.9vw rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  -webkit-text-stroke: clamp(0.06vw, 0.1vw, 0.6vw) #000000;
+  border: clamp(0.36vw, 0.75vw, 2.4vw) solid #3498db;
+  background-color: #3498db30;
+  position: relative;
+}
+
+.gameSection:hover {
+  transform: translateY(-0.18vw);
+  box-shadow: 0 0.3vw 1.2vw rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   COLOR CUSTOMIZATION SECTION
+   Change colors for each game below
+   ============================================ */
+
+/* STOP MATEMÁTICO - Orange/Brown theme */
+.gameSection[data-game-id="stop-matematico"] {
+  border-color: #000000;
+  background: radial-gradient(circle, #de9696bb, #ab3636bb);
+}
+
+.gameSection[data-game-id="stop-matematico"] h2,
+.gameSection[data-game-id="stop-matematico"] h3,
+.gameSection[data-game-id="stop-matematico"] p,
+.gameSection[data-game-id="stop-matematico"] li,
+.gameSection[data-game-id="stop-matematico"] strong,
+.gameSection[data-game-id="stop-matematico"] em {
+  color: #e2a01d; /* CHANGE TEXT COLOR HERE */
+  border-color: #e2a01d;
+}
+.gameSection[data-game-id="stop-matematico"] strong,
+.gameSection[data-game-id="stop-matematico"] h3{
+  color: #f0611f;
+}
+
+.gameSection[data-game-id="stop-matematico"] .rulesButton {
+  border: 0.26vw solid #080303; /* Purple border */
+  background: radial-gradient(circle, #b43636, #851616);
+  color: #e2a01d;
+}
+
+.gameCard[data-game-id="stop-matematico"] {
+  border-color: #000000;
+  background: radial-gradient(circle, #de9696bb, #ab3636bb);
+}
+.gameCard[data-game-id="stop-matematico"] h3,
+.gameCard[data-game-id="stop-matematico"] p {
+  color: #e2a01d;
+}
+.gameCard[data-game-id="stop-matematico"] button {
+  border: 0.26vw solid #080303; /* Purple border */
+  background: radial-gradient(circle, #b43636, #851616);
+  color: #e2a01d;
+}
+
+/* CAÇA-SOMA - Green theme */
+.gameSection[data-game-id="caca-soma"] {
+  border-color: #a11313;
+  background: radial-gradient(circle, #eacdcdbb, #716262bb);
+}
+
+.gameSection[data-game-id="caca-soma"] h2,
+.gameSection[data-game-id="caca-soma"] h3,
+.gameSection[data-game-id="caca-soma"] p,
+.gameSection[data-game-id="caca-soma"] li,
+.gameSection[data-game-id="caca-soma"] strong,
+.gameSection[data-game-id="caca-soma"] em {
+  color: white; /* CHANGE TEXT COLOR HERE */
+  -webkit-text-stroke-color: #791111;
+  
+}
+.gameSection[data-game-id="caca-soma"] strong,
+.gameSection[data-game-id="caca-soma"] h3{
+  color: #ffb5b5;
+}
+
+.gameSection[data-game-id="caca-soma"] .rulesButton {
+  border-color: #a11313;  /* Red border */
+  background: radial-gradient(circle, #be7676, #ac4c4c);
+  -webkit-text-stroke-color: #791111;
+}
+
+.gameCard[data-game-id="caca-soma"] h3,
+.gameCard[data-game-id="caca-soma"] p {
+ -webkit-text-stroke-color: #791111; 
+}
+
+.gameCard[data-game-id="caca-soma"] {
+  border-color: #a11313;
+  background: radial-gradient(circle, #b39898, #867575);
+}
+.gameCard[data-game-id="caca-soma"] button {
+   border-color: #a11313;  /* Red border */
+  background: radial-gradient(circle, #be7676, #ac4c4c);
+  -webkit-text-stroke-color: #791111;
+}
+
+/* CUBO MÁGICO - Green theme */
+.gameSection[data-game-id="cubo-magico"] {
+  border-color: #dadada;
+  background: radial-gradient(circle, #55b5dfbb, #0e668bbb);
+}
+
+.gameSection[data-game-id="cubo-magico"] h2,
+.gameSection[data-game-id="cubo-magico"] h3,
+.gameSection[data-game-id="cubo-magico"] p,
+.gameSection[data-game-id="cubo-magico"] li,
+.gameSection[data-game-id="cubo-magico"] strong,
+.gameSection[data-game-id="cubo-magico"] em {
+  color: white; /* CHANGE TEXT COLOR HERE */
+}
+
+.gameSection[data-game-id="cubo-magico"] .rulesButton {
+  background: radial-gradient(circle, #2d90d1, #2272a8);
+}
+
+
+.gameCard[data-game-id="cubo-magico"] {
+  border-color: #dadada;
+  background: radial-gradient(circle, #48a4ccbb, #0e668bbb);
+}
+.gameCard[data-game-id="cubo-magico"] button {
+  background: radial-gradient(circle, #2d90d1, #2272a8);
+}
+/* SUPER JOGO DA VELHA - Teal/Dark cyan theme */
+.gameSection[data-game-id="super-velha"] {
+  border-color: #0a1929;
+  background: radial-gradient(circle, #629cd2bb, #2c5689bb);
+}
+
+.gameSection[data-game-id="super-velha"] h2,
+.gameSection[data-game-id="super-velha"] h3,
+.gameSection[data-game-id="super-velha"] p,
+.gameSection[data-game-id="super-velha"] li,
+.gameSection[data-game-id="super-velha"] strong,
+.gameSection[data-game-id="super-velha"] em {
+  color: #8ddafd; /* CHANGE TEXT COLOR HERE */
+  -webkit-text-stroke-color: #0a1929;
+}
+.gameSection[data-game-id="super-velha"] strong,
+.gameSection[data-game-id="super-velha"] h3{
+  color: #2eb6f5;
+}
+.gameSection[data-game-id="super-velha"] .rulesButton {
+  border-color: #0a1929;  /* Purple border */
+  background: radial-gradient(circle, #3d6d9c, #2a527a);
+  -webkit-text-stroke-color: #0a1929;
+  color: #6bcdfa;
+}
+
+.gameCard[data-game-id="super-velha"] h3,
+.gameCard[data-game-id="super-velha"] p {
+  color: #6bcdfa; /* CHANGE TEXT COLOR HERE */
+  -webkit-text-stroke-color: #0a1929;
+}
+
+.gameCard[data-game-id="super-velha"] {
+  border-color: #0a1929;
+  background: radial-gradient(circle, #548dc2, #2c5689);
+}
+.gameCard[data-game-id="super-velha"] button {
+  border-color: #0a1929;  /* Purple border */
+  background: radial-gradient(circle, #3d6d9c, #2a527a);
+  -webkit-text-stroke-color: #0a1929;
+  color: #6bcdfa;
+}
+/* CAÇA-COROA - Red/Burgundy theme */
+.gameSection[data-game-id="caca-coroa"] {
+  border-color: #fbbf24;
+  background: radial-gradient(circle, #bd90f0bb, #9867cfbb);
+}
+
+.gameSection[data-game-id="caca-coroa"] h2,
+.gameSection[data-game-id="caca-coroa"] h3,
+.gameSection[data-game-id="caca-coroa"] p,
+.gameSection[data-game-id="caca-coroa"] li,
+.gameSection[data-game-id="caca-coroa"] strong,
+.gameSection[data-game-id="caca-coroa"] em {
+  color: #fbbf24; /* CHANGE TEXT COLOR HERE */
+  border-color: #fbbf24;
+  -webkit-text-stroke-color: #270757;
+}
+
+.gameSection[data-game-id="caca-coroa"] strong,
+.gameSection[data-game-id="caca-coroa"] h3 {
+  color: #fb8c24;
+}
+
+.gameSection[data-game-id="caca-coroa"] .rulesButton {
+  background: radial-gradient(circle, #7f52e9, #6d28d9);
+  border: 0.26vw solid #342075;
+  color: #fbbf24; /* Gold text */
+  -webkit-text-stroke: 0.1vw #4c1d95;
+}
+
+.gameCard[data-game-id="caca-coroa"] {
+  border-color: #fbbf24;
+  background: radial-gradient(circle, #bd90f099, #9867cf99);
+}
+.gameCard[data-game-id="caca-coroa"] h3 {
+  color: #fbbf24; /* Gold text */
+  -webkit-text-stroke: 0.17vw #2b0b5c;
+}
+.gameCard[data-game-id="caca-coroa"] p {
+  color: #fbbf24; /* Gold text */
+  -webkit-text-stroke: 0.13vw #2b0b5c;
+}
+.gameCard[data-game-id="caca-coroa"] button {
+  background: radial-gradient(circle, #7f52e9, #6d28d9);
+  border: 0.26vw solid #342075;
+  color: #fbbf24; /* Gold text */
+  -webkit-text-stroke: 0.13vw #2b0b5c;
+}
+
+/* GUERRA MATEMÁTICA - Orange/Brown theme */
+.gameSection[data-game-id="guerra-matematica"] {
+  border-color: #0e9c6d;
+  background: radial-gradient(circle, #97cfbdbb, #53b997bb);
+}
+
+.gameSection[data-game-id="guerra-matematica"] h2,
+.gameSection[data-game-id="guerra-matematica"] h3,
+.gameSection[data-game-id="guerra-matematica"] p,
+.gameSection[data-game-id="guerra-matematica"] li,
+.gameSection[data-game-id="guerra-matematica"] strong,
+.gameSection[data-game-id="guerra-matematica"] em {
+  color: white; /* CHANGE TEXT COLOR HERE */
+  -webkit-text-stroke-color: #32363a;
+}
+.gameSection[data-game-id="guerra-matematica"] strong,
+.gameSection[data-game-id="guerra-matematica"] h3{
+  color:#55f5c0;
+}
+
+
+.gameSection[data-game-id="guerra-matematica"] .rulesButton {
+  border-color: #097753;   /* Purple border */
+  background: radial-gradient(circle, #10b981, #0da572);
+  -webkit-text-stroke-color: #32363a;
+}
+
+
+.gameCard[data-game-id="guerra-matematica"] {
+  border-color: #0e9c6d;
+  background: radial-gradient(circle, #97cfbdbb, #53b997bb);
+}
+.gameCard[data-game-id="guerra-matematica"] h3,
+.gameCard[data-game-id="guerra-matematica"] p{
+  -webkit-text-stroke-color: #32363a;
+}
+.gameCard[data-game-id="guerra-matematica"] button {
+  border-color: #097753;   /* Purple border */
+  background: radial-gradient(circle, #10b981, #0da572);
+  -webkit-text-stroke-color: #32363a;
+}
+
+/* ============================================
+   END COLOR CUSTOMIZATION SECTION
+   ============================================ */
+
+/* Responsive design */
 @media (max-width: 768px) {
-  .title {
-    font-size: 2rem;
+  .manualPage {
+    padding: 2vw;
   }
 
-  .content {
-    padding: 1rem;
+  .manualPage h1 {
+    font-size: 5vw;
   }
 
-  .section h2 {
-    font-size: 1.5rem;
+  .gameSection {
+    padding: 3vw;
+    padding-top: 8vw;
   }
 
-  .section p,
-  .gameList li {
-    font-size: 1rem;
+  .rulesButton {
+    top: 2vw;
+    right: 2vw;
+    left: 2vw;
+    font-size: 2.5vw;
+    padding: 1.5vw 2vw;
+  }
+
+  .scrollTopButton {
+    width: 8vw;
+    height: 8vw;
+    font-size: 4vw;
+  }
+
+  .gameContent {
+    flex-direction: column;
+  }
+
+  .preview {
+    width: 100%;
+    max-width: 60vw;
+    align-self: center;
+  }
+
+  .manualPage h2 {
+    font-size: 4vw;
+  }
+
+  .manualPage h3 {
+    font-size: 3.5vw;
+  }
+}
+
+/* Animation for sections */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(1.2vw);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.gameSection {
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+/* Individual animation delays */
+.gameSection:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.gameSection:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.gameSection:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.gameSection:nth-child(4) {
+  animation-delay: 0.4s;
+}
+.gameSection:nth-child(5) {
+  animation-delay: 0.5s;
+}
+.gameSection:nth-child(6) {
+  animation-delay: 0.6s;
+}
+
+/* Style for the games list */
+.gamesList {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, auto);
+  gap: 1.5vw;
+  margin: 2vw 0;
+}
+
+.gameCard {
+  background: #3498db20;
+  padding: 1.5vw;
+  border-radius: 2vw;
+  box-shadow: 0 0.12vw 0.6vw rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  border: clamp(0.24vw, 0.5vw, 1.8vw) solid #3498db;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  padding-bottom: 4vw;
+}
+
+.gameCard:hover {
+  transform: translateY(-0.18vw);
+  box-shadow: 0 0.25vw 0.9vw rgba(0, 0, 0, 0.1);
+}
+
+.gameCard h3 {
+  margin-top: 0;
+  color: white;
+  -webkit-text-stroke: 0.17vw black;
+  font-size: 2.5vw;
+  margin-bottom: 0.5vw;
+}
+
+.gameCard p {
+  margin: 0 0 1vw 0;
+  color: white;
+  -webkit-text-stroke: 0.14vw black;
+  font-size: 1.8vw;
+  flex-grow: 1;
+}
+
+.viewButton {
+  background: radial-gradient(circle at center, #408bbd, #2177b1);
+  color: white;
+  border: none;
+  padding: 0vw 1vw;
+  border-radius: 3vw;
+  border: 0.2vw solid black;
+  cursor: pointer;
+  font-size: 1.5vw;
+  transition: background-color 0.2s ease;
+  -webkit-text-stroke: 0.12vw black;
+  position: absolute;
+  bottom: 1vw;
+  left: 4vw;
+  right: 4vw;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.viewButton:hover {
+  transform: scale(1.05) translateY(-0.18vw);
+}
+
+/* Feedback button under introdução */
+.feedbackButtonContainer {
+  margin-top: 5vw;
+  display: flex;
+  justify-content: center;
+}
+
+.feedbackButton {
+  background: radial-gradient(circle at center, #0ca371, #047857);
+  color: white;
+  border-radius: 3vw;
+  border: 0.2vw solid black;
+  padding: 0.6vw 2.4vw 0.9vw;
+  font-size: 1.6vw;
+  cursor: pointer;
+  -webkit-text-stroke: 0.12vw black;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 0.18vw 0.8vw rgba(0, 0, 0, 0.35);
+}
+
+.feedbackButton:hover {
+  transform: scale(1.05) translateY(-0.12vw);
+  box-shadow: 0 0.25vw 1vw rgba(0, 0, 0, 0.45);
+}
+
+/* Highlight for important notes */
+.note {
+  background-color: #f8f9fa;
+  border-left: 0.25vw solid #3498db;
+  padding: 1vw 1.5vw;
+  margin: 1.5vw 0;
+  border-radius: 0 0.25vw 0.25vw 0;
+}
+
+/* Responsive typography */
+@media (min-width: 1200px) {
+  .manualPage {
+    font-size: 1.1vw;
   }
 }

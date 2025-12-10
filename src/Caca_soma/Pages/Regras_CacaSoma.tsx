@@ -1,6 +1,7 @@
 import { useState } from "react";
 import styles from "../styles/regras.module.css";
 import { useNavigate } from "react-router-dom";
+import { useTutorialCompleted } from "../componentes/DynamicTutorial";
 
 type MandatoryCapture = true | false;
 
@@ -8,48 +9,26 @@ function CacaSomaRegras() {
   const navigate = useNavigate();
 
   const [showDetailedRules, setShowDetailedRules] = useState(false);
+  const [tutorialCompleted, resetTutorial] =
+      useTutorialCompleted("cacasoma_v1");
   function jogarStop() {
     navigate("/cacaSoma");
   }
+  const startTutorial = () => {
+    resetTutorial(); // Clear the "completed" flag
+    navigate("/cacaSoma");
+  };
 
   return (
     <div className={styles.regrasPage}>
       {/* Left Side - Rules */}
-      <div className={styles.boxBorder}>
-        <div className={styles.boxRegras}>
-          <ul className={styles.regras}>
-            <li>
-              <h3>Clique em INICIAR para sortear um número</h3>
-              <img
-                src={`${import.meta.env.BASE_URL}ComoJogarStop1.png`}
-                className={`${styles.como} ${styles.c1}`}
-              />
-            </li>
-            <li>
-              <img
-                src={`${import.meta.env.BASE_URL}ComoJogarStop2.png`}
-                className={`${styles.como} ${styles.c2}`}
-              />
-              <h3>Escolha 2 ou 3 numeros que somem ao número sorteado</h3>
-            </li>
-            <li>
-              <h3>Quem fizer mais rápido, ganha 1 ponto</h3>
-              <div className={styles.c3Box}>
-                <img
-                  src={`${import.meta.env.BASE_URL}ComoJogarStop3.png`}
-                  className={`${styles.como} ${styles.c3}`}
-                />
-              </div>
-            </li>
-            <li>
-              <img
-                src={`${import.meta.env.BASE_URL}ComoJogarStop4.png`}
-                className={`${styles.como} ${styles.c4}`}
-              />
-              <h3>Quem chegar em 5 pontos primero vence</h3>
-            </li>
-          </ul>
-        </div>
+    
+      <div className={styles.boxRegras}>
+          <div className={styles.gameTitle}>Caça Soma</div>
+        <img
+          src={`${import.meta.env.BASE_URL}cacasomaPreview.png`}
+          className={styles.preview}
+        />
       </div>
 
       {/* Right Side - Game Controls */}
@@ -57,13 +36,18 @@ function CacaSomaRegras() {
         <button className={styles.button} onClick={jogarStop}>
           <span>Jogar</span>
         </button>
+
+        <button className={styles.tutorialButton} onClick={startTutorial}>
+          <span>Tutorial</span>
+        </button>
+        <button
+          className={styles.detailedRulesButton}
+          onClick={() => setShowDetailedRules(true)}
+        >
+          Regras
+        </button>
       </div>
-      <button
-        className={styles.detailedRulesButton}
-        onClick={() => setShowDetailedRules(true)}
-      >
-        Regras Completas
-      </button>
+        
       {showDetailedRules && (
         <div
           className={styles.modalOverlay}
@@ -81,7 +65,7 @@ function CacaSomaRegras() {
             </button>
 
             <div className={styles.detailedRules}>
-              <h2>Como Jogar - Caça Soma</h2>
+              <h2>Regras Caça Soma</h2>
 
               <h3 className={styles.rulesTitle}>Início da Partida:</h3>
               <p className={styles.rulesText}>

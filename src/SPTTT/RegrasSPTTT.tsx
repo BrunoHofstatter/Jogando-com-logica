@@ -1,6 +1,7 @@
 import { useState } from "react";
 import styles from "./RegrasSPTTT.module.css";
 import { useNavigate } from "react-router-dom";
+import { useTutorialCompleted } from "./DynamicTutorial";
 
 type WinCondition = "line" | "majority";
 
@@ -8,49 +9,28 @@ function JogoStop() {
   const navigate = useNavigate();
   const [winCondition, setWinCondition] = useState<WinCondition>("line");
   const [showDetailedRules, setShowDetailedRules] = useState(false);
+  const [tutorialCompleted, resetTutorial] =
+      useTutorialCompleted("spttt_v1");
 
   function jogarStop() {
     navigate("/jogospttt", { state: { winCondition } });
   }
 
+  const startTutorial = () => {
+    resetTutorial(); // Clear the "completed" flag
+    navigate("/jogospttt", { state: { winCondition } });
+  };
+
   return (
     <div className={styles.regrasPage}>
-      {/* Left Side - Rules */}
-      <div className={styles.boxBorder}>
-        <div className={styles.boxRegras}>
-          <ul className={styles.regras}>
-            <li>
-              <h3>O jogo tem 9 jogos da velha pequenos</h3>
-              <img
-                src={`${import.meta.env.BASE_URL}ComoJogarStop1.png`}
-                className={`${styles.como} ${styles.c1}`}
-              />
-            </li>
-            <li>
-              <img
-                src={`${import.meta.env.BASE_URL}ComoJogarStop2.png`}
-                className={`${styles.como} ${styles.c2}`}
-              />
-              <h3>Sua jogada decide onde a próxima jogada vai ser</h3>
-            </li>
-            <li>
-              <h3>Ganhe os jogos da velha pequenos para ganhar</h3>
-              <div className={styles.c3Box}>
-                <img
-                  src={`${import.meta.env.BASE_URL}ComoJogarStop3.png`}
-                  className={`${styles.como} ${styles.c3}`}
-                />
-              </div>
-            </li>
-            <li>
-              <img
-                src={`${import.meta.env.BASE_URL}ComoJogarStop4.png`}
-                className={`${styles.como} ${styles.c4}`}
-              />
-              <h3>Escolha como ganhar - Clássico ou Pontos</h3>
-            </li>
-          </ul>
-        </div>
+       {/* Left Side - Rules */}
+
+      <div className={styles.boxRegras}>
+        <div className={styles.gameTitle}>Super Jogo da Velha</div>
+        <img
+          src={`${import.meta.env.BASE_URL}sptttPreview.png`}
+          className={styles.preview}
+        />
       </div>
 
       {/* Right Side - Game Controls */}
@@ -58,6 +38,7 @@ function JogoStop() {
         <button className={styles.button} onClick={jogarStop}>
           <span>Jogar</span>
         </button>
+
 
         {/* Win mode selector */}
         <div className={styles['mode-select-rules']}>
@@ -81,14 +62,18 @@ function JogoStop() {
             />
             Maioria dos Tabuleiros
           </label>
-        </div>                      
-      </div>
+        </div>     
+        <button className={styles.tutorialButton} onClick={startTutorial}>
+          <span>Tutorial</span>
+        </button>
       <button 
   className={styles.detailedRulesButton}
   onClick={() => setShowDetailedRules(true)}
 >
-  Regras Completas
-</button>
+  Regras
+</button>                 
+      </div>
+      
 {showDetailedRules && (
   <div className={styles.modalOverlay} onClick={() => setShowDetailedRules(false)}>
     <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>

@@ -8,7 +8,7 @@ import JogoStop from "./Stop/RegrasStop";
 import PaginaDamas from "./Damas/Pages/RegrasDamas";
 import Teste from "./Main/Pages/Teste";
 import SPTTT from "./SPTTT/RegrasSPTTT";
-import JogoSPTTT from "./SPTTT/SPTTT";
+import JogoSPTTT from "./SPTTT/SPTTTpage";
 import Pagina_Soma from "./Caca_soma/Pages/Pagina_principal";
 import "./App.css";
 import BaseGame from "./AA_baseGame/Pages/baseGamePage"

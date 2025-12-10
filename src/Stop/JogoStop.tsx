@@ -184,7 +184,7 @@ function StopJogo({ randomNumber, difficulty }: JogoStopProps) {
             <span className="numeroO">{randomNumber}</span>
           </div>
           {!pararJogo ? (
-            <button className="pararJogo" onClick={() => setPararJogo(true)}>
+            <button data-target="stopbutton" className="pararJogo" onClick={() => setPararJogo(true)}>
               STOP
             </button>
           ) : (
@@ -196,7 +196,11 @@ function StopJogo({ randomNumber, difficulty }: JogoStopProps) {
           )}
         </div>
         <div className="tabelaWrap">
-          <div className="tabela">
+          <div 
+            data-target="board"
+            className="tabela" 
+            style={{ '--columns': difficulty === 'd1' ? 4 : 5 } as React.CSSProperties}
+          >
             {caixasData.map((data, i) =>
               data.isDual ? (
                 <CaixaStop

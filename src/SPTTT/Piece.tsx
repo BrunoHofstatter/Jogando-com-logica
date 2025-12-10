@@ -1,5 +1,7 @@
 import styles from "./SPTTT.module.css";
 import { CircleSmall, X } from "lucide-react";
+
+
 interface PieceProps {
   player: "X" | "O";
 }

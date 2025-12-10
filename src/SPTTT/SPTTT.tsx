@@ -9,7 +9,11 @@ type BoardResult = Player | "tie";
 type MiniBoard = Player[];
 type UltimateBoard = MiniBoard[];
 
-export default function SPTTT() {
+interface SPTTTProps {
+  winCondition: "line" | "majority";
+}
+
+export default function SPTTT({ winCondition }: SPTTTProps) {
   const [boards, setBoards] = useState<UltimateBoard>(
     Array.from({ length: 9 }, () => Array(9).fill(null))
   );
@@ -34,9 +38,6 @@ export default function SPTTT() {
     cellIndex: number;
   } | null>(null);
   
-  const { winCondition } = location.state as {
-    winCondition: "line" | "majority";
-  };
   
   const [finalWinner, setFinalWinner] = useState<"X" | "O" | "tie" | null>(
     null
@@ -225,7 +226,7 @@ export default function SPTTT() {
     <div className={styles["jogo-SPTTT"]}>
       <div className={styles.statWrap}>
         {/* Turn indicator */}
-        <div className={styles["turn-indicator"]}>
+        <div className={styles["turn-indicator"]} data-target="player">
           <span>Turno do jogador:</span>
           <div className={styles["current-player-symbol"]}>
             <Piece player={currentPlayer!} />
@@ -249,13 +250,14 @@ export default function SPTTT() {
       </div>
 
       <div className={styles["board-wrap"]}>
-        <div className={styles["big-board"]}>
+        <div className={styles["big-board"]} data-target="bigboard">
           {boards.map((board, boardIndex) => {
             const isPreviewBoard = previewBoard === boardIndex;
 
             return (
               <div
                 key={boardIndex}
+                data-target={`smallboard-${boardIndex}`}
                 className={`${styles["small-board"]} ${
                   activeBoard === null || activeBoard === boardIndex
                     ? styles.playable
@@ -307,6 +309,7 @@ export default function SPTTT() {
                           ? styles.tappedCell
                           : ""
                       }`}
+                      data-cell={`${boardIndex}-${cellIndex}`}
                       onClick={() => {
                         if (!isTouchDevice && isValid) {
                           handleClick(boardIndex, cellIndex);

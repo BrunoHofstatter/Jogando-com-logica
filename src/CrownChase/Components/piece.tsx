@@ -93,9 +93,9 @@ const PieceComponent: React.FC<PieceProps> = ({
 
       case "king":
         return {
-          symbol: piece.data?.isKing || piece.data?.isPromoted ? "♚" : "♔",
+          symbol:  "●",
           backgroundColor: getPlayerColor(piece.owner),
-          textColor: "white",
+          textColor: "#fbbf24",
           shape: "circle",
         };
 
@@ -151,14 +151,14 @@ const PieceComponent: React.FC<PieceProps> = ({
         };
       case "killer":
         return {
-          symbol: "X",
+          symbol: "⚔",
           backgroundColor: getPlayerColor(piece.owner),
           textColor: "#fbbf24",
-          shape: "circle",
+          shape: "hexagon",
         };
       case "jumper":
         return {
-          symbol: "O",
+          symbol: "↑",
           backgroundColor: getPlayerColor(piece.owner),
           textColor: "#fbbf24",
           shape: "circle",
@@ -252,7 +252,12 @@ const PieceComponent: React.FC<PieceProps> = ({
       {hasMoved && gameConfig.name === "Chess" && (
         <div className={styles.pieceMovementIndicator} />
       )}
+      {/* King crown overlay */}
+      {piece.type === "king" && (
+        <div className={styles.pieceKingCrown}>👑</div>
+      )}
     </div>
+    
   );
 };
 

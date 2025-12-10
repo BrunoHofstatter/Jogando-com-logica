@@ -130,7 +130,7 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  font-size: clamp(52px, 15dvh, 255px);
+  font-size: clamp(52px, 15dvh, 7.5vw);
   -webkit-text-stroke: clamp(3px, 0.9dvh, 22px) #000000;
   filter: 
     drop-shadow(0 0 1dvh rgba(255, 255, 255, 0.8))
@@ -148,7 +148,7 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  font-size: clamp(46px, 13.5dvh, 225px);
+  font-size: clamp(46px, 13.5dvh, 6.75vw);
   -webkit-text-stroke: clamp(2px, 0.7dvh, 17px) #000000;
   filter: 
     drop-shadow(0 0 1dvh rgba(255, 255, 255, 0.8))
@@ -166,7 +166,7 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  font-size: clamp(60px, 18dvh, 300px);
+  font-size: clamp(60px, 18dvh, 9vw);
   -webkit-text-stroke: clamp(3px, 0.9dvh, 22px) #000000;
   filter: 
     drop-shadow(0 0 1dvh rgba(255, 255, 255, 0.8))

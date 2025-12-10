@@ -8,7 +8,8 @@
   user-select: none;
   border-radius: 50%;
   font-size: 2.5vw !important;
-  -webkit-text-stroke: 0.1vw #4c1d95;
+  -webkit-text-stroke: 0vw #4c1d95;
+  color: #1a0e47;
   box-shadow: 0 0.2vw 0.4vw rgba(0, 0, 0, 0.2);
 }
 
@@ -18,6 +19,10 @@
 
 .pieceSquare {
   border-radius: 15%;
+}
+.pieceHexagon {
+  border-radius: 0;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 }
 
 .pieceSelected {
@@ -112,27 +117,34 @@
   border-color: #bdc3c7;
 }
 
+.killer {
+  background: radial-gradient(circle, #2d1b69, #1a0e47);
+  border-color: #808080;
+  box-shadow: inset 1vw 4vw 1vw #1d1d1d3b;
+
+}
+
 .jumper {
   background: radial-gradient(circle, #ba68c8, #9c27b0);
   border-color: #c3c53a;
-  animation: jumperBounce 1.5s ease-in-out infinite alternate;
-}
-
-@keyframes jumperBounce {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-0.2vw); }
-}
-
-.killer {
-  background: radial-gradient(circle, #4c1d95, #2d1b69);
-  border-color: #e74c3c;
-  box-shadow: 0 0.3vw 0.6vw rgba(231, 76, 60, 0.4);
+  -webkit-text-stroke: 0.3vw #fbbf24;
 }
 
 .king {
   background: radial-gradient(circle, #fff176, #c3c53a);
   border-color: #9c27b0;
-  box-shadow: 0 0.4vw 0.8vw rgba(156, 39, 176, 0.3);
+  box-shadow: inset 0 4vw 0.8vw rgba(195, 197, 58, 0.3);
   transform: scale(1.05);
-  -webkit-text-stroke: 0vw #4c1d95;
+  -webkit-text-stroke: 0.01vw #8f6c13;
+  color: #1a0e47;
+}
+
+.pieceKingCrown {
+  position: absolute;
+  top: -3vw;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 3.5vw;
+  color: #ffd700;
+  text-shadow: 0 0 4px rgba(255, 215, 0, 0.8);
 }

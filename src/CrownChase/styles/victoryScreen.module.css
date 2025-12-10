@@ -1,0 +1,124 @@
+.gamePage {
+  display: flex;
+  width: 20vw;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  z-index: 1000;
+}
+
+/* Sidebar layout to keep the board visible */
+.victorySidebar {
+  position: fixed;
+  width: 47vw; /* slightly wider to avoid cramping text */
+  background: transparent; /* let the game board show fully */
+  color: #ecf0f1;
+  padding: 8px; /* outer padding so the inner box never touches edges */
+  box-shadow: none; /* shadow is on the inner box */
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto; /* Re-enable pointer events for the sidebar */
+}
+
+.victoryContent {
+    position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 0.6vw solid #fbbf24;
+  background: radial-gradient(circle, #5b2d79bb, #951acecc);
+  padding: 2vw ;
+  border-radius: 2vw;
+  text-align: center;
+  max-width: 100%;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+  margin: 0vw 0vw 0vw 0vw; /* keep distance from the sidebar edges, esp. left */
+  align-items: center;
+}
+
+.victoryTitle {
+  color: #fbbf24;
+  font-size: 5.5vw;
+  margin-bottom: 0;
+  text-shadow: 0 1.2vw 2.4vw rgba(0, 0, 0, 0.4);
+  -webkit-text-stroke: 0.35vw #26155e;
+}
+
+.victoryReason {
+  -webkit-text-stroke: 0.2vw #211252;
+  color: #fbbf24;
+  font-size: 2.3vw;
+}
+
+.victoryButton {
+  background: radial-gradient(circle, #8b5cf6, #6d28d9);
+  color: #fbbf24;
+  border: solid 0.2vw #2d1b69;
+  padding: 0.8vw 1.5vw 1.3vw 1.5vw;
+  font-size: 2.2vw;
+  border-radius: 1.7vw;
+  cursor: pointer;
+  transition: ease 0.5s;
+  -webkit-text-stroke: 0.12vw #242525;
+  line-height: 1;
+}
+
+.victoryButton:hover {
+  transform: scale(1.05) translateY(-0.5dvh);
+}
+
+/* Sidebar layout to keep the board visible */
+
+.victoryMessage {
+  margin: 1rem 0 1.25rem;
+  line-height: 1.6;
+}
+
+.victoryWinner {
+  color: #fbbf24;
+  font-size: 2.5vw;
+  margin: 0.75rem 0 0.5rem;
+  -webkit-text-stroke: 0.2vw #211252;
+}
+
+/* Player color accents */
+.playerRed {
+  position: relative;
+  top:0.5vw;
+  color: #cd4535;
+  -webkit-text-stroke: 0.25vw #a02c1f;
+  font-size: 5vw;
+  line-height: 1;
+}
+.playerRedOp {
+  position: relative;
+  top:0.35vw;
+  color: #cd4535;
+  -webkit-text-stroke: 0.2vw #a02c1f;
+  font-size: 4vw;
+  line-height: 1;
+}
+
+.playerBlue {
+  position: relative;
+  top:0.5vw;
+  color: #388dc5;
+  -webkit-text-stroke: 0.25vw #165580;
+  font-size: 5vw;
+  line-height: 1;
+}
+.playerBlueOp {
+  position: relative;
+  top:0.35vw;
+  color: #388dc5;
+  -webkit-text-stroke: 0.2vw #165580;
+  font-size: 4vw;
+  line-height: 1;
+}
+
+@media (max-width: 768px) {
+  .victorySidebar {
+    width: 260px;
+    padding: 1rem;
+  }
+}

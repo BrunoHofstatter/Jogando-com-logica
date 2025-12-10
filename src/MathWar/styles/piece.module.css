@@ -6,6 +6,10 @@
   transition: all 0.2s ease;
   position: relative;
   user-select: none;
+  border-radius: 50%;
+  font-size: 1.85vw !important;
+  
+  box-shadow: 0 0.2vw 0.4vw rgba(0, 0, 0, 0.2);
 }
 
 .pieceCircle {
@@ -17,17 +21,11 @@
 }
 
 .pieceSelected {
-  border: 3px solid #f1c40f;
+  border: 0.5vw solid #f1c40f;
 }
 
-.pieceSpecial {
-  border: 2px solid #f39c12;
-  box-shadow: 0 0 8px rgba(241, 196, 15, 0.6);
-}
 
-.piecePromoted {
-  border: 2px solid #9b59b6;
-}
+
 
 .pieceMoved {
   opacity: 0.9;
@@ -45,62 +43,70 @@
   height: 100%;
 }
 
-.pieceValue {
-  font-size: 8px;
-  font-weight: bold;
-  margin-top: -2px;
+
+
+
+
+.pieceRed {
+  border: 0.2vw solid #a02c1f !important;
+  -webkit-text-stroke: 0.11vw #79190e ;
 }
 
-.pieceIndicator {
-  position: absolute;
-  top: -3px;
-  right: -3px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  font-size: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
+.pieceBlue {
+  border: 0.2vw solid #1c6392 !important;
+  -webkit-text-stroke: 0.11vw #145077;
 }
 
-.piecePromotedIndicator {
-  background-color: #9b59b6;
+.captain {
+  background: radial-gradient(circle, #f39c12, #e67e22)!important;
+  border-color: #f1c40f;
+  box-shadow: 0 0.3vw 0.6vw rgba(241, 196, 15, 0.4);
 }
 
-.pieceSpecialIndicator {
-  background-color: #f39c12;
+.checker {
+  background: radial-gradient(circle, #95a5a6, #7f8c8d);
+  border-color: #bdc3c7;
 }
 
-.pieceMovementIndicator {
-  position: absolute;
-  bottom: -3px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: #e67e22;
+.jumper {
+  background: radial-gradient(circle, #ba68c8, #9c27b0);
+  border-color: #c3c53a;
+  animation: jumperBounce 1.5s ease-in-out infinite alternate;
 }
 
-.pieceCaptain {
-  border: 2px solid gold;
-  box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+@keyframes jumperBounce {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-0.2vw); }
+}
+
+.killer {
+  background: radial-gradient(circle, #4c1d95, #2d1b69);
+  border-color: #e74c3c;
+  box-shadow: 0 0.3vw 0.6vw rgba(231, 76, 60, 0.4);
+}
+
+.king {
+  background: radial-gradient(circle, #fff176, #c3c53a);
+  border-color: #9c27b0;
+  box-shadow: 0 0.4vw 0.8vw rgba(156, 39, 176, 0.3);
+  transform: scale(1.05);
+  -webkit-text-stroke: 0vw #4c1d95;
 }
 
 .pieceCaptainIndicator {
   position: absolute;
-  top: -5px;
-  right: -5px;
+  top: -0.5vw;
+  right: -0.5vw;
   background: gold;
   color: #000;
   border-radius: 50%;
-  width: 15px;
-  height: 15px;
-  font-size: 10px;
+  width: 1.2vw;
+  height: 1.2vw;
+  font-size: 1vw;
+  border: 0.1vw solid #b79307;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
+  -webkit-text-stroke: 0vw #4c1d95;
+  line-height: 1;
 }

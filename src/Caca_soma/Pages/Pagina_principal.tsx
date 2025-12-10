@@ -1,11 +1,118 @@
 import Tabuleiro from "../componentes/tabuleiro";
 import Girar from "../componentes/sorteio";
-
+import DynamicTutorial, { TutorialStep } from '../componentes/DynamicTutorial';
 import GameButton from "../componentes/GameButton";
 import { useEffect, useState, useRef } from "react";
 import styles from "../styles/design.module.css";
 
 function Caca_soma() {
+  const [showTutorial, setShowTutorial] = useState(false);
+  useEffect(() => {
+    const completed = localStorage.getItem('tutorial_cacasoma_v1_completed');
+    if (completed !== 'true') {
+      setTimeout(() => setShowTutorial(true), 500); // Delay for DOM
+    }
+  }, []);
+  const tutorialSteps: TutorialStep[] = [
+      {
+        id: 'numeroMagico',
+        target: '[data-target="numeroMagico"]',
+        highlight: true,
+        placement: 'auto',
+        title: 'Número Mágico',
+        body: <div style={{
+            fontSize: '2vw',
+            color: '#eee;',
+            marginBottom: '24px',
+            lineHeight: 1.5,
+            WebkitTextStroke: '0.15vw #720b0bff',
+            display:'flex',
+            flexDirection:'column',
+            gap:'1vw'
+          }}>
+            <span>- O <span style={{
+            color: '#ffb224ff',
+            fontSize:'2.3vw',
+          }}>Número Mágico</span> vai ser sorteado</span>
+            <span>- Clique em <span style={{
+            color: '#ffb224ff',
+            fontSize:'2.3vw',
+          }}>Começar</span> para iniciar o jogo </span>
+          </div>
+      },
+      {
+        id: 'tabuleiro',
+        target: '[data-target*="tabuleiro"]',
+        highlight: true,
+        placement: 'auto',
+        title: 'Tabuleiro',
+        body: <div style={{
+            fontSize: '2vw',
+            color: '#eee;',
+            marginBottom: '24px',
+            lineHeight: 1.5,
+            WebkitTextStroke: '0.15vw #720b0bff',
+            display:'flex',
+            flexDirection:'column',
+            gap:'1vw'
+          }}>
+            <span>- <span style={{
+            color: '#ffb224ff',
+            fontSize:'2.3vw',
+          }}>Monte</span> o Número Mágico com <span style={{
+            color: '#ffb224ff',
+            fontSize:'2.3vw',
+          }}>2 ou 3</span> números. </span>
+            <span>- A <span style={{
+            color: '#ffb224ff',
+            fontSize:'2.3vw',
+          }}>soma</span> desses números tem que ser <span style={{
+            color: '#ffb224ff',
+            fontSize:'2.3vw',
+          }}>igual</span> ao Número Mágico</span>
+            <span>- Clique em <span style={{
+            color: '#ffb224ff',
+            fontSize:'2.3vw',
+          }}>Enviar</span> quando terminar</span>
+          </div>
+      },
+      {
+        id: 'placar',
+        target: '[data-target="placar"]',
+        highlight: true,
+        placement: 'auto',
+        title: 'Placar',
+        body: <div style={{
+            fontSize: '2vw',
+            color: '#eee;',
+            marginBottom: '24px',
+            lineHeight: 1.5,
+            WebkitTextStroke: '0.15vw #720b0bff',
+            display:'flex',
+            flexDirection:'column',
+            gap:'1vw'
+          }}>
+            <span>- Veja quanto <span style={{
+            color: '#ffb224ff',
+            fontSize:'2.3vw',
+          }}>tempo</span> o jogador levou </span>
+            <span>- Depois que os dois jogadores jogarem, quem acertar com menos tempo ganha <span style={{
+            color: '#ffb224ff',
+            fontSize:'2.3vw',
+          }}>1 ponto</span> </span>
+            <span>- Quem fizer <span style={{
+            color: '#ffb224ff',
+            fontSize:'2.3vw',
+          }}>5 pontos</span> primeiro <span style={{
+            color: '#ffb224ff',
+            fontSize:'2.3vw',
+          }}>ganha</span> o jogo </span>
+          </div>
+      }
+    ];
+
+
+
   const [jogar, setJogar] = useState(false);
   const [clicar, setClicar] = useState(true);
   const [qualRodada, setQualRodada] = useState(0);
@@ -101,9 +208,9 @@ function Caca_soma() {
   return (
     <div className={styles.container}>
       <div className={styles.leftPanel}>
-        <div className={styles.gameControlsPanel}>
-          <div className={styles.sorteContainer}>
-            <div className={styles.textoSorte}>Número sorteado</div>
+        <div className={styles.gameControlsPanel} data-target="numeroMagico">
+          <div className={styles.sorteContainer} >
+            <div className={styles.textoSorte}>Número mágico</div>
             <div className={styles.numSorte}>
               <Girar
                 rodada={qualRodada}
@@ -128,7 +235,7 @@ function Caca_soma() {
         <div className={styles.scorePanel}>
           <div className={styles.scoreHeader}>PLACAR</div>
 
-          <div className={styles.playersRow}>
+          <div className={styles.playersRow} data-target='placar'>
             <div className={styles.playerSection}>
               <div className={`${styles.playerLabel} ${qualRodada % 2 === 0 ? styles.playerLabelActive : ''}`}>Jogador 1</div>
               <div className={styles.playerInfoRow}>
@@ -199,6 +306,14 @@ function Caca_soma() {
           //styles={styles} // se quiser passar styles para Tabuleiro
         />
       </div>
+      {showTutorial && (
+        <DynamicTutorial
+          steps={tutorialSteps}
+          onFinish={() => setShowTutorial(false)}
+          storageKey="cacasoma_v1"
+          locale="pt"
+        />
+      )}
     </div>
   );
 }

@@ -11,7 +11,7 @@ body {
 }
 
 .back-button {
-  position: absolute;
+  position: fixed;
   background: none;
   border: none;
   z-index: 9999;

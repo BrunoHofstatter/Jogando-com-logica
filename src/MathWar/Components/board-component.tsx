@@ -1,8 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { GameState, Position, Piece, TurnAction, GameConfig, GameRules } from '../Logic/types';
-import { GameEngine } from '../Logic/gameEngine';
-import PieceComponent from './piece';
-import styles from '../styles/board.module.css';
+import React, { useState, useEffect } from "react";
+import {
+  GameState,
+  Position,
+  Piece,
+  TurnAction,
+  GameConfig,
+  GameRules,
+  WinResult,
+} from "../Logic/types";
+import { GameEngine } from "../Logic/gameEngine";
+import PieceComponent from "./piece";
+import styles from "../styles/board.module.css";
+import { VictoryScreen } from "./VictoryScreen";
 
 interface BoardProps {
   gameConfig: GameConfig;
@@ -11,29 +20,34 @@ interface BoardProps {
   onGameStateChange?: (newState: GameState) => void;
 }
 
-const Board: React.FC<BoardProps> = ({ 
+const Board: React.FC<BoardProps> = ({
   gameConfig,
   gameRules,
-  gameState: externalGameState, 
-  onGameStateChange 
+  gameState: externalGameState,
+  onGameStateChange,
 }) => {
   const engine = new GameEngine();
-  const [internalGameState, setInternalGameState] = useState<GameState>(() => 
+  const [internalGameState, setInternalGameState] = useState<GameState>(() =>
     engine.initializeGame(gameConfig, gameRules)
   );
-  
+  const [gameOver, setGameOver] = useState(false);
   const gameState = externalGameState || internalGameState;
   const [selectedSquare, setSelectedSquare] = useState<Position | null>(null);
   const [availableActions, setAvailableActions] = useState<TurnAction[]>([]);
   const [highlightedSquares, setHighlightedSquares] = useState<Position[]>([]);
+  const [winResult, setWinResult] = useState<WinResult | null>(null);
 
   useEffect(() => {
     if (selectedSquare) {
-      const actions = engine.getAvailableActions(gameState, gameRules, selectedSquare);
+      const actions = engine.getAvailableActions(
+        gameState,
+        gameRules,
+        selectedSquare
+      );
       setAvailableActions(actions);
-      
+
       const highlights: Position[] = [];
-      actions.forEach(action => {
+      actions.forEach((action) => {
         if (action.to) {
           highlights.push(action.to);
         }
@@ -45,6 +59,42 @@ const Board: React.FC<BoardProps> = ({
       setHighlightedSquares([]);
     }
   }, [selectedSquare, gameState]);
+
+  // Check for win conditions
+  useEffect(() => {
+    const result = gameRules.checkWinCondition(gameState);
+    setWinResult(result);
+    if (result && gameState.gamePhase !== "ended") {
+      setGameOver(true);
+      const newState: GameState = {
+        ...gameState,
+        gamePhase: "ended" as const,
+        winner: result.winner,
+      };
+
+      if (onGameStateChange) {
+        onGameStateChange(newState);
+      } else {
+        setInternalGameState(newState);
+      }
+    }
+  }, [gameState]);
+
+  // Handle play again action
+  const handlePlayAgain = () => {
+    const newGameState = engine.initializeGame(gameConfig, gameRules);
+    setGameOver(false);
+    setWinResult(null);
+    setSelectedSquare(null);
+    setAvailableActions([]);
+    setHighlightedSquares([]);
+
+    if (onGameStateChange) {
+      onGameStateChange(newGameState);
+    } else {
+      setInternalGameState(newGameState);
+    }
+  };
 
   const handleSquareClick = (row: number, col: number) => {
     const clickedPosition = { row, col };
@@ -64,59 +114,76 @@ const Board: React.FC<BoardProps> = ({
         return;
       }
 
-      const validAction = availableActions.find(action => 
-        action.to?.row === row && action.to?.col === col
+      const validAction = availableActions.find(
+        (action) => action.to?.row === row && action.to?.col === col
       );
-      
+
       if (validAction) {
         const success = engine.executeAction(gameState, validAction, gameRules);
-        
+
         if (success) {
           if (onGameStateChange) {
             onGameStateChange(gameState);
           } else {
-            setInternalGameState({...gameState});
+            setInternalGameState({ ...gameState });
           }
-          
+
           setSelectedSquare(null);
         }
-      } else if (clickedPiece && clickedPiece.owner === gameState.currentPlayer) {
+      } else if (
+        clickedPiece &&
+        clickedPiece.owner === gameState.currentPlayer
+      ) {
         setSelectedSquare(clickedPosition);
       } else {
-        const placeAction = availableActions.find(action => 
-          action.type === "place" && action.to?.row === row && action.to?.col === col
+        const placeAction = availableActions.find(
+          (action) =>
+            action.type === "place" &&
+            action.to?.row === row &&
+            action.to?.col === col
         );
-        
+
         if (placeAction) {
-          const success = engine.executeAction(gameState, placeAction, gameRules);
-          
+          const success = engine.executeAction(
+            gameState,
+            placeAction,
+            gameRules
+          );
+
           if (success) {
             if (onGameStateChange) {
               onGameStateChange(gameState);
             } else {
-              setInternalGameState({...gameState});
+              setInternalGameState({ ...gameState });
             }
           }
         }
-        
+
         setSelectedSquare(null);
       }
     } else {
       if (clickedPiece && clickedPiece.owner === gameState.currentPlayer) {
         setSelectedSquare(clickedPosition);
       } else if (!clickedPiece) {
-        const placeAction = availableActions.find(action => 
-          action.type === "place" && action.to?.row === row && action.to?.col === col
+        const placeAction = availableActions.find(
+          (action) =>
+            action.type === "place" &&
+            action.to?.row === row &&
+            action.to?.col === col
         );
-        
+
         if (placeAction) {
-          const success = engine.executeAction(gameState, placeAction, gameRules);
-          
+          const success = engine.executeAction(
+            gameState,
+            placeAction,
+            gameRules
+          );
+
           if (success) {
             if (onGameStateChange) {
               onGameStateChange(gameState);
             } else {
-              setInternalGameState({...gameState});
+              setInternalGameState({ ...gameState });
             }
           }
         }
@@ -125,16 +192,18 @@ const Board: React.FC<BoardProps> = ({
   };
 
   const handleSpecialAction = (actionType: string) => {
-    const specialAction = availableActions.find(action => action.type === actionType);
-    
+    const specialAction = availableActions.find(
+      (action) => action.type === actionType
+    );
+
     if (specialAction) {
       const success = engine.executeAction(gameState, specialAction, gameRules);
-      
+
       if (success) {
         if (onGameStateChange) {
           onGameStateChange(gameState);
         } else {
-          setInternalGameState({...gameState});
+          setInternalGameState({ ...gameState });
         }
         setSelectedSquare(null);
       }
@@ -142,158 +211,164 @@ const Board: React.FC<BoardProps> = ({
   };
 
   const handleDiceRoll = () => {
-    const diceAction: TurnAction = { type: 'roll_dice' };
+    const diceAction: TurnAction = { type: "roll_dice" };
     const success = engine.executeAction(gameState, diceAction, gameRules);
-    
+
     if (success) {
       if (onGameStateChange) {
         onGameStateChange(gameState);
       } else {
-        setInternalGameState({...gameState});
+        setInternalGameState({ ...gameState });
       }
     }
   };
 
   const isSquareSelected = (row: number, col: number): boolean => {
-    return selectedSquare !== null && selectedSquare.row === row && selectedSquare.col === col;
+    return (
+      selectedSquare !== null &&
+      selectedSquare.row === row &&
+      selectedSquare.col === col
+    );
   };
 
   const isSquareHighlighted = (row: number, col: number): boolean => {
-    return highlightedSquares.some(pos => pos.row === row && pos.col === col);
+    return highlightedSquares.some((pos) => pos.row === row && pos.col === col);
   };
 
   const canPlaceHere = (row: number, col: number): boolean => {
-    return availableActions.some(action => 
-      action.type === "place" && action.to?.row === row && action.to?.col === col
+    return availableActions.some(
+      (action) =>
+        action.type === "place" &&
+        action.to?.row === row &&
+        action.to?.col === col
     );
   };
 
   const currentPlayerName = `Player ${gameState.currentPlayer + 1}`;
-  const winResult = gameRules.checkWinCondition(gameState);
-  const currentPlayerData = gameState.playerData?.[gameState.currentPlayer] || {};
+  const currentPlayerData =
+    gameState.playerData?.[gameState.currentPlayer] || {};
   const barriersLeft = currentPlayerData.barriersLeft || 0;
+  const finalWin: WinResult | null =
+    winResult ??
+    (gameState.gamePhase === "ended" && gameState.winner !== null
+      ? { winner: gameState.winner, reason: "Game Over" }
+      : null);
 
   return (
     <div className={styles.gamePage}>
       <div className={styles.gameContainer}>
         <div className={styles.gameInfo}>
-          <p className={styles.playerInfo}>
-            Current Player: 
-            <span className={`${styles.playerName} ${gameState.currentPlayer === 0 ? styles.player1 : styles.player2}`}>
-              {currentPlayerName}
+          <div className={styles.currentPlayer} data-target='player'>
+            Turno do Jogador
+            <span
+              className={`${styles.playerIndicator} ${
+                gameState.currentPlayer === 0
+                  ? styles.playerRed
+                  : styles.playerBlue
+              }`}
+            >
+              {gameState.currentPlayer === 0 ? "●" : "●"}
             </span>
-          </p>
-          <p className={styles.turnInfo}>Turn: {gameState.turnCount + 1}</p>
-          
-          {gameState.config.energyPerTurn !== undefined ? (
-            <p className={styles.resourceInfo}>Energy Left: {gameState.remainingEnergy || 0}</p>
-          ) : (
-            <p className={styles.resourceInfo}>Moves Left: {gameState.remainingMoves}</p>
-          )}
-          
-          {barriersLeft > 0 && (
-            <p className={styles.resourceInfo}>Barriers Available: {barriersLeft}</p>
-          )}
-          
-          {gameState.lastDiceRoll && (
-            <p className={styles.resourceInfo}>
-              Dice Roll: {Array.isArray(gameState.lastDiceRoll) ? 
-              gameState.lastDiceRoll.join(', ') : gameState.lastDiceRoll}
-            </p>
-          )}
-
-          <div className={styles.scoreDisplay}>
-            {gameState.gameData?.capturedPieces && (
-              <p>Captures: 
-                {Array.from({length: gameState.players}, (_, i) => (
-                  <span key={i} className={styles.scoreItem}>
-                    Player {i + 1}: {gameState.gameData?.capturedPieces[i] || 0}
-                  </span>
-                ))}
-              </p>
-            )}
-            
-            {gameState.gameData?.scores && (
-              <p>Scores: 
-                {Array.from({length: gameState.players}, (_, i) => (
-                  <span key={i} className={styles.scoreItem}>
-                    Player {i + 1}: {gameState.gameData?.scores[i] || 0}
-                  </span>
-                ))}
-              </p>
-            )}
           </div>
 
-          {winResult && (
-            <div className={styles.winDisplay}>
-              <strong>Game Over!</strong><br/>
-              {winResult.winner >= 0 ? (
-                <>Winner: Player {winResult.winner + 1}<br/></>
-              ) : (
-                <>Draw!<br/></>
-              )}
-              Reason: {winResult.reason}
-            </div>
-          )}
+          <div className={styles.sectionInfo} data-target='info'>
+            {/* Dice Roll Display */}
+            {gameState.lastDiceRoll && (
+              <div className={styles.diceInfo}>
+                <div className={styles.diceDisplay}>
+                  <span>
+                    Dado:{" "}
+                    <strong>
+                      {gameState.lastDiceRoll.reduce(
+                        (sum, die) => sum + die,
+                        0
+                      )}
+                    </strong>
+                  </span>
+                </div>
+              </div>
+            )}
 
-          {gameState.gameData?.mustCapture && (
-            <div className={styles.mustCapture}>
-              <strong>Must Capture!</strong>
+            {/* Selected Piece Energy Display */}
+            <div className={styles.energyInfo}>
+              <div className={styles.energyDisplay}>
+                <span>
+                  Energia da peça:{" "}
+                  <strong>
+                    {" "}
+                    {selectedSquare &&
+                    gameState.board[selectedSquare.row] &&
+                    gameState.board[selectedSquare.row][selectedSquare.col]
+                      ? gameState.board[selectedSquare.row][selectedSquare.col]
+                          ?.data?.pieceEnergy || "0"
+                      : "0"}
+                  </strong>
+                </span>
+              </div>
             </div>
-          )}
+          </div>
         </div>
         <div className={styles.boardWrapper}>
-        <div 
-          className={styles.board}
-          style={{
-            gridTemplateColumns: `repeat(${gameState.config.boardWidth}, clamp(2vw,9.5dvh,5vw))`,
-            gridTemplateRows: `repeat(${gameState.config.boardHeight}, clamp(2vw,9.5dvh,5vw))`,
-          }}
-        >
-          {gameState.board.map((row, rowIndex) =>
-            row.map((piece, colIndex) => {
-              const isSelected = isSquareSelected(rowIndex, colIndex);
-              const isHighlighted = isSquareHighlighted(rowIndex, colIndex);
-              const canPlace = !piece && canPlaceHere(rowIndex, colIndex);
-              const isObstacle = piece && piece.isObstacle;
-              const squareType = (rowIndex + colIndex) % 2 === 0 ? styles.lightSquare : styles.darkSquare;
-              
-              return (
-                <div
-                  key={`${rowIndex}-${colIndex}`}
-                  className={`${styles.square} ${squareType} ${
-                    isObstacle ? styles.squareObstacle : ''
-                  } ${isHighlighted ? styles.squareHighlighted : ''} ${
-                    canPlace ? styles.squareCanPlace : ''
-                  }`}
-                  onClick={() => !isObstacle && handleSquareClick(rowIndex, colIndex)}
-                >
-                  {piece && (
-                    <PieceComponent
-                      piece={piece}
-                      gameConfig={gameState.config}
-                      isSelected={isSelected}
-                      onPieceClick={() => !isObstacle && handleSquareClick(rowIndex, colIndex)}
-                    />
-                  )}
-                  
-                  {isHighlighted && !piece && (
-                    <div className={styles.moveIndicator} />
-                  )}
-                  
-                  {canPlace && (
-                    <div className={styles.placeIndicator} />
-                  )}
-                </div>
-              );
-            })
-          )}
-        </div>
+          <div
+            className={styles.board}
+            data-target='board'
+            style={{
+              gridTemplateColumns: `repeat(${gameState.config.boardWidth}, clamp(2.6vw,9.15dvh,5vw))`,
+              gridTemplateRows: `repeat(${gameState.config.boardHeight}, clamp(2.6vw,9.15dvh,5vw))`,
+            }}
+          >
+            {gameState.board.map((row, rowIndex) =>
+              row.map((piece, colIndex) => {
+                const isSelected = isSquareSelected(rowIndex, colIndex);
+                const isHighlighted = isSquareHighlighted(rowIndex, colIndex);
+                const canPlace = !piece && canPlaceHere(rowIndex, colIndex);
+                const isObstacle = piece && piece.isObstacle;
+                const squareType =
+                  (rowIndex + colIndex) % 2 === 0
+                    ? styles.lightSquare
+                    : styles.darkSquare;
+
+                return (
+                  <div
+                    key={`${rowIndex}-${colIndex}`}
+                    data-square={`${String.fromCharCode(97 + colIndex)}${rowIndex + 1}`}
+                    data-piece={piece ? `${piece.owner === 0 ? 'red' : 'blue'}-${piece.type}` : undefined}
+                    data-captain={piece?.data?.isCaptain ? 'true' : undefined}
+                    className={`${styles.square} ${squareType} ${
+                      isObstacle ? styles.squareObstacle : ""
+                    } ${isHighlighted ? styles.squareHighlighted : ""} ${
+                      canPlace ? styles.squareCanPlace : ""
+                    }`}
+                    onClick={() =>
+                      !isObstacle && handleSquareClick(rowIndex, colIndex)
+                    }
+                  >
+                    {piece && (
+                      <PieceComponent
+                        piece={piece}
+                        gameConfig={gameState.config}
+                        isSelected={isSelected}
+                        onPieceClick={() =>
+                          !isObstacle && handleSquareClick(rowIndex, colIndex)
+                        }
+                      />
+                    )}
+
+                    {isHighlighted && !piece && (
+                      <div className={styles.moveIndicator} />
+                    )}
+
+                    {canPlace && <div className={styles.placeIndicator} />}
+                  </div>
+                );
+              })
+            )}
+          </div>
         </div>
 
         <div className={styles.actionButtons}>
           {gameState.config.useDice && !gameState.lastDiceRoll && (
-            <button 
+            <button
               onClick={handleDiceRoll}
               className={`${styles.actionButton} ${styles.actionButtonDice}`}
               disabled={!!winResult}
@@ -302,19 +377,22 @@ const Board: React.FC<BoardProps> = ({
             </button>
           )}
 
-          {availableActions.filter(action => action.type === 'custom').map((action, index) => (
-            <button 
-              key={index}
-              onClick={() => handleSpecialAction('custom')}
-              className={`${styles.actionButton} ${styles.actionButtonCustom}`}
-              disabled={!!winResult}
-            >
-              {action.data?.buttonText || 'Custom Action'}
-            </button>
-          ))}
+          {availableActions
+            .filter((action) => action.type === "custom")
+            .map((action, index) => (
+              <button
+                key={index}
+                onClick={() => handleSpecialAction("custom")}
+                className={`${styles.actionButton} ${styles.actionButtonCustom}`}
+                disabled={!!winResult}
+              >
+                {action.data?.buttonText || "Custom Action"}
+              </button>
+            ))}
 
-          {availableActions.length === 0 && gameState.gamePhase === "playing" && (
-            <button 
+          {/* Skip turn button hidden as requested */}
+          {/* {availableActions.length === 0 && gameState.gamePhase === "playing" && (
+            <button
               onClick={() => {
                 const skipAction: TurnAction = { type: 'custom', data: { skip: true } };
                 engine.executeAction(gameState, skipAction, gameRules);
@@ -329,22 +407,42 @@ const Board: React.FC<BoardProps> = ({
             >
               Skip Turn
             </button>
-          )}
+          )} */}
         </div>
 
-        {selectedSquare && gameState.board[selectedSquare.row][selectedSquare.col] && (
-          <div className={styles.pieceInfo}>
-            <h4>Selected Piece</h4>
-            <p>Type: {gameState.board[selectedSquare.row][selectedSquare.col]?.type}</p>
-            <p>Position: ({selectedSquare.row}, {selectedSquare.col})</p>
-            {gameState.board[selectedSquare.row][selectedSquare.col]?.value !== undefined && (
-              <p>Value: {gameState.board[selectedSquare.row][selectedSquare.col]?.value}</p>
-            )}
-            <p>Available Actions: {availableActions.length}</p>
-          </div>
+        {selectedSquare &&
+          gameState.board[selectedSquare.row][selectedSquare.col] && (
+            <div className={styles.pieceInfo}>
+              <h4>Selected Piece</h4>
+              <p>
+                Type:{" "}
+                {gameState.board[selectedSquare.row][selectedSquare.col]?.type}
+              </p>
+              <p>
+                Position: ({selectedSquare.row}, {selectedSquare.col})
+              </p>
+              {gameState.board[selectedSquare.row][selectedSquare.col]
+                ?.value !== undefined && (
+                <p>
+                  Value:{" "}
+                  {
+                    gameState.board[selectedSquare.row][selectedSquare.col]
+                      ?.value
+                  }
+                </p>
+              )}
+              <p>Available Actions: {availableActions.length}</p>
+            </div>
+          )}
+        {finalWin && (
+          <VictoryScreen
+            winner={finalWin.winner}
+            reason={finalWin.reason}
+            onPlayAgain={handlePlayAgain}
+          />
         )}
       </div>
-    </div>    
+    </div>
   );
 };
 

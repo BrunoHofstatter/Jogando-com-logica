@@ -102,7 +102,7 @@ function Tabuleiro({
   // Paleta de cores para as células clicadas
 
   return (
-    <>
+    <div data-target='tabuleiro'>
       <Timer
         jogar={jogar}
         addTempo={addTempo}
@@ -129,7 +129,7 @@ function Tabuleiro({
         )}
       </div>
       
-    </>
+    </div>
   );
 }
 
