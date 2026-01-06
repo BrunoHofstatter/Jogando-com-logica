@@ -277,14 +277,13 @@
 }
 
 .hintImage {
-  width: 15vw;
-  height: 15vw;
+  width: 12vw;
+  height: 12vw;
   max-width: 120px;
   max-height: 120px;
-  margin: 1.5vh auto;
+  margin: 0;
   display: block;
   border-radius: 1.5vw;
-  border: 0.2vw solid white;
 }
 
 .correctionIndicator {

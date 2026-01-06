@@ -172,61 +172,33 @@ const Dimensions: React.FC = () => {
   };
   // Create hints with images
   const hint2Content = (
-    <div>
-      <p>
+    <div className={hintStyles.hintSideBySide}>
+      <p className={hintStyles.hintText}>
         Este cubo tem 3 quadradinhos de altura e 3 quadradinhos de largura. O
         cubo é 3x3.
       </p>
-      <img
-        src={getCubeImage("3x3")}
-        alt="3x3 Rubik's Cube"
-        className={styles.hintImage}
-      />
+      <div className={hintStyles.hintImageContainer}>
+        <img
+          src={getCubeImage("3x3")}
+          alt="3x3 Rubik's Cube"
+          className={styles.hintImage}
+        />
+      </div>
     </div>
   );
 
   const hint3Content = (
-    <div>
-      <p>
-        <strong>Cubo 2x2:</strong> 2 quadradinhos de altura, 2 de largura
+    <div className={hintStyles.hintSideBySide}>
+      <p className={hintStyles.hintText}>
+        Conte quantos quadradinhos um lado do cubo tem em uma linha. Este cubo tem 4 quadradinhos, então ele é 4x4.
       </p>
-      <img
-        src={getCubeImage("2x2")}
-        alt="2x2 Rubik's Cube"
-        className={styles.hintImage}
-      />
-      <p>
-        <strong>Cubo 3x3:</strong> 3 quadradinhos de altura, 3 de largura
-      </p>
-      <img
-        src={getCubeImage("3x3")}
-        alt="3x3 Rubik's Cube"
-        className={styles.hintImage}
-      />
-      <p>
-        <strong>Cubo 4x4:</strong> 4 quadradinhos de altura, 4 de largura
-      </p>
-      <img
-        src={getCubeImage("4x4")}
-        alt="4x4 Rubik's Cube"
-        className={styles.hintImage}
-      />
-      <p>
-        <strong>Cubo 5x5:</strong> 5 quadradinhos de altura, 5 de largura
-      </p>
-      <img
-        src={getCubeImage("5x5")}
-        alt="5x5 Rubik's Cube"
-        className={styles.hintImage}
-      />
-      <p>
-        <strong>Cubo 6x6:</strong> 6 quadradinhos de altura, 6 de largura
-      </p>
-      <img
-        src={getCubeImage("6x6")}
-        alt="6x6 Rubik's Cube"
-        className={styles.hintImage}
-      />
+      <div className={hintStyles.hintImageContainer}>
+        <img
+          src={getCubeImage("4x4")}
+          alt="4x4 Rubik's Cube"
+          className={styles.hintImage}
+        />
+      </div>
     </div>
   );
 

@@ -76,28 +76,31 @@ const Hint: React.FC<HintProps> = ({
       </button>
 
       {isOpen && (
-        <div className={styles.hintModalOverlay}>
-          <div className={styles.hintModal}>
+        <div className={styles.hintModalOverlay} onClick={closeHints}>
+          <div className={styles.hintModal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.hintHeader}>
-              
+
               <button onClick={closeHints} className={styles.closeButton}>
                 ×
               </button>
             </div>
-            
+
             <div className={styles.hintContent}>
-              {/* Show all hints up to the current one */}
-              {hints.slice(0, currentHint).map((hint, index) => (
-                <div key={index} className={styles.hintItem}>
-                  {hint}
-                  {index < currentHint - 1 && <hr className={styles.hintDivider} />}
-                </div>
-              ))}
+              {/* Show only the current hint */}
+              <div className={styles.hintItem}>
+                {hints[currentHint - 1]}
+              </div>
             </div>
-            
+
             <div className={styles.hintNavigation}>
-              
-              <button 
+              <button
+                onClick={showPreviousHint}
+                disabled={currentHint === 1}
+                className={styles.navButton}
+              >
+                Voltar
+              </button>
+              <button
                 onClick={showNextHint}
                 disabled={currentHint === totalHints}
                 className={styles.navButton}

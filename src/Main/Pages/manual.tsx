@@ -167,7 +167,7 @@ function Manual() {
             <h3>Dificuldades e Séries Recomendadas</h3>
             <ul>
               <li><strong>Dificuldades:</strong> a Fácil 1 tem adição e um pouco de subtração com números até 10; conforme a dificuldade aumenta, os número ficam maiores e multiplicação e divisão entram</li>
-              <li><strong>Séries indicadas:</strong> 3º ao 6º ano</li>
+              <li><strong>Séries indicadas:</strong> 3º ao 7º ano</li>
             </ul>
           </div>
           
@@ -226,7 +226,7 @@ function Manual() {
 
             <h3>Séries Recomendadas</h3>
             <ul>
-              <li><strong>Séries indicadas:</strong> 4º ao 6º ano</li>
+              <li><strong>Séries indicadas:</strong> 4º ao 7º ano</li>
             </ul>
           </div>
           
@@ -334,7 +334,7 @@ function Manual() {
 
             <h3>Séries Recomendadas</h3>
             <ul>
-              <li><strong>Séries indicadas:</strong> 5º e 6º ano</li>
+              <li><strong>Séries indicadas:</strong> 5º a 7º ano</li>
             </ul>
           </div>
           
@@ -391,7 +391,7 @@ function Manual() {
 
             <h3>Séries Recomendadas</h3>
             <ul>
-              <li><strong>Séries indicadas:</strong> 3º ao 6º ano</li>
+              <li><strong>Séries indicadas:</strong> 3º ao 7º ano</li>
             </ul>
           </div>
           
@@ -448,7 +448,7 @@ function Manual() {
 
             <h3>Séries Recomendadas</h3>
             <ul>
-              <li><strong>Séries indicadas:</strong> 6º ano</li>
+              <li><strong>Séries indicadas:</strong> 6º e 7º ano</li>
             </ul>
           </div>
           

@@ -7,15 +7,9 @@ import { useNavigate } from "react-router-dom";
 
 type CubeSize = "2x2" | "3x3" | "4x4" | "5x5" | "6x6";
 
-interface CubeImage {
+interface Cube {
   id: number;
   size: CubeSize;
-}
-
-interface DimensionBox {
-  id: number;
-  size: CubeSize;
-  droppedImage: number | null;
 }
 
 const Class2: React.FC = () => {
@@ -23,88 +17,40 @@ const Class2: React.FC = () => {
   const [score, setScore] = useState<number | null>(null);
   const [isChecking, setIsChecking] = useState(false);
   const [corrections, setCorrections] = useState<boolean[]>([]);
-  const [showCorrections, setShowCorrections] = useState(false);
+  const [userAnswers, setUserAnswers] = useState<string[]>(["", "", "", "", ""]);
 
   const goToNextClass = () => {
-  navigate("/class2"); // Adjust the path based on your routing
-};
+    navigate("/class2"); // Adjust the path based on your routing
+  };
 
   // Function to get image path based on cube size
   const getCubeImage = (size: CubeSize) => {
     return `${import.meta.env.BASE_URL}${size}.png`;
   };
-  const shuffleArray = <T,>(array: T[]): T[] => {
-    const shuffled = [...array];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+
+  // Fixed array of cubes in order
+  const cubes: Cube[] = [
+    { id: 1, size: "2x2" },
+    { id: 2, size: "3x3" },
+    { id: 3, size: "4x4" },
+    { id: 4, size: "5x5" },
+    { id: 5, size: "6x6" },
+  ];
+
+  // Get the correct answer for a cube (size squared)
+  const getCorrectAnswer = (size: CubeSize): number => {
+    const dimension = parseInt(size.split('x')[0]);
+    return dimension * dimension;
+  };
+
+  // Handle input change
+  const handleInputChange = (index: number, value: string) => {
+    // Only allow numbers
+    if (value === "" || /^\d+$/.test(value)) {
+      const newAnswers = [...userAnswers];
+      newAnswers[index] = value;
+      setUserAnswers(newAnswers);
     }
-    return shuffled;
-  };
-
-  // Available cube images to drag in the desired order: 4x4, 2x2, 6x6, 3x3, 5x5
-  const [cubeImages, setCubeImages] = useState<CubeImage[]>(() =>
-    shuffleArray([
-      { id: 1, size: "4x4" },
-      { id: 2, size: "2x2" },
-      { id: 3, size: "6x6" },
-      { id: 4, size: "3x3" },
-      { id: 5, size: "5x5" },
-    ])
-  );
-  // Dimension boxes where images can be dropped
-  const [dimensionBoxes, setDimensionBoxes] = useState<DimensionBox[]>([
-    { id: 1, size: "2x2", droppedImage: null },
-    { id: 2, size: "3x3", droppedImage: null },
-    { id: 3, size: "4x4", droppedImage: null },
-    { id: 4, size: "5x5", droppedImage: null },
-    { id: 5, size: "6x6", droppedImage: null },
-  ]);
-
-  // Handle drag start event
-  const handleDragStart = (e: React.DragEvent, imageId: number) => {
-    e.dataTransfer.setData("imageId", imageId.toString());
-  };
-
-  // Handle drag over event (necessary for drop to work)
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
-  // Handle drop event
-  const handleDrop = (e: React.DragEvent, boxId: number) => {
-    e.preventDefault();
-    const imageId = parseInt(e.dataTransfer.getData("imageId"));
-
-    // Check if this image is already placed in another box
-    const currentBoxIndex = dimensionBoxes.findIndex(
-      (box) => box.droppedImage === imageId
-    );
-
-    if (currentBoxIndex >= 0) {
-      // Remove from current box
-      setDimensionBoxes((prev) =>
-        prev.map((box) =>
-          box.droppedImage === imageId ? { ...box, droppedImage: null } : box
-        )
-      );
-    }
-
-    // Add to new box
-    setDimensionBoxes((prev) =>
-      prev.map((box) =>
-        box.id === boxId ? { ...box, droppedImage: imageId } : box
-      )
-    );
-  };
-
-  // Remove image from a box
-  const removeImageFromBox = (boxId: number) => {
-    setDimensionBoxes((prev) =>
-      prev.map((box) =>
-        box.id === boxId ? { ...box, droppedImage: null } : box
-      )
-    );
   };
 
   // Check answers and calculate score
@@ -112,47 +58,25 @@ const Class2: React.FC = () => {
     setIsChecking(true);
 
     let correct = 0;
-    const correctionResults: boolean[] = dimensionBoxes.map((box) => {
-      if (box.droppedImage) {
-        const droppedImage = cubeImages.find(
-          (img) => img.id === box.droppedImage
-        );
-        const isCorrect = droppedImage?.size === box.size;
-        if (isCorrect) correct++;
-        return isCorrect || false;
-      }
-      return false;
+    const correctionResults: boolean[] = cubes.map((cube, index) => {
+      const userAnswer = parseInt(userAnswers[index]);
+      const correctAnswer = getCorrectAnswer(cube.size);
+      const isCorrect = userAnswer === correctAnswer;
+      if (isCorrect) correct++;
+      return isCorrect;
     });
 
     setCorrections(correctionResults);
-    const calculatedScore = (correct / dimensionBoxes.length) * 100;
+    const calculatedScore = (correct / cubes.length) * 100;
     setScore(calculatedScore);
-    setShowCorrections(true);
   };
 
   // Reset the game
   const resetGame = () => {
-    setCubeImages(
-      shuffleArray([
-        { id: 1, size: "4x4" },
-        { id: 2, size: "2x2" },
-        { id: 3, size: "6x6" },
-        { id: 4, size: "3x3" },
-        { id: 5, size: "5x5" },
-      ])
-    );
-    setDimensionBoxes((prev) =>
-      prev.map((box) => ({ ...box, droppedImage: null }))
-    );
+    setUserAnswers(["", "", "", "", ""]);
     setScore(null);
     setIsChecking(false);
     setCorrections([]);
-    setShowCorrections(false);
-  };
-
-  // Close corrections but keep the results
-  const closeCorrections = () => {
-    setShowCorrections(false);
   };
 
   // Get score message
@@ -259,8 +183,9 @@ const Class2: React.FC = () => {
           styleFile={hintStyles}
         />
 
-        <div className={styles.dragContainer}>
-          {isChecking && score !== null ? (
+        {/* Score display at top when checking */}
+        {isChecking && score !== null && (
+          <div className={styles.scoreContainer}>
             <div className={styles.scoreRow}>
               <div className={styles.scoreText}>
                 <div className={styles.scoreTitle}>{getScoreMessage()}</div>
@@ -273,64 +198,87 @@ const Class2: React.FC = () => {
                 Tentar de novo
               </button>
             </div>
-          ) : (
-            <>
-              <div className={styles.imagesRow}>
-                {cubeImages.map((image) => {
-                  // Check if this image is already placed in a box
-                  const isPlaced = dimensionBoxes.some(
-                    (box) => box.droppedImage === image.id
-                  );
+          </div>
+        )}
 
-                  return (
-                    <div
-                      key={image.id}
-                      className={`${styles.cubeImage} ${
-                        isPlaced ? styles.placed : ""
-                      }`}
-                      draggable={!isPlaced && !isChecking}
-                      onDragStart={(e) =>
-                        !isPlaced && !isChecking && handleDragStart(e, image.id)
-                      }
-                    >
-                      <img
-                        src={getCubeImage(image.size)}
-                        alt={`${image.size} Rubik's Cube`}
-                        className={styles.cubeImg}
-                      />
-                    </div>
-                  );
-                })}
+        {/* Cubes with input boxes */}
+        <div className={styles.cubesContainer}>
+          {cubes.map((cube, index) => (
+            <div key={cube.id} className={styles.cubeWithInput}>
+              <div className={styles.cubeImageWrapper}>
+                <img
+                  src={getCubeImage(cube.size)}
+                  alt={`${cube.size} Rubik's Cube`}
+                  className={styles.cubeImg}
+                />
               </div>
-            </>
-          )}
+              <div className={styles.inputWrapper}>
+                <input
+                  type="text"
+                  value={userAnswers[index]}
+                  onChange={(e) => handleInputChange(index, e.target.value)}
+                  placeholder="Escreva aqui"
+                  className={styles.inputBox}
+                  disabled={isChecking}
+                />
+                {/* Correction indicators */}
+                {isChecking && (
+                  <div className={styles.correctionIndicator}>
+                    {corrections[index] ? (
+                      <div className={styles.iconStack}>
+                        <CheckCircle
+                          className={styles.check}
+                          strokeWidth={4}
+                          color="black"
+                        />
+                        <CheckCircle
+                          className={styles.check}
+                          strokeWidth={1.5}
+                          color="#0fb11d"
+                        />
+                      </div>
+                    ) : (
+                      <div className={styles.iconStack}>
+                        <XCircle
+                          className={styles.xmark}
+                          strokeWidth={4}
+                          color="black"
+                        />
+                        <XCircle
+                          className={styles.xmark}
+                          strokeWidth={1.5}
+                          color="#f02121"
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
+
         {!isChecking && (
-      <div className={styles.submitContainer}>
-        <button
-          onClick={checkAnswers}
-          className={styles.submitButton}
-          disabled={dimensionBoxes.some(
-            (box) => box.droppedImage === null
-          )}
-        >
-          Corrigir
-        </button>
-      </div>
-    )}
-    {isChecking && (
-      <div className={styles.submitContainer}>
-        <button
-          onClick={goToNextClass}
-          className={styles.nextButton}
-          disabled={dimensionBoxes.some(
-            (box) => box.droppedImage === null
-          )}
-        >
-          Próximo
-        </button>
-      </div>
-    )}
+          <div className={styles.submitContainer}>
+            <button
+              onClick={checkAnswers}
+              className={styles.submitButton}
+              disabled={userAnswers.some((answer) => answer === "")}
+            >
+              Corrigir
+            </button>
+          </div>
+        )}
+        {isChecking && (
+          <div className={styles.submitContainer}>
+            <button
+              onClick={goToNextClass}
+              className={styles.nextButton}
+            >
+              Próximo
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

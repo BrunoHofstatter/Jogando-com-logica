@@ -1,291 +1,390 @@
 .menuButtonContainer {
-    position: absolute;
-    top: 2vw;
-    left: 2vw;
-    z-index: 1001;
-  }
-  
-  .menuButton {
-    padding: 0.7vw 1.7vw 1vw 1.7vw;
-    background: radial-gradient(circle, #3498db, #2272a8);
-    color: white;
-    border: 0.2vw solid black;
-    border-radius: 2vw;
-    cursor: pointer;
-    font-size: 2vw;
-    font-weight: bold;
-    font-family: "Cherry Bomb One", system-ui;
-    -webkit-text-stroke: 0.13vw black;
-    box-shadow: 0 0.5vw 1.5vw rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
-    letter-spacing: 0.1vw;
-  }
-  
-  .menuButton:hover {
-    background: #2980b9;
-    transform: translateY(-0.3vw) scale(1.05);
-    box-shadow: 0 0.8vw 2vw rgba(0, 0, 0, 0.4);
-  }
+  position: absolute;
+  top: 2vw;
+  left: 2vw;
+  z-index: 1001;
+}
+
+.menuButton {
+  padding: 0.7vw 1.7vw 1vw 1.7vw;
+  background: radial-gradient(circle, #3498db, #2272a8);
+  color: white;
+  border: 0.2vw solid black;
+  border-radius: 2vw;
+  cursor: pointer;
+  font-size: 2vw;
+  font-weight: bold;
+  font-family: "Cherry Bomb One", system-ui;
+  -webkit-text-stroke: 0.13vw black;
+  box-shadow: 0 0.5vw 1.5vw rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  letter-spacing: 0.1vw;
+}
+
+.menuButton:hover {
+  background: #2980b9;
+  transform: translateY(-0.3vw) scale(1.05);
+  box-shadow: 0 0.8vw 2vw rgba(0, 0, 0, 0.4);
+}
+
 .container {
-    margin: 0 auto;
-    padding: 2vw;
-    text-align: center;
-    font-family: "Cherry Bomb One", system-ui;
-    color: white;
-    -webkit-text-stroke: 0.1vw black;
-    min-height: 100dvh;
-    max-height: 100dvh;
-    max-width: 100vw;
+  margin: 0 auto;
+  padding: 2vw;
+  text-align: center;
+  font-family: "Cherry Bomb One", system-ui;
+  color: white;
+  -webkit-text-stroke: 0.1vw black;
+  min-height: 100dvh;
+  max-height: 100dvh;
+  max-width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.container h2{
+  -webkit-text-stroke: 0.3vw black;
+  font-size: 5vw;
+  margin: 0 0 1dvh 0;
+}
+
+.container h3{
+ margin: 0 0 3dvh 0;
+ -webkit-text-stroke: 0.15vw black;
+}
+
+.scoreContainer {
+  width: 93vw;
+  margin: 0 0 2dvh 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cubesContainer {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 2.5vw;
+  margin: 2vh 0;
+  width: 93vw;
+}
+
+.cubeWithInput {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1vh;
+  width: 12vw;
+}
+
+.cubeImageWrapper {
+  width: 10vw;
+  height: 10vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cubeImg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 1.5vw;
+}
+
+.inputWrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.inputBox {
+  width: 100%;
+  padding: 0.8vh 0.5vw;
+  font-size: 1.8vw;
+  text-align: center;
+  border: 0.2vw solid rgba(255, 255, 255, 0.7);
+  border-radius: 1vw;
+  background: rgba(255, 255, 255, 0.9);
+  font-family: "Cherry Bomb One", system-ui;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.inputBox::placeholder {
+  color: rgba(0, 0, 0, 0.3);
+  font-family: "Cherry Bomb One", system-ui;
+}
+
+.inputBox:focus {
+  outline: none;
+  border-color: #3498db;
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 0 0.5vw rgba(52, 152, 219, 0.5);
+}
+
+.inputBox:disabled {
+  background: rgba(200, 200, 200, 0.5);
+  cursor: not-allowed;
+}
+
+.correctionIndicator {
+  position: absolute;
+  right: -3.5vw;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 4vw;
+  font-weight: bold;
+  z-index: 10;
+}
+
+.iconStack {
+  position: relative;
+  width: 3vw;
+  height: 3vw;
+}
+
+.check {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3vw;
+  height: 3vw;
+}
+
+.xmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3vw;
+  height: 3vw;
+}
+
+.submitContainer {
+  position: absolute;
+  bottom: 5vw;
+  right: 0vw;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  margin: 0vh 0;
+}
+
+.submitButton {
+  padding: 0.7vw 1.7vw 1vw 1.7vw;
+  background:radial-gradient(circle,#34c872,#1c934e );
+  color: white;
+  border: 0.2vw solid black;
+  border-radius: 2vw;
+  cursor: pointer;
+  font-size: 2vw;
+  font-weight: bold;
+  font-family: "Cherry Bomb One", system-ui;
+  -webkit-text-stroke: 0.13vw black;
+  box-shadow: 0 0.5vw 1.5vw rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  letter-spacing: 0.1vw;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: #219653;
+  transform: translateY(-0.3vw) scale(1.05);
+  box-shadow: 0 0.8vw 2vw rgba(0, 0, 0, 0.4);
+}
+
+.submitButton:disabled {
+  background: #3a855a;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.nextButton {
+  padding: 0.7vw 1.7vw 1vw 1.7vw;
+  background: radial-gradient(circle,#d33a2c,#9f2419 );
+  color: white;
+  border: 0.2vw solid black;
+  border-radius: 2vw;
+  cursor: pointer;
+  font-size: 2vw;
+  font-weight: bold;
+  font-family: "Cherry Bomb One", system-ui;
+  -webkit-text-stroke: 0.13vw black;
+  box-shadow: 0 0.5vw 1.5vw rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  letter-spacing: 0.1vw;
+}
+
+.nextButton:hover{
+  background: radial-gradient(circle,#c02e20,#8e1f14 );
+  transform: translateY(-0.3vw) scale(1.05);
+  box-shadow: 0 0.8vw 2vw rgba(0, 0, 0, 0.4);
+}
+
+.resetButton {
+  padding: 0.6vh 1.3vw 1vh 1.3vw;
+  background:radial-gradient(circle,#34c872,#219d54);
+  color: white;
+  border: 0.2vw solid black;
+  border-radius: 2vw;
+  height: fit-content;
+  cursor: pointer;
+  font-size: 2.5vw;
+  margin-top: 2vh;
+  font-family: "Cherry Bomb One", system-ui;
+  box-shadow: 0 0.5vw 1.5vw rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  -webkit-text-stroke: 0.2vw black;
+}
+
+.resetButton:hover {
+  background:radial-gradient(circle,#2ebb68,#1c904c);
+  transform: translateY(-0.3vw);
+  box-shadow: 0 0.8vw 2vw rgba(0, 0, 0, 0.3);
+}
+
+.hintImage {
+  width: 15vw;
+  height: 15vw;
+  max-width: 120px;
+  max-height: 120px;
+  margin: 1.5vh auto;
+  display: block;
+  border-radius: 1.5vw;
+  border: 0.2vw solid white;
+}
+
+.scoreRow {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3vw;
+  padding: 1vw 1vw;
+  margin: 0vh 0;
+  width: 65vw;
+  backdrop-filter: blur(2vw);
+  border: 0.2vw solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  flex-direction: row;
+  gap: 6vw;
+  justify-content: center;
+  align-items: center;
+}
+
+.scoreText{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0vw;
+  font-size: 2.8vw;
+  font-weight: bold;
+  font-family: "Cherry Bomb One", system-ui;
+  -webkit-text-stroke: 0.1vw black;
+}
+
+.scoreTitle {
+  margin: 0;
+  -webkit-text-stroke: 0.1vw black;
+}
+
+.scoreDisplay {
+  margin: 0;
+  -webkit-text-stroke: 0.1vw black;
+}
+
+.emptyScore {
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+  font-family: "Cherry Bomb One", system-ui;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .container {
+    padding: 3vw;
   }
-  
-  .container h2{
-    -webkit-text-stroke: 0.3vw black;
+
+  .cubesContainer {
+    gap: 4vw;
+  }
+
+  .cubeWithInput {
+    width: 25vw;
+  }
+
+  .cubeImageWrapper {
+    width: 20vw;
+    height: 20vw;
+  }
+
+  .inputBox {
+    font-size: 3.5vw;
+    padding: 1vh 1vw;
+  }
+
+  .correctionIndicator {
+    right: -8vw;
+  }
+
+  .iconStack {
+    width: 6vw;
+    height: 6vw;
+  }
+
+  .check, .xmark {
+    width: 6vw;
+    height: 6vw;
+  }
+
+  .submitButton, .nextButton {
+    font-size: 4vw;
+    padding: 1.5vh 8vw;
+  }
+}
+
+/* For very small screens */
+@media (max-width: 480px) {
+  .container {
+    padding: 4vw;
+  }
+
+  .cubesContainer {
+    gap: 5vw;
+  }
+
+  .cubeWithInput {
+    width: 40vw;
+  }
+
+  .cubeImageWrapper {
+    width: 30vw;
+    height: 30vw;
+  }
+
+  .inputBox {
+    font-size: 4.5vw;
+    padding: 1.5vh 2vw;
+  }
+
+  .correctionIndicator {
+    right: -10vw;
+  }
+
+  .iconStack {
+    width: 8vw;
+    height: 8vw;
+  }
+
+  .check, .xmark {
+    width: 8vw;
+    height: 8vw;
+  }
+
+  .submitButton, .nextButton {
     font-size: 5vw;
-    margin: 0 0 3dvh 0;
+    padding: 1.5vh 10vw;
   }
-  .container h3{
-   margin: 0 0 8dvh 0;
-   -webkit-text-stroke: 0.15vw black;
-  }
-  
-  .dragContainer{
-   width: 93vw;
-   margin:0 0 8dvh 0;
-   align-items: center;
-   justify-content: center;
-   display: flex;
-  }
-  .dragContainer h3 {
-    text-align: center;
-    font-size: 3vw;
-    margin-bottom: 2vh;
-    letter-spacing: 0.1vw;
-
-  }
-
-  
-  .imagesRow {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 5.1vw;
-    margin: 2vh 0;
-  }
-  
-  .cubeImage {
-    cursor: grab;
-    transition: all 0.3s ease;
-    width: 8.7vw;
-    height: 8.7vw;
-    display: flex;
-    align-items: center;
-    justify-content: center; 
-  }
-  
-  .cubeImage:hover {
-    transform: translateY(-0.5vw) scale(1.1);
-  }
-  
-  .cubeImage.placed {
-    opacity: 0.5;
-    cursor: default;
-  }
-  
-  .cubeImg {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    border-radius: 1.5vw;
-  }
-  
-  .submitContainer {
-    position: absolute;
-    bottom: 5vw;
-    right: 0vw;
-    z-index: 100;
-    display: flex;
-    justify-content: center;
-    margin: 0vh 0;
-  }
-  
-  .submitButton {
-    padding: 0.7vw 1.7vw 1vw 1.7vw;
-    background:radial-gradient(circle,#34c872,#1c934e );
-    color: white;
-    border: 0.2vw solid black;
-    border-radius: 2vw;
-    cursor: pointer;
-    font-size: 2vw;
-    font-weight: bold;
-    font-family: "Cherry Bomb One", system-ui;
-    -webkit-text-stroke: 0.13vw black;
-    box-shadow: 0 0.5vw 1.5vw rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
-    letter-spacing: 0.1vw;
-  }
-  
-  
-  .submitButton:hover:not(:disabled) {
-    background: #219653;
-    transform: translateY(-0.3vw) scale(1.05);
-    box-shadow: 0 0.8vw 2vw rgba(0, 0, 0, 0.4);
-  }
-  
-  
-  .submitButton:disabled {
-    background: #3a855a;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-  }
-  .nextButton {
-    padding: 0.7vw 1.7vw 1vw 1.7vw;
-    background: radial-gradient(circle,#d33a2c,#9f2419 );
-    color: white;
-    border: 0.2vw solid black;
-    border-radius: 2vw;
-    cursor: pointer;
-    font-size: 2vw;
-    font-weight: bold;
-    font-family: "Cherry Bomb One", system-ui;
-    -webkit-text-stroke: 0.13vw black;
-    box-shadow: 0 0.5vw 1.5vw rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
-    letter-spacing: 0.1vw;
-  }
-  .nextButton:hover{
-    background: radial-gradient(circle,#c02e20,#8e1f14 );
-    transform: translateY(-0.3vw) scale(1.05);
-    box-shadow: 0 0.8vw 2vw rgba(0, 0, 0, 0.4);
-  }
-  
-  .resetButton {
-    padding: 0.6vh 1.3vw 1vh 1.3vw;
-    background:radial-gradient(circle,#34c872,#219d54);
-    color: white;
-    border: 0.2vw solid black;
-    border-radius: 2vw;
-    height: fit-content;
-    cursor: pointer;
-    font-size: 2.5vw;
-    margin-top: 2vh;
-    font-family: "Cherry Bomb One", system-ui;
-    box-shadow: 0 0.5vw 1.5vw rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
-    -webkit-text-stroke: 0.2vw black;
-  }
-  
-  .resetButton:hover {
-    background:radial-gradient(circle,#2ebb68,#1c904c);
-    transform: translateY(-0.3vw);
-    box-shadow: 0 0.8vw 2vw rgba(0, 0, 0, 0.3);
-  }
-  
-  .hintImage {
-    width: 15vw;
-    height: 15vw;
-    max-width: 120px;
-    max-height: 120px;
-    margin: 1.5vh auto;
-    display: block;
-    border-radius: 1.5vw;
-    border: 0.2vw solid white;
-  }
-  
-  
-  
-  .scoreRow {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 3vw;
-    padding: 1vw 1vw;
-    margin: 0vh 0;
-    width: 65vw;
-    backdrop-filter: blur(2vw);
-    border: 0.2vw solid rgba(255, 255, 255, 0.3);
-    display: flex;
-    flex-direction: row;
-    gap: 6vw;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .scoreText{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 0vw;
-    font-size: 2.8vw;
-    font-weight: bold;
-    font-family: "Cherry Bomb One", system-ui;
-    -webkit-text-stroke: 0.1vw black;
-  
-  }
-  
-  .scoreTitle {
-    margin: 0;
-    -webkit-text-stroke: 0.1vw black;
-  }
-  
-  .scoreDisplay {
-    margin: 0;
-    -webkit-text-stroke: 0.1vw black;
-  
-  }
-  
-  .emptyScore {
-    color: rgba(255, 255, 255, 0.7);
-    font-style: italic;
-    font-family: "Cherry Bomb One", system-ui;
-  }
-  
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    .container {
-      padding: 3vw;
-      border-radius: 3vw;
-    }
-    
-    .imagesRow {
-      gap: 3vw;
-    }
-
-    .cubeImage {
-      width: 20vw;
-      height: 20vw;
-    }
-
-    .submitButton {
-      font-size: 4vw;
-      padding: 1.5vh 8vw;
-    }
-
-    .dragContainer h3 {
-      font-size: 4vw;
-    }
-  }
-
-  /* For very small screens */
-  @media (max-width: 480px) {
-    .container {
-      padding: 4vw;
-    }
-    
-    .imagesRow {
-      gap: 4vw;
-    }
-
-    .cubeImage {
-      width: 25vw;
-      height: 25vw;
-    }
-
-    .submitButton {
-      font-size: 5vw;
-      padding: 1.5vh 10vw;
-    }
-
-    .dragContainer h3 {
-      font-size: 5vw;
-    }
-  }
+}
