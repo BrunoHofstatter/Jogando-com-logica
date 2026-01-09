@@ -376,6 +376,27 @@ These implement custom game logic without the shared engine but follow similar d
 - Full type coverage for game mechanics
 - Use `Record<string, any>` in `Piece.customData` for game-specific extensions
 
+### File System Safety (Windows Environment)
+
+**CRITICAL: Never create files with Windows reserved names**
+
+The project is developed on Windows. The following names are **reserved device names** and must NEVER be used as filenames (with or without extensions):
+
+- `CON`, `PRN`, `AUX`, `NUL`
+- `COM1`, `COM2`, `COM3`, `COM4`, `COM5`, `COM6`, `COM7`, `COM8`, `COM9`
+- `LPT1`, `LPT2`, `LPT3`, `LPT4`, `LPT5`, `LPT6`, `LPT7`, `LPT8`, `LPT9`
+
+**Why this matters:**
+- These names reference hardware devices in Windows (e.g., `NUL` is the null device, `CON` is the console)
+- Creating files with these names causes file system errors
+- Such files cannot be deleted or manipulated using standard commands
+- Git may show them as untracked but they don't actually exist as files
+
+**What to do instead:**
+- When creating test files, use descriptive names like `test-output.txt`, `debug-log.txt`, `temp-data.json`
+- For null/empty file operations, use `/dev/null` on Unix or explicit Windows commands
+- Never redirect output to files named after these reserved keywords
+
 ### Deployment
 
 - Homepage: `https://jogandocomlogica.com/`

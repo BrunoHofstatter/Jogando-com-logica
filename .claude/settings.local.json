@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(del nul)",
+      "Bash(cmd //c 'del \"\"\\\\\\\\?\\\\C:\\\\Users\\\\bruno\\\\Projeto Jogando com lógica\\\\Jogando-com-logica\\\\nul\"\"')",
+      "Bash(cmd //c:*)",
+      "Bash(test:*)"
+    ]
+  }
+}
