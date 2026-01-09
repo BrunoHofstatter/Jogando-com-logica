@@ -3,17 +3,24 @@ import styles from "./SPTTT.module.css";
 import { Piece } from "./Piece";
 import { WinnerOverlay } from "./WinnerBox";
 import { useLocation } from "react-router-dom";
-
-type Player = "X" | "O" | null;
-type BoardResult = Player | "tie";
-type MiniBoard = Player[];
-type UltimateBoard = MiniBoard[];
+import {
+  Player,
+  BoardResult,
+  MiniBoard,
+  UltimateBoard,
+  checkWinner,
+  checkBigBoardWinner,
+  isValidMove,
+  getNextBoard,
+} from "./gameUtils";
+import { getAIMove } from "./aiPlayer";
 
 interface SPTTTProps {
   winCondition: "line" | "majority";
+  isAiMode?: boolean;
 }
 
-export default function SPTTT({ winCondition }: SPTTTProps) {
+export default function SPTTT({ winCondition, isAiMode = false }: SPTTTProps) {
   const [boards, setBoards] = useState<UltimateBoard>(
     Array.from({ length: 9 }, () => Array(9).fill(null))
   );
@@ -37,8 +44,7 @@ export default function SPTTT({ winCondition }: SPTTTProps) {
     boardIndex: number;
     cellIndex: number;
   } | null>(null);
-  
-  
+
   const [finalWinner, setFinalWinner] = useState<"X" | "O" | "tie" | null>(
     null
   );
@@ -46,8 +52,7 @@ export default function SPTTT({ winCondition }: SPTTTProps) {
   useEffect(() => {
     const checkTouchDevice = () => {
       setIsTouchDevice(
-        "ontouchstart" in window ||
-          navigator.maxTouchPoints > 0
+        "ontouchstart" in window || navigator.maxTouchPoints > 0
       );
     };
 
@@ -59,15 +64,46 @@ export default function SPTTT({ winCondition }: SPTTTProps) {
     };
   }, []);
 
-  const handleTouchStart = (boardIndex: number, cellIndex: number) => {
-    if (!isValidMove(boardIndex, cellIndex)) return;
+  // AI Logic
+  useEffect(() => {
+    if (
+      isAiMode &&
+      currentPlayer === "O" &&
+      !finalWinner &&
+      winners.some((w) => w === null) // Ensure game isn't over (rough check, checkBigBoardWinner handles real end)
+    ) {
+      // Small delay for UX
+      const timer = setTimeout(() => {
+        try {
+          const aiMove = getAIMove(boards, winners, activeBoard);
+          handleClick(aiMove.boardIndex, aiMove.cellIndex);
+        } catch (e) {
+          console.error("AI failed to make a move", e);
+        }
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [currentPlayer, isAiMode, finalWinner, boards, winners, activeBoard]);
 
-    if (tapCell && tapCell.boardIndex === boardIndex && tapCell.cellIndex === cellIndex) {
+  const handleTouchStart = (boardIndex: number, cellIndex: number) => {
+    if (
+      !isValidMove(boardIndex, cellIndex, boards, winners, activeBoard)
+    )
+      return;
+
+    // Prevent human from touching if it's AI turn
+    if (isAiMode && currentPlayer === 'O') return;
+
+    if (
+      tapCell &&
+      tapCell.boardIndex === boardIndex &&
+      tapCell.cellIndex === cellIndex
+    ) {
       handleClick(boardIndex, cellIndex);
       setTapCell(null);
     } else {
       setTapCell({ boardIndex, cellIndex });
-      const nextBoard = getNextBoard(cellIndex);
+      const nextBoard = getNextBoard(cellIndex, winners);
       setPreviewBoard(nextBoard);
     }
   };
@@ -76,20 +112,6 @@ export default function SPTTT({ winCondition }: SPTTTProps) {
     setTapCell(null);
     setPreviewBoard(null);
   }, [activeBoard, currentPlayer]);
-
-  const isValidMove = (boardIndex: number, cellIndex: number): boolean => {
-    if (winners[boardIndex] !== null) return false;
-    if (activeBoard !== null && activeBoard !== boardIndex) return false;
-    if (boards[boardIndex][cellIndex] !== null) return false;
-    return true;
-  };
-
-  const getNextBoard = (cellIndex: number): number | null => {
-    if (winners[cellIndex] !== null) {
-      return null;
-    }
-    return cellIndex;
-  };
 
   useEffect(() => {
     if (winCondition === "majority") {
@@ -100,81 +122,6 @@ export default function SPTTT({ winCondition }: SPTTTProps) {
       setScores(newScores);
     }
   }, [winners, winCondition]);
-  function checkWinner(board: MiniBoard): BoardResult {
-    const lines = [
-      [0, 1, 2],
-      [3, 4, 5],
-      [6, 7, 8], // rows
-      [0, 3, 6],
-      [1, 4, 7],
-      [2, 5, 8], // cols
-      [0, 4, 8],
-      [2, 4, 6], // diagonals
-    ];
-
-    for (let [a, b, c] of lines) {
-      if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-        return board[a];
-      }
-    }
-
-    // Check for tie (board is full with no winner)
-    if (board.every((cell) => cell !== null)) {
-      return "tie";
-    }
-
-    return null;
-  }
-
-  function checkBigBoardWinner(
-    winners: Array<BoardResult>
-  ): BoardResult | null {
-    if (winCondition === "line") {
-      const lines = [
-        [0, 1, 2],
-        [3, 4, 5],
-        [6, 7, 8], // rows
-        [0, 3, 6],
-        [1, 4, 7],
-        [2, 5, 8], // cols
-        [0, 4, 8],
-        [2, 4, 6], // diagonals
-      ];
-
-      for (let [a, b, c] of lines) {
-        if (
-          winners[a] &&
-          winners[a] === winners[b] &&
-          winners[a] === winners[c] &&
-          winners[a] !== "tie"
-        ) {
-          // Set the winning board line for animation
-          setWinningBoardLine([a, b, c]);
-
-          // Clear animation after it completes
-          setTimeout(() => setWinningBoardLine(null), 1000);
-
-          return winners[a];
-        }
-      }
-
-      if (winners.every((winner) => winner !== null)) {
-        return "tie";
-      }
-    } else {
-      // Majority win condition (unchanged)
-      if (winners.every((winner) => winner !== null)) {
-        const countX = winners.filter((winner) => winner === "X").length;
-        const countO = winners.filter((winner) => winner === "O").length;
-
-        if (countX > countO) return "X";
-        if (countO > countX) return "O";
-        return "tie";
-      }
-    }
-
-    return null;
-  }
 
   const handleClick = (boardIndex: number, cellIndex: number) => {
     if (winners[boardIndex] !== null) return;
@@ -197,15 +144,19 @@ export default function SPTTT({ winCondition }: SPTTTProps) {
     setBoards(newBoards);
     setWinners(newWinners);
 
-    const nextBoard = cellIndex;
-    const targetBoardHasMoves =
-      newBoards[nextBoard].some((cell) => cell === null) &&
-      !newWinners[nextBoard];
-
-    setActiveBoard(targetBoardHasMoves ? nextBoard : null);
+    const nextBoard = getNextBoard(cellIndex, newWinners);
+    setActiveBoard(nextBoard);
     setCurrentPlayer(currentPlayer === "X" ? "O" : "X");
 
-    const bigWinner = checkBigBoardWinner(newWinners);
+    const { winner: bigWinner, winningLine } = checkBigBoardWinner(
+      newWinners,
+      winCondition
+    );
+
+    if (winningLine) {
+        setWinningBoardLine(winningLine);
+        setTimeout(() => setWinningBoardLine(null), 1000);
+    }
 
     if (bigWinner) {
       setTimeout(() => {
@@ -222,6 +173,7 @@ export default function SPTTT({ winCondition }: SPTTTProps) {
     setFinalWinner(null);
     setWinningBoardLine(null);
   };
+
   return (
     <div className={styles["jogo-SPTTT"]}>
       <div className={styles.statWrap}>
@@ -285,7 +237,13 @@ export default function SPTTT({ winCondition }: SPTTTProps) {
                   </div>
                 )}
                 {board.map((cell, cellIndex) => {
-                  const isValid = isValidMove(boardIndex, cellIndex);
+                  const isValid = isValidMove(
+                    boardIndex,
+                    cellIndex,
+                    boards,
+                    winners,
+                    activeBoard
+                  );
                   const showHoverPreview =
                     !cell &&
                     isValid &&
@@ -297,6 +255,9 @@ export default function SPTTT({ winCondition }: SPTTTProps) {
                     isValid &&
                     tapCell?.boardIndex === boardIndex &&
                     tapCell?.cellIndex === cellIndex;
+
+                  // Disable interaction if it's AI turn and valid (just in case)
+                  const isDisabled = !isValid || (isAiMode && currentPlayer === 'O');
 
                   return (
                     <button
@@ -311,20 +272,20 @@ export default function SPTTT({ winCondition }: SPTTTProps) {
                       }`}
                       data-cell={`${boardIndex}-${cellIndex}`}
                       onClick={() => {
-                        if (!isTouchDevice && isValid) {
+                        if (!isTouchDevice && !isDisabled) {
                           handleClick(boardIndex, cellIndex);
                         }
                       }}
                       onTouchStart={() => {
-                        if (isValid) {
+                        if (!isDisabled) {
                           handleTouchStart(boardIndex, cellIndex);
                         }
                       }}
-                      disabled={!isValid}
+                      disabled={isDisabled}
                       onMouseEnter={() => {
-                        if (isValid) {
+                        if (!isDisabled) {
                           setHoveredCell({ boardIndex, cellIndex });
-                          const nextBoard = getNextBoard(cellIndex);
+                          const nextBoard = getNextBoard(cellIndex, winners);
                           setPreviewBoard(nextBoard);
                         }
                       }}
@@ -355,7 +316,7 @@ export default function SPTTT({ winCondition }: SPTTTProps) {
 
       {/* Winner Overlay */}
       {finalWinner && (
-        <WinnerOverlay winner={finalWinner} onRestart={restartGame} />
+        <WinnerOverlay winner={finalWinner} onRestart={restartGame} isAiMode={isAiMode} />
       )}
     </div>
   );

@@ -10,9 +10,12 @@ import { getAIMove } from "../Logic/aiPlayer";
 export default function MathWarAIPage() {
   const [showTutorial, setShowTutorial] = useState(false);
   const engine = new GameEngine();
-  const [gameState, setGameState] = useState<GameState>(() =>
-    engine.initializeGame(gameConfig, gameRules)
-  );
+  const [gameState, setGameState] = useState<GameState>(() => {
+    const initialState = engine.initializeGame(gameConfig, gameRules);
+    // Force Player 1 (Blue/Human) to start first in AI mode
+    initialState.currentPlayer = 1;
+    return initialState;
+  });
 
   // Check if tutorial should auto-start
   useEffect(() => {

@@ -8,6 +8,7 @@ import PaginaDamas from "./Damas/Pages/RegrasDamas";
 import Teste from "./Main/Pages/Teste";
 import SPTTT from "./SPTTT/RegrasSPTTT";
 import JogoSPTTT from "./SPTTT/SPTTTpage";
+import SPTTTAIPage from "./SPTTT/aiGamePage";
 import VersusModePage from "./Caca_soma/Pages/VersusModePage";
 import LevelSelectionPage from "./Caca_soma/Pages/LevelSelectionPage";
 import LevelGamePage from "./Caca_soma/Pages/LevelGamePage";
@@ -63,6 +64,7 @@ function App() {
         <Route path="/teste" element={<Teste />} />
         <Route path="/spttt" element={<SPTTT />} />
         <Route path="/jogospttt" element={<JogoSPTTT />} />
+        <Route path="/spttt-ai" element={<SPTTTAIPage />} />
         <Route path="/cacaSoma" element={<VersusModePage />} />
         <Route path="/cacaSomaNiveis" element={<LevelSelectionPage />} />
         <Route path="/cacaSomaNivel/:levelId" element={<LevelGamePage />} />
