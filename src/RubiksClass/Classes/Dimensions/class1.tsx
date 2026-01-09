@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styles from "./class1.module.css";
-import hintStyles from "./class1Hint.module.css";
+import hintStyles from "./class1hint.module.css";
 import Hint from "../../Components/hintButton";
 import { CheckCircle, XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
