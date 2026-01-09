@@ -84,6 +84,48 @@
   box-shadow: 0 0 2vw rgba(244, 67, 54, 0.5); /* Red glow */
 }
 
+.modeButtons {
+  display: flex;
+  gap: 2vw;
+  margin-bottom: 4vw;
+  width: 100%;
+  justify-content: center;
+}
+
+.modeButton {
+  border: 0.9dvh solid #a11313;  /* Red border */
+  background: radial-gradient(circle, #d38c8c, #ac4c4c); /* Red gradient */
+  border-radius: 2vw;
+  box-sizing: border-box;
+  color: #eee; /* White text */
+  -webkit-text-stroke: 0.2vw #af2020; /* Red stroke */
+  font-size: clamp(2.5vw, 6dvh, 3.5vw);
+  font-family: "Cherry Bomb One", system-ui;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1vw 2.5vw;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 1.5vw rgba(0, 0, 0, 0.3), inset 0 0 0.5vw rgba(0, 0, 0, 0.3);
+  flex: 1;
+  max-width: 45%;
+}
+
+.modeButton:hover {
+  border: 0.9dvh solid #ac1d1d;
+  -webkit-text-stroke: 0.2vw #ba2b2b;
+  background: radial-gradient(circle, #e19c9c, #ba5555);
+  transform: scale(1.05) translateY(-0.5dvh);
+  box-shadow: 0 0 1.5vw rgba(244, 67, 54, 0.5); /* Red glow */
+}
+
+.modeButton:active {
+  transform: scale(0.98);
+}
+
 
 .tutorialButton{
   position: absolute;

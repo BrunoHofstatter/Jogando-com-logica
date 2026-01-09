@@ -37,7 +37,7 @@ export class GameEngine {
 
     const state: GameState = {
       board,
-      currentPlayer: 0,
+      currentPlayer: 1,
       turnCount: 0,
       players: config.players,
       config,

@@ -16,6 +16,8 @@ interface Prop {
   sorteado: number;
   onTimeUpdate?: (tempo: number) => void;
   onOkayChange?: (okayFn: () => void) => void; // Pass okay function to parent
+  boardSize?: 5 | 7 | 10; // Board dimension (default 10 for versus mode)
+  maxSelections?: 2 | 3; // Max numbers to select (default 3 for versus mode)
 }
 
 function Tabuleiro({
@@ -32,10 +34,12 @@ function Tabuleiro({
   sorteado,
   onTimeUpdate,
   onOkayChange,
+  boardSize = 10,
+  maxSelections = 3,
 }: Prop) {
-  // 10x10 matrix filled with false
+  // Dynamic board size (5x5, 7x7, or 10x10)
   const [board, setBoard] = useState(
-    Array.from({ length: 10 }, () => Array(10).fill(0))
+    Array.from({ length: boardSize }, () => Array(boardSize).fill(0))
   );
 
   // Create the submit turn function that can be passed to parent
@@ -68,13 +72,13 @@ function Tabuleiro({
 
   useEffect(() => {
     if (qualRodada === 0) {
-      setBoard(Array.from({ length: 10 }, () => Array(10).fill(0)));
+      setBoard(Array.from({ length: boardSize }, () => Array(boardSize).fill(0)));
     }
-  }, [qualRodada]);
+  }, [qualRodada, boardSize]);
 
   const toggleCell = (row: number, col: number, valor: number) => {
-    if (board[row][col] === 0 && jogar && quantos < 3) {
-      if (quantos < 3) {
+    if (board[row][col] === 0 && jogar && quantos < maxSelections) {
+      if (quantos < maxSelections) {
         setQuantos(quantos + 1);
         mudarSoma(valor);
       }
@@ -87,7 +91,7 @@ function Tabuleiro({
         )
       );
     }
-    if (board[row][col] === 1 && jogar && quantos <= 3) {
+    if (board[row][col] === 1 && jogar && quantos <= maxSelections) {
       setQuantos(quantos - 1);
       mudarSoma(-valor);
       setBoard((prev) =>
@@ -109,7 +113,7 @@ function Tabuleiro({
         soma={soma}
         onTimeUpdate={onTimeUpdate}
       />
-      <div className={styles.board}>
+      <div className={styles.board} style={{ gridTemplateColumns: `repeat(${boardSize}, 1fr)` }}>
         {board.map((row, rIdx) =>
           row.map((cell, cIdx) => (
             <div
@@ -121,9 +125,9 @@ function Tabuleiro({
                   ? styles.cellSelected
                   : styles.cellCorrect
               }`}
-              onClick={() => toggleCell(rIdx, cIdx, rIdx * 10 + cIdx + 1)}
+              onClick={() => toggleCell(rIdx, cIdx, rIdx * boardSize + cIdx + 1)}
             >
-              {rIdx * 10 + cIdx + 1}
+              {rIdx * boardSize + cIdx + 1}
             </div>
           ))
         )}

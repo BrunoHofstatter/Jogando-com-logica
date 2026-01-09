@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { CheckCircle, XCircle } from "lucide-react";
+import { validateAnswer, validateDualAnswer } from "../Logic/validationUtils";
+import styles from "../styles/StopGame.module.css";
 
-type CaixaStopProps =
+type CalculationCellProps =
   | {
       numero_base: number;
       numero: number;
@@ -12,14 +14,19 @@ type CaixaStopProps =
     }
   | {
       numero_base: number;
-      numeros: [number, number]; // <-- two numbers here for the two operations
+      numeros: [number, number];
       contas: [string, string];
       checar: boolean;
       registrarAcerto: () => void;
       isDual: true;
     };
 
-function CaixaStop(props: CaixaStopProps) {
+/**
+ * Individual calculation cell component
+ * Displays operation(s), input field, and validation feedback
+ * Supports both single and dual (chained) operations
+ */
+function CalculationCell(props: CalculationCellProps) {
   const [certo, setCerto] = useState<boolean | null>(null);
   const [respostaCorreta, setRespostaCorreta] = useState<number | null>(null);
   const [valorInput, setValorInput] = useState("");
@@ -34,67 +41,54 @@ function CaixaStop(props: CaixaStopProps) {
     event.preventDefault();
   };
 
+  // Validate answer when checar prop becomes true
   useEffect(() => {
     if (!props.checar) return;
 
-    const calculate = (op: string, a: number, b: number) => {
-      switch (op) {
-        case "+":
-          return a + b;
-        case "-":
-          return a - b;
-        case "x":
-          return a * b;
-        case "÷":
-          return a / b;
-        default:
-          return NaN;
-      }
-    };
-
     if (isDual) {
-      // Use numeros[0] and numeros[1] separately, each for their operation
-      const intermediate = calculate(
-        props.contas[0],
+      // Validate dual operation
+      const result = validateDualAnswer(
+        props.contas,
         props.numero_base,
-        props.numeros[0]
-      );
-      const finalResult = calculate(
-        props.contas[1],
-        intermediate,
-        props.numeros[1]
+        props.numeros,
+        valorInput
       );
 
-      const input = Number(valorInput);
-      const acerto = Math.abs(input - finalResult) < 0.0001;
-
-      setCerto(acerto);
-      if (acerto) {
+      setCerto(result.isCorrect);
+      if (result.isCorrect) {
         props.registrarAcerto();
       } else {
-        setRespostaCorreta(finalResult);
+        setRespostaCorreta(result.correctAnswer);
       }
     } else {
-      const resultado = calculate(props.conta, props.numero_base, props.numero);
-      if (Number(valorInput) === resultado) {
-        setCerto(true);
+      // Validate single operation
+      const result = validateAnswer(
+        props.conta,
+        props.numero_base,
+        props.numero,
+        valorInput
+      );
+
+      setCerto(result.isCorrect);
+      if (result.isCorrect) {
         props.registrarAcerto();
       } else {
-        setCerto(false);
-        setRespostaCorreta(resultado);
+        setRespostaCorreta(result.correctAnswer);
       }
     }
   }, [props.checar]);
 
   return (
     <div>
-      <div className={isDual ? "headerDual" : "header"}>
+      {/* Header showing operation(s) */}
+      <div className={isDual ? styles.headerDual : styles.header}>
         {isDual ? (
           <>
             <div>
               {props.contas[0]}
               {props.numeros[0]}
-            </div>  <div>
+            </div>
+            <div>
               {props.contas[1]}
               {props.numeros[1]}
             </div>
@@ -106,25 +100,29 @@ function CaixaStop(props: CaixaStopProps) {
           </>
         )}
       </div>
-      <form className="cellBorder" onSubmit={handleSubmit}>
+
+      {/* Input field */}
+      <form className={styles.cellBorder} onSubmit={handleSubmit}>
         <input
-          className="input-cell"
+          className={styles.inputCell}
           type="number"
           value={valorInput}
           onChange={handleChange}
         />
       </form>
+
+      {/* Feedback (shown after checking) */}
       {props.checar && (
-        <div className="feedback">
+        <div className={styles.feedback}>
           {certo === true && (
-            <div className="icon-stack">
+            <div className={styles.iconStack}>
               <CheckCircle
-                className="icon check out"
+                className={`${styles.icon} ${styles.check} out`}
                 strokeWidth={4}
                 color="black"
               />
               <CheckCircle
-                className="icon check"
+                className={`${styles.icon} ${styles.check}`}
                 strokeWidth={1.5}
                 color="#0fb11d"
               />
@@ -132,19 +130,19 @@ function CaixaStop(props: CaixaStopProps) {
           )}
           {certo === false && (
             <>
-              <div className="icon-stack">
+              <div className={styles.iconStack}>
                 <XCircle
-                  className="icon xmark out"
+                  className={`${styles.icon} ${styles.xmark} out`}
                   strokeWidth={4}
                   color="black"
                 />
                 <XCircle
-                  className="icon xmark"
+                  className={`${styles.icon} ${styles.xmark}`}
                   strokeWidth={1.5}
                   color="#f02121"
                 />
               </div>
-              <div className="correction"> {respostaCorreta}</div>
+              <div className={styles.correction}> {respostaCorreta}</div>
             </>
           )}
         </div>
@@ -153,4 +151,4 @@ function CaixaStop(props: CaixaStopProps) {
   );
 }
 
-export default CaixaStop;
+export default CalculationCell;

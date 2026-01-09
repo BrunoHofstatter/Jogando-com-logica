@@ -1,15 +1,17 @@
-import StopPage from "./Stop/PageStop";
-/*import StopJogo from "./Stop/JogoStop";*/
+import StopPage from "./Stop/Pages/StopGamePage";
 import Home from "./Main/Pages/Home";
 import Jogos from "./Main/Pages/Jogos";
 import Sobre from "./Main/Pages/Sobre";
 import Contato from "./Main/Pages/Contato";
-import JogoStop from "./Stop/RegrasStop";
+import JogoStop from "./Stop/Pages/RegrasPage";
 import PaginaDamas from "./Damas/Pages/RegrasDamas";
 import Teste from "./Main/Pages/Teste";
 import SPTTT from "./SPTTT/RegrasSPTTT";
 import JogoSPTTT from "./SPTTT/SPTTTpage";
-import Pagina_Soma from "./Caca_soma/Pages/Pagina_principal";
+import VersusModePage from "./Caca_soma/Pages/VersusModePage";
+import LevelSelectionPage from "./Caca_soma/Pages/LevelSelectionPage";
+import LevelGamePage from "./Caca_soma/Pages/LevelGamePage";
+import ResultsPage from "./Caca_soma/Pages/ResultsPage";
 import "./App.css";
 import BaseGame from "./AA_baseGame/Pages/baseGamePage"
 import { Routes, Route, useLocation, Link } from "react-router-dom";
@@ -17,11 +19,13 @@ import JogoDamas from "./Damas/Pages/JogoDamas"
 import DamasRegras from "./AA_baseGame/Pages/regrasPage";
 import CrownChasePage from "./CrownChase/Pages/baseGamePage";
 import CrownChaseRegras from "./CrownChase/Pages/regrasPage";
+import CrownChaseAIPage from "./CrownChase/Pages/aiGamePage";
 import CacaSomaRegras from "./Caca_soma/Pages/Regras_CacaSoma";
 import ClassMenu from "./RubiksClass/Classes/ClassMenu";
 import Dimensions from "./RubiksClass/Classes/Dimensions/class1";
 import MathWarRegras from "./MathWar/Pages/regrasPage"
 import MathWarPage from "./MathWar/Pages/baseGamePage"
+import MathWarAIPage from "./MathWar/Pages/aiGamePage"
 import Manual from "./Main/Pages/manual"
 import Class2 from "./RubiksClass/Classes/FaceArea/class2.tsx"
 
@@ -59,16 +63,21 @@ function App() {
         <Route path="/teste" element={<Teste />} />
         <Route path="/spttt" element={<SPTTT />} />
         <Route path="/jogospttt" element={<JogoSPTTT />} />
-        <Route path="/cacaSoma" element={<Pagina_Soma />} />
+        <Route path="/cacaSoma" element={<VersusModePage />} />
+        <Route path="/cacaSomaNiveis" element={<LevelSelectionPage />} />
+        <Route path="/cacaSomaNivel/:levelId" element={<LevelGamePage />} />
+        <Route path="/cacaSomaResultado" element={<ResultsPage />} />
         <Route path="/baseGame" element={<BaseGame />} />
         <Route path="/damasregras" element={<DamasRegras />} />
         <Route path="/crownchasePg" element={<CrownChasePage />} />
         <Route path="/crownchaseRg" element={<CrownChaseRegras />} />
+        <Route path="/crownchase-ai" element={<CrownChaseAIPage />} />
         <Route path="/cacasomaRg" element={<CacaSomaRegras />} />
         <Route path="/dimensions" element={<Dimensions />} />
         <Route path="/classMenu" element={<ClassMenu />} />
         <Route path="/mathwarRg" element={<MathWarRegras />} />
         <Route path="/mathwarPg" element={<MathWarPage />} />
+        <Route path="/mathwar-ai" element={<MathWarAIPage />} />
         <Route path="/manual" element={<Manual />} />
         <Route path="/class2" element={<Class2 />} />
       </Routes>

@@ -3,9 +3,16 @@ import { gameConfig } from "../Logic/gameConfig";
 import { gameRules } from "../Logic/gameRules";
 import { useState, useEffect } from 'react';
 import DynamicTutorial, { TutorialStep } from "../Components/DynamicTutorial";
+import { GameEngine } from "../../CrownChase/Logic/gameEngine";
+import { GameState } from "../../CrownChase/Logic/types";
+import { getAIMove } from "../Logic/aiPlayer";
 
-export default function CrownChasePage() {
+export default function CrownChaseAIPage() {
   const [showTutorial, setShowTutorial] = useState(false);
+  const engine = new GameEngine();
+  const [gameState, setGameState] = useState<GameState>(() =>
+    engine.initializeGame(gameConfig, gameRules)
+  );
 
   // Check if tutorial should auto-start
   useEffect(() => {
@@ -14,6 +21,36 @@ export default function CrownChasePage() {
       setShowTutorial(true);
     }
   }, []);
+
+  // Handle AI move when it's AI's turn (player 0 = red = AI)
+  useEffect(() => {
+    if (gameState.currentPlayer === 0 && gameState.gamePhase === 'playing') {
+      // Add a delay so the AI doesn't move instantly
+      const timeout = setTimeout(() => {
+        makeAIMove();
+      }, 800);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [gameState.currentPlayer, gameState.gamePhase]);
+
+  const makeAIMove = () => {
+    try {
+      const aiMove = getAIMove(gameState, gameRules, 1); // Level 1 difficulty
+      const success = engine.executeAction(gameState, aiMove, gameRules);
+
+      if (success) {
+        setGameState({...gameState});
+      }
+    } catch (error) {
+      console.error("AI move failed:", error);
+    }
+  };
+
+  const handleGameStateChange = (newState: GameState) => {
+    setGameState({...newState});
+  };
+
   const tutorialSteps: TutorialStep[] = [
     {
       id: 'king',
@@ -108,7 +145,7 @@ export default function CrownChasePage() {
     },
     {
       id: 'board',
-      target: '[data-target="gameInfo"]', // Point to game info panel
+      target: '[data-target="gameInfo"]',
       highlight: true,
       placement: 'auto',
       title: 'Informações do Jogo',
@@ -135,7 +172,13 @@ export default function CrownChasePage() {
   ];
 
   return <>
-      <Board gameConfig={gameConfig} gameRules={gameRules} />
+      <Board
+        gameConfig={gameConfig}
+        gameRules={gameRules}
+        gameState={gameState}
+        onGameStateChange={handleGameStateChange}
+        isAIMode={true}
+      />
 
       {showTutorial && (
         <DynamicTutorial

@@ -11,9 +11,14 @@ function CacaSomaRegras() {
   const [showDetailedRules, setShowDetailedRules] = useState(false);
   const [tutorialCompleted, resetTutorial] =
       useTutorialCompleted("cacasoma_v1");
-  function jogarStop() {
+  function jogarNiveis() {
+    navigate("/cacaSomaNiveis");
+  }
+
+  function jogarVersus() {
     navigate("/cacaSoma");
   }
+
   const startTutorial = () => {
     resetTutorial(); // Clear the "completed" flag
     navigate("/cacaSoma");
@@ -33,9 +38,18 @@ function CacaSomaRegras() {
 
       {/* Right Side - Game Controls */}
       <div className={styles.botoes}>
-        <button className={styles.button} onClick={jogarStop}>
+        <button className={styles.button} onClick={jogarNiveis}>
           <span>Jogar</span>
         </button>
+
+        <div className={styles.modeButtons}>
+          <button className={styles.modeButton} onClick={jogarNiveis}>
+            <span>Todos os Níveis</span>
+          </button>
+          <button className={styles.modeButton} onClick={jogarVersus}>
+            <span>Modo Versus</span>
+          </button>
+        </div>
 
         <button className={styles.tutorialButton} onClick={startTutorial}>
           <span>Tutorial</span>

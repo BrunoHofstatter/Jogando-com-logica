@@ -1,0 +1,347 @@
+/* ========================================
+   NUMBER REVEAL STYLES (from Stop.css)
+   ======================================== */
+
+.sortPage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 0vw solid #5e1317;
+  box-shadow: inset 0 0 2vw #5e1317e0;
+  min-height: 100dvh;
+  width: 100vw;
+  border-radius: 0.15vw;
+  background: radial-gradient(circle, #de9696, #ab3636);
+}
+
+.bordaSort {
+  background: radial-gradient(circle, #a30c0c, #740505);
+  border: 0.5vw solid #080303;
+  border-radius: 6vw;
+  padding: 2.2vw;
+  text-align: center;
+  width: fit-content;
+  box-sizing: border-box;
+  box-shadow: 0 0 2vw #000;
+}
+
+.divSort {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 2vw;
+  border: 0.5vw solid #080303;
+  border-radius: 5.3vw;
+  background: radial-gradient(circle, #aa6d6d, #844749);
+  padding: 1.5vw 3.5vw 2.2vw 3.5vw;
+}
+
+.sort {
+  font-family: "Cherry Bomb One", system-ui;
+  font-weight: 200;
+  font-style: normal;
+  font-size: 7vw;
+  color: #e2a01d;
+  -webkit-text-stroke: 0.44vw #000000;
+}
+
+.numeroBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, #b13737, #851616);
+  border: 0.7vw solid #000000;
+  border-radius: 3vw;
+  padding: 0.7vw 2.7vw;
+  width: fit-content;
+  height: fit-content;
+  line-height: 1;
+}
+
+.numero {
+  font-size: clamp(0.73vw, 14vw, 146.5vw);
+  font-family: "Cherry Bomb One", system-ui;
+  font-weight: 200;
+  font-style: normal;
+  color: #e2a01d;
+  -webkit-text-stroke: 0.51vw #000000;
+  display: block;
+  line-height: 1;
+  padding: 0;
+  margin: 0;
+  transform: translateY(-0.88vw);
+}
+
+/* ========================================
+   GAME BOARD STYLES (from JogoStop.css)
+   ======================================== */
+
+.jogoStop {
+  width: 100vw;
+  height: 100dvh;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0vw;
+  position: relative;
+  font-family: "Cherry Bomb One", system-ui;
+  font-weight: 200;
+  font-style: normal;
+  font-size: 1.74vw;
+  color: #f1b02d;
+  border: 0dvh solid #7a0808;
+  box-shadow: inset 0 0 3vw #5e1317a0;
+  -webkit-text-stroke: 0.11vw #000000;
+  background: radial-gradient(circle, #de9696, #ab3636);
+}
+
+.jogoStop h2 {
+  color: #f3c364;
+  top: 6dvh;
+  right: 8vw;
+  position: absolute;
+  font-size: 4vw;
+  -webkit-text-stroke: 0.25vw #030000;
+}
+
+.stopBorder {
+  padding: 4.2vw 4.2vw 4.2vw 0.21vw;
+  border: 0vw solid #7a0808;
+  border-radius: 3.47vw;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 90vw;
+  height: 93dvh;
+  background: none;
+  box-shadow: 0 0 0vw #000;
+}
+
+.resetButton {
+  font-family: "Cherry Bomb One", system-ui;
+  font-weight: 200;
+  font-style: normal;
+  position: absolute;
+  bottom: 6dvh;
+  right: 8vw;
+  -webkit-text-stroke: 0.2vw #080303;
+  color: #f1b02d;
+  font-size: 2.3vw;
+  background: radial-gradient(circle, #a02b2b, #851616);
+  border-radius: 1.5vw;
+  border: 0.3vw solid #080303;
+  padding: 0 0.7vw 0.2vw 0.7vw;
+}
+
+.resetButton:hover {
+  transform: scale(1.04);
+}
+
+/* ========================================
+   MAGIC NUMBER DISPLAY & STOP BUTTON
+   ======================================== */
+
+.numMagico {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  font-size: 3.13vw;
+  font-weight: bold;
+  height: 100%;
+  text-align: center;
+  border-radius: 1.39vw;
+  -webkit-text-stroke: 0.11vw #330404;
+  width: 35vw;
+  gap: 5.56vw;
+}
+
+.numeroCaixa {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, #b13737, #851616);
+  border: 0.7vw solid #000000;
+  border-radius: 3vw;
+  padding: 0.7vw 2.7vw;
+  width: fit-content;
+  height: fit-content;
+  line-height: 1;
+  margin: auto;
+  cursor: pointer;
+}
+
+.numeroO {
+  font-size: clamp(0.73vw, 14vw, 146.5vw);
+  font-family: "Cherry Bomb One", system-ui;
+  font-weight: 200;
+  font-style: normal;
+  color: #e2a01d;
+  -webkit-text-stroke: 0.51vw #000000;
+  display: block;
+  line-height: 1;
+  padding: 0;
+  margin: 0;
+  transform: translateY(-0.88vw);
+}
+
+.pararJogo {
+  border: 0.56vw solid #080303;
+  background: radial-gradient(circle, #a02b2b, #851616);
+  border-radius: 4.17vw;
+  box-sizing: border-box;
+  color: #e2a01d;
+  -webkit-text-stroke: 0.42vw #080303;
+  font-size: 5.21vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 19.8vw;
+  height: 10.42vw;
+  text-align: center;
+  margin: auto;
+  margin-top: 0vw;
+  padding-bottom: 0.49vw;
+}
+
+.pararJogo:hover {
+  border: 0.56vw solid #080303;
+  background: radial-gradient(circle, #922222, #740f0f);
+  transform: scale(1.03);
+  -webkit-text-stroke: 0.42vw #080303;
+  color: #e2a01d;
+}
+
+.finalResultado {
+  border: 0.56vw solid #080303;
+  background: radial-gradient(circle, #a02b2b, #851616);
+  border-radius: 4.17vw;
+  box-sizing: border-box;
+  color: #e2a01d;
+  -webkit-text-stroke: 0.14vw #080303;
+  max-width: 24.3vw;
+  font-size: 2.78vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin: auto;
+  padding: 0.69vw 2vw 1vw 2vw;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+/* ========================================
+   CALCULATION TABLE/GRID
+   ======================================== */
+
+.tabelaWrap {
+  position: relative;
+  display: inline-block;
+}
+
+.tabela {
+  display: grid;
+  grid-template-columns: repeat(var(--columns, 5), 1fr);
+  column-gap: 3vw;
+  row-gap: 3.5vw;
+  -webkit-text-stroke: 0.16vw #000000;
+  color: #f1b02d;
+  width: 51vw;
+}
+
+/* ========================================
+   CALCULATION CELL STYLES
+   ======================================== */
+
+.header,
+.headerDual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0.37vw solid #0e0202;
+  border-radius: 0.69vw;
+  background: radial-gradient(circle, #bd5656, #a33838);
+  box-shadow: inset 0 0 0vw #831c1cbb;
+  margin-bottom: 0.49vw;
+  font-size: 2.08vw;
+  flex-direction: column;
+}
+
+.headerDual {
+  padding: 0.13vw 0;
+  font-size: 1.8vw;
+  line-height: 1.1;
+}
+
+.cellBorder {
+  background: radial-gradient(circle, #af1111, #970909);
+  border: 0.31vw solid #080303;
+  border-radius: 0.69vw;
+  padding: 0.76vw;
+  text-align: center;
+}
+
+.inputCell {
+  font-size: 2.08vw;
+  color: #f1b02d;
+  background: radial-gradient(circle, #b67f7f, #9b6061);
+  border: 0.31vw solid #080303;
+  border-radius: 0.69vw;
+  width: 100%;
+  padding: 1.04vw 0 1.04vw 0.35vw;
+  box-sizing: border-box;
+}
+
+.inputCell:focus {
+  border-color: #080303;
+  box-shadow: 0 0 0.35vw rgba(153, 16, 16, 0.5);
+}
+
+/* ========================================
+   FEEDBACK ICONS
+   ======================================== */
+
+.feedback {
+  gap: 0.4vw;
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  right: 2dvh;
+  bottom: 4dvh;
+}
+
+.iconStack {
+  width: 3vw;
+}
+
+.icon {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.check {
+  width: 3vw;
+  height: 3vw;
+  color: #0fb11d;
+}
+
+.xmark {
+  width: 3vw;
+  height: 3vw;
+  color: #e02121;
+}
+
+.correction {
+  -webkit-text-stroke: 0.15vw #080303;
+  bottom: 0.7vw;
+  font-size: 2.5vw;
+  position: relative;
+  height: 0;
+  font-weight: 1000;
+  color: #ff9100;
+}

@@ -18,6 +18,7 @@ interface BoardProps {
   gameRules: GameRules;
   gameState?: GameState;
   onGameStateChange?: (newState: GameState) => void;
+  isAIMode?: boolean;
 }
 
 const Board: React.FC<BoardProps> = ({
@@ -25,6 +26,7 @@ const Board: React.FC<BoardProps> = ({
   gameRules,
   gameState: externalGameState,
   onGameStateChange,
+  isAIMode = false,
 }) => {
   const engine = new GameEngine();
   const [internalGameState, setInternalGameState] = useState<GameState>(() =>
@@ -439,6 +441,7 @@ const Board: React.FC<BoardProps> = ({
             winner={finalWin.winner}
             reason={finalWin.reason}
             onPlayAgain={handlePlayAgain}
+            isAIMode={isAIMode}
           />
         )}
       </div>

@@ -5,14 +5,22 @@ interface Properties {
   clicar: boolean;
   mudarSorteado: (x: number) => void;
   rodada: number;
+  customRange?: [number, number]; // Optional custom range for level mode
 }
 
-function Girar({ mudarJogar, clicar, mudarSorteado, rodada }: Properties) {
+function Girar({ mudarJogar, clicar, mudarSorteado, rodada, customRange }: Properties) {
   const [displayedNumber, setDisplayedNumber] = useState(0);
   const interval = useRef<ReturnType<typeof setInterval> | null>(null);
   const stop = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const NumGenerator = () => {
+    // If custom range is provided (level mode), use it
+    if (customRange) {
+      const [min, max] = customRange;
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // Otherwise, use rodada-based calculation (versus mode)
     return Math.floor(
       Math.random() * (150 - rodada * 3 + 3) + (rodada * 3 + 3)
     );

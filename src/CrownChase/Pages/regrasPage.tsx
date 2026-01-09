@@ -3,22 +3,30 @@ import styles from "../styles/regras.module.css";
 import { useNavigate } from "react-router-dom";
 import { useTutorialCompleted } from "../Components/DynamicTutorial";
 
-type MandatoryCapture = true | false;
+type GameMode = "pvp" | "ai";
 
 function CrownChaseRegras() {
   const navigate = useNavigate();
-
+  const [gameMode, setGameMode] = useState<GameMode>("ai");
   const [showDetailedRules, setShowDetailedRules] = useState(false);
   const [tutorialCompleted, resetTutorial] =
     useTutorialCompleted("crownchase_v1");
 
   function jogarStop() {
-    navigate("/crownchasePg");
+    if (gameMode === "ai") {
+      navigate("/crownchase-ai");
+    } else {
+      navigate("/crownchasePg");
+    }
   }
 
   const startTutorial = () => {
     resetTutorial(); // Clear the "completed" flag
-    navigate("/crownchasePg");
+    if (gameMode === "ai") {
+      navigate("/crownchase-ai");
+    } else {
+      navigate("/crownchasePg");
+    }
   };
 
   return (
@@ -38,6 +46,31 @@ function CrownChaseRegras() {
         <button className={styles.button} onClick={jogarStop}>
           <span>Jogar</span>
         </button>
+
+        {/* Mode selector */}
+        <div className={styles['mode-select-rules']}>
+          <label>
+            <input
+              type="radio"
+              name="gameMode"
+              value="ai"
+              checked={gameMode === "ai"}
+              onChange={() => setGameMode("ai")}
+            />
+            Contra Computador
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="gameMode"
+              value="pvp"
+              checked={gameMode === "pvp"}
+              onChange={() => setGameMode("pvp")}
+            />
+            Dois Jogadores
+          </label>
+        </div>
+
         <button className={styles.tutorialButton} onClick={startTutorial}>
           <span>Tutorial</span>
         </button>
