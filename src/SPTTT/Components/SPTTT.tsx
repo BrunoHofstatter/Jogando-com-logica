@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import styles from "./SPTTT.module.css";
+import styles from "../Style/SPTTT.module.css";
 import { Piece } from "./Piece";
 import { WinnerOverlay } from "./WinnerBox";
 import { useLocation } from "react-router-dom";
@@ -12,8 +12,8 @@ import {
   checkBigBoardWinner,
   isValidMove,
   getNextBoard,
-} from "./gameUtils";
-import { getAIMove } from "./aiPlayer";
+} from "../Logic/gameUtils";
+import { getAIMove } from "../Logic/aiPlayer";
 
 interface SPTTTProps {
   winCondition: "line" | "majority";

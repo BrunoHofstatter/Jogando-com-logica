@@ -1,24 +1,32 @@
 import { useState } from "react";
-import styles from "./RegrasSPTTT.module.css";
+import styles from "../Style/RegrasSPTTT.module.css";
 import { useNavigate } from "react-router-dom";
-import { useTutorialCompleted } from "./DynamicTutorial";
+import { useTutorialCompleted } from "../Components/DynamicTutorial";
 
-type WinCondition = "line" | "majority";
+type GameMode = "pvp" | "ai";
 
 function JogoStop() {
   const navigate = useNavigate();
-  const [winCondition, setWinCondition] = useState<WinCondition>("line");
+  const [gameMode, setGameMode] = useState<GameMode>("pvp");
   const [showDetailedRules, setShowDetailedRules] = useState(false);
   const [tutorialCompleted, resetTutorial] =
       useTutorialCompleted("spttt_v1");
 
-  function jogarStop() {
-    navigate("/jogospttt", { state: { winCondition } });
+  function startGame() {
+    if (gameMode === "ai") {
+      navigate("/spttt-ai", { state: { winCondition: "line" } });
+    } else {
+      navigate("/jogospttt", { state: { winCondition: "line" } });
+    }
   }
 
   const startTutorial = () => {
     resetTutorial(); // Clear the "completed" flag
-    navigate("/jogospttt", { state: { winCondition } });
+    if (gameMode === "ai") {
+      navigate("/spttt-ai", { state: { winCondition: "line" } });
+    } else {
+      navigate("/jogospttt", { state: { winCondition: "line" } });
+    }
   };
 
   return (
@@ -35,32 +43,32 @@ function JogoStop() {
 
       {/* Right Side - Game Controls */}
       <div className={styles.botoes}>
-        <button className={styles.button} onClick={jogarStop}>
+        <button className={styles.button} onClick={startGame}>
           <span>Jogar</span>
         </button>
 
 
-        {/* Win mode selector */}
+        {/* Game mode selector */}
         <div className={styles['mode-select-rules']}>
           <label>
             <input
               type="radio"
-              name="winMode"
-              value="line"
-              checked={winCondition === "line"}
-              onChange={() => setWinCondition("line")}
+              name="gameMode"
+              value="pvp"
+              checked={gameMode === "pvp"}
+              onChange={() => setGameMode("pvp")}
             />
-            Clássico (3 em linha)
+            Dois Jogadores
           </label>
           <label>
             <input
               type="radio"
-              name="winMode"
-              value="majority"
-              checked={winCondition === "majority"}
-              onChange={() => setWinCondition("majority")}
+              name="gameMode"
+              value="ai"
+              checked={gameMode === "ai"}
+              onChange={() => setGameMode("ai")}
             />
-            Maioria dos Tabuleiros
+            Contra Computador
           </label>
         </div>     
         <button className={styles.tutorialButton} onClick={startTutorial}>
