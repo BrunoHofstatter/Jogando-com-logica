@@ -1,4 +1,4 @@
-import styles from "./Winner.module.css";
+import styles from "../Style/Winner.module.css";
 import { Piece } from "./Piece";
 
 export function WinnerOverlay({

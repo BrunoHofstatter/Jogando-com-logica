@@ -1,7 +1,7 @@
 import { useLocation } from "react-router-dom";
-import SPTTT from "./SPTTT";
+import SPTTT from "../Components/SPTTT";
 import { useState, useEffect } from "react";
-import DynamicTutorial, { TutorialStep } from "./DynamicTutorial";
+import DynamicTutorial, { TutorialStep } from "../Components/DynamicTutorial";
 
 export default function SPTTTPage() {
   const [showTutorial, setShowTutorial] = useState(false);
