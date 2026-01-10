@@ -1,4 +1,4 @@
-import styles from "./SPTTT.module.css";
+import styles from "../Style/SPTTT.module.css";
 import { CircleSmall, X } from "lucide-react";
 
 
