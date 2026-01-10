@@ -8,12 +8,13 @@ type GameMode = "pvp" | "ai";
 function MathWarRegras() {
   const navigate = useNavigate();
   const [gameMode, setGameMode] = useState<GameMode>("ai");
+  const [aiDifficulty, setAiDifficulty] = useState<1 | 2>(1);
   const [showDetailedRules, setShowDetailedRules] = useState(false);
   const [tutorialCompleted, resetTutorial] = useTutorialCompleted("mathwar_v1");
 
   function jogarStop() {
     if (gameMode === "ai") {
-      navigate("/mathwar-ai");
+      navigate("/mathwar-ai", { state: { difficulty: aiDifficulty } });
     } else {
       navigate("/mathwarPg");
     }
@@ -22,10 +23,16 @@ function MathWarRegras() {
   const startTutorial = () => {
     resetTutorial(); // Clear the "completed" flag
     if (gameMode === "ai") {
-      navigate("/mathwar-ai");
+      navigate("/mathwar-ai", { state: { difficulty: aiDifficulty } });
     } else {
       navigate("/mathwarPg");
     }
+  };
+
+  const toggleDifficulty = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setAiDifficulty((prev) => (prev === 1 ? 2 : 1));
   };
 
   return (
@@ -57,6 +64,11 @@ function MathWarRegras() {
               onChange={() => setGameMode("ai")}
             />
             Contra Computador
+            {gameMode === "ai" && (
+              <button className={styles.difficultyButton} onClick={toggleDifficulty}>
+                Nível: {aiDifficulty === 1 ? "Muito Fácil" : "Fácil"}
+              </button>
+            )}
           </label>
           <label>
             <input
