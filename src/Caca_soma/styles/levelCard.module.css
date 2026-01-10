@@ -1,0 +1,106 @@
+.card {
+  position: relative;
+  padding: 1.5vw;
+  background: radial-gradient(circle, #d38c8c, #ac4c4c); /* Red gradient matching buttons */
+  border: 0.6vw solid #a11313;
+  border-radius: 2vw;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 1.5vw rgba(0, 0, 0, 0.3), inset 0 0 0.5vw rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 0.8vw;
+  min-height: 25dvh;
+  box-sizing: border-box;
+}
+
+.card:hover {
+  transform: scale(1.03) translateY(-0.5dvh);
+  background: radial-gradient(circle, #e19c9c, #ba5555);
+  box-shadow: 0 0 2vw rgba(244, 67, 54, 0.5);
+  border-color: #ac1d1d;
+}
+
+.cardLocked {
+  background: radial-gradient(circle, #8a8a8a, #5e5e5e);
+  border-color: #4a4a4a;
+  cursor: not-allowed;
+  opacity: 0.8;
+  filter: grayscale(0.8);
+}
+
+.cardLocked:hover {
+  transform: none;
+  box-shadow: 0 0 1.5vw rgba(0, 0, 0, 0.3);
+  background: radial-gradient(circle, #8a8a8a, #5e5e5e);
+}
+
+.lockIcon {
+  position: absolute;
+  top: 1vw;
+  right: 1vw;
+  font-size: 2.5vw;
+  color: #eee;
+  text-shadow: 0 0.2vw 0.4vw rgba(0,0,0,0.5);
+  -webkit-text-stroke: 0.1vw #333;
+}
+
+.levelNumber {
+  font-size: 3vw;
+  font-weight: bold;
+  color: #eee;
+  text-align: center;
+  font-family: "Cherry Bomb One", system-ui;
+  -webkit-text-stroke: 0.2vw #af2020;
+}
+
+.description {
+  font-size: 1.5vw;
+  color: #eee;
+  text-align: center;
+  font-family: "Cherry Bomb One", system-ui;
+  min-height: 3vw;
+  -webkit-text-stroke: 0.1vw #af2020;
+}
+
+.starsContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: auto;
+}
+
+.bestTime {
+  font-size: 1.2vw;
+  color: #eee;
+  text-align: center;
+  font-family: "Cherry Bomb One", system-ui;
+  -webkit-text-stroke: 0.08vw #af2020;
+  margin-top: 0.5vw;
+}
+
+.completed {
+  font-size: 1.2vw;
+  color: #4caf50;
+  text-align: center;
+  font-weight: bold;
+  font-family: "Cherry Bomb One", system-ui;
+  -webkit-text-stroke: 0.08vw #1b5e20;
+  margin-top: 0.5vw;
+}
+
+/* Locked state text adjustments */
+.cardLocked .levelNumber,
+.cardLocked .description {
+  -webkit-text-stroke: 0.2vw #333;
+}
+
+@media (max-width: 600px) {
+  .card {
+    border-radius: 4vw;
+    padding: 3vw;
+  }
+  .levelNumber { font-size: 6vw; }
+  .description { font-size: 3vw; }
+  .bestTime { font-size: 2.5vw; }
+  .completed { font-size: 2.5vw; }
+}

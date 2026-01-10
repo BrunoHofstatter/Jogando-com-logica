@@ -7,7 +7,7 @@ import Tabuleiro from '../componentes/tabuleiro';
 import Girar from '../componentes/sorteio';
 import GameButton from '../componentes/GameButton';
 import RoundTracker from '../componentes/RoundTracker';
-import styles from '../styles/design.module.css';
+import styles from '../styles/levelGame.module.css';
 
 function LevelGamePage() {
   const { levelId } = useParams<{ levelId: string }>();
@@ -26,6 +26,7 @@ function LevelGamePage() {
   const [clicar, setClicar] = useState(true);
   const [liveTime, setLiveTime] = useState(0);
   const [okayFunction, setOkayFunction] = useState<(() => void) | null>(null);
+  const [gameOver, setGameOver] = useState(false);
 
   // Load level config on mount
   useEffect(() => {
@@ -45,6 +46,11 @@ function LevelGamePage() {
   const mudarClicar = () => setClicar(!clicar);
   const mudarSorteado = (x: number) => setSorteado(x);
   const mudarSoma = (x: number) => setSoma(soma + x);
+
+  // Start Game handler (called by "Começar" button)
+  const onStartGame = () => {
+    mudarClicar(); // This triggers Girar effect
+  };
 
   // Handle time updates from timer
   const onTimeUpdate = (tempo: number) => {
@@ -79,6 +85,7 @@ function LevelGamePage() {
       setClicar(true);
     } else {
       // Level complete, navigate to results
+      setGameOver(true);
       finishLevel([...roundResults, result], totalTime + tempo);
     }
   }, [currentRound, sorteado, soma, roundResults, totalTime]);
@@ -114,89 +121,68 @@ function LevelGamePage() {
   return (
     <div className={styles.container}>
       <div className={styles.leftPanel}>
-        {/* Round tracker */}
-        <RoundTracker currentRound={currentRound} totalRounds={10} />
+        {/* Magic number & Controls */}
+        <div className={styles.controlsBox}>
+          <RoundTracker currentRound={currentRound} totalRounds={10} />
 
-        {/* Magic number display */}
-        <div style={{
-          fontSize: '3rem',
-          fontWeight: 'bold',
-          color: '#fff',
-          textAlign: 'center',
-          padding: '1rem',
-          fontFamily: '"Cherry Bomb One", cursive',
-          WebkitTextStroke: '1px #b71c1c',
-          textShadow: '2px 2px 4px rgba(0,0,0,0.7)'
-        }}>
-          <Girar
-            mudarJogar={mudarJogar}
+          <h2 className={styles.magicNumberTitle}>Número Mágico</h2>
+          <div className={styles.magicNumberDisplay}>
+            <Girar
+              mudarJogar={mudarJogar}
+              clicar={clicar}
+              mudarSorteado={mudarSorteado}
+              rodada={currentRound}
+              customRange={getCurrentRange()}
+            />
+          </div>
+
+          <GameButton
+            jogar={jogar}
             clicar={clicar}
-            mudarSorteado={mudarSorteado}
-            rodada={currentRound}
-            customRange={getCurrentRange()}
+            gameOver={gameOver}
+            onStartGame={onStartGame}
+            onSubmit={okayFunction || undefined}
           />
         </div>
 
-        {/* Game button */}
-        <GameButton
-          jogar={jogar}
-          clicar={clicar}
-          mudarClicar={mudarClicar}
-          onSubmit={okayFunction}
-        />
-
-        {/* Current selection sum */}
-        <div style={{
-          fontSize: '1.5rem',
-          color: '#fff',
-          textAlign: 'center',
-          marginTop: '1rem',
-          fontFamily: '"Cherry Bomb One", cursive'
-        }}>
-          Soma atual: {soma}
-        </div>
-
-        {/* Live time display */}
-        <div style={{
-          fontSize: '1.2rem',
-          color: '#fff',
-          textAlign: 'center',
-          marginTop: '0.5rem',
-          fontFamily: '"Cherry Bomb One", cursive'
-        }}>
-          Tempo: {liveTime.toFixed(1)}s
-        </div>
-
-        {/* Total time display */}
-        <div style={{
-          fontSize: '1rem',
-          color: '#aaa',
-          textAlign: 'center',
-          marginTop: '0.5rem',
-          fontFamily: '"Cherry Bomb One", cursive'
-        }}>
-          Tempo total: {totalTime.toFixed(1)}s
+        {/* Stats */}
+        <div className={styles.statsBox}>
+          <div className={styles.statItem}>
+            <span className={styles.statLabel}>Soma atual:</span>
+            <span className={styles.statValue}>{soma}</span>
+          </div>
+          <div className={styles.statItem}>
+            <span className={styles.statLabel}>Tempo:</span>
+            <span className={styles.statValue}>{liveTime.toFixed(1)}s</span>
+          </div>
+          <div className={styles.statItem}>
+            <span className={styles.statLabel}>Tempo total:</span>
+            <span className={styles.statValue}>{totalTime.toFixed(1)}s</span>
+          </div>
         </div>
       </div>
 
       {/* Game board */}
-      <Tabuleiro
-        mudarClicar={mudarClicar}
-        mudarJogar={mudarJogar}
-        mudarRodada={() => {}} // No-op for level mode
-        mudarSoma={mudarSoma}
-        addTempo={addTempo}
-        soma={soma}
-        jogar={jogar}
-        qualRodada={currentRound}
-        quantos={quantos}
-        setQuantos={setQuantos}
-        sorteado={sorteado}
-        onTimeUpdate={onTimeUpdate}
-        onOkayChange={setOkayFunction}
-        boardSize={levelConfig.boardSize}
-        maxSelections={levelConfig.numbersToSelect}
-      />
+      <div className={styles.rightPanel}>
+        <Tabuleiro
+          mudarClicar={mudarClicar}
+          mudarJogar={mudarJogar}
+          mudarRodada={() => {}} // No-op for level mode
+          mudarSoma={mudarSoma}
+          addTempo={addTempo}
+          soma={soma}
+          jogar={jogar}
+          qualRodada={currentRound}
+          quantos={quantos}
+          setQuantos={setQuantos}
+          sorteado={sorteado}
+          onTimeUpdate={onTimeUpdate}
+          onOkayChange={setOkayFunction}
+          boardSize={levelConfig.boardSize}
+          maxSelections={levelConfig.numbersToSelect}
+          customStyles={styles}
+        />
+      </div>
     </div>
   );
 }

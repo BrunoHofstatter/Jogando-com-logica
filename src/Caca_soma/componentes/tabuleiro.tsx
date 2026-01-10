@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import styles from "../styles/design.module.css"; // CSS Modules
+import defaultStyles from "../styles/design.module.css"; // CSS Modules
 import Timer from "./timer";
 
 interface Prop {
@@ -18,6 +18,7 @@ interface Prop {
   onOkayChange?: (okayFn: () => void) => void; // Pass okay function to parent
   boardSize?: 5 | 7 | 10; // Board dimension (default 10 for versus mode)
   maxSelections?: 2 | 3; // Max numbers to select (default 3 for versus mode)
+  customStyles?: { [key: string]: string }; // Optional custom styles
 }
 
 function Tabuleiro({
@@ -36,7 +37,11 @@ function Tabuleiro({
   onOkayChange,
   boardSize = 10,
   maxSelections = 3,
+  customStyles,
 }: Prop) {
+  // Use custom styles if provided, otherwise default
+  const styles = customStyles || defaultStyles;
+
   // Dynamic board size (5x5, 7x7, or 10x10)
   const [board, setBoard] = useState(
     Array.from({ length: boardSize }, () => Array(boardSize).fill(0))
@@ -66,7 +71,8 @@ function Tabuleiro({
   // Pass the okay function to parent when it changes
   useEffect(() => {
     if (onOkayChange) {
-      onOkayChange(okay);
+      // Wrap in a function to prevent React from treating it as a state updater
+      onOkayChange(() => okay);
     }
   }, [onOkayChange, okay]);
 
