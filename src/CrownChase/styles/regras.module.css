@@ -249,3 +249,21 @@
   gap: 2vw;
   list-style-type: none;
 }
+.difficultyButton {
+  margin-left: 1vw;
+  font-family: "Cherry Bomb One", system-ui;
+  font-size: 1.5vw;
+  padding: 0.5vw 1vw;
+  border-radius: 1vw;
+  border: 0.2vw solid #c1c424;
+  background: radial-gradient(circle, #7c3aed, #5b21b6);
+  color: #fbbf24;
+  -webkit-text-stroke: 0.1vw #4c1d95;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.difficultyButton:hover {
+  transform: scale(1.05);
+  background: radial-gradient(circle, #8041ec, #672cc5);
+}

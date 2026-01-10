@@ -8,13 +8,14 @@ type GameMode = "pvp" | "ai";
 function CrownChaseRegras() {
   const navigate = useNavigate();
   const [gameMode, setGameMode] = useState<GameMode>("ai");
+  const [aiDifficulty, setAiDifficulty] = useState<1 | 2>(1);
   const [showDetailedRules, setShowDetailedRules] = useState(false);
   const [tutorialCompleted, resetTutorial] =
     useTutorialCompleted("crownchase_v1");
 
   function jogarStop() {
     if (gameMode === "ai") {
-      navigate("/crownchase-ai");
+      navigate("/crownchase-ai", { state: { difficulty: aiDifficulty } });
     } else {
       navigate("/crownchasePg");
     }
@@ -23,10 +24,16 @@ function CrownChaseRegras() {
   const startTutorial = () => {
     resetTutorial(); // Clear the "completed" flag
     if (gameMode === "ai") {
-      navigate("/crownchase-ai");
+      navigate("/crownchase-ai", { state: { difficulty: aiDifficulty } });
     } else {
       navigate("/crownchasePg");
     }
+  };
+
+  const toggleDifficulty = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setAiDifficulty((prev) => (prev === 1 ? 2 : 1));
   };
 
   return (
@@ -58,6 +65,11 @@ function CrownChaseRegras() {
               onChange={() => setGameMode("ai")}
             />
             Contra Computador
+            {gameMode === "ai" && (
+              <button className={styles.difficultyButton} onClick={toggleDifficulty}>
+                Nível: {aiDifficulty === 1 ? "Muito Fácil" : "Fácil"}
+              </button>
+            )}
           </label>
           <label>
             <input

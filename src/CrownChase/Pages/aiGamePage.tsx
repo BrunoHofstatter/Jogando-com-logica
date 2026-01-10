@@ -2,12 +2,15 @@ import Board from "../Components/board-component";
 import { gameConfig } from "../Logic/gameConfig";
 import { gameRules } from "../Logic/gameRules";
 import { useState, useEffect } from 'react';
+import { useLocation } from "react-router-dom";
 import DynamicTutorial, { TutorialStep } from "../Components/DynamicTutorial";
 import { GameEngine } from "../../CrownChase/Logic/gameEngine";
 import { GameState } from "../../CrownChase/Logic/types";
 import { getAIMove } from "../Logic/aiPlayer";
 
 export default function CrownChaseAIPage() {
+  const location = useLocation();
+  const difficulty = location.state?.difficulty || 1;
   const [showTutorial, setShowTutorial] = useState(false);
   const engine = new GameEngine();
   const [gameState, setGameState] = useState<GameState>(() =>
@@ -36,7 +39,7 @@ export default function CrownChaseAIPage() {
 
   const makeAIMove = () => {
     try {
-      const aiMove = getAIMove(gameState, gameRules, 1); // Level 1 difficulty
+      const aiMove = getAIMove(gameState, gameRules, difficulty);
       const success = engine.executeAction(gameState, aiMove, gameRules);
 
       if (success) {
