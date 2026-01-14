@@ -11,6 +11,7 @@ interface BoardProps {
   gameState?: GameState;
   onGameStateChange?: (newState: GameState) => void;
   isAIMode?: boolean;
+  difficulty?: number;
 }
 
 const Board: React.FC<BoardProps> = ({
@@ -18,10 +19,11 @@ const Board: React.FC<BoardProps> = ({
   gameRules,
   gameState: externalGameState,
   onGameStateChange,
-  isAIMode = false
+  isAIMode = false,
+  difficulty
 }) => {
   const engine = new GameEngine();
-  const [internalGameState, setInternalGameState] = useState<GameState>(() => 
+  const [internalGameState, setInternalGameState] = useState<GameState>(() =>
     engine.initializeGame(gameConfig, gameRules)
   );
   const [gameOver, setGameOver] = useState(false);
@@ -34,7 +36,7 @@ const Board: React.FC<BoardProps> = ({
     if (selectedSquare) {
       const actions = engine.getAvailableActions(gameState, gameRules, selectedSquare);
       setAvailableActions(actions);
-      
+
       const highlights: Position[] = [];
       actions.forEach(action => {
         if (action.to) {
@@ -60,7 +62,7 @@ const Board: React.FC<BoardProps> = ({
         gamePhase: "ended" as const,
         winner: result.winner
       };
-      
+
       if (onGameStateChange) {
         onGameStateChange(newState);
       } else {
@@ -77,7 +79,7 @@ const Board: React.FC<BoardProps> = ({
     setSelectedSquare(null);
     setAvailableActions([]);
     setHighlightedSquares([]);
-    
+
     if (onGameStateChange) {
       onGameStateChange(newGameState);
     } else {
@@ -89,6 +91,11 @@ const Board: React.FC<BoardProps> = ({
   const handleSquareClick = (row: number, col: number) => {
     const clickedPosition = { row, col };
     const clickedPiece = gameState.board[row][col];
+
+    // Block input if it's AI's turn (User Request)
+    if (isAIMode && gameState.currentPlayer === 0) {
+      return;
+    }
 
     if (gameState.gamePhase === "ended") {
       return;
@@ -104,59 +111,59 @@ const Board: React.FC<BoardProps> = ({
         return;
       }
 
-      const validAction = availableActions.find(action => 
+      const validAction = availableActions.find(action =>
         action.to?.row === row && action.to?.col === col
       );
-      
+
       if (validAction) {
         const success = engine.executeAction(gameState, validAction, gameRules);
-        
+
         if (success) {
           if (onGameStateChange) {
             onGameStateChange(gameState);
           } else {
-            setInternalGameState({...gameState});
+            setInternalGameState({ ...gameState });
           }
-          
+
           setSelectedSquare(null);
         }
       } else if (clickedPiece && clickedPiece.owner === gameState.currentPlayer) {
         setSelectedSquare(clickedPosition);
       } else {
-        const placeAction = availableActions.find(action => 
+        const placeAction = availableActions.find(action =>
           action.type === "place" && action.to?.row === row && action.to?.col === col
         );
-        
+
         if (placeAction) {
           const success = engine.executeAction(gameState, placeAction, gameRules);
-          
+
           if (success) {
             if (onGameStateChange) {
               onGameStateChange(gameState);
             } else {
-              setInternalGameState({...gameState});
+              setInternalGameState({ ...gameState });
             }
           }
         }
-        
+
         setSelectedSquare(null);
       }
     } else {
       if (clickedPiece && clickedPiece.owner === gameState.currentPlayer) {
         setSelectedSquare(clickedPosition);
       } else if (!clickedPiece) {
-        const placeAction = availableActions.find(action => 
+        const placeAction = availableActions.find(action =>
           action.type === "place" && action.to?.row === row && action.to?.col === col
         );
-        
+
         if (placeAction) {
           const success = engine.executeAction(gameState, placeAction, gameRules);
-          
+
           if (success) {
             if (onGameStateChange) {
               onGameStateChange(gameState);
             } else {
-              setInternalGameState({...gameState});
+              setInternalGameState({ ...gameState });
             }
           }
         }
@@ -166,15 +173,15 @@ const Board: React.FC<BoardProps> = ({
 
   const handleSpecialAction = (actionType: string) => {
     const specialAction = availableActions.find(action => action.type === actionType);
-    
+
     if (specialAction) {
       const success = engine.executeAction(gameState, specialAction, gameRules);
-      
+
       if (success) {
         if (onGameStateChange) {
           onGameStateChange(gameState);
         } else {
-          setInternalGameState({...gameState});
+          setInternalGameState({ ...gameState });
         }
         setSelectedSquare(null);
       }
@@ -184,12 +191,12 @@ const Board: React.FC<BoardProps> = ({
   const handleDiceRoll = () => {
     const diceAction: TurnAction = { type: 'roll_dice' };
     const success = engine.executeAction(gameState, diceAction, gameRules);
-    
+
     if (success) {
       if (onGameStateChange) {
         onGameStateChange(gameState);
       } else {
-        setInternalGameState({...gameState});
+        setInternalGameState({ ...gameState });
       }
     }
   };
@@ -203,7 +210,7 @@ const Board: React.FC<BoardProps> = ({
   };
 
   const canPlaceHere = (row: number, col: number): boolean => {
-    return availableActions.some(action => 
+    return availableActions.some(action =>
       action.type === "place" && action.to?.row === row && action.to?.col === col
     );
   };
@@ -221,6 +228,11 @@ const Board: React.FC<BoardProps> = ({
     <div className={styles.gamePage}>
       <div className={styles.gameContainer}>
         <div className={styles.gameInfo} data-target="gameInfo">
+          {isAIMode && difficulty && (
+            <div className={styles.difficultyBox}>
+              Nível: {difficulty === 1 ? "Muito Fácil" : difficulty === 2 ? "Fácil" : difficulty === 3 ? "Médio" : "Difícil"}
+            </div>
+          )}
           <div className={styles.currentPlayer}>
             Vez do Jogador
             <span className={`${styles.playerIndicator} ${gameState.currentPlayer === 0 ? styles.playerRed : styles.playerBlue}`}>
@@ -230,7 +242,7 @@ const Board: React.FC<BoardProps> = ({
 
           <div className={styles.capturesSection}>
             <div className={styles.captureInfo}>
-              
+
               <span className={styles.captureText}>Peças <div className={styles.redIndicator}>●</div> capturadas: {gameState.gameData?.capturedPieces?.[0] || 0} </span>
             </div>
             <div className={styles.captureInfo}>
@@ -239,59 +251,57 @@ const Board: React.FC<BoardProps> = ({
           </div>
         </div>
         <div className={styles.boardWrapper}>
-        <div 
-          className={styles.board}
-          style={{
-            gridTemplateColumns: `repeat(${gameState.config.boardWidth}, clamp(2.6vw,12.35dvh,6.5vw))`,
-            gridTemplateRows: `repeat(${gameState.config.boardHeight}, clamp(2.6vw,12.35dvh,6.5vw))`,
-          }}
-        >
-          {gameState.board.map((row, rowIndex) =>
-            row.map((piece, colIndex) => {
-              const isSelected = isSquareSelected(rowIndex, colIndex);
-              const isHighlighted = isSquareHighlighted(rowIndex, colIndex);
-              const canPlace = !piece && canPlaceHere(rowIndex, colIndex);
-              const isObstacle = piece && piece.isObstacle;
-              const squareType = (rowIndex + colIndex) % 2 === 0 ? styles.lightSquare : styles.darkSquare;
-              
-              return (
-                <div
-                  key={`${rowIndex}-${colIndex}`}
-                  data-square={`${String.fromCharCode(97 + colIndex)}${rowIndex + 1}`}
-                  data-piece={piece ? `${piece.owner === 0 ? 'red' : 'blue'}-${piece.type}` : undefined}
-                  className={`${styles.square} ${squareType} ${
-                    isObstacle ? styles.squareObstacle : ''
-                  } ${isHighlighted ? styles.squareHighlighted : ''} ${
-                    canPlace ? styles.squareCanPlace : ''
-                  }`}
-                  onClick={() => !isObstacle && handleSquareClick(rowIndex, colIndex)}
-                >
-                  {piece && (
-                    <PieceComponent
-                      piece={piece}
-                      gameConfig={gameState.config}
-                      isSelected={isSelected}
-                      onPieceClick={() => !isObstacle && handleSquareClick(rowIndex, colIndex)}
-                    />
-                  )}
-                  
-                  {isHighlighted && !piece && (
-                    <div className={styles.moveIndicator} />
-                  )}
-                  
-                  {canPlace && (
-                    <div className={styles.placeIndicator} />
-                  )}
-                </div>
-              );
-            })
-          )}
-        </div>
+          <div
+            className={styles.board}
+            style={{
+              gridTemplateColumns: `repeat(${gameState.config.boardWidth}, clamp(2.6vw,12.35dvh,6.5vw))`,
+              gridTemplateRows: `repeat(${gameState.config.boardHeight}, clamp(2.6vw,12.35dvh,6.5vw))`,
+            }}
+          >
+            {gameState.board.map((row, rowIndex) =>
+              row.map((piece, colIndex) => {
+                const isSelected = isSquareSelected(rowIndex, colIndex);
+                const isHighlighted = isSquareHighlighted(rowIndex, colIndex);
+                const canPlace = !piece && canPlaceHere(rowIndex, colIndex);
+                const isObstacle = piece && piece.isObstacle;
+                const squareType = (rowIndex + colIndex) % 2 === 0 ? styles.lightSquare : styles.darkSquare;
+
+                return (
+                  <div
+                    key={`${rowIndex}-${colIndex}`}
+                    data-square={`${String.fromCharCode(97 + colIndex)}${rowIndex + 1}`}
+                    data-piece={piece ? `${piece.owner === 0 ? 'red' : 'blue'}-${piece.type}` : undefined}
+                    className={`${styles.square} ${squareType} ${isObstacle ? styles.squareObstacle : ''
+                      } ${isHighlighted ? styles.squareHighlighted : ''} ${canPlace ? styles.squareCanPlace : ''
+                      }`}
+                    onClick={() => !isObstacle && handleSquareClick(rowIndex, colIndex)}
+                  >
+                    {piece && (
+                      <PieceComponent
+                        piece={piece}
+                        gameConfig={gameState.config}
+                        isSelected={isSelected}
+                        onPieceClick={() => !isObstacle && handleSquareClick(rowIndex, colIndex)}
+                      />
+                    )}
+
+                    {isHighlighted && !piece && (
+                      <div className={styles.moveIndicator} />
+                    )}
+
+                    {canPlace && (
+                      <div className={styles.placeIndicator} />
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
         </div>
 
         <div className={styles.actionButtons}>
           {gameState.config.useDice && !gameState.lastDiceRoll && (
-            <button 
+            <button
               onClick={handleDiceRoll}
               className={`${styles.actionButton} ${styles.actionButtonDice}`}
               disabled={!!finalWin}
@@ -301,7 +311,7 @@ const Board: React.FC<BoardProps> = ({
           )}
 
           {availableActions.filter(action => action.type === 'custom').map((action, index) => (
-            <button 
+            <button
               key={index}
               onClick={() => handleSpecialAction('custom')}
               className={`${styles.actionButton} ${styles.actionButtonCustom}`}

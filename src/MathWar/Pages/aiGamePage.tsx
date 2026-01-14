@@ -8,10 +8,15 @@ import { GameEngine } from "../Logic/gameEngine";
 import { GameState } from "../Logic/types";
 import { getAIMove } from "../Logic/aiPlayer";
 
+import { DiceAnimation } from "../Components/DiceAnimation";
+
 export default function MathWarAIPage() {
   const location = useLocation();
   const difficulty = location.state?.difficulty || 1;
   const [showTutorial, setShowTutorial] = useState(false);
+  const [showDiceAnim, setShowDiceAnim] = useState(false);
+  const [diceTarget, setDiceTarget] = useState<number[]>([]);
+
   const engine = new GameEngine();
   const [gameState, setGameState] = useState<GameState>(() => {
     const initialState = engine.initializeGame(gameConfig, gameRules);
@@ -28,33 +33,59 @@ export default function MathWarAIPage() {
     }
   }, []);
 
+  // Handle Dice Animation on turn change
+  useEffect(() => {
+    if (gameState.turnCount % 3 === 0 && gameState.lastDiceRoll) {
+      setDiceTarget(gameState.lastDiceRoll);
+      setShowDiceAnim(true);
+    }
+  }, [gameState.turnCount]);
+
   // Handle AI move when it's AI's turn (player 0 = red = AI)
   useEffect(() => {
-    if (gameState.currentPlayer === 0 && gameState.gamePhase === 'playing') {
+    // Only move if AI turn AND animation is not playing
+    if (gameState.currentPlayer === 0 && gameState.gamePhase === 'playing' && !showDiceAnim) {
       // Add a delay so the AI doesn't move instantly
       const timeout = setTimeout(() => {
         makeAIMove();
-      }, 800);
+      }, 1500);
 
       return () => clearTimeout(timeout);
     }
-  }, [gameState.currentPlayer, gameState.gamePhase]);
+  }, [gameState.currentPlayer, gameState.gamePhase, showDiceAnim]);
 
   const makeAIMove = () => {
-    try {
-      const aiMove = getAIMove(gameState, gameRules, difficulty);
-      const success = engine.executeAction(gameState, aiMove, gameRules);
+    // Try to get a move, with fallback to simpler logic if it fails
+    const attemptMove = (currentDifficulty: number): boolean => {
+      try {
+        const aiMove = getAIMove(gameState, gameRules, currentDifficulty as any);
+        const success = engine.executeAction(gameState, aiMove, gameRules);
 
-      if (success) {
-        setGameState({...gameState});
+        if (success) {
+          setGameState({ ...gameState });
+          return true;
+        } else {
+          console.warn(`AI move failed executive action at difficulty ${currentDifficulty}`);
+          return false;
+        }
+      } catch (error) {
+        console.error(`AI failed at difficulty ${currentDifficulty}:`, error);
+        return false;
       }
-    } catch (error) {
-      console.error("AI move failed:", error);
+    };
+
+    // First try valid difficulty
+    if (!attemptMove(difficulty)) {
+      console.warn("AI failed primary difficulty, falling back to random (Level 1)");
+      // Fallback to random move
+      if (!attemptMove(1)) {
+        console.error("AI completely failed to move!");
+      }
     }
   };
 
   const handleGameStateChange = (newState: GameState) => {
-    setGameState({...newState});
+    setGameState({ ...newState });
   };
 
   const tutorialSteps: TutorialStep[] = [
@@ -65,24 +96,24 @@ export default function MathWarAIPage() {
       placement: 'auto',
       title: 'O Capitão',
       body: <div style={{
-          fontSize: '2vw',
-          color: '#f3f4f6',
-          marginBottom: '24px',
-          lineHeight: 1.5,
-          WebkitTextStroke: '0.15vw #414549ff',
-          display:'flex',
-          flexDirection:'column',
-          gap:'1vw'
-        }}>
-          <span>- Pode ser <span style={{
-        color: '#3da2e6ff',
-        fontSize:'2.3vw',
-      }}>qualquer </span> peça </span>
-          <span>- Se ele for capturado, o jogo <span style={{
-        color: '#3da2e6ff',
-        fontSize:'2.3vw',
-      }}>acaba </span> </span>
-        </div>
+        fontSize: '2vw',
+        color: '#f3f4f6',
+        marginBottom: '24px',
+        lineHeight: 1.5,
+        WebkitTextStroke: '0.15vw #414549ff',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1vw'
+      }}>
+        <span>- Pode ser <span style={{
+          color: '#3da2e6ff',
+          fontSize: '2.3vw',
+        }}>qualquer </span> peça </span>
+        <span>- Se ele for capturado, o jogo <span style={{
+          color: '#3da2e6ff',
+          fontSize: '2.3vw',
+        }}>acaba </span> </span>
+      </div>
     },
     {
       id: 'sum',
@@ -91,24 +122,24 @@ export default function MathWarAIPage() {
       placement: 'auto',
       title: 'A Soma Redonda',
       body: <div style={{
-          fontSize: '2vw',
-          color: '#f3f4f6',
-          marginBottom: '24px',
-          lineHeight: 1.5,
-          WebkitTextStroke: '0.15vw #414549ff',
-          display:'flex',
-          flexDirection:'column',
-          gap:'1vw'
-        }}>
-          <span>- Se move somente em <span style={{
-        color: '#3da2e6ff',
-        fontSize:'2.3vw',
-      }}>linha reta </span> </span>
-          <span>- O número na peça é seu <span style={{
-        color: '#3da2e6ff',
-        fontSize:'2.3vw',
-      }}>valor </span> </span>
-        </div>
+        fontSize: '2vw',
+        color: '#f3f4f6',
+        marginBottom: '24px',
+        lineHeight: 1.5,
+        WebkitTextStroke: '0.15vw #414549ff',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1vw'
+      }}>
+        <span>- Se move somente em <span style={{
+          color: '#3da2e6ff',
+          fontSize: '2.3vw',
+        }}>linha reta </span> </span>
+        <span>- O número na peça é seu <span style={{
+          color: '#3da2e6ff',
+          fontSize: '2.3vw',
+        }}>valor </span> </span>
+      </div>
     },
     {
       id: 'sumDiag',
@@ -117,24 +148,24 @@ export default function MathWarAIPage() {
       placement: 'auto',
       title: 'A Soma Quadrada ',
       body: <div style={{
-          fontSize: '2vw',
-          color: '#f3f4f6',
-          marginBottom: '24px',
-          lineHeight: 1.5,
-          WebkitTextStroke: '0.15vw #414549ff',
-          display:'flex',
-          flexDirection:'column',
-          gap:'1vw'
-        }}>
-          <span>- Se move somente em <span style={{
-        color: '#3da2e6ff',
-        fontSize:'2.3vw',
-      }}>diagonal </span> </span>
-          <span>- O número na peça é seu <span style={{
-        color: '#3da2e6ff',
-        fontSize:'2.3vw',
-      }}>valor </span> </span>
-        </div>
+        fontSize: '2vw',
+        color: '#f3f4f6',
+        marginBottom: '24px',
+        lineHeight: 1.5,
+        WebkitTextStroke: '0.15vw #414549ff',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1vw'
+      }}>
+        <span>- Se move somente em <span style={{
+          color: '#3da2e6ff',
+          fontSize: '2.3vw',
+        }}>diagonal </span> </span>
+        <span>- O número na peça é seu <span style={{
+          color: '#3da2e6ff',
+          fontSize: '2.3vw',
+        }}>valor </span> </span>
+      </div>
     },
     {
       id: 'info',
@@ -143,27 +174,27 @@ export default function MathWarAIPage() {
       placement: 'auto',
       title: 'Informações do Jogo',
       body: <div style={{
-          fontSize: '2vw',
-          color: '#f3f4f6',
-          marginBottom: '24px',
-          lineHeight: 1.5,
-          WebkitTextStroke: '0.15vw #414549ff',
-          display:'flex',
-          flexDirection:'column',
-          gap:'1vw'
-        }}>
-          <span>- Toda rodada o <span style={{
-        color: '#3da2e6ff',
-        fontSize:'2.3vw',
-      }}>dado </span> gera um número de <span style={{
-        color: '#3da2e6ff',
-        fontSize:'2.3vw',
-      }}>2 a 10 </span>  </span>
-          <span>- O valor de cada peça + o dado = <span style={{
-        color: '#3da2e6ff',
-        fontSize:'2.3vw',
-      }}>energia </span> da peça </span>
-        </div>
+        fontSize: '2vw',
+        color: '#f3f4f6',
+        marginBottom: '24px',
+        lineHeight: 1.5,
+        WebkitTextStroke: '0.15vw #414549ff',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1vw'
+      }}>
+        <span>- Toda rodada o <span style={{
+          color: '#3da2e6ff',
+          fontSize: '2.3vw',
+        }}>dado </span> gera um número de <span style={{
+          color: '#3da2e6ff',
+          fontSize: '2.3vw',
+        }}>2 a 10 </span>  </span>
+        <span>- O valor de cada peça + o dado = <span style={{
+          color: '#3da2e6ff',
+          fontSize: '2.3vw',
+        }}>energia </span> da peça </span>
+      </div>
     },
     {
       id: 'board',
@@ -172,46 +203,54 @@ export default function MathWarAIPage() {
       placement: 'auto',
       title: 'Informações do Jogo',
       body: <div style={{
-          fontSize: '2vw',
-          color: '#f3f4f6',
-          marginBottom: '24px',
-          lineHeight: 1.5,
-          WebkitTextStroke: '0.15vw #414549ff',
-          display:'flex',
-          flexDirection:'column',
-          gap:'1vw'
-        }}>
-          <span>- Para andar <span style={{
-        color: '#3da2e6ff',
-        fontSize:'2.3vw',
-      }}>1 </span> espaço gasta <span style={{
-        color: '#3da2e6ff',
-        fontSize:'2.3vw',
-      }}>2 </span> de energia  </span>
-          <span>- Para capturar uma peça gasta <span style={{
-        color: '#3da2e6ff',
-        fontSize:'2.3vw',
-      }}>mais 2 </span> de energia </span>
-        </div>
+        fontSize: '2vw',
+        color: '#f3f4f6',
+        marginBottom: '24px',
+        lineHeight: 1.5,
+        WebkitTextStroke: '0.15vw #414549ff',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1vw'
+      }}>
+        <span>- Para andar <span style={{
+          color: '#3da2e6ff',
+          fontSize: '2.3vw',
+        }}>1 </span> espaço gasta <span style={{
+          color: '#3da2e6ff',
+          fontSize: '2.3vw',
+        }}>2 </span> de energia  </span>
+        <span>- Para capturar uma peça gasta <span style={{
+          color: '#3da2e6ff',
+          fontSize: '2.3vw',
+        }}>mais 2 </span> de energia </span>
+      </div>
     },
   ];
 
   return <>
-      <Board
-        gameConfig={gameConfig}
-        gameRules={gameRules}
-        gameState={gameState}
-        onGameStateChange={handleGameStateChange}
-        isAIMode={true}
-      />
+    <Board
+      gameConfig={gameConfig}
+      gameRules={gameRules}
+      gameState={gameState}
+      onGameStateChange={handleGameStateChange}
+      isAIMode={true}
+      difficulty={difficulty}
+    />
 
-      {showTutorial && (
-        <DynamicTutorial
-          steps={tutorialSteps}
-          onFinish={() => setShowTutorial(false)}
-          storageKey="mathwar_v1"
-          locale="pt"
-        />
-      )}
-    </>;
+    {showTutorial && (
+      <DynamicTutorial
+        steps={tutorialSteps}
+        onFinish={() => setShowTutorial(false)}
+        storageKey="mathwar_v1"
+        locale="pt"
+      />
+    )}
+
+    {showDiceAnim && (
+      <DiceAnimation
+        targetValue={diceTarget}
+        onComplete={() => setShowDiceAnim(false)}
+      />
+    )}
+  </>;
 }

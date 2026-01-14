@@ -23,7 +23,7 @@
 }
 
 .gamePage {
-  color:#00b09b;
+  color: #00b09b;
 }
 
 .gameContainer::before {
@@ -54,13 +54,32 @@
   flex-direction: column;
   gap: clamp(1.2vw, 1.8vw, 2.4vw);
   transition: all 0.35s ease;
+  position: relative;
 }
 
 .gameInfo:hover {
-  
+
   box-shadow:
     0 2vw 4vw rgba(0, 0, 0, 0.4),
     inset 0 0 1.6vw rgba(87, 37, 161, 0.7);
+}
+
+.difficultyBox {
+  position: absolute;
+  top: -4.5vw;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5vw;
+  background: radial-gradient(circle, #7c3aed, #5b21b6);
+  border: 0.2vw solid #c1c424;
+  border-radius: 2vw;
+  padding: 0.8vw 1.5vw;
+  color: #fbbf24;
+  font-size: 1.5vw;
+  -webkit-text-stroke: 0.08vw #4c1d95;
+  box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.3);
+  z-index: 10;
 }
 
 .currentPlayer {
@@ -96,9 +115,12 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.1);
   }
@@ -152,7 +174,7 @@
   justify-content: center;
   line-height: 1;
   align-items: center;
-   display: flex;
+  display: flex;
   flex-direction: row;
 }
 
@@ -180,6 +202,7 @@
   0% {
     text-shadow: 0 0 0.6vw rgba(255, 71, 87, 0.6);
   }
+
   100% {
     text-shadow: 0 0 1vw rgba(255, 71, 87, 0.8);
   }
@@ -189,6 +212,7 @@
   0% {
     text-shadow: 0 0 0.6vw rgba(55, 66, 250, 0.6);
   }
+
   100% {
     text-shadow: 0 0 1vw rgba(55, 66, 250, 0.8);
   }
@@ -214,7 +238,8 @@
   color: #3498db;
 }
 
-.turnInfo, .resourceInfo {
+.turnInfo,
+.resourceInfo {
   font-size: clamp(1vw, 1.25vw, 1.5vw);
   margin: clamp(0.5vw, 0.625vw, 0.75vw) 0;
   display: flex;
@@ -254,12 +279,15 @@
 }
 
 @keyframes winPulse {
-  0%, 100% { 
-    transform: scale(1); 
+
+  0%,
+  100% {
+    transform: scale(1);
     box-shadow: 0 0.3vw 1.2vw rgba(0, 0, 0, 0.2);
   }
-  50% { 
-    transform: scale(1.02); 
+
+  50% {
+    transform: scale(1.02);
     box-shadow: 0 0.6vw 2vw rgba(0, 0, 0, 0.3);
   }
 }
@@ -276,9 +304,12 @@
 }
 
 @keyframes urgentPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 0.3vw 1.2vw rgba(255, 65, 108, 0.4);
   }
+
   50% {
     box-shadow: 0 0.6vw 2vw rgba(255, 65, 108, 0.8);
   }
@@ -311,7 +342,7 @@
     inset 0 0 0.5vw rgba(255, 255, 255, 0.3);
   position: relative;
   overflow: hidden;
-   background: radial-gradient(circle, #bd90f0, #8757be);
+  background: radial-gradient(circle, #bd90f0, #8757be);
   transition: all 0.3s ease;
 }
 
@@ -379,10 +410,13 @@
 }
 
 @keyframes highlightPulse {
-  0%, 100% { 
+
+  0%,
+  100% {
     box-shadow: 0 0 0 0.25vw #00e676, 0 0 1.2vw #00e676;
   }
-  50% { 
+
+  50% {
     box-shadow: 0 0 0 0.3vw #00e676, 0 0 1.6vw #00e676;
   }
 }
@@ -402,11 +436,14 @@
 }
 
 @keyframes moveGlow {
-  0%, 100% { 
+
+  0%,
+  100% {
     opacity: 0.8;
     transform: scale(1);
   }
-  50% { 
+
+  50% {
     opacity: 1;
     transform: scale(1.2);
   }
@@ -422,11 +459,14 @@
 }
 
 @keyframes placeGlow {
-  0%, 100% { 
+
+  0%,
+  100% {
     opacity: 0.7;
     transform: scale(1);
   }
-  50% { 
+
+  50% {
     opacity: 0.9;
     transform: scale(1.1);
   }
@@ -514,7 +554,8 @@
   color: white;
   box-shadow: 0 0.6vw 2.5vw rgba(0, 0, 0, 0.2);
   border: 0.08vw solid rgba(255, 255, 255, 0.18);
-  display: none; /* Hide the piece info panel when pieces are clicked */
+  display: none;
+  /* Hide the piece info panel when pieces are clicked */
 }
 
 .pieceInfo h4 {
@@ -528,6 +569,7 @@
   display: flex;
   justify-content: space-between;
 }
+
 /* Responsive Design */
 @media (max-width: 480px) {
   .gameTitle {

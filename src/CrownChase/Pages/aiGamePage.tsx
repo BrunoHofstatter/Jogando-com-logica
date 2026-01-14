@@ -43,7 +43,7 @@ export default function CrownChaseAIPage() {
       const success = engine.executeAction(gameState, aiMove, gameRules);
 
       if (success) {
-        setGameState({...gameState});
+        setGameState({ ...gameState });
       }
     } catch (error) {
       console.error("AI move failed:", error);
@@ -51,7 +51,7 @@ export default function CrownChaseAIPage() {
   };
 
   const handleGameStateChange = (newState: GameState) => {
-    setGameState({...newState});
+    setGameState({ ...newState });
   };
 
   const tutorialSteps: TutorialStep[] = [
@@ -62,24 +62,24 @@ export default function CrownChaseAIPage() {
       placement: 'auto',
       title: 'O Rei',
       body: <div style={{
-          fontSize: '2vw',
-          color: '#f2d356ff',
-          marginBottom: '24px',
-          lineHeight: 1.5,
-          WebkitTextStroke: '0.15vw #241555ff',
-          display:'flex',
-          flexDirection:'column',
-          gap:'1vw'
-        }}>
-          <span>- O rei <span style={{
-            color: '#fb5530ff',
-            fontSize:'2.3vw',
-          }}>não</span> se move</span>
-          <span>- Capture o rei inimigo para <span style={{
-            color: '#fb5530ff',
-            fontSize:'2.3vw',
-          }}>ganhar</span></span>
-        </div>
+        fontSize: '2vw',
+        color: '#f2d356ff',
+        marginBottom: '24px',
+        lineHeight: 1.5,
+        WebkitTextStroke: '0.15vw #241555ff',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1vw'
+      }}>
+        <span>- O rei <span style={{
+          color: '#fb5530ff',
+          fontSize: '2.3vw',
+        }}>não</span> se move</span>
+        <span>- Capture o rei inimigo para <span style={{
+          color: '#fb5530ff',
+          fontSize: '2.3vw',
+        }}>ganhar</span></span>
+      </div>
     },
     {
       id: 'killer',
@@ -88,24 +88,24 @@ export default function CrownChaseAIPage() {
       placement: 'auto',
       title: 'O Assassino',
       body: <div style={{
-          fontSize: '2vw',
-          color: '#f2d356ff',
-          marginBottom: '24px',
-          lineHeight: 1.5,
-          WebkitTextStroke: '0.15vw #241555ff',
-          display:'flex',
-          flexDirection:'column',
-          gap:'1vw'
-        }}>
-          <span>- Se move 1 casa para <span style={{
-            color: '#fb5530ff',
-            fontSize:'2.3vw',
-          }}>todos </span>lados</span>
-          <span>- Pode capturar <span style={{
-            color: '#fb5530ff',
-            fontSize:'2.3vw',
-          }}>qualquer </span>peça</span>
-        </div>
+        fontSize: '2vw',
+        color: '#f2d356ff',
+        marginBottom: '24px',
+        lineHeight: 1.5,
+        WebkitTextStroke: '0.15vw #241555ff',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1vw'
+      }}>
+        <span>- Se move 1 casa para <span style={{
+          color: '#fb5530ff',
+          fontSize: '2.3vw',
+        }}>todos </span>lados</span>
+        <span>- Pode capturar <span style={{
+          color: '#fb5530ff',
+          fontSize: '2.3vw',
+        }}>qualquer </span>peça</span>
+      </div>
     },
     {
       id: 'jumper',
@@ -114,37 +114,37 @@ export default function CrownChaseAIPage() {
       placement: 'auto',
       title: 'O Saltador',
       body: <div style={{
-          fontSize: '2vw',
-          color: '#f2d356ff',
-          marginBottom: '24px',
-          lineHeight: 1.5,
-          WebkitTextStroke: '0.15vw #241555ff',
-          display:'flex',
-          flexDirection:'column',
-          gap:'1vw'
-        }}>
-          <span>- Move 1 casa para <span style={{
-            color: '#fb5530ff',
-            fontSize:'2.3vw',
-          }}>baixo</span>, <span style={{
-            color: '#fb5530ff',
-            fontSize:'2.3vw',
-          }}>cima</span> e <span style={{
-            color: '#fb5530ff',
-            fontSize:'2.3vw',
-          }}>lados</span></span>
-          <span>- Pode <span style={{
-            color: '#fb5530ff',
-            fontSize:'2.3vw',
-          }}>pular</span> por cima de qualquer peça <span style={{
-            color: '#fb5530ff',
-            fontSize:'2.3vw',
-          }}>sem </span>capturar</span>
-          <span>- Pode capturar <span style={{
-            color: '#fb5530ff',
-            fontSize:'2.3vw',
-          }}>somente </span>o rei</span>
-        </div>
+        fontSize: '2vw',
+        color: '#f2d356ff',
+        marginBottom: '24px',
+        lineHeight: 1.5,
+        WebkitTextStroke: '0.15vw #241555ff',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1vw'
+      }}>
+        <span>- Move 1 casa para <span style={{
+          color: '#fb5530ff',
+          fontSize: '2.3vw',
+        }}>baixo</span>, <span style={{
+          color: '#fb5530ff',
+          fontSize: '2.3vw',
+        }}>cima</span> e <span style={{
+          color: '#fb5530ff',
+          fontSize: '2.3vw',
+        }}>lados</span></span>
+        <span>- Pode <span style={{
+          color: '#fb5530ff',
+          fontSize: '2.3vw',
+        }}>pular</span> por cima de qualquer peça <span style={{
+          color: '#fb5530ff',
+          fontSize: '2.3vw',
+        }}>sem </span>capturar</span>
+        <span>- Pode capturar <span style={{
+          color: '#fb5530ff',
+          fontSize: '2.3vw',
+        }}>somente </span>o rei</span>
+      </div>
     },
     {
       id: 'board',
@@ -153,43 +153,44 @@ export default function CrownChaseAIPage() {
       placement: 'auto',
       title: 'Informações do Jogo',
       body: <div style={{
-          fontSize: '2vw',
-          color: '#f2d356ff',
-          marginBottom: '24px',
-          lineHeight: 1.5,
-          WebkitTextStroke: '0.15vw #241555ff',
-          display:'flex',
-          flexDirection:'column',
-          gap:'1vw'
-        }}>
-          <span>- Veja de quem é a <span style={{
-            color: '#fb5530ff',
-            fontSize:'2.3vw',
-          }}>vez</span> </span>
-          <span>- Veja quantas peças foram <span style={{
-            color: '#fb5530ff',
-            fontSize:'2.3vw',
-          }}>capturadas</span></span>
-        </div>
+        fontSize: '2vw',
+        color: '#f2d356ff',
+        marginBottom: '24px',
+        lineHeight: 1.5,
+        WebkitTextStroke: '0.15vw #241555ff',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1vw'
+      }}>
+        <span>- Veja de quem é a <span style={{
+          color: '#fb5530ff',
+          fontSize: '2.3vw',
+        }}>vez</span> </span>
+        <span>- Veja quantas peças foram <span style={{
+          color: '#fb5530ff',
+          fontSize: '2.3vw',
+        }}>capturadas</span></span>
+      </div>
     }
   ];
 
   return <>
-      <Board
-        gameConfig={gameConfig}
-        gameRules={gameRules}
-        gameState={gameState}
-        onGameStateChange={handleGameStateChange}
-        isAIMode={true}
-      />
+    <Board
+      gameConfig={gameConfig}
+      gameRules={gameRules}
+      gameState={gameState}
+      onGameStateChange={handleGameStateChange}
+      isAIMode={true}
+      difficulty={difficulty}
+    />
 
-      {showTutorial && (
-        <DynamicTutorial
-          steps={tutorialSteps}
-          onFinish={() => setShowTutorial(false)}
-          storageKey="crownchase_v1"
-          locale="pt"
-        />
-      )}
-    </>;
+    {showTutorial && (
+      <DynamicTutorial
+        steps={tutorialSteps}
+        onFinish={() => setShowTutorial(false)}
+        storageKey="crownchase_v1"
+        locale="pt"
+      />
+    )}
+  </>;
 }

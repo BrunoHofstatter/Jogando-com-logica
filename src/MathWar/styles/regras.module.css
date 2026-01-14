@@ -25,21 +25,33 @@
   width: 47%;
   border-radius: 3.3vw;
 }
-.gameTitle{
+
+.gameTitle {
   font-size: clamp(3vw, 9.45dvh, 5vw);
   color: #f3f4f6;
   -webkit-text-stroke: 0.3vw #626970;
 }
+
 .preview {
   height: clamp(30vw, 73dvh, 40vw);
   transition: all 0.5s ease;
   animation: pulsePreview 5s infinite;
 }
+
 @keyframes pulsePreview {
-  0% { transform: scale(0.96) }
-  50% { transform: scale(1) }
-  100% { transform: scale(0.96) }
+  0% {
+    transform: scale(0.96)
+  }
+
+  50% {
+    transform: scale(1)
+  }
+
+  100% {
+    transform: scale(0.96)
+  }
 }
+
 .botoes {
   gap: 0vw;
   width: 47%;
@@ -50,7 +62,7 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  position:relative;
+  position: relative;
 }
 
 .button {
@@ -68,7 +80,7 @@
   padding: 0.3vw 2.5vw 2vw 2.5vw;
   line-height: 1;
   cursor: pointer;
-  margin-bottom: 5vw;
+  margin-bottom: 4vw;
   transition: all 0.5s ease;
   box-shadow: inset 0 0 2vw #00000040;
 }
@@ -83,16 +95,62 @@
 
 }
 
-.tutorialButton{
+
+/* Mode selector for rules page */
+.mode-select-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 1vw;
+  font-size: 2vw;
+  -webkit-text-stroke: 0.1vw #3e4247;
+  color: #f3f4f6;
+  margin-bottom: 5vw;
+}
+
+.mode-select-rules label {
+  display: flex;
+  align-items: center;
+  gap: 0.5vw;
+  background: radial-gradient(circle, #34d399, #10b981);
+  border: 0.2vw solid #097753;
+  border-radius: 2vw;
+  padding: 0.8vw 1.5vw;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: #f3f4f6;
+}
+
+.mode-select-rules label:hover {
+  transform: scale(1.03);
+  background: radial-gradient(circle, #34d399, #18c58b);
+}
+
+.mode-select-rules input[type="radio"] {
+  width: 1.2vw;
+  height: 1.2vw;
+  accent-color: #0a9768;
+}
+
+.contraComputador {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  position: relative;
+}
+
+.tutorialButton {
   position: absolute;
   bottom: 4.2dvh;
   left: 3vw;
-  border: 0.26vw solid #097753;   /* Purple border */
-  background: radial-gradient(circle, #10b981, #0da572); /* Purple gradient */
+  border: 0.26vw solid #097753;
+  /* Purple border */
+  background: radial-gradient(circle, #10b981, #0da572);
+  /* Purple gradient */
   border-radius: 1.7vw;
   padding: 0.1vw 1vw 0.5vw 1vw;
   color: #f3f4f6;
-  -webkit-text-stroke: 0.17vw #3e4247; /* Purple stroke */
+  -webkit-text-stroke: 0.17vw #3e4247;
+  /* Purple stroke */
   font-size: clamp(1.5vw, 5dvh, 2.7vw);
   font-family: "Cherry Bomb One", system-ui;
   cursor: pointer;
@@ -102,19 +160,22 @@
 
 .tutorialButton:hover {
   transform: scale(1.03) translateY(-0.5dvh);
-  background: radial-gradient(circle, #f3f4f6, #d1d5db); /* Lighter purple */
+  /* Lighter purple */
 }
 
 .detailedRulesButton {
   position: absolute;
   bottom: 4.2dvh;
   right: 3vw;
-  border: 0.26vw solid #097753;   /* Purple border */
-  background: radial-gradient(circle, #10b981, #0da572); /* Purple gradient */
+  border: 0.26vw solid #097753;
+  /* Purple border */
+  background: radial-gradient(circle, #10b981, #0da572);
+  /* Purple gradient */
   border-radius: 1.7vw;
   padding: 0.1vw 1vw 0.5vw 1vw;
   color: #f3f4f6;
-  -webkit-text-stroke: 0.17vw #3e4247; /* Purple stroke */
+  -webkit-text-stroke: 0.17vw #3e4247;
+  /* Purple stroke */
   font-size: clamp(1.5vw, 5dvh, 2.7vw);
   font-family: "Cherry Bomb One", system-ui;
   cursor: pointer;
@@ -124,7 +185,7 @@
 
 .detailedRulesButton:hover {
   transform: scale(1.03) translateY(-0.5dvh);
-  background: radial-gradient(circle, #f3f4f6, #d1d5db); /* Lighter gray */
+  /* Lighter gray */
 }
 
 /* Modal Overlay */
@@ -143,28 +204,35 @@
 
 .modalContent {
   background: radial-gradient(circle, #a6decc, #7ae0be);
-  border: 0.6vw solid #10b981;  /* Mint border */
+  border: 0.6vw solid #10b981;
+  /* Mint border */
   border-radius: 3.3vw;
   padding: 2vw 3vw;
   margin-top: 5dvh;
   max-width: 90%;
   max-height: 92dvh;
   overflow-y: auto;
-  color: #1f2937; /* Dark gray text */
-  -webkit-text-stroke: 0.1vw #5c6269; /* Medium gray stroke */
+  color: #1f2937;
+  /* Dark gray text */
+  -webkit-text-stroke: 0.1vw #5c6269;
+  /* Medium gray stroke */
   font-size: 1.5vw;
   position: relative;
 }
 
 .closeButton {
-  background: radial-gradient(circle, #6ee7b7, #34d399); /* Mint gradient */
-  border: 0.3vw solid #10b981; /* Mint border */
+  background: radial-gradient(circle, #6ee7b7, #34d399);
+  /* Mint gradient */
+  border: 0.3vw solid #10b981;
+  /* Mint border */
   border-radius: 50%;
   padding: 0 0 0.2vw 0;
   width: 4vw;
   height: 4vw;
-  color: #ffffff; /* White text */
-  -webkit-text-stroke: 0.2vw #059669; /* Dark mint stroke */
+  color: #ffffff;
+  /* White text */
+  -webkit-text-stroke: 0.2vw #059669;
+  /* Dark mint stroke */
   font-size: 2.5vw;
   cursor: pointer;
   display: flex;
@@ -183,14 +251,16 @@
 
 .closeButton:hover {
   transform: scale(1.05) translateY(-0.5dvh);
-  background: radial-gradient(circle, #a7f3d0, #6ee7b7); /* Brighter mint */
+  background: radial-gradient(circle, #a7f3d0, #6ee7b7);
+  /* Brighter mint */
 }
 
 .detailedRules {
   max-height: 100%;
   overflow-y: visible;
 }
-.detailedRules h3{
+
+.detailedRules h3 {
   color: #30e3ab;
   -webkit-text-stroke: 0.21vw #2e3135;
   font-size: 3.5vw;
@@ -206,62 +276,74 @@
 
 .detailedRules h2 {
   font-size: 4.5vw;
-  color: #30e3ab; /* Bright mint text */
-  -webkit-text-stroke: 0.25vw #2e3135; /* Medium gray stroke */
+  color: #30e3ab;
+  /* Bright mint text */
+  -webkit-text-stroke: 0.25vw #2e3135;
+  /* Medium gray stroke */
   text-align: center;
   margin-bottom: 2vw;
 }
 
-.rulesSpan{
-  color:  #60eb9a;
+.rulesSpan {
+  color: #60eb9a;
   font-size: 2.3vw;
-  -webkit-text-stroke: 0.18vw #2e3135; 
+  -webkit-text-stroke: 0.18vw #2e3135;
 }
-.rulesStrong{
+
+.rulesStrong {
   color: #9af533;
 }
 
-.detailedRules li{
+.detailedRules li {
   font-size: 1.7vw;
   color: #f3f4f6;
   -webkit-text-stroke: 0.13vw #2e3135;
 }
-.pieceImage{
+
+.pieceImage {
   width: 3vw;
 }
-.boardImage{
-  width:40vw;
-  padding: 2vw 0vw 0 5vw ;
+
+.boardImage {
+  width: 40vw;
+  padding: 2vw 0vw 0 5vw;
 }
-.boardDiv{
+
+.boardDiv {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
   gap: 4vw;
 }
-.legend{
+
+.legend {
   width: 40vw;
   display: flex;
   flex-direction: column;
   gap: 2vw;
   list-style-type: none;
 }
+
 .difficultyButton {
+  left: 24vw;
   margin-left: 1vw;
   font-family: "Cherry Bomb One", system-ui;
   font-size: 1.5vw;
-  padding: 0.5vw 1vw;
-  border-radius: 1vw;
+  padding: 0.3vw 0.7vw;
+  border-radius: 0.8vw;
   border: 0.2vw solid #097753;
-  background: radial-gradient(circle, #10b981, #0da572);
+  background: radial-gradient(circle, #2acaa7, #1ca386);
   color: #f3f4f6;
   -webkit-text-stroke: 0.1vw #3e4247;
   cursor: pointer;
   transition: all 0.2s;
+  height: fit-content;
+  position: absolute;
+  min-width: 10vw;
 }
 
 .difficultyButton:hover {
   transform: scale(1.05);
-  background: radial-gradient(circle, #34d399, #18c58b);
+  background: radial-gradient(circle, #2cbd9d, #1f977d);
 }

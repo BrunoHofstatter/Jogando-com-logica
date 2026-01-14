@@ -222,10 +222,11 @@ export default function SPTTTAIPage() {
 
   const location = useLocation();
   const winCondition = location.state?.winCondition || "line"; // default to "line" if not specified
+  const difficulty = location.state?.difficulty || 1;
 
   return (
     <div className="spttt-page">
-      <SPTTT winCondition={winCondition} isAiMode={true} />
+      <SPTTT winCondition={winCondition} isAiMode={true} difficulty={difficulty} />
       {showTutorial && (
         <DynamicTutorial
           steps={tutorialSteps}

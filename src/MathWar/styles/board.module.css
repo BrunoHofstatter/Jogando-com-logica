@@ -33,16 +33,12 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(
-      circle at 20% 20%,
+  background: radial-gradient(circle at 20% 20%,
       rgba(255, 255, 255, 0.18) 0%,
-      transparent 30%
-    ),
-    radial-gradient(
-      circle at 80% 80%,
+      transparent 30%),
+    radial-gradient(circle at 80% 80%,
       rgba(255, 255, 255, 0.16) 0%,
-      transparent 35%
-    );
+      transparent 35%);
   pointer-events: none;
 }
 
@@ -59,10 +55,29 @@
   flex-direction: column;
   gap: clamp(1.2vw, 1.8vw, 2.4vw);
   transition: all 0.4s ease;
+  position: relative;
 }
 
 .gameInfo:hover {
   transform: scale(1.01);
+}
+
+.difficultyBox {
+  position: absolute;
+  top: -4.5vw;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5vw;
+  background: radial-gradient(circle, #2acaa7, #1ca386);
+  border: 0.2vw solid #097753;
+  border-radius: 2vw;
+  padding: 0.8vw 1.5vw;
+  color: #f3f4f6;
+  font-size: 1.5vw;
+  -webkit-text-stroke: 0.08vw #3e4247;
+  box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.3);
+  z-index: 10;
 }
 
 .currentPlayer {
@@ -98,10 +113,12 @@
 }
 
 @keyframes pulse {
+
   0%,
   100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.1);
   }
@@ -157,6 +174,7 @@
   transform: translateX(0.6vw);
   border-color: #0e9c6d;
 }
+
 .diceDisplay strong {
   font-size: 3vw;
   line-height: 1;
@@ -185,6 +203,7 @@
   transform: translateX(0.6vw);
   border-color: #0e9c6d;
 }
+
 .energyDisplay strong {
   font-size: 3vw;
   line-height: 1;
@@ -235,6 +254,7 @@
   0% {
     text-shadow: 0 0 0.6vw rgba(255, 71, 87, 0.6);
   }
+
   100% {
     text-shadow: 0 0 1vw rgba(255, 71, 87, 0.8);
   }
@@ -244,6 +264,7 @@
   0% {
     text-shadow: 0 0 0.6vw rgba(55, 66, 250, 0.6);
   }
+
   100% {
     text-shadow: 0 0 1vw rgba(55, 66, 250, 0.8);
   }
@@ -310,11 +331,13 @@
 }
 
 @keyframes winPulse {
+
   0%,
   100% {
     transform: scale(1);
     box-shadow: 0 0.3vw 1.2vw rgba(0, 0, 0, 0.2);
   }
+
   50% {
     transform: scale(1.02);
     box-shadow: 0 0.6vw 2vw rgba(0, 0, 0, 0.3);
@@ -333,10 +356,12 @@
 }
 
 @keyframes urgentPulse {
+
   0%,
   100% {
     box-shadow: 0 0.3vw 1.2vw rgba(255, 65, 108, 0.4);
   }
+
   50% {
     box-shadow: 0 0.6vw 2vw rgba(255, 65, 108, 0.8);
   }
@@ -377,11 +402,9 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(
-      90deg,
+  background: linear-gradient(90deg,
       transparent 98%,
-      rgba(255, 255, 255, 0.12) 100%
-    ),
+      rgba(255, 255, 255, 0.12) 100%),
     linear-gradient(0deg, transparent 98%, rgba(255, 255, 255, 0.12) 100%);
   background-size: clamp(4vw, 5vw, 6vw) clamp(4vw, 5vw, 6vw);
   pointer-events: none;
@@ -436,10 +459,12 @@
 }
 
 @keyframes highlightPulse {
+
   0%,
   100% {
     box-shadow: 0 0 0 0.25vw #fbbf24, 0 0 1.2vw #fbbf24;
   }
+
   50% {
     box-shadow: 0 0 0 0.3vw #fbbf24, 0 0 1.6vw #fbbf24;
   }
@@ -460,11 +485,13 @@
 }
 
 @keyframes moveGlow {
+
   0%,
   100% {
     opacity: 0.8;
     transform: scale(1);
   }
+
   50% {
     opacity: 1;
     transform: scale(1.2);
@@ -481,11 +508,13 @@
 }
 
 @keyframes placeGlow {
+
   0%,
   100% {
     opacity: 0.7;
     transform: scale(1);
   }
+
   50% {
     opacity: 0.9;
     transform: scale(1.1);
@@ -513,11 +542,9 @@
   box-shadow: 0 0.6vw 1.3vw rgba(0, 0, 0, 0.3);
   position: relative;
   overflow: hidden;
-  background: radial-gradient(
-    circle,
-    rgba(52, 211, 153, 0.8),
-    rgba(16, 185, 129, 0.85)
-  );
+  background: radial-gradient(circle,
+      rgba(52, 211, 153, 0.8),
+      rgba(16, 185, 129, 0.85));
   -webkit-text-stroke: 0.06vw #065f46;
 }
 
@@ -528,12 +555,10 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.28),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.28),
+      transparent);
   transition: 0.5s;
 }
 
@@ -583,7 +608,8 @@
   color: white;
   box-shadow: 0 0.6vw 2.5vw rgba(0, 0, 0, 0.2);
   border: 0.08vw solid rgba(255, 255, 255, 0.18);
-  display: none; /* Hide the piece info panel when pieces are clicked */
+  display: none;
+  /* Hide the piece info panel when pieces are clicked */
 }
 
 .pieceInfo h4 {
@@ -597,6 +623,7 @@
   display: flex;
   justify-content: space-between;
 }
+
 /* Responsive Design */
 @media (max-width: 480px) {
   .gameTitle {

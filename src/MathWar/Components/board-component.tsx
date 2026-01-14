@@ -19,6 +19,7 @@ interface BoardProps {
   gameState?: GameState;
   onGameStateChange?: (newState: GameState) => void;
   isAIMode?: boolean;
+  difficulty?: number;
 }
 
 const Board: React.FC<BoardProps> = ({
@@ -27,6 +28,7 @@ const Board: React.FC<BoardProps> = ({
   gameState: externalGameState,
   onGameStateChange,
   isAIMode = false,
+  difficulty
 }) => {
   const engine = new GameEngine();
   const [internalGameState, setInternalGameState] = useState<GameState>(() =>
@@ -107,6 +109,12 @@ const Board: React.FC<BoardProps> = ({
     }
 
     if (clickedPiece && clickedPiece.isObstacle) {
+      return;
+    }
+
+    // Block input if it's AI turn in AI mode
+    // Player 0 = Red (AI), Player 1 = Blue (Human)
+    if (isAIMode && gameState.currentPlayer === 0) {
       return;
     }
 
@@ -260,17 +268,29 @@ const Board: React.FC<BoardProps> = ({
     <div className={styles.gamePage}>
       <div className={styles.gameContainer}>
         <div className={styles.gameInfo}>
+          {isAIMode && difficulty && (
+            <div className={styles.difficultyBox}>
+              Nível: {difficulty === 1 ? "Muito Fácil" : difficulty === 2 ? "Fácil" : difficulty === 3 ? "Médio" : "Difícil"}
+            </div>
+          )}
           <div className={styles.currentPlayer} data-target='player'>
-            Turno do Jogador
-            <span
-              className={`${styles.playerIndicator} ${
-                gameState.currentPlayer === 0
+            <div style={{ marginBottom: '0.5rem' }}>
+              Turno: {gameState.turnCount + 1}
+            </div>
+            <div>
+              Turno do Jogador
+              <span
+                className={`${styles.playerIndicator} ${gameState.currentPlayer === 0
                   ? styles.playerRed
                   : styles.playerBlue
-              }`}
-            >
-              {gameState.currentPlayer === 0 ? "●" : "●"}
-            </span>
+                  }`}
+              >
+                {gameState.currentPlayer === 0 ? "●" : "●"}
+              </span>
+            </div>
+            <div style={{ fontSize: '0.9rem', marginTop: '0.5rem', color: '#a0aec0' }}>
+              Próxima rolagem em: {3 - (gameState.turnCount % 3)} turnos
+            </div>
           </div>
 
           <div className={styles.sectionInfo} data-target='info'>
@@ -299,10 +319,10 @@ const Board: React.FC<BoardProps> = ({
                   <strong>
                     {" "}
                     {selectedSquare &&
-                    gameState.board[selectedSquare.row] &&
-                    gameState.board[selectedSquare.row][selectedSquare.col]
+                      gameState.board[selectedSquare.row] &&
+                      gameState.board[selectedSquare.row][selectedSquare.col]
                       ? gameState.board[selectedSquare.row][selectedSquare.col]
-                          ?.data?.pieceEnergy || "0"
+                        ?.data?.pieceEnergy || "0"
                       : "0"}
                   </strong>
                 </span>
@@ -336,11 +356,9 @@ const Board: React.FC<BoardProps> = ({
                     data-square={`${String.fromCharCode(97 + colIndex)}${rowIndex + 1}`}
                     data-piece={piece ? `${piece.owner === 0 ? 'red' : 'blue'}-${piece.type}` : undefined}
                     data-captain={piece?.data?.isCaptain ? 'true' : undefined}
-                    className={`${styles.square} ${squareType} ${
-                      isObstacle ? styles.squareObstacle : ""
-                    } ${isHighlighted ? styles.squareHighlighted : ""} ${
-                      canPlace ? styles.squareCanPlace : ""
-                    }`}
+                    className={`${styles.square} ${squareType} ${isObstacle ? styles.squareObstacle : ""
+                      } ${isHighlighted ? styles.squareHighlighted : ""} ${canPlace ? styles.squareCanPlace : ""
+                      }`}
                     onClick={() =>
                       !isObstacle && handleSquareClick(rowIndex, colIndex)
                     }
@@ -425,14 +443,14 @@ const Board: React.FC<BoardProps> = ({
               </p>
               {gameState.board[selectedSquare.row][selectedSquare.col]
                 ?.value !== undefined && (
-                <p>
-                  Value:{" "}
-                  {
-                    gameState.board[selectedSquare.row][selectedSquare.col]
-                      ?.value
-                  }
-                </p>
-              )}
+                  <p>
+                    Value:{" "}
+                    {
+                      gameState.board[selectedSquare.row][selectedSquare.col]
+                        ?.value
+                    }
+                  </p>
+                )}
               <p>Available Actions: {availableActions.length}</p>
             </div>
           )}

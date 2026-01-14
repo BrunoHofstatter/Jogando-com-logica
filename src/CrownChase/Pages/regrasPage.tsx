@@ -8,7 +8,7 @@ type GameMode = "pvp" | "ai";
 function CrownChaseRegras() {
   const navigate = useNavigate();
   const [gameMode, setGameMode] = useState<GameMode>("ai");
-  const [aiDifficulty, setAiDifficulty] = useState<1 | 2>(1);
+  const [aiDifficulty, setAiDifficulty] = useState<1 | 2 | 3 | 4>(1);
   const [showDetailedRules, setShowDetailedRules] = useState(false);
   const [tutorialCompleted, resetTutorial] =
     useTutorialCompleted("crownchase_v1");
@@ -33,7 +33,12 @@ function CrownChaseRegras() {
   const toggleDifficulty = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    setAiDifficulty((prev) => (prev === 1 ? 2 : 1));
+    setAiDifficulty((prev) => {
+      if (prev === 1) return 2;
+      if (prev === 2) return 3;
+      if (prev === 3) return 4;
+      return 1;
+    });
   };
 
   return (
@@ -56,21 +61,24 @@ function CrownChaseRegras() {
 
         {/* Mode selector */}
         <div className={styles['mode-select-rules']}>
-          <label>
-            <input
-              type="radio"
-              name="gameMode"
-              value="ai"
-              checked={gameMode === "ai"}
-              onChange={() => setGameMode("ai")}
-            />
-            Contra Computador
+          <div className={styles.contraComputador}>
+            <label>
+              <input
+                type="radio"
+                name="gameMode"
+                value="ai"
+                checked={gameMode === "ai"}
+                onChange={() => setGameMode("ai")}
+              />
+              Contra Computador
+
+            </label>
             {gameMode === "ai" && (
               <button className={styles.difficultyButton} onClick={toggleDifficulty}>
-                Nível: {aiDifficulty === 1 ? "Muito Fácil" : "Fácil"}
+                Nível: {aiDifficulty === 1 ? "Muito Fácil" : aiDifficulty === 2 ? "Fácil" : aiDifficulty === 3 ? "Médio" : "Difícil"}
               </button>
             )}
-          </label>
+          </div>
           <label>
             <input
               type="radio"
@@ -112,35 +120,35 @@ function CrownChaseRegras() {
                 <h2>Regras Caça Coroa</h2>
 
                 <h3 className={styles.rulesTitle}>Posição Inicial</h3>
-              <div className={styles.boardDiv}>
-                <img
-                  src={`${import.meta.env.BASE_URL}crownchaseBoard.png`}
-                  className={styles.boardImage}
-                />
-                <ul className={styles.legend}>
-                  <li>
-                    <img
-                      src={`${import.meta.env.BASE_URL}crownchaseJumper.png`}
-                      className={styles.pieceImage}
-                    />{" "}
-                    -{">"} Saltador
-                  </li>
-                  <li>
-                    <img
-                      src={`${import.meta.env.BASE_URL}crownchaseAssassin.png`}
-                      className={styles.pieceImage}
-                    />{" "}
-                    -{">"} Assassino
-                  </li>
-                  <li>
-                    <img
-                      src={`${import.meta.env.BASE_URL}crownchaseKing.png`}
-                      className={styles.pieceImage}
-                    />{" "}
-                    -{">"} Rei
-                  </li>
-                </ul>
-              </div>
+                <div className={styles.boardDiv}>
+                  <img
+                    src={`${import.meta.env.BASE_URL}crownchaseBoard.png`}
+                    className={styles.boardImage}
+                  />
+                  <ul className={styles.legend}>
+                    <li>
+                      <img
+                        src={`${import.meta.env.BASE_URL}crownchaseJumper.png`}
+                        className={styles.pieceImage}
+                      />{" "}
+                      -{">"} Saltador
+                    </li>
+                    <li>
+                      <img
+                        src={`${import.meta.env.BASE_URL}crownchaseAssassin.png`}
+                        className={styles.pieceImage}
+                      />{" "}
+                      -{">"} Assassino
+                    </li>
+                    <li>
+                      <img
+                        src={`${import.meta.env.BASE_URL}crownchaseKing.png`}
+                        className={styles.pieceImage}
+                      />{" "}
+                      -{">"} Rei
+                    </li>
+                  </ul>
+                </div>
 
                 <h3 className={styles.rulesTitle}>Início da Partida</h3>
                 <p className={styles.rulesText}>
@@ -178,7 +186,7 @@ function CrownChaseRegras() {
                 </p>
 
                 <h3 className={styles.rulesTitle}>
-                  Assassino 
+                  Assassino
                 </h3>
                 <p className={styles.rulesText}>
                   <span className={styles.rulesSpan}>Movimento:</span> Move{" "}
@@ -199,7 +207,7 @@ function CrownChaseRegras() {
                 </p>
 
                 <h3 className={styles.rulesTitle}>
-                  Saltador 
+                  Saltador
                 </h3>
                 <p className={styles.rulesText}>
                   <span className={styles.rulesSpan}>Movimento Básico:</span>{" "}

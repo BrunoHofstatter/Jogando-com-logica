@@ -18,9 +18,10 @@ import { getAIMove } from "../Logic/aiPlayer";
 interface SPTTTProps {
   winCondition: "line" | "majority";
   isAiMode?: boolean;
+  difficulty?: 1 | 2 | 3 | 4;
 }
 
-export default function SPTTT({ winCondition, isAiMode = false }: SPTTTProps) {
+export default function SPTTT({ winCondition, isAiMode = false, difficulty = 1 }: SPTTTProps) {
   const [boards, setBoards] = useState<UltimateBoard>(
     Array.from({ length: 9 }, () => Array(9).fill(null))
   );
@@ -65,17 +66,25 @@ export default function SPTTT({ winCondition, isAiMode = false }: SPTTTProps) {
   }, []);
 
   // AI Logic
+  // AI Logic
   useEffect(() => {
+    const { winner: currentWinner } = checkBigBoardWinner(winners, winCondition);
+
     if (
       isAiMode &&
       currentPlayer === "O" &&
       !finalWinner &&
+      !currentWinner && // Check immediate winner state
       winners.some((w) => w === null) // Ensure game isn't over (rough check, checkBigBoardWinner handles real end)
     ) {
       // Small delay for UX
       const timer = setTimeout(() => {
         try {
-          const aiMove = getAIMove(boards, winners, activeBoard);
+          // Double check winner inside timeout just in case
+          const { winner: winnerNow } = checkBigBoardWinner(winners, winCondition);
+          if (winnerNow) return;
+
+          const aiMove = getAIMove(boards, winners, activeBoard, difficulty);
           handleClick(aiMove.boardIndex, aiMove.cellIndex);
         } catch (e) {
           console.error("AI failed to make a move", e);
@@ -83,7 +92,7 @@ export default function SPTTT({ winCondition, isAiMode = false }: SPTTTProps) {
       }, 800);
       return () => clearTimeout(timer);
     }
-  }, [currentPlayer, isAiMode, finalWinner, boards, winners, activeBoard]);
+  }, [currentPlayer, isAiMode, finalWinner, boards, winners, activeBoard, difficulty, winCondition]);
 
   const handleTouchStart = (boardIndex: number, cellIndex: number) => {
     if (
@@ -154,8 +163,8 @@ export default function SPTTT({ winCondition, isAiMode = false }: SPTTTProps) {
     );
 
     if (winningLine) {
-        setWinningBoardLine(winningLine);
-        setTimeout(() => setWinningBoardLine(null), 1000);
+      setWinningBoardLine(winningLine);
+      setTimeout(() => setWinningBoardLine(null), 1000);
     }
 
     if (bigWinner) {
@@ -184,6 +193,13 @@ export default function SPTTT({ winCondition, isAiMode = false }: SPTTTProps) {
             <Piece player={currentPlayer!} />
           </div>
         </div>
+
+        {isAiMode && (
+          <div className={styles["difficulty-indicator"]}>
+            <span>Dificuldade: {difficulty === 1 ? "Muito Fácil" : difficulty === 2 ? "Fácil" : difficulty === 3 ? "Médio" : "Difícil"}</span>
+          </div>
+        )}
+
         {winCondition === "majority" && (
           <div className={styles.scoreDisplayWrap}>
             <div className={styles.scoreDisplay}>
@@ -210,21 +226,18 @@ export default function SPTTT({ winCondition, isAiMode = false }: SPTTTProps) {
               <div
                 key={boardIndex}
                 data-target={`smallboard-${boardIndex}`}
-                className={`${styles["small-board"]} ${
-                  activeBoard === null || activeBoard === boardIndex
-                    ? styles.playable
-                    : ""
-                } ${
-                  winners[boardIndex]
+                className={`${styles["small-board"]} ${activeBoard === null || activeBoard === boardIndex
+                  ? styles.playable
+                  : ""
+                  } ${winners[boardIndex]
                     ? winners[boardIndex] === "tie"
                       ? styles.tied
                       : styles.won
                     : ""
-                } ${isPreviewBoard ? styles.previewNext : ""} ${
-                  winningBoardLine?.includes(boardIndex)
+                  } ${isPreviewBoard ? styles.previewNext : ""} ${winningBoardLine?.includes(boardIndex)
                     ? styles.winningBoard
                     : ""
-                }`}
+                  }`}
               >
                 {winners[boardIndex] && winners[boardIndex] !== "tie" && (
                   <div className={styles["board-winner"]}>
@@ -262,14 +275,12 @@ export default function SPTTT({ winCondition, isAiMode = false }: SPTTTProps) {
                   return (
                     <button
                       key={cellIndex}
-                      className={`${styles.casa} ${
-                        isValid ? styles.playableCell : ""
-                      } ${
-                        tapCell?.boardIndex === boardIndex &&
-                        tapCell?.cellIndex === cellIndex
+                      className={`${styles.casa} ${isValid ? styles.playableCell : ""
+                        } ${tapCell?.boardIndex === boardIndex &&
+                          tapCell?.cellIndex === cellIndex
                           ? styles.tappedCell
                           : ""
-                      }`}
+                        }`}
                       data-cell={`${boardIndex}-${cellIndex}`}
                       onClick={() => {
                         if (!isTouchDevice && !isDisabled) {

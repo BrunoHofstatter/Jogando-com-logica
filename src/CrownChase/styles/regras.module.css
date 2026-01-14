@@ -26,21 +26,33 @@
   width: 47%;
   border-radius: 3.3vw;
 }
-.gameTitle{
+
+.gameTitle {
   font-size: clamp(3vw, 10.5dvh, 5.5vw);
   -webkit-text-stroke: 0.3vw #4c1d95;
   color: #fbbf24;
 }
+
 .preview {
   height: clamp(30vw, 73dvh, 40vw);
   transition: all 0.5s ease;
   animation: pulsePreview 5s infinite;
 }
+
 @keyframes pulsePreview {
-  0% { transform: scale(0.96) }
-  50% { transform: scale(1) }
-  100% { transform: scale(0.96) }
+  0% {
+    transform: scale(0.96)
+  }
+
+  50% {
+    transform: scale(1)
+  }
+
+  100% {
+    transform: scale(0.96)
+  }
 }
+
 .botoes {
   gap: 0vw;
   width: 47%;
@@ -51,7 +63,7 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  position:relative;
+  position: relative;
 }
 
 .button {
@@ -70,7 +82,7 @@
   line-height: 1;
   box-shadow: inset 0 0 1vw #dcdf45ff;
   cursor: pointer;
-  margin-bottom: 5vw;
+  margin-bottom: 4vw;
   transition: all 0.5s ease;
 }
 
@@ -85,16 +97,64 @@
 
 
 
-.tutorialButton{
+
+/* Mode selector for rules page */
+.mode-select-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 1vw;
+  font-size: 2vw;
+  -webkit-text-stroke: 0.1vw #4c1d95;
+  color: #fbbf24;
+  margin-bottom: 5vw;
+}
+
+.mode-select-rules label {
+  display: flex;
+  align-items: center;
+  gap: 0.5vw;
+  background: radial-gradient(circle, #7c3aed, #5b21b6);
+  border: 0.2vw solid #c1c424;
+  border-radius: 2vw;
+  padding: 0.8vw 1.5vw;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: #fbbf24;
+
+}
+
+.mode-select-rules label:hover {
+  transform: scale(1.03);
+  background: radial-gradient(circle, #8041ec, #672cc5);
+}
+
+.mode-select-rules input[type="radio"] {
+  width: 1.2vw;
+  height: 1.2vw;
+  accent-color: #fbbf24;
+}
+
+.contraComputador {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  position: relative;
+}
+
+.tutorialButton {
   position: absolute;
   bottom: 4.2dvh;
   left: 3vw;
-  border: 0.26vw solid #342075;  /* Purple border */
-  background: radial-gradient(circle, #8b5cf6, #6d28d9);  /* Purple gradient */
+  border: 0.26vw solid #342075;
+  /* Purple border */
+  background: radial-gradient(circle, #8b5cf6, #6d28d9);
+  /* Purple gradient */
   border-radius: 1.7vw;
   padding: 0.1vw 1vw 0.5vw 1vw;
-  color: #fbbf24; /* Gold text */
-  -webkit-text-stroke: 0.17vw #4c1d95; /* Purple stroke */
+  color: #fbbf24;
+  /* Gold text */
+  -webkit-text-stroke: 0.17vw #4c1d95;
+  /* Purple stroke */
   font-size: clamp(1.5vw, 5dvh, 2.7vw);
   font-family: "Cherry Bomb One", system-ui;
   cursor: pointer;
@@ -104,19 +164,24 @@
 
 .tutorialButton:hover {
   transform: scale(1.03) translateY(-0.5dvh);
-  background: radial-gradient(circle, #a855f7, #7c3aed); /* Lighter purple */
+  background: radial-gradient(circle, #a855f7, #7c3aed);
+  /* Lighter purple */
 }
 
 .detailedRulesButton {
   position: absolute;
   bottom: 4.2dvh;
   right: 3vw;
-  border: 0.26vw solid #342075;  /* Purple border */
-  background: radial-gradient(circle, #8b5cf6, #6d28d9);  /* Purple gradient */
+  border: 0.26vw solid #342075;
+  /* Purple border */
+  background: radial-gradient(circle, #8b5cf6, #6d28d9);
+  /* Purple gradient */
   border-radius: 1.7vw;
   padding: 0.1vw 1vw 0.5vw 1vw;
-  color: #fbbf24; /* Gold text */
-  -webkit-text-stroke: 0.17vw #4c1d95; /* Purple stroke */
+  color: #fbbf24;
+  /* Gold text */
+  -webkit-text-stroke: 0.17vw #4c1d95;
+  /* Purple stroke */
   font-size: clamp(1.5vw, 5dvh, 2.7vw);
   font-family: "Cherry Bomb One", system-ui;
   cursor: pointer;
@@ -126,7 +191,8 @@
 
 .detailedRulesButton:hover {
   transform: scale(1.03) translateY(-0.5dvh);
-  background: radial-gradient(circle, #a855f7, #7c3aed); /* Lighter purple */
+  background: radial-gradient(circle, #a855f7, #7c3aed);
+  /* Lighter purple */
 }
 
 /* Modal Overlay */
@@ -144,16 +210,20 @@
 }
 
 .modalContent {
-  background: radial-gradient(circle, #9d6fee, #8154c9); /* Purple gradient */
-  border: 0.6vw solid #4c1d95;  /* Purple border */
+  background: radial-gradient(circle, #9d6fee, #8154c9);
+  /* Purple gradient */
+  border: 0.6vw solid #4c1d95;
+  /* Purple border */
   border-radius: 3.3vw;
   padding: 2vw 3vw;
   margin-top: 5dvh;
   max-width: 90%;
   max-height: 92dvh;
   overflow-y: auto;
-  color: #ffffff; /* White text */
-  -webkit-text-stroke: 0.1vw #2d1b69; /* Purple stroke */
+  color: #ffffff;
+  /* White text */
+  -webkit-text-stroke: 0.1vw #2d1b69;
+  /* Purple stroke */
   font-size: 1.5vw;
   position: relative;
 }
@@ -161,12 +231,16 @@
 .closeButton {
   border-radius: 50%;
   padding: 0 0 0.2vw 0;
-  background: radial-gradient(circle, #a855f7, #7c3aed); /* Purple gradient */
-  border: 0.3vw solid #4c1d95; /* Purple border */
+  background: radial-gradient(circle, #a855f7, #7c3aed);
+  /* Purple gradient */
+  border: 0.3vw solid #4c1d95;
+  /* Purple border */
   width: 4vw;
   height: 4vw;
-  color: #ffc228; /* White text */
-  -webkit-text-stroke: 0.2vw #4c1d95; /* Purple stroke */
+  color: #ffc228;
+  /* White text */
+  -webkit-text-stroke: 0.2vw #4c1d95;
+  /* Purple stroke */
   font-size: 2.5vw;
   cursor: pointer;
   display: flex;
@@ -185,85 +259,102 @@
 
 .closeButton:hover {
   transform: scale(1.05) translateY(-0.5dvh);
-  background: radial-gradient(circle, #c084fc, #a855f7); /* Brighter purple */
+  background: radial-gradient(circle, #c084fc, #a855f7);
+  /* Brighter purple */
 }
 
 .detailedRules {
   max-height: 100%;
   overflow-y: visible;
 }
-.detailedRules h3{
+
+.detailedRules h3 {
   color: #fbbf24;
-  -webkit-text-stroke: 0.21vw #421980; 
+  -webkit-text-stroke: 0.21vw #421980;
   font-size: 3.5vw;
   margin-top: 4vw;
 }
 
 .detailedRules p {
   font-size: 2.1vw;
-  -webkit-text-stroke: 0.17vw #421980; /* Purple stroke */
+  -webkit-text-stroke: 0.17vw #421980;
+  /* Purple stroke */
   margin-bottom: 1.5vw;
   color: #f5f5a9;
 }
 
 .detailedRules h2 {
   font-size: 4.5vw;
-  color: #fbbf24; /* Bright gold text */
-  -webkit-text-stroke: 0.25vw #421980; /* Purple stroke */
+  color: #fbbf24;
+  /* Bright gold text */
+  -webkit-text-stroke: 0.25vw #421980;
+  /* Purple stroke */
   text-align: center;
   margin-bottom: 2vw;
 }
 
-.rulesSpan{
+.rulesSpan {
   color: #fdd264;
   font-size: 2.3vw;
-  -webkit-text-stroke: 0.18vw #421980; 
+  -webkit-text-stroke: 0.18vw #421980;
 }
-.rulesStrong{
+
+.rulesStrong {
   color: #f58a33;
 }
-.detailedRules li{
+
+.detailedRules li {
   font-size: 1.7vw;
-  -webkit-text-stroke: 0.13vw #421980; /* Purple stroke */
+  -webkit-text-stroke: 0.13vw #421980;
+  /* Purple stroke */
   color: #f5f5a9;
 }
-.pieceImage{
+
+.pieceImage {
   width: 3vw;
   margin-bottom: 0.6vw;
 }
-.boardImage{
-  width:40vw;
-  padding: 2vw 0vw 0 5vw ;
+
+.boardImage {
+  width: 40vw;
+  padding: 2vw 0vw 0 5vw;
 }
-.boardDiv{
+
+.boardDiv {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
   gap: 4vw;
 }
-.legend{
+
+.legend {
   width: 40vw;
   display: flex;
   flex-direction: column;
   gap: 2vw;
   list-style-type: none;
 }
+
 .difficultyButton {
+  left: 24vw;
   margin-left: 1vw;
   font-family: "Cherry Bomb One", system-ui;
   font-size: 1.5vw;
-  padding: 0.5vw 1vw;
-  border-radius: 1vw;
+  padding: 0.3vw 0.7vw;
+  border-radius: 0.8vw;
   border: 0.2vw solid #c1c424;
-  background: radial-gradient(circle, #7c3aed, #5b21b6);
+  background: radial-gradient(circle, #9c3aed, #6f22ad);
   color: #fbbf24;
   -webkit-text-stroke: 0.1vw #4c1d95;
   cursor: pointer;
   transition: all 0.2s;
+  height: fit-content;
+  position: absolute;
+  min-width: 10vw;
 }
 
 .difficultyButton:hover {
   transform: scale(1.05);
-  background: radial-gradient(circle, #8041ec, #672cc5);
+  background: radial-gradient(circle, #8b38cf, #602292);
 }
