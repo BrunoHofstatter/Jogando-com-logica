@@ -5,59 +5,70 @@ Game Rules and Mechanics
 - Pieces:
   - `Sum` (Cross): Moves orthogonally (up, down, left, right).
   - `SumDiag` (X): Moves diagonally.
-  - `Captain`: A specific piece secretly assigned as the "Leader".
+  - `Captain`: A secretly assigned "Leader" piece (usually in the back row).
 - Energy System:
-  - Movement costs energy.
-  - Energy = `Piece Value` + `Dice Roll` (Dice rolled every 3 turns).
-  - Cost is calculated based on distance and action type (Captures cost more).
+  - Players have `Energy` based on: `Piece Value` + `Dice Roll` (2d5, rolled every 3 turns).
+  - Movement Cost: Calculated as `Distance * 2`.
+  - Capture Cost: `Base Cost + 2`.
+  - Captain Nerf: Captains pay double energy for all actions.
 - Win Condition: Capture the opponent's Captain OR capture all opponent pieces.
 - AI Levels:
-  - Easy: Random moves.
-  - Medium: Prioritizes capturing the Captain and high-value pieces.
-  - Hard: Uses an evaluated heuristic system that considers safety, strategic positioning, and material value.
+  - Easy: Random.
+  - Medium: Prioritizes captures (100%) and high energy moves.
+  - Hard: Evaluates board state for safety, positioning, and material value.
 
 2. Crown Chase (Caça Coroa)
 - Concept: A fast-paced 5x5 strategy game.
 - Pieces:
-  - `King`: Immoblie target.
+  - `King`: Immobile target.
   - `Killer`: Moves 1 square in any direction.
-  - `Jumper`: Moves 1 square or jumps 2 squares orthogonally.
+  - `Jumper`: Moves 1 square or jumps 2 squares orthogonally (over pieces).
 - Mechanics:
-  - Jumper Jump: Can jump over pieces to move quickly or capture.
-  - Capture: Landing on an enemy piece captures it.
+  - Jumper Jump: Can jump over allied or enemy pieces. Can only capture Kings.
+  - Capture: Landing on an enemy piece removes it from the board.
 - Win Condition: Capture the enemy King.
 - AI Levels:
-  - Implements Minimax algorithm for higher difficulties to predict player moves and protect the King.
+  - Uses Minimax algorithm (Depth 2) with an evaluation function scoring Material, Safety, and Positioning.
 
 3. Super Tic-Tac-Toe (SPTTT)
 - Concept: A recursive version of Tic-Tac-Toe.
-- Board: A 3x3 grid where each cell contains a smaller 3x3 "MiniBoard".
+- Board: A 3x3 "UltimateBoard" where each cell contains a 3x3 "MiniBoard".
 - Rules:
-  - Winning a MiniBoard marks that cell on the main "UltimateBoard" with your symbol (X or O).
-  - The position of your move in a MiniBoard dictates which MiniBoard the opponent must play in next.
-  - If a target MiniBoard is already won/full, the opponent can play anywhere.
-- Win Condition: Win the UltimateBoard by getting 3 wins in a row (or majority wins if board fills).
+  - Winning a MiniBoard marks that cell on the UltimateBoard with your symbol (X or O).
+  - The "Next Board" Constraint: Your move's position in the MiniBoard determines which MiniBoard the opponent MUST play in next.
+  - Free Move: If sent to a full or won MiniBoard, you can play anywhere.
+- Win Condition: Get 3 in a row on the UltimateBoard (or majority wins if board fills).
 - AI Levels:
-  - Includes a "Hard" mode that prevents giving the opponent "free moves" (sending them to a full board) and actively blocks winning lines.
+  - Hard Mode: actively avoids sending the opponent to won/full boards (preventing free moves) and blocks winning lines on both board scales.
 
 4. Caça Soma
 - Concept: A pattern-finding math game.
-- Mechanic: The board is filled with numbers. The player must select a set of numbers (2 or 3) that sum up to a specific "Magic Number" displayed for the round.
-- Level System:
-  - Progressive difficulty through 3 board sizes: 5x5, 7x7, and 10x10.
-  - Evaluation: Players earn 1-3 stars based on correctness and time taken.
-  - Configuration: Defined in `levelConfigs.ts` with specific number ranges for each round.
+- Mechanic: The board is filled with numbers. The player must select a set of numbers (2 or 3) that sum up to a specific "Magic Number".
+- Level System (`levelConfigs.ts`):
+  - 10 Rounds per Level.
+  - Board Sizes: 5x5 (Level 1), 7x7, 10x10.
+  - Difficulty: Increases by broadening the random number ranges (e.g., `[3, 15]` to `[10, 30]`).
+- Scoring:
+  - 1-3 Stars based on Correct Answers (e.g., 9/10 for 3 stars) and Time Taken.
 
 5. Stop Matemático
 - Concept: Quick-fire arithmetic challenges.
-- Mechanic: Players are presented with boxes containing numbers and must choose one number from each box to satisfy an equation (e.g., `Box A + Box B = Target`).
-- Modes:
-  - Single Box: Select one number to complete operation.
-  - Dual Box: Select numbers from two different sets to solve two sequential operations.
-- Difficulty:
-  - 6 Levels (d1-d6), ranging from simple addition (Fácil 1) to complex mixed operations with division and large numbers (Difícil 2).
-- Status: Codebase recently refactored to separate logic (`gameLogic.ts`) from configuration (`gameConfig.ts`).
+- Mechanic: Players are presented with boxes containing numbers and must choose one number from each box to satisfy an equation.
+- Difficulties (`d1` - `d6`):
+  - d1 (Fácil 1): Simple addition/subtraction, small numbers (1-10).
+  - d2 (Fácil 2): Larger ranges (5-20), dual-box operations introduced.
+  - d3 (Médio 1): Multiplication (x) introduced, skipped ranges (e.g., no 30s).
+  - d4 (Médio 2): Larger numbers (100s, 300s), more multiplication.
+  - d5 (Difícil 1): Division (÷) introduced, mixed operations.
+  - d6 (Difícil 2): Complex equations, large numbers (1000s), tight constraints.
 
-6. Other Games
-- Kings Path / Passagem: Mentioned in codebase types, likely legacy or future modules involving pathfinding mechanics.
-- Rubik's Cube: A 3D manipulation module (`RubiksClass`) existing in the codebase, likely for spatial reasoning.
+6. Rubik's Class (Dimensions)
+- Concept: Interactive educational module for learning Cube sizes.
+- Mechanic: Drag-and-drop interface.
+- Activity: Users drag images of cubes (2x2, 3x3, 4x4, 5x5, 6x6) into labeled boxes.
+- Feedback: Immediate visual correction (Green Check / Red X) and score summary.
+- Next Steps: Progresses to `Class2` (Face Area).
+
+7. Damas (Checkers)
+- Concept: Classic Checkers implementation.
+- Status: Functional basic gameplay (`JogoDamas.tsx`), Rules page (`RegrasDamas.tsx`).

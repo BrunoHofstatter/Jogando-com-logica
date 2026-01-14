@@ -4,37 +4,57 @@ Technical Architecture - Jogando com Lógica
 The core of the project is the `GameEngine` class (Singleton), located in `src/AA_baseGame/Logic/gameEngine.ts`. It manages the entire lifecycle of a game session, agnostic of the specific game rules.
 
 - State Management: It maintains the `GameState` (board, players, turn count, history, etc.).
-- Event System: Implements an observer pattern (`addEventListener`, `emitEvent`) to notify the UI of changes (e.g., `turn_start`, `action_executed`, `win`).
+- Event System: Implements an observer pattern (`addEventListener`, `emitEvent`) to notify the UI of changes.
+  - Events: `turn_start`, `action_executed`, `win`, `invalid_action`, `piece_captured`, `piece_promoted`, `barrier_placed`.
 - Action Execution: The `executeAction` method handles the flow of a turn:
   1. Validates the move using `GameRules.validateMove`.
   2. Checks resource costs (Energy/Moves).
   3. Executes the action via `GameRules.executeAction`.
   4. Checks for win conditions via `GameRules.checkWinCondition`.
-  5. Manages turn transitions.
+  5. Manages turn transitions (calls `onTurnStart`, `onTurnEnd`).
 
 2. Core Interfaces (`src/AA_baseGame/Logic/types.ts`)
 
-- GameConfig: Defines static settings like board dimensions, player count, initial piece setup, and turn constraints (time limits, moves per turn).
+- GameConfig: Defines static settings like `boardWidth`, `boardHeight`, `initialSetup` (pieces), and turn constraints (`energyPerTurn`, `movesPerTurn`).
 - GameRules: An interface that every game must implement. It bridges the generic engine with specific game logic. Key methods:
   - `validateMove(state, action)`: Boolean check for move legality.
   - `executeAction(state, action)`: Modifies the state based on the action.
   - `checkWinCondition(state)`: Returns a `WinResult` if a player wins.
   - `getAvailableActions(state)`: Returns all legal moves (crucial for AI).
-- GameState: The dynamic snapshot of the game. Includes the `board` (grid of `Piece` objects), `currentPlayer`, `remainingMoves`, and custom `gameData`.
-- TurnAction: Represents a player's intent. Properties: `type` (move, capture, place), `from`/`to` (coordinates), and optional data.
+- GameState: The dynamic snapshot of the game. Includes the `board` (grid of `Piece` objects), `currentPlayer`, `remainingMoves`, `remainingEnergy` (MathWar specific), and custom `gameData`.
 
-3. How It Works
-- Initialization: `gameEngine.initializeGame(config, rules)` creates the initial state.
-- Turn Loop: The UI calls `gameEngine.executeAction`. The engine validates the action against the active `GameRules`. If valid, the state is updated, and events are fired. The UI listens to these events to re-render.
-- Win Conditions: Checked automatically after every action. If a winner is found, the game phase changes to "ended".
+3. UI Architecture
+- Framework: React 19 with functional components and Hooks.
+- Routing: `react-router-dom` handles navigation. `App.tsx` defines the route map (e.g., `/mathwarPg`, `/spttt-ai`).
+- Styling:
+  - Global styles in `index.css`.
+  - Component-specific styles using CSS Modules (e.g., `class1.module.css`).
+  - Layouts often use CSS Grid or Flexbox for game boards.
+- Game Pages:
+  - "Regras" Pages: Landing pages with rules and game setup (Player vs Player / Player vs Computer).
+  - Game Pages: Render the actual board. They instantiate `GameEngine` or use game-specific logic (like `Caca_soma`).
 
 4. AI Integration
 AI is implemented as a layer on top of the Game Engine, specifically for competitive games (Math War, Crown Chase, SPTTT).
 
-- Architecture: Each game has an `aiPlayer.ts` file exporting a `getAIMove(state, rules, difficulty)` function.
-- Hook: The UI detects if the current player is AI (e.g., Player 0 in MathWar). If so, it requests a move from `getAIMove` and passes it to `gameEngine.executeAction`.
+- Pattern: Strategy Pattern. Each game has an `aiPlayer.ts` module.
+- Interface: `getAIMove(state, rules, difficulty)` -> `TurnAction`.
 - Difficulties (1-4):
   - Level 1 (Random): Picks a random valid move.
   - Level 2 (Simple/Heuristic): Prioritizes captures or immediate gains (e.g., finding the "Captain" in Math War).
   - Level 3 (Medium): Uses basic scoring or limited lookahead to evaluate moves.
-  - Level 4 (Hard): Implements more advanced algorithms like Minimax (Crown Chase) or optimized heuristics with deep scoring (Math War, SPTTT) to provide a strong challenge.
+  - Level 4 (Hard): Implements more advanced algorithms:
+    - Crown Chase: Minimax algorithm (Depth 2 + Eval function).
+    - Math War: Evaluated Heuristics (Score based on safety, threats, and positioning).
+    - SPTTT: Strategic scoring preventing "free moves" for opponents.
+
+5. Level & Config Systems (Non-Engine Games)
+- Caça Soma:
+  - Uses `LevelConfig` interface (`Logic/gameTypes.ts`).
+  - Defines explicit rounds, board sizes (5x5 to 10x10), and star thresholds in `levelConfigs.ts`.
+- Stop Matemático:
+  - Uses `DifficultyConfig` (`Logic/gameConfig.ts`).
+  - Defines `possibleNumbersByBox`, `contasPorBox` (operations), and `dualBoxes` for 6 progressive difficulties (`d1`-`d6`).
+- Rubik's Class:
+  - Educational modules (`Class1`, `Class2`) with interactive drag-and-drop mechanics.
+  - Uses independent state logic inside React components (`Dimensions`, `FaceArea`).
