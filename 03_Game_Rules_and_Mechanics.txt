@@ -1,0 +1,63 @@
+Game Rules and Mechanics
+
+1. Math War (Guerra Matemática)
+- Concept: A tactical board game on an 8x8 grid combining movement strategy with arithmetic.
+- Pieces:
+  - `Sum` (Cross): Moves orthogonally (up, down, left, right).
+  - `SumDiag` (X): Moves diagonally.
+  - `Captain`: A specific piece secretly assigned as the "Leader".
+- Energy System:
+  - Movement costs energy.
+  - Energy = `Piece Value` + `Dice Roll` (Dice rolled every 3 turns).
+  - Cost is calculated based on distance and action type (Captures cost more).
+- Win Condition: Capture the opponent's Captain OR capture all opponent pieces.
+- AI Levels:
+  - Easy: Random moves.
+  - Medium: Prioritizes capturing the Captain and high-value pieces.
+  - Hard: Uses an evaluated heuristic system that considers safety, strategic positioning, and material value.
+
+2. Crown Chase (Caça Coroa)
+- Concept: A fast-paced 5x5 strategy game.
+- Pieces:
+  - `King`: Immoblie target.
+  - `Killer`: Moves 1 square in any direction.
+  - `Jumper`: Moves 1 square or jumps 2 squares orthogonally.
+- Mechanics:
+  - Jumper Jump: Can jump over pieces to move quickly or capture.
+  - Capture: Landing on an enemy piece captures it.
+- Win Condition: Capture the enemy King.
+- AI Levels:
+  - Implements Minimax algorithm for higher difficulties to predict player moves and protect the King.
+
+3. Super Tic-Tac-Toe (SPTTT)
+- Concept: A recursive version of Tic-Tac-Toe.
+- Board: A 3x3 grid where each cell contains a smaller 3x3 "MiniBoard".
+- Rules:
+  - Winning a MiniBoard marks that cell on the main "UltimateBoard" with your symbol (X or O).
+  - The position of your move in a MiniBoard dictates which MiniBoard the opponent must play in next.
+  - If a target MiniBoard is already won/full, the opponent can play anywhere.
+- Win Condition: Win the UltimateBoard by getting 3 wins in a row (or majority wins if board fills).
+- AI Levels:
+  - Includes a "Hard" mode that prevents giving the opponent "free moves" (sending them to a full board) and actively blocks winning lines.
+
+4. Caça Soma
+- Concept: A pattern-finding math game.
+- Mechanic: The board is filled with numbers. The player must select a set of numbers (2 or 3) that sum up to a specific "Magic Number" displayed for the round.
+- Level System:
+  - Progressive difficulty through 3 board sizes: 5x5, 7x7, and 10x10.
+  - Evaluation: Players earn 1-3 stars based on correctness and time taken.
+  - Configuration: Defined in `levelConfigs.ts` with specific number ranges for each round.
+
+5. Stop Matemático
+- Concept: Quick-fire arithmetic challenges.
+- Mechanic: Players are presented with boxes containing numbers and must choose one number from each box to satisfy an equation (e.g., `Box A + Box B = Target`).
+- Modes:
+  - Single Box: Select one number to complete operation.
+  - Dual Box: Select numbers from two different sets to solve two sequential operations.
+- Difficulty:
+  - 6 Levels (d1-d6), ranging from simple addition (Fácil 1) to complex mixed operations with division and large numbers (Difícil 2).
+- Status: Codebase recently refactored to separate logic (`gameLogic.ts`) from configuration (`gameConfig.ts`).
+
+6. Other Games
+- Kings Path / Passagem: Mentioned in codebase types, likely legacy or future modules involving pathfinding mechanics.
+- Rubik's Cube: A 3D manipulation module (`RubiksClass`) existing in the codebase, likely for spatial reasoning.

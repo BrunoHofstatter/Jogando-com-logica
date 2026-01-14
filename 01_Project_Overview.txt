@@ -1,0 +1,19 @@
+Project Name: Jogando com Lógica
+
+Mission:
+To teach logical reasoning and math to students (grades 3-7) through interactive web games. The project aims to provide an engaging platform where students can practice mathematical concepts and strategic thinking in a fun, gamified environment.
+
+Tech Stack:
+- Frontend: React (with Vite)
+- Language: TypeScript
+- Styling: CSS Modules
+- Architecture: Custom Game Engine (Object-Oriented)
+- Verification: Playwright (Python scripts)
+
+Target Audience:
+- Students: Grades 3-7 (Primary focus)
+- Teachers: Includes a dedicated "Para Professores" area for resource management and classroom integration.
+
+Current State:
+MVP (Minimum Viable Product) phase.
+The project is currently being polished for a pilot deployment with teachers starting next week. Key game modules are functional, AI is implemented for competitive games, and level systems are being finalized for single-player logic games.

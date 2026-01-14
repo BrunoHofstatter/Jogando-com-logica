@@ -1,0 +1,34 @@
+Current Roadmap and Status
+
+1. Completed
+- Core Engine: The `GameEngine` is stable and successfully powering multiple game types.
+- AI Implementation:
+  - Math War: Full 4-tier difficulty (Random to Evaluated Heuristic).
+  - Crown Chase: Full 4-tier difficulty (including Minimax).
+  - SPTTT: Full 4-tier difficulty (including Strategic Block/Win logic).
+- Refactoring:
+  - Stop Matemático: Successfully reorganized into clean, modular files (`gameLogic`, `gameConfig`).
+- Basic Game Mechanics: All base rules for Math War, Crown Chase, SPTTT, and Caça Soma are functional.
+
+2. In Progress (Active Work)
+- UI Refinement:
+  - Polishing the "Player vs Computer" selection screens.
+  - Ensuring the "Nível" (Level) toggle is consistent across all competitive games.
+- Difficulty Balancing:
+  - Playtesting AI levels to ensure "Easy" is accessible and "Hard" is genuinely challenging without being unfair.
+- Caça Soma Levels:
+  - Designing and implementing the UI for the Level Selection screen (matching the visual theme).
+  - Finalizing logic for Star thresholds (Time vs Accuracy).
+
+3. Upcoming
+- Stop Matemático Levels:
+  - Implementing the UI for level selection.
+  - Integrating the `difficulties` (d1-d6) into a progressive unlock system.
+- Teacher Feedback Pilot:
+  - Starting next week.
+  - Focus on usability, instruction clarity, and student engagement.
+- Bug Fixing:
+  - Addressing specific issues in the Rubik's Cube classes.
+- Design Improvements:
+  - Optimizing mobile margins and responsiveness.
+  - Improving font readability across all games (specifically `webkit_stroke` requirements for Caça Soma).
