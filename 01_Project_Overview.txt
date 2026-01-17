@@ -1,0 +1,32 @@
+Project Name: Jogando com Lógica
+
+Mission:
+To teach logical reasoning and math to students (grades 3-7) through interactive web games. The project aims to provide an engaging platform where students can practice mathematical concepts and strategic thinking in a fun, gamified environment.
+
+Tech Stack:
+- Frontend: React 19 (using Vite 6.2)
+- Language: TypeScript 5.7
+- Styling: CSS Modules, Bootstrap 5.3
+- Routing: React Router 7.6
+- Icons: Lucide React
+- Verification: Playwright (Python scripts)
+- Deployment: GitHub Pages
+
+Target Audience:
+- Students: Grades 3-7 (Primary focus)
+- Teachers: Includes a dedicated "Para Professores" area (manual) for resource management and classroom integration.
+
+Project Structure:
+- `src/AA_baseGame`: Contains the core `GameEngine` and shared components.
+- `src/MathWar`: Files for "Guerra Matemática" (Strategy/Math).
+- `src/CrownChase`: Files for "Caça Coroa" (Strategy/Minimax).
+- `src/SPTTT`: Files for "Super Tic-Tac-Toe" (Recursion/Logic).
+- `src/Caca_soma`: Files for "Caça Soma" (Pattern Matching/Math).
+- `src/Stop`: Files for "Stop Matemático" (Quick Math).
+- `src/Damas`: Files for "Damas" (Classic Checkers).
+- `src/RubiksClass`: Files for Rubik's Cube educational modules.
+- `src/Main`: Shared pages (Home, Contact, Manual, About).
+
+Current State:
+MVP (Minimum Viable Product) phase.
+The project is currently being polished for a pilot deployment with teachers next week. Key game modules are functional, AI is implemented for competitive games (Math War, Crown Chase, SPTTT), and level systems are being finalized for single-player logic games (Caça Soma, Stop).

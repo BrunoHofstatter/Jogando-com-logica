@@ -1,0 +1,38 @@
+Current Roadmap and Status
+
+1. Completed
+- Core Engine: `GameEngine` is robust, handling state, events, and validation for multiple games.
+- AI Implementation:
+  - Math War: Complete (4 Difficulties: Random -> Heuristic).
+  - Crown Chase: Complete (4 Difficulties: Random -> Minimax).
+  - SPTTT: Complete (4 Difficulties: Random -> Strategic/Blocking).
+- Stop Matemático Refactor:
+  - Logic successfully separated into `gameLogic.ts` (mechanics) and `gameConfig.ts` (data).
+  - 6 Difficulty levels (`d1`-`d6`) fully configured.
+- Caça Soma Logic:
+  - Level configuration system (`levelConfigs.ts`) implemented.
+  - Game types (`GameMode`, `LevelProgress`) defined.
+
+2. In Progress (Active Work)
+- Caça Soma UI:
+  - `LevelSelectionPage` is implemented (`/cacaSomaNiveis`) but requires visual polishing to match `Regras_CacaSoma`.
+  - `LevelGamePage` logic is connecting to the config system.
+- AI UI Refinement:
+  - Ensuring consistency in the "Player vs Computer" setup screens across Math War, Crown Chase, and SPTTT.
+- Rubik's Classes:
+  - `Dimensions` (Class 1) is functional with drag-and-drop.
+  - `FaceArea` (Class 2) is implemented (`class2.tsx`) but requires testing/bug fixing.
+
+3. Upcoming Tasks
+- Stop Matemático Levels UI:
+  - Build a Level Selection screen similar to Caça Soma's to expose the `d1`-`d6` difficulties to the user.
+- Teacher Deployment (Next Week):
+  - Finalize the `/manual` page content (currently a placeholder or basic guide).
+  - Verify all "Regras" pages are clear and instructional.
+- Visual Polish:
+  - Standardize `BackButton` behavior (logic exists in `App.tsx`).
+  - Mobile responsiveness adjustments (margins, font sizes).
+  - Apply `webkit_stroke` styling to Caça Soma text as requested.
+- Bug Fixes:
+  - Rubik's `Class2` needs verification.
+  - General difficulty balancing for AI Hard modes.
