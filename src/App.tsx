@@ -28,6 +28,7 @@ import MathWarRegras from "./MathWar/Pages/regrasPage"
 import MathWarPage from "./MathWar/Pages/baseGamePage"
 import MathWarAIPage from "./MathWar/Pages/aiGamePage"
 import Manual from "./Main/Pages/manual"
+import LevelsMenuPage from "./Stop/Pages/LevelsMenuPage";
 import Class2 from "./RubiksClass/Classes/FaceArea/class2.tsx"
 
 function BackButton() {
@@ -60,6 +61,7 @@ function App() {
         <Route path="/contato" element={<Contato />} />
         <Route path="/jogoStop" element={<JogoStop />} />
         <Route path="/stoppage" element={<StopPage />} />
+        <Route path="/stop-levels" element={<LevelsMenuPage />} />
         <Route path="/damas" element={<PaginaDamas />} />
         <Route path="/teste" element={<Teste />} />
         <Route path="/spttt" element={<SPTTT />} />

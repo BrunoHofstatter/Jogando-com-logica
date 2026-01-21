@@ -18,7 +18,7 @@ export function WinnerOverlay({
     if (winner === "X") {
       titleText = "Você Venceu!";
     } else {
-      titleText = "O Bot Venceu!";
+      titleText = "O computador Venceu!";
     }
   }
 

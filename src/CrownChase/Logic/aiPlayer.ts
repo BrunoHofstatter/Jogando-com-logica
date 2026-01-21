@@ -1,5 +1,4 @@
-import { GameState, TurnAction } from '../../AA_baseGame/Logic/types';
-import { GameRules } from '../../AA_baseGame/Logic/types';
+import { GameState, TurnAction, GameRules } from './types';
 
 export type AIDifficulty = 1 | 2 | 3 | 4 | 5;
 
@@ -111,15 +110,13 @@ function scoreMove(
 
 function getDifficulty4Move(state: GameState, moves: TurnAction[], gameRules: GameRules): TurnAction {
   // Config
-  const DEPTH = 2; // Lookahead: 1 (my move) + 1 (enemy response)
-  const NOISE_FACTOR = 0.1; // 10% randomness to weaken perfect play
+  const DEPTH = 3; // Lookahead: Me -> You -> Me
+  const NOISE_FACTOR = 0.0; // DEBUG: Disable noise for pure test
 
   let bestScore = -Infinity;
   let bestMoves: TurnAction[] = [];
 
   // If we have a winning move immediately (Capture King), take it!
-  // This is a "Depth 1" check that overrides everything because Minimax might
-  // sometimes undervalue a win if it sees a "better" win later (unlikely but safe).
   for (const move of moves) {
     if (isWinningMove(state, move)) return move;
   }
@@ -134,13 +131,10 @@ function getDifficulty4Move(state: GameState, moves: TurnAction[], gameRules: Ga
     simulatedState.currentPlayer = nextPlayer;
 
     // Call Minimax (Minimizing for enemy)
-    // We pass -Infinity, Infinity for Alpha/Beta
     let score = minimax(simulatedState, DEPTH - 1, false, -Infinity, Infinity, gameRules, state.currentPlayer);
 
     // Add User-Requested Weakening Noise
-    // Score is typically in hundreds/thousands. 
-    // We modify it by +/- 10% of its absolute value + some flat noise.
-    if (score !== Infinity && score !== -Infinity) {
+    if (score !== Infinity && score !== -Infinity && NOISE_FACTOR > 0) {
       const noise = (Math.random() - 0.5) * (Math.abs(score) * NOISE_FACTOR + 20);
       score += noise;
     }
@@ -148,12 +142,12 @@ function getDifficulty4Move(state: GameState, moves: TurnAction[], gameRules: Ga
     if (score > bestScore) {
       bestScore = score;
       bestMoves = [move];
-    } else if (Math.abs(score - bestScore) < 5) { // Treat close scores as equal
+    } else if (Math.abs(score - bestScore) < 5) {
       bestMoves.push(move);
     }
   }
 
-  // Pick random from best (or tied) moves
+  // Pick random from best moves
   return bestMoves[Math.floor(Math.random() * bestMoves.length)];
 }
 
@@ -164,10 +158,8 @@ function minimax(
   alpha: number,
   beta: number,
   gameRules: GameRules,
-  rootPlayer: number // The player who started the search (The AI)
+  rootPlayer: number
 ): number {
-
-  // Terminal State Checks (King Capture / No Moves)
   const enemyOfRoot = rootPlayer === 0 ? 1 : 0;
   const aiKing = findKingPosition(state, rootPlayer);
   const enemyKing = findKingPosition(state, enemyOfRoot);
@@ -181,8 +173,7 @@ function minimax(
 
   const availableMoves = gameRules.getAvailableActions(state);
   if (availableMoves.length === 0) {
-    // Stalemate or Loss depending on rules? Assuming loss if cant move or just neutral
-    return -50000;
+    return -50000; // Stalemate/Loss
   }
 
   if (isMaximizing) {
@@ -190,7 +181,6 @@ function minimax(
     for (const move of availableMoves) {
       const nextState = cloneState(state);
       executeMoveSim(nextState, move);
-      // Switch turn
       nextState.currentPlayer = state.currentPlayer === 0 ? 1 : 0;
 
       const evalScore = minimax(nextState, depth - 1, false, alpha, beta, gameRules, rootPlayer);
@@ -204,7 +194,6 @@ function minimax(
     for (const move of availableMoves) {
       const nextState = cloneState(state);
       executeMoveSim(nextState, move);
-      // Switch turn
       nextState.currentPlayer = state.currentPlayer === 0 ? 1 : 0;
 
       const evalScore = minimax(nextState, depth - 1, true, alpha, beta, gameRules, rootPlayer);
@@ -216,13 +205,16 @@ function minimax(
   }
 }
 
-/**
- * Static Evaluation Function
- * Returns a score representing how good the state is for the `rootPlayer`.
- */
+// Debug helper
+const DEBUG_LOG = true;
+
 function evaluateState(state: GameState, rootPlayer: number): number {
   let score = 0;
-  const enemyPlayer = rootPlayer === 0 ? 1 : 0;
+
+  // Debug Breakdown
+  let matScore = 0;
+  let safetyScore = 0;
+  let posScore = 0;
 
   for (let r = 0; r < state.config.boardHeight; r++) {
     for (let c = 0; c < state.config.boardWidth; c++) {
@@ -238,30 +230,74 @@ function evaluateState(state: GameState, rootPlayer: number): number {
       else if (piece.type === 'killer') value = 500;
       else if (piece.type === 'jumper') value = 300;
 
-      score += value * multiplier;
+      const mVal = value * multiplier;
+      score += mVal;
+      matScore += mVal;
 
       // 2. Safety (Am I under attack?)
-      // Note: This is computationally expensive, but board is small (5x5)
-      // Ideally we pass threats down, but re-scanning here is fine for valid Depth 0
       if (isPositionUnderAttack(state, { row: r, col: c }, piece.owner)) {
-        // If it's the King, huge penalty (Check) -> but not as big as losing king
         if (piece.type === 'king') {
-          score -= 500 * multiplier; // "Check" penalty
+          // If it's the King
+          const penalty = 500 * multiplier;
+          score -= penalty;
+          safetyScore -= penalty;
+          // if (DEBUG_LOG && isMe) console.log(`[Eval] King at ${r},${c} under attack!`);
         } else {
-          // Piece under threat
-          score -= (value * 0.5) * multiplier; // Risking half the piece's value
+          // Piece under threat - Assume it's 90% lost to avoid horizon effect blunders
+          const penalty = (value * 0.9) * multiplier;
+          score -= penalty;
+          safetyScore -= penalty;
+          // if (DEBUG_LOG && isMe) console.log(`[Eval] Piece at ${r},${c} under attack! Penalty: ${penalty}`);
         }
       }
 
-      // 3. Positional / Aggression
-      // Reward advancing Killers slightly
+      // 3. Positional
       if (piece.type === 'killer') {
-        // Simple center control / advance bonus
-        if (r > 0 && r < 4 && c > 0 && c < 4) score += 20 * multiplier;
+        if (r > 0 && r < 4 && c > 0 && c < 4) {
+          const bonus = 20 * multiplier;
+          score += bonus;
+          posScore += bonus;
+        }
       }
     }
   }
+
+  // Very hacky debug log to see why scores are negative
+  // Only log if the score is significantly bad and we are the root player verifying our own state?
+  // No, Minimax calls this for leaf nodes.
+  // We can't log every leaf or console dies.
+  // We will return the score, but we need a way to see the breakdown for the BEST moves in getDifficulty4Move.
+
   return score;
+}
+
+// Helper to get breakdown for debug logging in the main loop
+function getScoreBreakdown(state: GameState, rootPlayer: number): string {
+  let mat = 0, safe = 0, pos = 0;
+  for (let r = 0; r < state.config.boardHeight; r++) {
+    for (let c = 0; c < state.config.boardWidth; c++) {
+      const piece = state.board[r][c];
+      if (!piece) continue;
+      const isMe = piece.owner === rootPlayer;
+      const multiplier = isMe ? 1 : -1;
+      let value = 0;
+      if (piece.type === 'king') value = 10000;
+      else if (piece.type === 'killer') value = 500;
+      else if (piece.type === 'jumper') value = 300;
+
+      mat += value * multiplier;
+
+      if (isPositionUnderAttack(state, { row: r, col: c }, piece.owner)) {
+        if (piece.type === 'king') safe -= 500 * multiplier;
+        else safe -= (value * 0.9) * multiplier;
+      }
+
+      if (piece.type === 'killer' && r > 0 && r < 4 && c > 0 && c < 4) {
+        pos += 20 * multiplier;
+      }
+    }
+  }
+  return `Mat: ${mat}, Safe: ${safe}, Pos: ${pos}`;
 }
 
 // --- Common Helpers ---

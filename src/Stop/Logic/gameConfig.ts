@@ -200,3 +200,22 @@ export const difficulties: Record<string, DifficultyConfig> = {
  * Type for difficulty keys
  */
 export type DifficultyKey = keyof typeof difficulties;
+
+/**
+ * Returns a random difficulty key
+ * @param exclude Optional key to exclude from selection (to avoid repeats)
+ */
+export function getRandomDifficultyKey(exclude?: DifficultyKey): DifficultyKey {
+  const keys = Object.keys(difficulties) as DifficultyKey[];
+
+  if (exclude) {
+    const filteredKeys = keys.filter(k => k !== exclude);
+    if (filteredKeys.length > 0) {
+      const randomIndex = Math.floor(Math.random() * filteredKeys.length);
+      return filteredKeys[randomIndex];
+    }
+  }
+
+  const randomIndex = Math.floor(Math.random() * keys.length);
+  return keys[randomIndex];
+}

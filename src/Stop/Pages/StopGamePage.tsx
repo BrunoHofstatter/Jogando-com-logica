@@ -5,7 +5,8 @@ import GameBoard from "../Components/GameBoard";
 import DynamicTutorial, {
   TutorialStep,
 } from "../Components/DynamicTutorial";
-import type { DifficultyKey } from "../Logic/gameConfig";
+import { getRandomDifficultyKey, type DifficultyKey } from "../Logic/gameConfig";
+import { getLevelById, type LevelConfig } from "../Logic/levelsConfig";
 import styles from "../styles/StopGame.module.css";
 
 /**
@@ -14,7 +15,29 @@ import styles from "../styles/StopGame.module.css";
  */
 function StopGamePage() {
   const location = useLocation();
-  const difficulty = (location.state?.difficulty || "d2") as DifficultyKey;
+  const mode = location.state?.mode || "random";
+  const levelId = location.state?.level || 1;
+  const [levelConfig, setLevelConfig] = useState<LevelConfig | null>(null);
+
+  // Initialize difficulty based on mode
+  const [difficulty, setDifficulty] = useState<DifficultyKey>(() => {
+    // Priority: If tutorial is not completed, FORCE d1
+    // The tutorial flag is "tutorial_stop_v1_completed"
+    const tutorialCompleted = localStorage.getItem("tutorial_stop_v1_completed") === "true";
+
+    // If we are in a forced tutorial mode, we definitely want d1.
+    // If we are in random mode (first load) but tutorial is not done, we also want d1.
+    if (!tutorialCompleted) {
+      return "d1";
+    }
+
+    if (mode === "random") {
+      return getRandomDifficultyKey();
+    }
+
+    // For specific levels or forced difficulty
+    return (location.state?.difficulty || "d1") as DifficultyKey;
+  });
 
   const [showTutorial, setShowTutorial] = useState(false);
   const [randomNumber, setRandomNumber] = useState<number | null>(null);
@@ -24,13 +47,22 @@ function StopGamePage() {
 
   const tutorialActiveRef = useRef(false);
 
-  // Auto-show tutorial on first visit
+  // Auto-show tutorial on first visit or if explicitly requested
   useEffect(() => {
     const completed = localStorage.getItem("tutorial_stop_v1_completed");
-    if (completed !== "true") {
+    if (mode === "tutorial_fixed" || completed !== "true") {
       setTimeout(() => setShowTutorial(true), 500);
     }
-  }, []);
+  }, [mode]);
+
+  useEffect(() => {
+    if (mode === "level") {
+      const config = getLevelById(levelId);
+      if (config) setLevelConfig(config);
+    } else {
+      setLevelConfig(null);
+    }
+  }, [mode, levelId]);
 
   // Tutorial step definitions
   const tutorialSteps: TutorialStep[] = [
@@ -200,6 +232,9 @@ function StopGamePage() {
   }, []);
 
   const handleReset = () => {
+    if (mode === "random") {
+      setDifficulty(prev => getRandomDifficultyKey(prev));
+    }
     setResetTrigger((prev) => prev + 1);
     setShowNumber(true);
     setShowGame(false);
@@ -221,10 +256,21 @@ function StopGamePage() {
       {/* Game board */}
       {showGame && randomNumber !== null && (
         <>
-          <GameBoard randomNumber={randomNumber} difficulty={difficulty} />
+          <GameBoard
+            randomNumber={randomNumber}
+            difficulty={difficulty}
+            levelConfig={levelConfig}
+            onReset={handleReset}
+          />
           <button onClick={handleReset} className={styles.resetButton}>
             Reiniciar
           </button>
+
+          {mode === "level" && (
+            <div className={styles.levelDisplay}>
+              Nível: {levelId}
+            </div>
+          )}
         </>
       )}
 

@@ -4,8 +4,10 @@
   font-style: normal;
   display: flex;
   max-height: 100dvh;
-  overflow: hidden; /* avoids double scrollbars */
-  border: 0dvh solid #9b0b16; /* 1px remains 1dvh as it was already 1dvh */
+  overflow: hidden;
+  /* avoids double scrollbars */
+  border: 0dvh solid #9b0b16;
+  /* 1px remains 1dvh as it was already 1dvh */
   padding: 0vw;
   min-height: 100dvh;
   width: 100vw;
@@ -13,6 +15,7 @@
   align-items: center;
   background: radial-gradient(circle, #de9696, #ab3636);
 }
+
 .boxRegras {
   display: flex;
   flex-direction: column;
@@ -22,22 +25,34 @@
   width: 47%;
   border-radius: 3.3vw;
 }
-.gameTitle{
+
+.gameTitle {
   font-size: clamp(3vw, 9dvh, 4.8vw);
   color: #e2a01d;
   -webkit-text-stroke: 0.3vw #080303;
   margin-bottom: 4dvh;
 }
+
 .preview {
   height: clamp(20vw, 50dvh, 28vw);
   transition: all 0.5s ease;
   animation: pulsePreview 5s infinite;
 }
+
 @keyframes pulsePreview {
-  0% { transform: scale(0.96) }
-  50% { transform: scale(1) }
-  100% { transform: scale(0.96) }
+  0% {
+    transform: scale(0.96)
+  }
+
+  50% {
+    transform: scale(1)
+  }
+
+  100% {
+    transform: scale(0.96)
+  }
 }
+
 .botoes {
   gap: 0vw;
   width: 47%;
@@ -48,8 +63,9 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  position:relative;
+  position: relative;
 }
+
 .button {
   border: 1.8dvh solid #080303;
   background: radial-gradient(circle, #b43636, #851616);
@@ -78,16 +94,19 @@
   -webkit-text-stroke: 0.42vw #080303;
 }
 
-.tutorialButton{
+.tutorialButton {
   position: absolute;
   bottom: 4.2dvh;
   left: 3vw;
-  border: 0.26vw solid #080303; /* Purple border */
-  background: radial-gradient(circle, #b43636, #851616);  /* Purple gradient */
+  border: 0.26vw solid #080303;
+  /* Purple border */
+  background: radial-gradient(circle, #b43636, #851616);
+  /* Purple gradient */
   border-radius: 1.7vw;
   padding: 0.1vw 1vw 0.5vw 1vw;
   color: #e2a01d;
-  -webkit-text-stroke: 0.17vw #080303;/* Purple stroke */
+  -webkit-text-stroke: 0.17vw #080303;
+  /* Purple stroke */
   font-size: clamp(1.5vw, 5dvh, 2.7vw);
   font-family: "Cherry Bomb One", system-ui;
   cursor: pointer;
@@ -97,19 +116,24 @@
 
 .tutorialButton:hover {
   transform: scale(1.03) translateY(-0.5dvh);
-  background: radial-gradient(circle, #b43636, #b82a2a); /* Lighter purple */
+  background: radial-gradient(circle, #b43636, #b82a2a);
+  /* Lighter purple */
 }
 
 .detailedRulesButton {
   position: absolute;
   bottom: 4.2dvh;
   right: 3vw;
-  border: 0.26vw solid #080303; /* Purple border */
-  background: radial-gradient(circle, #b43636, #851616);  /* Purple gradient */
+  border: 0.26vw solid #080303;
+  /* Purple border */
+  background: radial-gradient(circle, #b43636, #851616);
+  /* Purple gradient */
   border-radius: 1.7vw;
   padding: 0.1vw 1vw 0.5vw 1vw;
-  color: #e2a01d; /* Gold text */
-  -webkit-text-stroke: 0.17vw #080303; /* Purple stroke */
+  color: #e2a01d;
+  /* Gold text */
+  -webkit-text-stroke: 0.17vw #080303;
+  /* Purple stroke */
   font-size: clamp(1.5vw, 5dvh, 2.7vw);
   font-family: "Cherry Bomb One", system-ui;
   cursor: pointer;
@@ -119,12 +143,13 @@
 
 .detailedRulesButton:hover {
   transform: scale(1.03) translateY(-0.5dvh);
-  background: radial-gradient(circle, #b43636, #b82a2a); /* Lighter purple */
+  background: radial-gradient(circle, #b43636, #b82a2a);
+  /* Lighter purple */
 }
 
 .difPart {
   position: relative;
-  margin-bottom:6vw;
+  margin-bottom: 6vw;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -198,7 +223,7 @@
 .difMenuItem.selected {
   background: radial-gradient(circle, #8b4513, #a94317);
   border: solid 0.05vw #9d6517;
-  
+
 }
 
 
@@ -217,16 +242,20 @@
 }
 
 .modalContent {
-  background: radial-gradient(circle, #c6aeae, #564343); /* Match boxRegras background */
-  border: 0.6vw solid #570505;  /* Dark red border */
+  background: radial-gradient(circle, #c6aeae, #564343);
+  /* Match boxRegras background */
+  border: 0.6vw solid #570505;
+  /* Dark red border */
   border-radius: 3.3vw;
   padding: 2vw 3vw;
   margin: 5dvh auto 0;
   max-width: 90%;
   max-height: 92dvh;
   overflow-y: auto;
-  color: #ffffff; /* White text */
-  -webkit-text-stroke: 0.1vw #080303; /* Dark text stroke */
+  color: #ffffff;
+  /* White text */
+  -webkit-text-stroke: 0.1vw #080303;
+  /* Dark text stroke */
   font-size: 1.5vw;
   position: relative;
 }
@@ -234,12 +263,16 @@
 .closeButton {
   border-radius: 50%;
   padding: 0 0 0.2vw 0;
-  background: radial-gradient(circle, #b43636, #851616); /* Red gradient */
-  border: 0.3vw solid #570505; /* Dark red border */
+  background: radial-gradient(circle, #b43636, #851616);
+  /* Red gradient */
+  border: 0.3vw solid #570505;
+  /* Dark red border */
   width: 4vw;
   height: 4vw;
-  color: #e2a01d; /* Gold text */
-  -webkit-text-stroke: 0.2vw #080303; /* Dark text stroke */
+  color: #e2a01d;
+  /* Gold text */
+  -webkit-text-stroke: 0.2vw #080303;
+  /* Dark text stroke */
   font-size: 2.5vw;
   cursor: pointer;
   display: flex;
@@ -258,7 +291,8 @@
 
 .closeButton:hover {
   transform: scale(1.05) translateY(-0.5dvh);
-  background: radial-gradient(circle, #d14a4a, #a02a2a); /* Brighter red */
+  background: radial-gradient(circle, #d14a4a, #a02a2a);
+  /* Brighter red */
 }
 
 .detailedRules {
@@ -267,24 +301,323 @@
 }
 
 .detailedRules h3 {
-  color: #e2a01d; /* Gold text */
-  -webkit-text-stroke: 0.21vw #080303; /* Dark text stroke */
+  color: #e2a01d;
+  /* Gold text */
+  -webkit-text-stroke: 0.21vw #080303;
+  /* Dark text stroke */
   font-size: 3vw;
   margin-bottom: 1.5vw;
 }
 
 .detailedRules p {
   font-size: 2.1vw;
-  -webkit-text-stroke: 0.17vw #080303; /* Dark text stroke */
+  -webkit-text-stroke: 0.17vw #080303;
+  /* Dark text stroke */
   margin-bottom: 1.5vw;
-  color: #ffffff; /* White text */
+  color: #ffffff;
+  /* White text */
   line-height: 1.4;
 }
 
 .detailedRules h2 {
   font-size: 4.5vw;
-  color: #e2a01d; /* Gold text */
-  -webkit-text-stroke: 0.25vw #080303;  /* Dark text stroke */
+  color: #e2a01d;
+  /* Gold text */
+  -webkit-text-stroke: 0.25vw #080303;
+  /* Dark text stroke */
   text-align: center;
   margin-bottom: 2vw;
+}
+
+/* Mode selector for rules page - Adapted from CrownChase to match Stop Theme */
+.mode-select-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 1vw;
+  font-size: 2vw;
+  -webkit-text-stroke: 0.1vw #080303;
+  color: #e2a01d;
+  margin-bottom: 5vw;
+}
+
+.mode-select-rules label {
+  display: flex;
+  align-items: center;
+  gap: 0.5vw;
+  background: radial-gradient(circle, #b43636, #851616);
+  border: 0.2vw solid #080303;
+  border-radius: 2vw;
+  padding: 0.8vw 1.5vw;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: #e2a01d;
+}
+
+.mode-select-rules label:hover {
+  transform: scale(1.03);
+  background: radial-gradient(circle, #c43e3e, #961919);
+}
+
+.mode-select-rules input[type="radio"] {
+  width: 1.2vw;
+  height: 1.2vw;
+  accent-color: #e2a01d;
+}
+
+/* Container for the "Levels" row to allow the small button next to it */
+.levelsRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  position: relative;
+}
+
+/* Small square button for Levels Menu */
+.levelsButton {
+  margin-left: 1vw;
+  font-family: "Cherry Bomb One", system-ui;
+  font-size: 1.5vw;
+  padding: 0.3vw 0.7vw;
+  border-radius: 0.8vw;
+  border: 0.2vw solid #080303;
+  background: radial-gradient(circle, #e2a01d, #b8860b);
+  /* Gold gradient */
+  color: #851616;
+  /* Dark red text */
+  -webkit-text-stroke: 0.05vw #080303;
+  cursor: pointer;
+  transition: all 0.2s;
+  height: fit-content;
+  position: absolute;
+  left: 100%;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.levelsButton:hover {
+  transform: scale(1.05);
+  background: radial-gradient(circle, #f0b030, #cda70d);
+}
+
+.resetProgressButton {
+  position: absolute;
+  bottom: 2dvh;
+  left: 3vw;
+  font-family: inherit;
+  font-size: 1.5vw;
+  color: #e2a01d;
+  background: radial-gradient(circle, #8b2b2b, #601414);
+  border: 0.2vw solid #080303;
+  border-radius: 1vw;
+  padding: 0.5vw 1.5vw;
+  cursor: pointer;
+  -webkit-text-stroke: 0.05vw #080303;
+  box-shadow: 0 0 1vw rgba(0, 0, 0, 0.5);
+  text-decoration: none;
+  opacity: 1;
+  transition: all 0.2s;
+}
+
+.resetProgressButton:hover {
+  transform: scale(1.05);
+  background: radial-gradient(circle, #a03535, #751a1a);
+}
+
+.confirmModal {
+  background: radial-gradient(circle, #b43636, #851616);
+  border: 0.5vw solid #080303;
+  border-radius: 2vw;
+  padding: 2vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2vw;
+  width: 40vw;
+  box-shadow: 0 0 2vw #000;
+  text-align: center;
+}
+
+.confirmText {
+  font-size: 2.5vw;
+  color: #e2a01d;
+  -webkit-text-stroke: 0.15vw #080303;
+}
+
+.confirmButtons {
+  display: flex;
+  gap: 2vw;
+}
+
+.confirmBtn {
+  font-family: inherit;
+  font-size: 2vw;
+  padding: 0.5vw 2vw;
+  border-radius: 1vw;
+  border: 0.2vw solid #080303;
+  cursor: pointer;
+  -webkit-text-stroke: 0.1vw #080303;
+  transition: transform 0.2s;
+}
+
+.confirmBtn:hover {
+  transform: scale(1.05);
+}
+
+.yesBtn {
+  background: radial-gradient(circle, #4caf50, #2e7d32);
+  color: white;
+}
+
+
+/* Level Info Modal */
+.levelInfoModal {
+  background: radial-gradient(circle, #c6aeae, #564343);
+  /* Match detailedRules */
+  border: 0.4vw solid #570505;
+  border-radius: 3vw;
+  padding: 1.5vw 2vw;
+  /* Reduced */
+  width: 50vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5vw;
+  /* Reduced */
+  box-shadow: 0 0 3vw #000;
+  position: relative;
+  animation: fadeIn 0.3s ease;
+  color: #fff;
+  max-height: 80dvh;
+  /* Restrict height */
+  overflow-y: auto;
+  /* Enable scroll if needed */
+}
+
+.levelInfoTitle {
+  font-size: 3.5vw;
+  /* Reduced */
+  color: #e2a01d;
+  /* Gold */
+  -webkit-text-stroke: 0.2vw #080303;
+  margin-bottom: 0.5vw;
+  /* Reduced */
+  line-height: 1;
+  text-align: center;
+}
+
+.starCriteriaContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0;
+  border-radius: 1.5vw;
+  border: 0.2vw solid #570505;
+  box-sizing: border-box;
+  /* overflow: hidden removed to avoid clipping content */
+}
+
+.starCriteriaRow {
+  display: flex;
+  align-items: center;
+  gap: 1.5vw;
+  width: 100%;
+  padding: 1vw 1.5vw;
+  /* Reduced padding */
+  border-bottom: 0.15vw solid rgba(255, 255, 255, 0.1);
+  background: transparent;
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  flex-shrink: 0;
+  /* Prevent collapsing */
+}
+
+.starCriteriaRow:last-child {
+  border-bottom: none;
+}
+
+.starIcon {
+  font-size: 2.5vw;
+  /* Reduced font size */
+  color: #e2a01d;
+  -webkit-text-stroke: 0.1vw #080303;
+  min-width: 6vw;
+  /* Reduced width */
+  text-align: center;
+  display: flex;
+  justify-content: center;
+}
+
+.starText {
+  font-size: 1.5vw;
+  /* Reduced font size */
+  color: #ffffff;
+  -webkit-text-stroke: 0.08vw #080303;
+  font-weight: bold;
+  flex: 1;
+  text-align: left;
+}
+
+.playLevelButton {
+  border: 0.4vw solid #080303;
+  background: radial-gradient(circle, #b43636, #851616);
+  border-radius: 3vw;
+  box-sizing: border-box;
+  color: #e2a01d;
+  -webkit-text-stroke: 0.15vw #080303;
+  font-size: 3.5vw;
+  /* Reduced font size */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0.3vw 3vw;
+  /* Reduced padding */
+  cursor: pointer;
+  margin-top: 1vw;
+  /* Reduced margin */
+  transition: all 0.2s ease;
+  box-shadow: inset 0 0 1vw #dcdf45ff;
+}
+
+.playLevelButton:active {
+  transform: translateY(0.5vw);
+  box-shadow: 0 0 0 #006400;
+}
+
+.playLevelButton:hover {
+  transform: scale(1.05);
+  background: radial-gradient(circle, #c43e3e, #961919);
+}
+
+.closeModalX {
+  position: absolute;
+  top: 1vw;
+  right: 1.5vw;
+  font-size: 2.5vw;
+  /* Reduced font size */
+  color: #e2a01d;
+  cursor: pointer;
+  -webkit-text-stroke: 0.15vw #080303;
+  transition: transform 0.2s;
+  background: radial-gradient(circle, #b43636, #851616);
+  width: 3vw;
+  /* Reduced size */
+  height: 3vw;
+  /* Reduced size */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0.15vw solid #570505;
+}
+
+.closeModalX:hover {
+  transform: scale(1.1);
+  background: radial-gradient(circle, #d14a4a, #a02a2a);
 }
