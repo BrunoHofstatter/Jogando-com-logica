@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { DifficultyKey } from "../Logic/gameConfig";
 import { difficulties } from "../Logic/gameConfig";
+import type { LevelConfig } from "../Logic/levelsConfig";
 import styles from "../styles/StopGame.module.css";
 
 interface NumberRevealProps {
   difficulty: DifficultyKey;
+  levelConfig?: LevelConfig | null;
   onNumberRevealed: (number: number) => void;
   onAnimationComplete: () => void;
   tutorialActive: boolean;
@@ -16,6 +18,7 @@ interface NumberRevealProps {
  */
 function NumberReveal({
   difficulty,
+  levelConfig,
   onNumberRevealed,
   onAnimationComplete,
   tutorialActive,
@@ -33,10 +36,15 @@ function NumberReveal({
    * Generate a random number from the difficulty's possible numbers
    */
   const NumGenerator = useCallback(() => {
-    const possible = difficulties[difficulty].possibleRandomNumbers;
+    let possible: number[] = [];
+    if (levelConfig?.possibleRandomNumbers) {
+      possible = levelConfig.possibleRandomNumbers;
+    } else {
+      possible = difficulties[difficulty].possibleRandomNumbers;
+    }
     const index = Math.floor(Math.random() * possible.length);
     return possible[index];
-  }, [difficulty]);
+  }, [difficulty, levelConfig]);
 
   /**
    * Start the number animation sequence

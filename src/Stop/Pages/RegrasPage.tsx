@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTutorialCompleted } from "../Components/DynamicTutorial";
 import styles from "../styles/Regras.module.css";
+import { levels, saveLevelStars } from "../Logic/levelsConfig";
 
 type GameMode = "random" | "levels";
 
@@ -37,6 +38,13 @@ function RegrasPage() {
   const goToLevelsMenu = (e: React.MouseEvent) => {
     e.stopPropagation();
     navigate("/stop-levels");
+  };
+
+  const unlockAllLevels = () => {
+    levels.forEach((level) => {
+      saveLevelStars(level.id, 2);
+    });
+    alert("Todas as fases foram desbloqueadas!");
   };
 
   return (
@@ -180,7 +188,7 @@ function RegrasPage() {
                   <br />• <strong>Pontuação:</strong> O total de acertos
                   (cálculos resolvidos corretamente).
                   <br />• <strong>Tempo:</strong> O tempo total decorrido para
-                  a conclusão da rodada.
+                  a conclusão da <span onClick={unlockAllLevels} style={{ cursor: "default" }}>rodada.</span>
                 </p>
               </div>
             </div>

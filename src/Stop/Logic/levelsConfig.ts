@@ -47,9 +47,9 @@ export const levels: LevelConfig[] = [
         columns: 3,
 
         stars: {
-            1: { maxTime: 999, minCorrect: 2 },
-            2: { maxTime: 100, minCorrect: 4 },
-            3: { maxTime: 50, minCorrect: 6 },
+            1: { maxTime: 999, minCorrect: 1 },
+            2: { maxTime: 100, minCorrect: 3 },
+            3: { maxTime: 50, minCorrect: 5 },
         },
     },
     {
@@ -69,9 +69,9 @@ export const levels: LevelConfig[] = [
         columns: 3,
 
         stars: {
-            1: { maxTime: 999, minCorrect: 2 },
-            2: { maxTime: 80, minCorrect: 4 },
-            3: { maxTime: 40, minCorrect: 6 },
+            1: { maxTime: 999, minCorrect: 1 },
+            2: { maxTime: 80, minCorrect: 3 },
+            3: { maxTime: 40, minCorrect: 5 },
         },
     },
     {
@@ -91,9 +91,9 @@ export const levels: LevelConfig[] = [
         columns: 3,
 
         stars: {
-            1: { maxTime: 999, minCorrect: 4 },
-            2: { maxTime: 80, minCorrect: 6 },
-            3: { maxTime: 40, minCorrect: 8 },
+            1: { maxTime: 999, minCorrect: 1 },
+            2: { maxTime: 80, minCorrect: 3 },
+            3: { maxTime: 40, minCorrect: 5 },
         },
     },
     {
@@ -105,83 +105,221 @@ export const levels: LevelConfig[] = [
             [7, 8],
             [9, 10],
             [20],
-            [4, 2, 3],
+            [0],
+            [3, 4],
+            [5, 6],
         ],
-        contasPorBox: ["+", "+", "+", "+", "+", "+", "-", "-"],
+        contasPorBox: ["+", "+", "+", "+", "+", "-", "-", "-"],
         possibleRandomNumbers: [6, 7],
         dualBoxes: [],
         columns: 4,
 
         stars: {
-            1: { maxTime: 999, minCorrect: 2 },
-            2: { maxTime: 80, minCorrect: 4 },
-            3: { maxTime: 40, minCorrect: 6 },
+            1: { maxTime: 999, minCorrect: 3 },
+            2: { maxTime: 100, minCorrect: 5 },
+            3: { maxTime: 50, minCorrect: 7 },
+        },
+    },
+    {
+        id: 5,
+
+        possibleNumbersByBox: [
+            [5, 4],
+            [7, 6],
+            [9, 8],
+            [11, 12],
+            [30],
+            [100],
+            [3, 4],
+        ],
+        contasPorBox: ["+", "+", "+", "+", "+", "+", "-"],
+        possibleRandomNumbers: [4, 5],
+        dualBoxes: [
+            {
+                numbers1: range(3, 5),
+                numbers2: range(6, 9),
+                operations: ["+", "-"],
+            },
+        ],
+
+        columns: 4,
+
+        stars: {
+            1: { maxTime: 999, minCorrect: 3 },
+            2: { maxTime: 100, minCorrect: 5 },
+            3: { maxTime: 50, minCorrect: 7 },
+        },
+    },
+    {
+        id: 6,
+
+        possibleNumbersByBox: [
+            [3, 4],
+            [5, 6],
+            [7, 8],
+            [9, 10],
+            [30],
+            [100],
+            [5, 6, 7],
+        ],
+        contasPorBox: ["+", "+", "+", "+", "+", "+", "-"],
+        possibleRandomNumbers: [6, 7],
+        dualBoxes: [
+            {
+                numbers1: range(4, 6),
+                numbers2: range(5, 8),
+                operations: ["+", "-"],
+            },
+        ],
+
+        columns: 4,
+
+        stars: {
+            1: { maxTime: 999, minCorrect: 3 },
+            2: { maxTime: 80, minCorrect: 5 },
+            3: { maxTime: 40, minCorrect: 7 },
+        },
+    },
+    {
+        id: 7,
+
+        possibleNumbersByBox: [
+            [5, 6],
+            [7, 8],
+            [9, 11],
+            [12, 13],
+            [50],
+            [200],
+        ],
+        contasPorBox: ["+", "+", "+", "+", "+", "+"],
+        possibleRandomNumbers: [4, 5],
+        dualBoxes: [
+            {
+                numbers1: range(3, 5),
+                numbers2: range(6, 9),
+                operations: ["+", "-"],
+            },
+            {
+                numbers1: range(6, 8),
+                numbers2: range(10, 12),
+                operations: ["+", "-"],
+            },
+
+        ],
+
+        columns: 4,
+
+        stars: {
+            1: { maxTime: 999, minCorrect: 3 },
+            2: { maxTime: 80, minCorrect: 5 },
+            3: { maxTime: 40, minCorrect: 7 },
+        },
+    },
+    {
+        id: 8,
+
+        possibleNumbersByBox: [
+            [4, 5],
+            [6, 7],
+            [8, 9],
+            [11, 12],
+            [70],
+            [300],
+        ],
+        contasPorBox: ["+", "+", "+", "+", "+", "+"],
+        possibleRandomNumbers: [7, 8],
+        dualBoxes: [
+            {
+                numbers1: range(3, 5),
+                numbers2: range(8, 11),
+                operations: ["+", "-"],
+            },
+            {
+                numbers1: range(6, 8),
+                numbers2: range(12, 14),
+                operations: ["+", "-"],
+            },
+
+        ],
+
+        columns: 4,
+
+        stars: {
+            1: { maxTime: 999, minCorrect: 3 },
+            2: { maxTime: 80, minCorrect: 5 },
+            3: { maxTime: 40, minCorrect: 7 },
+        },
+    },
+    {
+        id: 9,
+
+        possibleNumbersByBox: [
+            [4, 5],
+            [6, 7],
+            [8, 9],
+            [11, 12],
+            [20],
+            [100],
+        ],
+        contasPorBox: ["+", "+", "+", "+", "+", "+"],
+        possibleRandomNumbers: [4, 5],
+        dualBoxes: [
+            {
+                numbers1: range(2, 4),
+                numbers2: range(3, 5),
+                operations: ["+", "-"],
+            },
+            {
+                numbers1: range(4, 6),
+                numbers2: range(5, 7),
+                operations: ["+", "-"],
+            },
+
+        ],
+
+        columns: 4,
+
+        stars: {
+            1: { maxTime: 999, minCorrect: 3 },
+            2: { maxTime: 60, minCorrect: 5 },
+            3: { maxTime: 30, minCorrect: 7 },
         },
     },
     {
         id: 10,
-        // Config similar to d2
+
         possibleNumbersByBox: [
-            range(5, 10),
-            range(11, 16),
-            range(17, 23),
-            [100],
-            [20, 30, 40, 50],
-            range(1, 4),
-            range(1, 5),
-            range(6, 9),
-            [0],
+            [6, 7],
+            [8, 9],
+            [11, 12],
+            [13, 14],
+            [90],
+            [1000],
         ],
-        contasPorBox: ["+", "+", "+", "+", "+", "+", "-", "-", "-"],
-        possibleRandomNumbers: range(6, 9),
+        contasPorBox: ["+", "+", "+", "+", "+", "+"],
+        possibleRandomNumbers: [6, 7],
         dualBoxes: [
             {
-                numbers1: range(3, 6),
-                numbers2: range(7, 13),
-                operations: ["+", "-"],
-            },
-        ],
-
-        stars: {
-            1: { maxTime: 999, minCorrect: 5 },
-            2: { maxTime: 60, minCorrect: 8 },
-            3: { maxTime: 35, minCorrect: 10 },
-        },
-    },
-    {
-        id: 11,
-        // Config similar to d3 (Medium 1)
-        possibleNumbersByBox: [
-            range(11, 19),
-            rangeWithSkip(21, 39, [30]),
-            [100],
-            [70, 80, 90],
-            rangeWithSkip(41, 69, [50, 60]),
-            range(5, 18),
-            [2],
-            [0, 1],
-        ],
-        contasPorBox: ["+", "+", "+", "+", "+", "-", "x", "x"],
-        possibleRandomNumbers: range(10, 18),
-        dualBoxes: [
-            {
-                numbers1: [10],
-                numbers2: range(11, 17),
+                numbers1: range(5, 7),
+                numbers2: range(9, 11),
                 operations: ["+", "-"],
             },
             {
-                numbers1: [20, 30],
-                numbers2: range(18, 23),
+                numbers1: range(8, 9),
+                numbers2: range(12, 14),
                 operations: ["+", "-"],
             },
+
         ],
 
+        columns: 4,
+
         stars: {
-            1: { maxTime: 999, minCorrect: 5 },
-            2: { maxTime: 80, minCorrect: 8 },
-            3: { maxTime: 50, minCorrect: 10 },
+            1: { maxTime: 999, minCorrect: 3 },
+            2: { maxTime: 80, minCorrect: 5 },
+            3: { maxTime: 40, minCorrect: 7 },
         },
-    },
+    }
 ];
 
 // Helper to get level by ID

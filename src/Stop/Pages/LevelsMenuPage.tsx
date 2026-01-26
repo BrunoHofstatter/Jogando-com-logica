@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import styles from "../styles/Regras.module.css";
+import styles from "../styles/levelsMenu.module.css";
 import { levels, getLevelStars, isLevelUnlocked, resetAllProgress } from "../Logic/levelsConfig";
 
 function LevelsMenuPage() {
@@ -118,6 +118,7 @@ function LevelsMenuPage() {
                             <div
                                 key={level.id}
                                 onClick={() => handleLevelClick(level.id)}
+                                className={styles.levelButton}
                                 style={{
                                     background: unlocked
                                         ? 'radial-gradient(circle, #a02b2b, #851616)'

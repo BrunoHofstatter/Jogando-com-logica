@@ -247,6 +247,7 @@ function StopGamePage() {
       {showNumber && (
         <NumberReveal
           difficulty={difficulty}
+          levelConfig={levelConfig}
           onNumberRevealed={handleNumberRevealed}
           onAnimationComplete={proceedToGame}
           tutorialActive={tutorialActiveRef.current}
