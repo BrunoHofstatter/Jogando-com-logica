@@ -6,8 +6,9 @@ export type GameMode = 'versus' | 'level';
 export interface LevelConfig {
   levelId: number;
   boardSize: 5 | 7 | 10;                    // Board dimension (5x5=1-25, 7x7=1-49, 10x10=1-100)
+  rounds: number;                           // Number of rounds in the level
   numbersToSelect: 2 | 3;                   // How many numbers must be selected
-  randomNumberRanges: [number, number][];   // Array of 10 ranges (one per round)
+  randomNumberRanges: [number, number][];   // Array of ranges (one per round)
   starThresholds: {
     oneStarCorrect: number;                 // Min correct answers for 1 star
     twoStarCorrect: number;                 // Min correct answers for 2 stars
@@ -18,6 +19,7 @@ export interface LevelConfig {
   };
   description: string;                      // Portuguese description
   requiredStars: number;                    // Stars needed to unlock (0 for first level)
+  columns?: number;                         // Optional override for grid columns
 }
 
 // Level progress tracking (stored in localStorage)

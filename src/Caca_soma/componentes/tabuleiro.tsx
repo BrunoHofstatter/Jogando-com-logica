@@ -19,6 +19,8 @@ interface Prop {
   boardSize?: 5 | 7 | 10; // Board dimension (default 10 for versus mode)
   maxSelections?: 2 | 3; // Max numbers to select (default 3 for versus mode)
   customStyles?: { [key: string]: string }; // Optional custom styles
+  onCorrectMatch?: (indices: string[]) => void; // CB for tracking used cells
+  onSelectionChange?: (numbers: number[]) => void; // CB for tracking selected numbers
 }
 
 function Tabuleiro({
@@ -38,6 +40,8 @@ function Tabuleiro({
   boardSize = 10,
   maxSelections = 3,
   customStyles,
+  onCorrectMatch,
+  onSelectionChange,
 }: Prop) {
   // Use custom styles if provided, otherwise default
   const styles = customStyles || defaultStyles;
@@ -54,6 +58,19 @@ function Tabuleiro({
       const currentSoma = soma;
       const wasCorrect = sorteado === currentSoma;
 
+      // Identify selected cells if correct
+      if (wasCorrect && onCorrectMatch) {
+        const selectedIndices: string[] = [];
+        board.forEach((row, rIdx) => {
+          row.forEach((cell, cIdx) => {
+            if (cell === 1) {
+              selectedIndices.push(`${rIdx}-${cIdx}`);
+            }
+          });
+        });
+        onCorrectMatch(selectedIndices);
+      }
+
       setBoard((prev) =>
         prev.map((r, rIdx) =>
           r.map((cell, cIdx) => (cell === 1 ? (wasCorrect ? 2 : 0) : cell))
@@ -66,7 +83,7 @@ function Tabuleiro({
       mudarJogar();
       mudarRodada();
     }
-  }, [quantos, soma, sorteado, setQuantos, mudarSoma, mudarClicar, mudarJogar, mudarRodada]);
+  }, [quantos, soma, sorteado, setQuantos, mudarSoma, mudarClicar, mudarJogar, mudarRodada, board, onCorrectMatch]);
 
   // Pass the okay function to parent when it changes
   useEffect(() => {
@@ -77,18 +94,41 @@ function Tabuleiro({
   }, [onOkayChange, okay]);
 
   useEffect(() => {
-    if (qualRodada === 0) {
+    // Reset board if round is 0 (game reset) OR if board dimensions don't match config
+    if (qualRodada === 0 || board.length !== boardSize) {
       setBoard(Array.from({ length: boardSize }, () => Array(boardSize).fill(0)));
     }
-  }, [qualRodada, boardSize]);
+  }, [qualRodada, boardSize, board.length]);
 
   const toggleCell = (row: number, col: number, valor: number) => {
+    let action: 'add' | 'remove' | 'none' = 'none';
+
     if (board[row][col] === 0 && jogar && quantos < maxSelections) {
+      action = 'add';
+    } else if (board[row][col] === 1 && jogar && quantos <= maxSelections) {
+      action = 'remove';
+    }
+
+    if (action === 'none') return;
+
+    // Calculate new selection for callback
+    const newSelectedNumbers: number[] = [];
+    board.forEach((r, rIdx) => {
+      r.forEach((cell, cIdx) => {
+        // If it's already selected (1) AND not the one we're toggling
+        // OR if correct (2)? No, only current selection (1)
+        if (cell === 1 && (rIdx !== row || cIdx !== col)) {
+          newSelectedNumbers.push(rIdx * boardSize + cIdx + 1);
+        }
+      });
+    });
+
+    if (action === 'add') {
+      newSelectedNumbers.push(valor);
       if (quantos < maxSelections) {
         setQuantos(quantos + 1);
         mudarSoma(valor);
       }
-
       setBoard((prev) =>
         prev.map((r, rIdx) =>
           r.map((cell, cIdx) =>
@@ -96,8 +136,8 @@ function Tabuleiro({
           )
         )
       );
-    }
-    if (board[row][col] === 1 && jogar && quantos <= maxSelections) {
+    } else if (action === 'remove') {
+      // already collected others above
       setQuantos(quantos - 1);
       mudarSoma(-valor);
       setBoard((prev) =>
@@ -107,6 +147,10 @@ function Tabuleiro({
           )
         )
       );
+    }
+
+    if (onSelectionChange) {
+      onSelectionChange(newSelectedNumbers);
     }
   };
   // Paleta de cores para as células clicadas
@@ -119,18 +163,25 @@ function Tabuleiro({
         soma={soma}
         onTimeUpdate={onTimeUpdate}
       />
-      <div className={styles.board} style={{ gridTemplateColumns: `repeat(${boardSize}, 1fr)` }}>
+      <div
+        className={styles.board}
+        style={{
+          gridTemplateColumns: `repeat(${boardSize}, 1fr)`,
+          // @ts-ignore
+          "--board-size": boardSize
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
         {board.map((row, rIdx) =>
           row.map((cell, cIdx) => (
             <div
               key={`${rIdx}-${cIdx}`}
-              className={`${styles.celula} ${
-                cell === 0
-                  ? styles.cellDefault
-                  : cell === 1
+              className={`${styles.celula} ${cell === 0
+                ? styles.cellDefault
+                : cell === 1
                   ? styles.cellSelected
                   : styles.cellCorrect
-              }`}
+                }`}
               onClick={() => toggleCell(rIdx, cIdx, rIdx * boardSize + cIdx + 1)}
             >
               {rIdx * boardSize + cIdx + 1}
@@ -138,7 +189,7 @@ function Tabuleiro({
           ))
         )}
       </div>
-      
+
     </div>
   );
 }

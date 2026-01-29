@@ -3,20 +3,46 @@ import { levels } from './levelConfigs';
 
 const STORAGE_KEY = 'cacasoma_level_progress';
 
-// Get all level progress from localStorage
+// Get all level progress from localStorage, ensuring synchronization with current config
 export const getAllProgress = (): LevelProgress[] => {
   const stored = localStorage.getItem(STORAGE_KEY);
-  if (!stored) {
-    return initializeProgress();
+  let progress: LevelProgress[] = [];
+
+  if (stored) {
+    try {
+      progress = JSON.parse(stored);
+    } catch {
+      progress = [];
+    }
   }
-  try {
-    return JSON.parse(stored);
-  } catch {
-    return initializeProgress();
+
+  // Synchronization: Add missing levels from config to progress
+  // This handles cases where new levels are added to the code but not yet in localStorage
+  let changed = false;
+  levels.forEach(level => {
+    if (!progress.find(p => p.levelId === level.levelId)) {
+      progress.push({
+        levelId: level.levelId,
+        completed: false,
+        bestStars: 0,
+        bestTime: Infinity,
+        bestCorrect: 0,
+        attempts: 0,
+        lastPlayed: ''
+      });
+      changed = true;
+    }
+  });
+
+  // If we initialized empty or added new levels, save back to storage
+  if (changed || !stored) {
+    saveAllProgress(progress);
   }
+
+  return progress;
 };
 
-// Initialize progress for all levels
+// Initialize progress for all levels (helper, mostly used internally or for reset)
 const initializeProgress = (): LevelProgress[] => {
   const progress = levels.map(level => ({
     levelId: level.levelId,

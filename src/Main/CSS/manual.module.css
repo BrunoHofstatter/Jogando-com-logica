@@ -205,16 +205,19 @@
 .gameSection[data-game-id="stop-matematico"] li,
 .gameSection[data-game-id="stop-matematico"] strong,
 .gameSection[data-game-id="stop-matematico"] em {
-  color: #e2a01d; /* CHANGE TEXT COLOR HERE */
+  color: #e2a01d;
+  /* CHANGE TEXT COLOR HERE */
   border-color: #e2a01d;
 }
+
 .gameSection[data-game-id="stop-matematico"] strong,
-.gameSection[data-game-id="stop-matematico"] h3{
+.gameSection[data-game-id="stop-matematico"] h3 {
   color: #f0611f;
 }
 
 .gameSection[data-game-id="stop-matematico"] .rulesButton {
-  border: 0.26vw solid #080303; /* Purple border */
+  border: 0.26vw solid #080303;
+  /* Purple border */
   background: radial-gradient(circle, #b43636, #851616);
   color: #e2a01d;
 }
@@ -223,12 +226,15 @@
   border-color: #000000;
   background: radial-gradient(circle, #de9696bb, #ab3636bb);
 }
+
 .gameCard[data-game-id="stop-matematico"] h3,
 .gameCard[data-game-id="stop-matematico"] p {
   color: #e2a01d;
 }
+
 .gameCard[data-game-id="stop-matematico"] button {
-  border: 0.26vw solid #080303; /* Purple border */
+  border: 0.26vw solid #080303;
+  /* Purple border */
   background: radial-gradient(circle, #b43636, #851616);
   color: #e2a01d;
 }
@@ -245,32 +251,37 @@
 .gameSection[data-game-id="caca-soma"] li,
 .gameSection[data-game-id="caca-soma"] strong,
 .gameSection[data-game-id="caca-soma"] em {
-  color: white; /* CHANGE TEXT COLOR HERE */
+  color: white;
+  /* CHANGE TEXT COLOR HERE */
   -webkit-text-stroke-color: #791111;
-  
+
 }
+
 .gameSection[data-game-id="caca-soma"] strong,
-.gameSection[data-game-id="caca-soma"] h3{
+.gameSection[data-game-id="caca-soma"] h3 {
   color: #ffb5b5;
 }
 
 .gameSection[data-game-id="caca-soma"] .rulesButton {
-  border-color: #a11313;  /* Red border */
+  border-color: #a11313;
+  /* Red border */
   background: radial-gradient(circle, #be7676, #ac4c4c);
   -webkit-text-stroke-color: #791111;
 }
 
 .gameCard[data-game-id="caca-soma"] h3,
 .gameCard[data-game-id="caca-soma"] p {
- -webkit-text-stroke-color: #791111; 
+  -webkit-text-stroke-color: #791111;
 }
 
 .gameCard[data-game-id="caca-soma"] {
   border-color: #a11313;
   background: radial-gradient(circle, #b39898, #867575);
 }
+
 .gameCard[data-game-id="caca-soma"] button {
-   border-color: #a11313;  /* Red border */
+  border-color: #a11313;
+  /* Red border */
   background: radial-gradient(circle, #be7676, #ac4c4c);
   -webkit-text-stroke-color: #791111;
 }
@@ -287,7 +298,8 @@
 .gameSection[data-game-id="cubo-magico"] li,
 .gameSection[data-game-id="cubo-magico"] strong,
 .gameSection[data-game-id="cubo-magico"] em {
-  color: white; /* CHANGE TEXT COLOR HERE */
+  color: white;
+  /* CHANGE TEXT COLOR HERE */
 }
 
 .gameSection[data-game-id="cubo-magico"] .rulesButton {
@@ -299,9 +311,11 @@
   border-color: #dadada;
   background: radial-gradient(circle, #48a4ccbb, #0e668bbb);
 }
+
 .gameCard[data-game-id="cubo-magico"] button {
   background: radial-gradient(circle, #2d90d1, #2272a8);
 }
+
 /* SUPER JOGO DA VELHA - Teal/Dark cyan theme */
 .gameSection[data-game-id="super-velha"] {
   border-color: #0a1929;
@@ -314,15 +328,19 @@
 .gameSection[data-game-id="super-velha"] li,
 .gameSection[data-game-id="super-velha"] strong,
 .gameSection[data-game-id="super-velha"] em {
-  color: #8ddafd; /* CHANGE TEXT COLOR HERE */
+  color: #8ddafd;
+  /* CHANGE TEXT COLOR HERE */
   -webkit-text-stroke-color: #0a1929;
 }
+
 .gameSection[data-game-id="super-velha"] strong,
-.gameSection[data-game-id="super-velha"] h3{
+.gameSection[data-game-id="super-velha"] h3 {
   color: #2eb6f5;
 }
+
 .gameSection[data-game-id="super-velha"] .rulesButton {
-  border-color: #0a1929;  /* Purple border */
+  border-color: #0a1929;
+  /* Purple border */
   background: radial-gradient(circle, #3d6d9c, #2a527a);
   -webkit-text-stroke-color: #0a1929;
   color: #6bcdfa;
@@ -330,7 +348,8 @@
 
 .gameCard[data-game-id="super-velha"] h3,
 .gameCard[data-game-id="super-velha"] p {
-  color: #6bcdfa; /* CHANGE TEXT COLOR HERE */
+  color: #6bcdfa;
+  /* CHANGE TEXT COLOR HERE */
   -webkit-text-stroke-color: #0a1929;
 }
 
@@ -338,12 +357,15 @@
   border-color: #0a1929;
   background: radial-gradient(circle, #548dc2, #2c5689);
 }
+
 .gameCard[data-game-id="super-velha"] button {
-  border-color: #0a1929;  /* Purple border */
+  border-color: #0a1929;
+  /* Purple border */
   background: radial-gradient(circle, #3d6d9c, #2a527a);
   -webkit-text-stroke-color: #0a1929;
   color: #6bcdfa;
 }
+
 /* CAÇA-COROA - Red/Burgundy theme */
 .gameSection[data-game-id="caca-coroa"] {
   border-color: #fbbf24;
@@ -356,7 +378,8 @@
 .gameSection[data-game-id="caca-coroa"] li,
 .gameSection[data-game-id="caca-coroa"] strong,
 .gameSection[data-game-id="caca-coroa"] em {
-  color: #fbbf24; /* CHANGE TEXT COLOR HERE */
+  color: #fbbf24;
+  /* CHANGE TEXT COLOR HERE */
   border-color: #fbbf24;
   -webkit-text-stroke-color: #270757;
 }
@@ -369,7 +392,8 @@
 .gameSection[data-game-id="caca-coroa"] .rulesButton {
   background: radial-gradient(circle, #7f52e9, #6d28d9);
   border: 0.26vw solid #342075;
-  color: #fbbf24; /* Gold text */
+  color: #fbbf24;
+  /* Gold text */
   -webkit-text-stroke: 0.1vw #4c1d95;
 }
 
@@ -377,18 +401,24 @@
   border-color: #fbbf24;
   background: radial-gradient(circle, #bd90f099, #9867cf99);
 }
+
 .gameCard[data-game-id="caca-coroa"] h3 {
-  color: #fbbf24; /* Gold text */
+  color: #fbbf24;
+  /* Gold text */
   -webkit-text-stroke: 0.17vw #2b0b5c;
 }
+
 .gameCard[data-game-id="caca-coroa"] p {
-  color: #fbbf24; /* Gold text */
+  color: #fbbf24;
+  /* Gold text */
   -webkit-text-stroke: 0.13vw #2b0b5c;
 }
+
 .gameCard[data-game-id="caca-coroa"] button {
   background: radial-gradient(circle, #7f52e9, #6d28d9);
   border: 0.26vw solid #342075;
-  color: #fbbf24; /* Gold text */
+  color: #fbbf24;
+  /* Gold text */
   -webkit-text-stroke: 0.13vw #2b0b5c;
 }
 
@@ -404,17 +434,20 @@
 .gameSection[data-game-id="guerra-matematica"] li,
 .gameSection[data-game-id="guerra-matematica"] strong,
 .gameSection[data-game-id="guerra-matematica"] em {
-  color: white; /* CHANGE TEXT COLOR HERE */
+  color: white;
+  /* CHANGE TEXT COLOR HERE */
   -webkit-text-stroke-color: #32363a;
 }
+
 .gameSection[data-game-id="guerra-matematica"] strong,
-.gameSection[data-game-id="guerra-matematica"] h3{
-  color:#55f5c0;
+.gameSection[data-game-id="guerra-matematica"] h3 {
+  color: #55f5c0;
 }
 
 
 .gameSection[data-game-id="guerra-matematica"] .rulesButton {
-  border-color: #097753;   /* Purple border */
+  border-color: #097753;
+  /* Purple border */
   background: radial-gradient(circle, #10b981, #0da572);
   -webkit-text-stroke-color: #32363a;
 }
@@ -424,12 +457,15 @@
   border-color: #0e9c6d;
   background: radial-gradient(circle, #97cfbdbb, #53b997bb);
 }
+
 .gameCard[data-game-id="guerra-matematica"] h3,
-.gameCard[data-game-id="guerra-matematica"] p{
+.gameCard[data-game-id="guerra-matematica"] p {
   -webkit-text-stroke-color: #32363a;
 }
+
 .gameCard[data-game-id="guerra-matematica"] button {
-  border-color: #097753;   /* Purple border */
+  border-color: #097753;
+  /* Purple border */
   background: radial-gradient(circle, #10b981, #0da572);
   -webkit-text-stroke-color: #32363a;
 }
@@ -492,6 +528,7 @@
     opacity: 0;
     transform: translateY(1.2vw);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -507,18 +544,23 @@
 .gameSection:nth-child(1) {
   animation-delay: 0.1s;
 }
+
 .gameSection:nth-child(2) {
   animation-delay: 0.2s;
 }
+
 .gameSection:nth-child(3) {
   animation-delay: 0.3s;
 }
+
 .gameSection:nth-child(4) {
   animation-delay: 0.4s;
 }
+
 .gameSection:nth-child(5) {
   animation-delay: 0.5s;
 }
+
 .gameSection:nth-child(6) {
   animation-delay: 0.6s;
 }
@@ -601,11 +643,11 @@
   background: radial-gradient(circle at center, #0ca371, #047857);
   color: white;
   border-radius: 3vw;
-  border: 0.2vw solid black;
+  border: 0.22vw solid black;
   padding: 0.6vw 2.4vw 0.9vw;
-  font-size: 1.6vw;
+  font-size: 2.5vw;
   cursor: pointer;
-  -webkit-text-stroke: 0.12vw black;
+  -webkit-text-stroke: 0.18vw black;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   box-shadow: 0 0.18vw 0.8vw rgba(0, 0, 0, 0.35);
 }

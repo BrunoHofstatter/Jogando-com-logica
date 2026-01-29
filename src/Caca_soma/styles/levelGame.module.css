@@ -1,14 +1,18 @@
+/* Main Container */
 .container {
   font-family: "Cherry Bomb One", system-ui;
   font-weight: 200;
   display: flex;
   justify-content: center;
+  /* Align content to right */
   align-items: center;
-  gap: 2vw;
+  gap: 0vw;
+  /* Gap between panel and board */
   min-height: 100dvh;
   width: 100vw;
-  background: radial-gradient(circle, #d6baba, #5a4e4e); /* Darker version of Regras */
-  padding: 2vw;
+  background: radial-gradient(circle, #d6baba, #5a4e4e);
+  padding: 0 0 0 10vw;
+  /* Gap from right border */
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -17,74 +21,95 @@
 .leftPanel {
   display: flex;
   flex-direction: column;
-  gap: 2vw;
+  gap: 1vw;
   width: 30vw;
-  height: 90dvh;
+  /* Wider panel */
+  flex-shrink: 0;
   justify-content: center;
 }
 
-/* Magic Number & Controls Box */
+/* Control Box */
 .controlsBox {
   background: radial-gradient(circle, #8a8a8a, #5e5e5e);
   border: 0.5vw solid #b71c1c;
   border-radius: 2vw;
-  padding: 1.5vw;
+  padding: 1vw;
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 1.5vw;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* Typography elements */
+.magicNumberContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 3vw;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 2vw;
+}
+
+.magicNumberTextColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   gap: 1vw;
-  box-shadow: 0 1vw 2vw rgba(0,0,0,0.4);
+  /* Align text to right, closer to number */
+  line-height: 1;
 }
 
 .magicNumberTitle {
   font-size: 2.5vw;
   color: #eee;
-  -webkit-text-stroke: 0.15vw #961212;
+  -webkit-text-stroke: 0.18vw #961212;
   margin: 0;
+  text-align: right;
 }
 
 .magicNumberDisplay {
+  min-width: 9vw;
   font-size: 5vw;
   color: #fff;
   font-weight: bold;
-  -webkit-text-stroke: 0.3vw #b71c1c;
-  text-shadow: 0.2vw 0.2vw 0.5vw rgba(0,0,0,0.5);
-  min-height: 6vw;
+  background: radial-gradient(circle, #fc7979, #c35a5a);
+  -webkit-text-stroke: 0.2vw #b71c1c;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  padding: 0.5vw 1vw 1vw 1vw;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 0.3vw solid #b71c1c;
+  border-radius: 2vw;
+  line-height: 1;
 }
 
-/* Stats Box */
-.statsBox {
-  background: radial-gradient(circle, #b48c8c77, #95585877);
-  border: 0.3vw solid #b71c1c;
-  border-radius: 1.5vw;
-  padding: 1.5vw;
+/* Timer Display */
+.timerDisplay {
+  margin-top: 1vw;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
   gap: 1vw;
 }
 
-.statItem {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.statLabel {
-  font-size: 1.8vw;
-  color: #eee;
-  -webkit-text-stroke: 0.1vw #961212;
-}
-
-.statValue {
+.timerLabel {
   font-size: 2vw;
+  color: #ddd;
+  -webkit-text-stroke: 0.14vw #961212;
+}
+
+.timerValue {
+  min-width: 7vw;
+  font-size: 2.5vw;
   font-weight: bold;
   color: #fff;
   -webkit-text-stroke: 0.12vw #961212;
 }
 
+/* Round Tracker */
 .roundTracker {
   display: flex;
   justify-content: center;
@@ -93,102 +118,77 @@
 }
 
 .roundDot {
-  width: 1.5vw;
-  height: 1.5vw;
+  width: 2vw;
+  height: 2vw;
   border-radius: 50%;
-  border: 0.2vw solid #b71c1c;
+  border: 0.3vw solid #b71c1c;
   background: #555;
 }
 
 .roundDotActive {
   background: #ffeb3b;
-  box-shadow: 0 0 1vw #ffeb3b;
+  box-shadow: 0 0 8px #ffeb3b;
 }
 
 .roundDotCompleted {
   background: #4caf50;
 }
 
-/* Game Buttons */
-.gameButton {
-  font-family: "Cherry Bomb One", system-ui;
-  font-size: 2.5vw;
-  padding: 0.5vw 2vw;
-  border-radius: 2vw;
-  border: 0.3vw solid #b71c1c;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  color: #eee;
-  -webkit-text-stroke: 0.15vw #961212;
-  margin-top: 1vw;
-  width: 100%;
-}
 
-.comecarButton {
-  background: radial-gradient(circle, #4caf50, #2e7d32);
-  border-color: #1b5e20;
-  -webkit-text-stroke: 0.15vw #1b5e20;
-}
-.comecarButton:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 1.5vw rgba(76, 175, 80, 0.6);
-}
 
-.enviarButton {
-  background: radial-gradient(circle, #ff9800, #f57c00);
-  border-color: #e65100;
-  -webkit-text-stroke: 0.15vw #e65100;
-}
-.enviarButton:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 1.5vw rgba(255, 152, 0, 0.6);
-}
-
-.waitButton {
-  background: #777;
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-/* Right Panel - Board */
+/* Right Panel - Board Container */
 .rightPanel {
   flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 90dvh;
+  height: 100%;
 }
 
 /* Board Grid */
 .board {
   display: grid;
-  gap: 0.8vw;
+  gap: 0.5vw;
   background: radial-gradient(circle, #a9a9a9, #6e6e6e);
-  padding: 2vw;
-  border: 1vw solid #b71c1c;
-  border-radius: 3vw;
-  box-shadow: 0 2vw 4vw rgba(0,0,0,0.5);
+  padding: 1.5vw;
+  border: 0.5vw solid #b71c1c;
+  border-radius: 2vw;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+
+  /* FIXED HEIGHT as requested */
+  height: 85dvh;
+  aspect-ratio: 1/1;
 }
 
-/* Cell Styles - Matching Class Names with design.module.css */
+/* Cells */
 .celula {
-  width: 6vw;
-  height: 6vw;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.5vw;
+
+  /* Dynamic font size: 
+     If board is 10x10, --board-size=10. 85vh height -> 8.5vh cell. Font ~ 4vh.
+     If board is 5x5, --board-size=5. 85vh height -> 17vh cell. Font ~ 8vh.
+     Calculation: 40vh / size (approx half of cell size)
+  */
+  font-size: calc(40dvh / var(--board-size, 10));
+
   font-weight: bold;
   color: #eee;
-  -webkit-text-stroke: 0.15vw #550505;
-  border: 0.3vw solid #b71c1c;
+  -webkit-text-stroke: 0.13vw #550505;
+  border: 0.22vw solid #b71c1c;
   border-radius: 1vw;
   cursor: pointer;
   transition: transform 0.1s;
+  user-select: none;
 }
 
 .celula:hover {
   transform: scale(1.05);
+  z-index: 2;
 }
 
 .cellDefault {
@@ -198,9 +198,10 @@
 .cellSelected {
   background: radial-gradient(circle, #ffeb3b, #fbc02d);
   color: #333;
-  -webkit-text-stroke: 0.1vw #333;
+  -webkit-text-stroke: 1px #333;
   border-color: #f57f17;
   transform: scale(1.05);
+  z-index: 2;
 }
 
 .cellCorrect {
@@ -208,29 +209,58 @@
   border-color: #1b5e20;
 }
 
-@media (max-width: 1024px) {
-  .container {
-    flex-direction: column;
-    padding: 1vw;
-    overflow-y: auto;
-  }
-  .leftPanel {
-    width: 90%;
-    height: auto;
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-  .controlsBox, .statsBox {
-    flex: 1;
-  }
-  .rightPanel {
-    height: auto;
-    width: 100%;
-    padding-bottom: 5vw;
-  }
-  .celula {
-    width: 8vw;
-    height: 8vw;
-    font-size: 4vw;
-  }
+/* Game Buttons */
+.gameButton {
+  font-family: "Cherry Bomb One", system-ui;
+  font-size: 1.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  border: 3px solid #b71c1c;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #eee;
+  -webkit-text-stroke: 1px #961212;
+  width: 100%;
+}
+
+.comecarButton {
+  background: radial-gradient(circle, #4caf50, #2e7d32);
+  border-color: #1b5e20;
+  -webkit-text-stroke: 1px #1b5e20;
+}
+
+.comecarButton:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(76, 175, 80, 0.6);
+}
+
+.enviarButton {
+  background: radial-gradient(circle, #ff9800, #f57c00);
+  border-color: #e65100;
+  -webkit-text-stroke: 1px #e65100;
+}
+
+.enviarButton:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(255, 152, 0, 0.6);
+}
+
+.waitButton {
+  background: #777;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+
+
+.instructionText {
+  font-size: 1.7vw;
+  color: #ddd;
+  -webkit-text-stroke: 0.1vw #961212;
+  font-family: inherit;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 0.5rem;
+  border-radius: 8px;
+  width: 100%;
 }

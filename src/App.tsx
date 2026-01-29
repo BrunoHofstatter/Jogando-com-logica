@@ -12,7 +12,7 @@ import SPTTTAIPage from "./SPTTT/Pages/aiGamePage";
 import VersusModePage from "./Caca_soma/Pages/VersusModePage";
 import LevelSelectionPage from "./Caca_soma/Pages/LevelSelectionPage";
 import LevelGamePage from "./Caca_soma/Pages/LevelGamePage";
-import ResultsPage from "./Caca_soma/Pages/ResultsPage";
+// import ResultsPage from "./Caca_soma/Pages/ResultsPage";
 import "./App.css";
 import BaseGame from "./AA_baseGame/Pages/baseGamePage"
 import { Routes, Route, useLocation, Link } from "react-router-dom";
@@ -70,7 +70,7 @@ function App() {
         <Route path="/cacaSoma" element={<VersusModePage />} />
         <Route path="/cacaSomaNiveis" element={<LevelSelectionPage />} />
         <Route path="/cacaSomaNivel/:levelId" element={<LevelGamePage />} />
-        <Route path="/cacaSomaResultado" element={<ResultsPage />} />
+        {/* <Route path="/cacaSomaResultado" element={<ResultsPage />} /> */}
         <Route path="/baseGame" element={<BaseGame />} />
         <Route path="/damasregras" element={<DamasRegras />} />
         <Route path="/crownchasePg" element={<CrownChasePage />} />

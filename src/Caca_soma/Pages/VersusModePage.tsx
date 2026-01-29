@@ -2,7 +2,7 @@ import Tabuleiro from "../componentes/tabuleiro";
 import Girar from "../componentes/sorteio";
 import DynamicTutorial, { TutorialStep } from '../componentes/DynamicTutorial';
 import GameButton from "../componentes/GameButton";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import styles from "../styles/design.module.css";
 
 function Caca_soma() {
@@ -14,102 +14,102 @@ function Caca_soma() {
     }
   }, []);
   const tutorialSteps: TutorialStep[] = [
-      {
-        id: 'numeroMagico',
-        target: '[data-target="numeroMagico"]',
-        highlight: true,
-        placement: 'auto',
-        title: 'Número Mágico',
-        body: <div style={{
-            fontSize: '2vw',
-            color: '#eee;',
-            marginBottom: '24px',
-            lineHeight: 1.5,
-            WebkitTextStroke: '0.15vw #720b0bff',
-            display:'flex',
-            flexDirection:'column',
-            gap:'1vw'
-          }}>
-            <span>- O <span style={{
-            color: '#ffb224ff',
-            fontSize:'2.3vw',
-          }}>Número Mágico</span> vai ser sorteado</span>
-            <span>- Clique em <span style={{
-            color: '#ffb224ff',
-            fontSize:'2.3vw',
-          }}>Começar</span> para iniciar o jogo </span>
-          </div>
-      },
-      {
-        id: 'tabuleiro',
-        target: '[data-target*="tabuleiro"]',
-        highlight: true,
-        placement: 'auto',
-        title: 'Tabuleiro',
-        body: <div style={{
-            fontSize: '2vw',
-            color: '#eee;',
-            marginBottom: '24px',
-            lineHeight: 1.5,
-            WebkitTextStroke: '0.15vw #720b0bff',
-            display:'flex',
-            flexDirection:'column',
-            gap:'1vw'
-          }}>
-            <span>- <span style={{
-            color: '#ffb224ff',
-            fontSize:'2.3vw',
-          }}>Monte</span> o Número Mágico com <span style={{
-            color: '#ffb224ff',
-            fontSize:'2.3vw',
-          }}>2 ou 3</span> números. </span>
-            <span>- A <span style={{
-            color: '#ffb224ff',
-            fontSize:'2.3vw',
-          }}>soma</span> desses números tem que ser <span style={{
-            color: '#ffb224ff',
-            fontSize:'2.3vw',
-          }}>igual</span> ao Número Mágico</span>
-            <span>- Clique em <span style={{
-            color: '#ffb224ff',
-            fontSize:'2.3vw',
-          }}>Enviar</span> quando terminar</span>
-          </div>
-      },
-      {
-        id: 'placar',
-        target: '[data-target="placar"]',
-        highlight: true,
-        placement: 'auto',
-        title: 'Placar',
-        body: <div style={{
-            fontSize: '2vw',
-            color: '#eee;',
-            marginBottom: '24px',
-            lineHeight: 1.5,
-            WebkitTextStroke: '0.15vw #720b0bff',
-            display:'flex',
-            flexDirection:'column',
-            gap:'1vw'
-          }}>
-            <span>- Veja quanto <span style={{
-            color: '#ffb224ff',
-            fontSize:'2.3vw',
-          }}>tempo</span> o jogador levou </span>
-            <span>- Depois que os dois jogadores jogarem, quem acertar com menos tempo ganha <span style={{
-            color: '#ffb224ff',
-            fontSize:'2.3vw',
-          }}>1 ponto</span> </span>
-            <span>- Quem fizer <span style={{
-            color: '#ffb224ff',
-            fontSize:'2.3vw',
-          }}>5 pontos</span> primeiro <span style={{
-            color: '#ffb224ff',
-            fontSize:'2.3vw',
-          }}>ganha</span> o jogo </span>
-          </div>
-      }
-    ];
+    {
+      id: 'numeroMagico',
+      target: '[data-target="numeroMagico"]',
+      highlight: true,
+      placement: 'auto',
+      title: 'Número Mágico',
+      body: <div style={{
+        fontSize: '2vw',
+        color: '#eee;',
+        marginBottom: '24px',
+        lineHeight: 1.5,
+        WebkitTextStroke: '0.15vw #720b0bff',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1vw'
+      }}>
+        <span>- O <span style={{
+          color: '#ffb224ff',
+          fontSize: '2.3vw',
+        }}>Número Mágico</span> vai ser sorteado</span>
+        <span>- Clique em <span style={{
+          color: '#ffb224ff',
+          fontSize: '2.3vw',
+        }}>Começar</span> para iniciar o jogo </span>
+      </div>
+    },
+    {
+      id: 'tabuleiro',
+      target: '[data-target*="tabuleiro"]',
+      highlight: true,
+      placement: 'auto',
+      title: 'Tabuleiro',
+      body: <div style={{
+        fontSize: '2vw',
+        color: '#eee;',
+        marginBottom: '24px',
+        lineHeight: 1.5,
+        WebkitTextStroke: '0.15vw #720b0bff',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1vw'
+      }}>
+        <span>- <span style={{
+          color: '#ffb224ff',
+          fontSize: '2.3vw',
+        }}>Monte</span> o Número Mágico com <span style={{
+          color: '#ffb224ff',
+          fontSize: '2.3vw',
+        }}>2 ou 3</span> números. </span>
+        <span>- A <span style={{
+          color: '#ffb224ff',
+          fontSize: '2.3vw',
+        }}>soma</span> desses números tem que ser <span style={{
+          color: '#ffb224ff',
+          fontSize: '2.3vw',
+        }}>igual</span> ao Número Mágico</span>
+        <span>- Clique <span style={{
+          color: '#ffb224ff',
+          fontSize: '2.3vw',
+        }}>Fora do Tabuleiro</span> quando terminar</span>
+      </div>
+    },
+    {
+      id: 'placar',
+      target: '[data-target="placar"]',
+      highlight: true,
+      placement: 'auto',
+      title: 'Placar',
+      body: <div style={{
+        fontSize: '2vw',
+        color: '#eee;',
+        marginBottom: '24px',
+        lineHeight: 1.5,
+        WebkitTextStroke: '0.15vw #720b0bff',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1vw'
+      }}>
+        <span>- Veja quanto <span style={{
+          color: '#ffb224ff',
+          fontSize: '2.3vw',
+        }}>tempo</span> o jogador levou </span>
+        <span>- Depois que os dois jogadores jogarem, quem acertar com menos tempo ganha <span style={{
+          color: '#ffb224ff',
+          fontSize: '2.3vw',
+        }}>1 ponto</span> </span>
+        <span>- Quem fizer <span style={{
+          color: '#ffb224ff',
+          fontSize: '2.3vw',
+        }}>5 pontos</span> primeiro <span style={{
+          color: '#ffb224ff',
+          fontSize: '2.3vw',
+        }}>ganha</span> o jogo </span>
+      </div>
+    }
+  ];
 
 
 
@@ -120,17 +120,17 @@ function Caca_soma() {
   const [soma, setSoma] = useState(0);
   const [quantos, setQuantos] = useState(0);
 
-  const mudarRodada = () => setQualRodada(qualRodada + 1);
-  const mudarClicar = () => setClicar(!clicar);
-  const mudarJogar = () => setJogar(!jogar);
-  const mudarSorteado = (x: number) => setSorteado(x);
-  const mudarSoma = (x: number) => setSoma(soma + x);
+  const mudarRodada = useCallback(() => setQualRodada(prev => prev + 1), []);
+  const mudarClicar = useCallback(() => setClicar(prev => !prev), []);
+  const mudarJogar = useCallback(() => setJogar(prev => !prev), []);
+  const mudarSorteado = useCallback((x: number) => setSorteado(x), []);
+  const mudarSoma = useCallback((x: number) => setSoma(prev => prev + x), []);
 
   const [pontu_1, setPontu_1] = useState(0);
   const [pontu_2, setPontu_2] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [winner, setWinner] = useState<string | null>(null);
-  const okayFunctionRef = useRef<(() => void) | null>(null);
+  const [okayFunction, setOkayFunction] = useState<(() => void) | null>(null);
 
   const addPontu = (qual: boolean) => {
     if (qual) {
@@ -201,16 +201,41 @@ function Caca_soma() {
     }
   };
 
-  const handleOkayChange = (okayFn: () => void) => {
-    okayFunctionRef.current = okayFn;
+  const handleOkayChange = useCallback((okayFn: () => void) => {
+    setOkayFunction(okayFn);
+  }, []);
+
+  // Global click handler for submitting the game (replacing the button)
+  const handleGlobalClick = () => {
+    if (jogar && okayFunction) {
+      okayFunction();
+    }
   };
 
+  // Listen for "Enter" key to submit
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === 'Enter' && jogar && okayFunction) {
+        event.preventDefault();
+        okayFunction();
+      }
+    };
+
+    if (jogar && okayFunction) {
+      document.addEventListener('keydown', handleKeyPress);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [jogar, okayFunction]);
+
   return (
-    <div className={styles.container}>
+    <div className={styles.container} onClick={handleGlobalClick}>
       <div className={styles.leftPanel}>
         <div className={styles.gameControlsPanel} data-target="numeroMagico">
           <div className={styles.sorteContainer} >
-            <div className={styles.textoSorte}>Número mágico</div>
+            <div className={styles.textoSorte}>Número Mágico</div>
             <div className={styles.numSorte}>
               <Girar
                 rodada={qualRodada}
@@ -222,13 +247,19 @@ function Caca_soma() {
           </div>
 
           <div className={styles.botaoIni}>
-            <GameButton
-              clicar={clicar}
-              jogar={jogar}
-              gameOver={gameOver}
-              onStartGame={onStartGame}
-              onSubmit={okayFunctionRef.current || undefined}
-            />
+            {jogar ? (
+              <div className={styles.instructionText}>
+                Clique fora do tabuleiro para confirmar
+              </div>
+            ) : (
+              <GameButton
+                clicar={clicar}
+                jogar={jogar}
+                gameOver={gameOver}
+                onStartGame={onStartGame}
+                onSubmit={okayFunction || undefined}
+              />
+            )}
           </div>
         </div>
 
@@ -249,10 +280,10 @@ function Caca_soma() {
                     {qualRodada % 2 === 0 && jogar
                       ? `${liveTime.toFixed(1)}s`
                       : tempo_1 === 10000
-                      ? "X"
-                      : tempo_1 > 0
-                      ? `${tempo_1.toFixed(1)}s`
-                      : "0.0s"}
+                        ? "X"
+                        : tempo_1 > 0
+                          ? `${tempo_1.toFixed(1)}s`
+                          : "0.0s"}
                   </span>
                 </div>
               </div>
@@ -270,10 +301,10 @@ function Caca_soma() {
                     {qualRodada % 2 !== 0 && jogar
                       ? `${liveTime.toFixed(1)}s`
                       : tempo_2 === 10000
-                      ? "X"
-                      : tempo_2 > 0
-                      ? `${tempo_2.toFixed(1)}s`
-                      : "0.0s"}
+                        ? "X"
+                        : tempo_2 > 0
+                          ? `${tempo_2.toFixed(1)}s`
+                          : "0.0s"}
                   </span>
                 </div>
               </div>
@@ -282,7 +313,7 @@ function Caca_soma() {
 
           {gameOver && (
             <button className={styles.button} onClick={reiniciar}>
-            Jogar de novo
+              Jogar de novo
             </button>
           )}
         </div>
@@ -303,7 +334,7 @@ function Caca_soma() {
           sorteado={sorteado}
           onTimeUpdate={handleTimeUpdate}
           onOkayChange={handleOkayChange}
-          //styles={styles} // se quiser passar styles para Tabuleiro
+        //styles={styles} // se quiser passar styles para Tabuleiro
         />
       </div>
       {showTutorial && (

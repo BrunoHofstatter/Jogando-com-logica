@@ -3,15 +3,16 @@
   text-align: center;
   margin-bottom: clamp(17px, 2vw, 50px);
   -webkit-text-stroke: clamp(1.5px, 0.2vw, 10px) #000000;
-  
+
 }
+
 p {
   font-size: clamp(15px, 1.8vw, 1000px);
   -webkit-text-stroke: clamp(1px, 0.13vw, 10px) #000000;
 }
 
 
-iframe{
+iframe {
   width: clamp(300px, 80vw, 800px);
   aspect-ratio: 3 / 4;
   border: 2px solid black;
@@ -40,5 +41,29 @@ h2 {
   width: 100%;
   box-sizing: border-box;
   padding: 1rem 3rem;
-  padding: 1vw clamp(20px, 6vw, 800px );
+  padding: 1vw clamp(20px, 6vw, 800px);
+}
+
+.feedbackButtonContainer {
+  margin-top: 5vw;
+  display: flex;
+  justify-content: center;
+}
+
+.feedbackButton {
+  background: radial-gradient(circle at center, #0ca371, #047857);
+  color: white;
+  border-radius: 3vw;
+  border: 0.2vw solid black;
+  padding: 0.6vw 2.4vw 0.9vw;
+  font-size: 1.6vw;
+  cursor: pointer;
+  -webkit-text-stroke: 0.12vw black;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 0.18vw 0.8vw rgba(0, 0, 0, 0.35);
+}
+
+.feedbackButton:hover {
+  transform: scale(1.05) translateY(-0.12vw);
+  box-shadow: 0 0.25vw 1vw rgba(0, 0, 0, 0.45);
 }

@@ -1,0 +1,266 @@
+/* ========================================
+   LEVEL RESULTS MODAL
+   ======================================== */
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.levelResultModal {
+    background: radial-gradient(circle, #e6c8c8, #6d5b5b);
+    /* Slightly lighter than container for contrast */
+    border: 0.6vw solid #550505;
+    border-radius: 3vw;
+    padding: 3vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 60vw;
+    max-height: 90vh;
+    /* Ensure it fits on screen */
+    box-shadow: 0 0 3vw #000;
+    animation: fadeIn 0.3s ease;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+    position: relative;
+    /* Ensure nested absolute elements are relative to this */
+}
+
+.modalExpanded {
+    /* Optional styles when expanded */
+}
+
+.levelTitle {
+    font-size: 4.5vw;
+    color: #eee;
+    -webkit-text-stroke: 0.25vw #550505;
+    text-align: center;
+    width: 100%;
+}
+
+.starsContainer {
+    display: flex;
+    gap: 1vw;
+    justify-content: center;
+    margin: 1vw 0;
+}
+
+.starFilled {
+    font-size: 6vw;
+    color: #e2a01d;
+    -webkit-text-stroke: 0.2vw #080303;
+}
+
+.starEmpty {
+    font-size: 6vw;
+    color: #555;
+    -webkit-text-stroke: 0.2vw #080303;
+}
+
+.resultStats {
+    font-size: 2.5vw;
+    color: #eee;
+    -webkit-text-stroke: 0.1vw #550505;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5vw;
+}
+
+.resultStats p {
+    margin: 0;
+}
+
+.resultActions {
+    display: flex;
+    gap: 1.5vw;
+    margin-top: 1.5vw;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.actionBtn {
+    font-family: inherit;
+    font-size: 2vw;
+    padding: 0.5vw 2vw;
+    border-radius: 2vw;
+    border: 0.3vw solid #550505;
+    background: #fff;
+    color: #b71c1c;
+    cursor: pointer;
+    transition: transform 0.2s;
+    text-transform: uppercase;
+    font-weight: bold;
+    -webkit-text-stroke: 0.1vw #550505;
+}
+
+.actionBtn:hover {
+    transform: scale(1.05);
+}
+
+.actionBtn:nth-child(1) {
+    background: radial-gradient(circle, #d57f7f, #7b5050);
+    color: #eee;
+}
+
+.actionBtn:nth-child(2) {
+    background: radial-gradient(circle, #d34b4b, #9a3a3a);
+    color: #eee;
+}
+
+.primaryBtn {
+    background: radial-gradient(circle, #4caf50, #2e7d32) !important;
+    color: #eee !important;
+    border-color: #1b5e20 !important;
+    -webkit-text-stroke: 0.1vw #1b5e20 !important;
+    font-size: 2.5vw;
+}
+
+/* Toggle Details Button */
+.detailsToggle {
+    background: none;
+    border: none;
+    color: #eee;
+    font-family: inherit;
+    font-size: 1.8vw;
+    cursor: pointer;
+    margin-top: 1vw;
+    -webkit-text-stroke: 0.1vw #550505;
+    text-decoration: underline;
+    transition: transform 0.2s;
+}
+
+.detailsToggle:hover {
+    transform: scale(1.05);
+}
+
+/* Details Modal Overlay */
+.detailsModalOverlay {
+    position: absolute;
+    bottom: 120%;
+    /* Position above the button */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-height: 40vh;
+    /* As requested */
+    background: radial-gradient(circle, #8a8a8a, #5e5e5e);
+    /* Match controlsBox background */
+    border: 0.4vw solid #b71c1c;
+    /* Match game theme border */
+    border-radius: 2vw;
+    padding: 1.5vw;
+    box-shadow: 0 1vw 2vw rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    animation: fadeInDetails 0.2s ease forwards;
+}
+
+/* Specific animation for details to preserve centering */
+@keyframes fadeInDetails {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+    }
+}
+
+.detailsHeader {
+    display: none;
+    /* Removed as requested */
+}
+
+/* Click outside backdrop */
+.clickOutsideBackdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9;
+    /* Below details (10) but above everything else */
+    cursor: default;
+}
+
+.detailsList {
+    width: 100%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8vw;
+    padding-right: 0.5vw;
+}
+
+/* Scrollbar styles for details list */
+.detailsList::-webkit-scrollbar {
+    width: 0.5vw;
+}
+
+.detailsList::-webkit-scrollbar-track {
+    background: #5e5e5e;
+}
+
+.detailsList::-webkit-scrollbar-thumb {
+    background: #b71c1c;
+    border-radius: 0.25vw;
+}
+
+.detailItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5vw 1vw;
+    border-radius: 0.8vw;
+    font-size: 1.5vw;
+    color: #fff;
+    -webkit-text-stroke: 0.08vw #000;
+}
+
+.detailCorrect {
+    background: rgba(76, 175, 80, 0.8);
+    border: 0.15vw solid #2e7d32;
+}
+
+.detailIncorrect {
+    background: rgba(244, 67, 54, 0.8);
+    border: 0.15vw solid #c62828;
+}
+
+.detailRound {
+    font-weight: bold;
+}
+
+.detailInfo {
+    font-size: 1.3vw;
+}
+
+.detailIcon {
+    font-weight: bold;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

@@ -3,9 +3,10 @@ import React from 'react';
 interface RoundTrackerProps {
   currentRound: number;    // 1-10
   totalRounds: number;     // Always 10
+  levelId: number;
 }
 
-function RoundTracker({ currentRound, totalRounds }: RoundTrackerProps) {
+function RoundTracker({ currentRound, totalRounds, levelId }: RoundTrackerProps) {
   const progressPercent = (currentRound / totalRounds) * 100;
 
   return (
@@ -13,30 +14,31 @@ function RoundTracker({ currentRound, totalRounds }: RoundTrackerProps) {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      gap: '0.5rem',
-      padding: '1rem',
+      gap: '0.5vw',
+      padding: '1vw',
       width: '100%',
-      maxWidth: '400px'
     }}>
       {/* Round text */}
       <div style={{
-        fontSize: '1.5rem',
+        fontSize: '2.5vw',
         fontWeight: 'bold',
         color: '#fff',
         textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
-        fontFamily: '"Cherry Bomb One", cursive'
+        fontFamily: '"Cherry Bomb One", cursive',
+        WebkitTextStroke: '0.1vw #b71c1c',
+
       }}>
-        Rodada {currentRound}/{totalRounds}
+        Nível {levelId} - Rodada {currentRound}/{totalRounds}
       </div>
 
       {/* Progress bar container */}
       <div style={{
         width: '100%',
-        height: '1.5rem',
+        height: '2vw',
         backgroundColor: 'rgba(0,0,0,0.3)',
-        borderRadius: '1rem',
+        borderRadius: '1vw',
         overflow: 'hidden',
-        border: '2px solid #b71c1c',
+        border: '0.2vw solid #b71c1c',
         boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
       }}>
         {/* Progress bar fill */}
@@ -61,19 +63,22 @@ function RoundTracker({ currentRound, totalRounds }: RoundTrackerProps) {
           <div
             key={index}
             style={{
-              width: '1.5rem',
-              height: '1.5rem',
+              width: '2.5vw',
+              height: '2.5vw',
               borderRadius: '50%',
               backgroundColor: index < currentRound ? '#4caf50' : 'rgba(255,255,255,0.3)',
-              border: index === currentRound - 1 ? '2px solid #fff' : '2px solid transparent',
+              WebkitTextStroke: index < currentRound ? '0.1vw #af2f2fff' : '0.0vw #4caf50',
+              border: index < currentRound ? '0.15vw solid #af2f2fff' : '0.15vw solid transparent',
+              scale: index === currentRound - 1 ? '1.2' : '1',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '0.7rem',
+              fontSize: '1.5vw',
               fontWeight: 'bold',
               color: index < currentRound ? '#fff' : '#888',
               transition: 'all 0.3s ease',
-              boxShadow: index < currentRound ? '0 2px 4px rgba(76,175,80,0.5)' : 'none'
+              boxShadow: index < currentRound ? '0 2px 4px rgba(76,175,80,0.5)' : 'none',
+
             }}
           >
             {index + 1}

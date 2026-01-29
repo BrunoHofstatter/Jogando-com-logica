@@ -42,7 +42,7 @@ function RegrasPage() {
 
   const unlockAllLevels = () => {
     levels.forEach((level) => {
-      saveLevelStars(level.id, 2);
+      saveLevelStars(level.id, 3);
     });
     alert("Todas as fases foram desbloqueadas!");
   };
@@ -188,7 +188,7 @@ function RegrasPage() {
                   <br />• <strong>Pontuação:</strong> O total de acertos
                   (cálculos resolvidos corretamente).
                   <br />• <strong>Tempo:</strong> O tempo total decorrido para
-                  a conclusão da <span onClick={unlockAllLevels} style={{ cursor: "default" }}>rodada.</span>
+                  a conclusão da <span onClick={unlockAllLevels} style={{ cursor: "text" }}>rodada.</span>
                 </p>
               </div>
             </div>

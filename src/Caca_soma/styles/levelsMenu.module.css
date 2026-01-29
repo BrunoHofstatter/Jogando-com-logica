@@ -1,0 +1,298 @@
+.regrasPage {
+    font-family: "Cherry Bomb One", system-ui;
+    font-weight: 200;
+    font-style: normal;
+    display: flex;
+    max-height: 100dvh;
+    overflow: hidden;
+    /* avoids double scrollbars */
+    border: 0dvh solid #b71c1c;
+    /* 1px remains 1dvh as it was already 1dvh */
+    padding: 0vw;
+    min-height: 100dvh;
+    width: 100vw;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle, #eacdcd, #716262);
+}
+
+.gameTitle {
+    font-size: clamp(3vw, 9dvh, 4.8vw);
+    color: #eee;
+    -webkit-text-stroke: 0.3vw #af2020;
+    margin: 3dvh 0 2dvh 0;
+}
+
+.button {
+    border: 0.4vw solid #a11313;
+    background: radial-gradient(circle, #d38c8c, #ac4c4c);
+    border-radius: 7vw;
+    box-sizing: border-box;
+    color: #eee;
+    -webkit-text-stroke: 0.22vw #af2020;
+    font-size: clamp(8.5vw, 20dvh, 11vw);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0.3vw 2.5vw 2vw 2.5vw;
+    line-height: 1;
+    box-shadow: inset 0 0 1vw rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    margin-bottom: 3.5vw;
+    transition: all 0.5s ease;
+    box-shadow: 0 0 3vw rgba(0, 0, 0, 0.3), inset 0 0 1vw rgba(0, 0, 0, 0.3);
+}
+
+.button:hover {
+    background: radial-gradient(circle, #e19c9c, #ba5555);
+    transform: scale(1.07) translateY(-1dvh);
+}
+
+.levelButton {
+    transition: all 0.5s ease;
+}
+
+.levelButton:hover {
+    transform: scale(1.07) translateY(-1dvh);
+}
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Specific Styles for Levels Menu */
+
+.resetProgressButton {
+    position: absolute;
+    bottom: 2dvh;
+    left: 3vw;
+    font-family: inherit;
+    font-size: 1.5vw;
+    color: #eee;
+    background: radial-gradient(circle, #d38c8c, #ac4c4c);
+    border: 0.2vw solid #a11313;
+    border-radius: 1vw;
+    padding: 0.5vw 1.5vw;
+    cursor: pointer;
+    -webkit-text-stroke: 0.05vw #af2020;
+    box-shadow: 0 0 1vw rgba(0, 0, 0, 0.5);
+    text-decoration: none;
+    opacity: 1;
+    transition: all 0.2s;
+}
+
+.resetProgressButton:hover {
+    transform: scale(1.05);
+    background: radial-gradient(circle, #e19c9c, #ba5555);
+}
+
+.confirmModal {
+    background: radial-gradient(circle, #b2b2b2, #727272);
+    border: 0.5vw solid #a11313;
+    border-radius: 2vw;
+    padding: 2vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2vw;
+    width: 40vw;
+    box-shadow: 0 0 2vw #000;
+    text-align: center;
+}
+
+.confirmText {
+    font-size: 2.5vw;
+    color: #eee;
+    -webkit-text-stroke: 0.15vw #af2020;
+}
+
+.confirmButtons {
+    display: flex;
+    gap: 2vw;
+}
+
+.confirmBtn {
+    font-family: inherit;
+    font-size: 2vw;
+    padding: 0.5vw 2vw;
+    border-radius: 1vw;
+    border: 0.2vw solid #080303;
+    cursor: pointer;
+    -webkit-text-stroke: 0.1vw #080303;
+    transition: transform 0.2s;
+}
+
+.confirmBtn:hover {
+    transform: scale(1.05);
+}
+
+.yesBtn {
+    background: radial-gradient(circle, #4caf50, #2e7d32);
+    color: #fff;
+}
+
+.noBtn {
+    background: radial-gradient(circle, #f44336, #d32f2f);
+    color: #fff;
+}
+
+/* Level Info Modal */
+.levelInfoModal {
+    background: radial-gradient(circle, #b2b2b2, #727272);
+    /* Match detailedRules */
+    border: 0.4vw solid #a11313;
+    border-radius: 3vw;
+    padding: 1.5vw 2vw;
+    /* Reduced */
+    width: 50vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5vw;
+    /* Reduced */
+    box-shadow: 0 0 3vw #000;
+    position: relative;
+    animation: fadeIn 0.3s ease;
+    color: #fff;
+    max-height: 80dvh;
+    /* Restrict height */
+    overflow-y: auto;
+    /* Enable scroll if needed */
+}
+
+.levelInfoTitle {
+    font-size: 3.5vw;
+    /* Reduced */
+    color: #eee;
+    /* White */
+    -webkit-text-stroke: 0.2vw #af2020;
+    margin-bottom: 0.5vw;
+    /* Reduced */
+    line-height: 1;
+    text-align: center;
+}
+
+.starCriteriaContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0;
+    border-radius: 1.5vw;
+    border: 0.2vw solid #a11313;
+    box-sizing: border-box;
+    /* overflow: hidden removed to avoid clipping content */
+}
+
+.starCriteriaRow {
+    display: flex;
+    align-items: center;
+    gap: 1.5vw;
+    width: 100%;
+    padding: 1vw 1.5vw;
+    /* Reduced padding */
+    border-bottom: 0.15vw solid rgba(255, 255, 255, 0.1);
+    background: transparent;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    flex-shrink: 0;
+    /* Prevent collapsing */
+}
+
+.starCriteriaRow:last-child {
+    border-bottom: none;
+}
+
+.starIcon {
+    font-size: 2.5vw;
+    /* Reduced font size */
+    color: #ffd700;
+    -webkit-text-stroke: 0.1vw #080303;
+    min-width: 6vw;
+    /* Reduced width */
+    text-align: center;
+    display: flex;
+    justify-content: center;
+}
+
+.starText {
+    font-size: 1.5vw;
+    /* Reduced font size */
+    color: #ffffff;
+    -webkit-text-stroke: 0.08vw #080303;
+    font-weight: bold;
+    flex: 1;
+    text-align: left;
+}
+
+.playLevelButton {
+    border: 0.4vw solid #a11313;
+    background: radial-gradient(circle, #d38c8c, #ac4c4c);
+    border-radius: 10vw;
+    box-sizing: border-box;
+    color: #eee;
+    -webkit-text-stroke: 0.2vw #af2020;
+    font-size: 3.5vw;
+    /* Reduced font size */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0.3vw 3vw;
+    /* Reduced padding */
+    cursor: pointer;
+    margin-top: 1vw;
+    /* Reduced margin */
+    transition: all 0.2s ease;
+    box-shadow: inset 0 0 0.1vw rgba(255, 255, 255, 0.3);
+}
+
+.playLevelButton:active {
+    transform: translateY(0.5vw);
+    box-shadow: 0 0 0 #006400;
+}
+
+.playLevelButton:hover {
+    transform: scale(1.05);
+    background: radial-gradient(circle, #e19c9c, #ba5555);
+}
+
+.closeModalX {
+    position: absolute;
+    top: 1vw;
+    right: 1.5vw;
+    font-size: 2vw;
+    /* Reduced font size */
+    color: #eee;
+    cursor: pointer;
+    -webkit-text-stroke: 0.15vw #af2020;
+    transition: transform 0.2s;
+    background: radial-gradient(circle, #d38c8c, #ac4c4c);
+    width: 3vw;
+    /* Reduced size */
+    height: 3vw;
+    /* Reduced size */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0.15vw solid #a11313;
+}
+
+.closeModalX:hover {
+    transform: scale(1.1);
+    background: radial-gradient(circle, #e19c9c, #ba5555);
+}

@@ -324,7 +324,7 @@ function GameBoard({ randomNumber, difficulty, levelConfig, onReset }: GameBoard
         <div className={styles.modalOverlay}>
           <div className={styles.levelResultModal}>
             <div className={styles.levelTitle}>
-              {starsEarned >= 1 ? "Nível Concluído!" : "Tente Novamente"}
+              {starsEarned >= 1 ? `Nível ${levelConfig.id} Concluído!` : "Tente Novamente"}
             </div>
 
             <div className={styles.starsContainer}>

@@ -34,6 +34,7 @@
   align-items: center;
   justify-content: center;
 }
+
 .sorteContainer {
   display: flex;
   flex-direction: column;
@@ -43,12 +44,14 @@
   transform: translateX(-1vw);
 }
 
-.textoSorte{
+.textoSorte {
   color: #eee;
   -webkit-text-stroke: 0.17vw #961212;
   font-size: 2vw;
+  margin: 0 0 0 3vw
 }
-.numSorte{
+
+.numSorte {
   color: #eee;
   -webkit-text-stroke: 0.3vw #961212;
   font-size: 4vw;
@@ -64,7 +67,7 @@
   background: radial-gradient(circle, #8a8a8a, #5e5e5e);
   border-radius: 1.5vw;
   border: 0.3vw solid #b71c1c;
-  
+
 }
 
 /* Score Header */
@@ -94,9 +97,10 @@
   border-radius: 1vw;
   border: 0.2vw solid #b71c1c;
   flex: 1;
-  
+
 }
-.playerLabel{
+
+.playerLabel {
   font-size: 1.8vw;
   font-weight: bold;
   text-align: center;
@@ -104,6 +108,7 @@
   color: #fff;
   -webkit-text-stroke: 0.11vw #961212;
 }
+
 /* Player Label */
 .playerLabelActive {
   font-size: 1.8vw;
@@ -121,6 +126,7 @@
   from {
     text-shadow: 0 0 1vw #ff2d2d, 0 0 2vw #ff2020, 0 0 3vw #b71c1c;
   }
+
   to {
     text-shadow: 0 0 1.5vw #ff6565, 0 0 3vw #ff7272, 0 0 4.5vw #b71c1c;
   }
@@ -150,7 +156,9 @@
 }
 
 /* Numbers styling (reusing existing classes) */
-.numPontu1, .numPontu2, .numTempo {
+.numPontu1,
+.numPontu2,
+.numTempo {
   font-size: 2vw;
   font-weight: bold;
   color: #eee;
@@ -159,7 +167,7 @@
 
 /* Right Panel - Game Board */
 .gameBoard {
-  
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -289,26 +297,31 @@
   transform: none;
   box-shadow: 0 0.3vw 0.6vw #00000040;
 }
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .container {
-    grid-template-columns: 1fr;
+
+
+.instructionText {
+  font-family: inherit;
+  font-size: 1.5vw;
+  color: #fff;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 0.5rem;
+  border-radius: 8px;
+  width: 100%;
+  animation: pulse 2s infinite;
+  margin-left: 2vw;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.7;
   }
 
-  .board {
-    grid-template-columns: repeat(10, 7dvh);
-    grid-template-rows: repeat(10, 7dvh);
-    gap: 0.5dvh;
-    max-width: 80dvh;
-    max-height: 80dvh;
-    border: 0.6dvh solid #b71c1c;
-    border-radius: 2.5dvh;
-    padding: 1.2dvh;
-    box-shadow: 0 0 1.2dvh #000a;
+  50% {
+    opacity: 1;
   }
 
-  .celula {
-    font-size: 2dvh;
-    border-radius: 0.8dvh;
+  100% {
+    opacity: 0.7;
   }
 }

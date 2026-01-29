@@ -503,3 +503,97 @@
         transform: scale(1);
     }
 }
+
+/* ========================================
+   VIRTUAL KEYBOARD
+   ======================================== */
+
+.virtualKeyboardBackdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 998;
+}
+
+.virtualKeyboard {
+    position: fixed;
+    z-index: 999;
+    height: 80dvh;
+    width: 28vw;
+    background: radial-gradient(circle, #a02b2b, #851616);
+    border: 0.5vw solid #080303;
+    border-radius: 2vw;
+    box-shadow: 0 0 2vw #080303;
+    padding: 1.5vw;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: "Cherry Bomb One", system-ui;
+    margin-top: 5dvh;
+}
+
+.keyGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 1vw;
+    width: 100%;
+    height: 100%;
+}
+
+.keyButton {
+    background: radial-gradient(circle, #d97272, #be4444);
+    border: 0.4vw solid #080303;
+    border-radius: 1vw;
+    font-family: "Cherry Bomb One", system-ui;
+    font-size: 4vw;
+    -webkit-text-stroke: 0.3vw #080303;
+    color: #f1b02d;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.1s;
+    padding: 0;
+}
+
+.keyButton:active {
+    transform: scale(0.95);
+}
+
+.actionKey {
+    background: radial-gradient(circle, #e8b142, #b98213);
+    color: #000000;
+}
+
+.actionKey:active {
+    background: radial-gradient(circle, #d5897f, #b35a4e);
+}
+
+.keyButtonClose {
+    position: absolute;
+    top: -1.5vw;
+    right: -1.5vw;
+    background: #e02121;
+    border: 0.3vw solid #0e0202;
+    border-radius: 50%;
+    width: 4vw;
+    height: 4vw;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    z-index: 1001;
+    transition: transform 0.1s;
+}
+
+.keyButtonClose:hover {
+    transform: scale(1.1);
+}
