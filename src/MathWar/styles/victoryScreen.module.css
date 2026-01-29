@@ -10,30 +10,36 @@
 /* Sidebar layout to keep the board visible */
 .victorySidebar {
   position: fixed;
-  width: 47vw; /* slightly wider to avoid cramping text */
-  background: transparent; /* let the game board show fully */
+  width: 47vw;
+  /* slightly wider to avoid cramping text */
+  background: transparent;
+  /* let the game board show fully */
   color: #ecf0f1;
-  padding: 8px; /* outer padding so the inner box never touches edges */
-  box-shadow: none; /* shadow is on the inner box */
+  padding: 8px;
+  /* outer padding so the inner box never touches edges */
+  box-shadow: none;
+  /* shadow is on the inner box */
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  pointer-events: auto; /* Re-enable pointer events for the sidebar */
+  pointer-events: auto;
+  /* Re-enable pointer events for the sidebar */
 }
 
 .victoryContent {
-    position: relative;
+  position: relative;
   display: flex;
   flex-direction: column;
   border: 0.6vw solid #0c8b61;
   background: radial-gradient(circle, #aabfbbbb, #729d8ccc);
   background: radial-gradient(circle, #82dfb4bb, #41a774cc);
-  padding: 2vw ;
+  padding: 2vw;
   border-radius: 2vw;
   text-align: center;
   max-width: 100%;
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
-  margin: 0vw 0vw 0vw 0vw; /* keep distance from the sidebar edges, esp. left */
+  margin: 0vw 0vw 0vw 0vw;
+  /* keep distance from the sidebar edges, esp. left */
   align-items: center;
 }
 
@@ -60,7 +66,7 @@
   border-radius: 1.7vw;
   cursor: pointer;
   transition: ease 0.5s;
-  -webkit-text-stroke: 0.12vw #53585e;
+  -webkit-text-stroke: 0.12vw #3d4045;
   line-height: 1;
 }
 
@@ -85,15 +91,16 @@
 /* Player color accents */
 .playerRed {
   position: relative;
-  top:0.5vw;
+  top: 0.5vw;
   color: #cd4535;
   -webkit-text-stroke: 0.25vw #a02c1f;
   font-size: 5vw;
   line-height: 1;
 }
+
 .playerRedOp {
   position: relative;
-  top:0.35vw;
+  top: 0.35vw;
   color: #cd4535;
   -webkit-text-stroke: 0.2vw #a02c1f;
   font-size: 4vw;
@@ -102,15 +109,16 @@
 
 .playerBlue {
   position: relative;
-  top:0.5vw;
+  top: 0.5vw;
   color: #388dc5;
   -webkit-text-stroke: 0.25vw #165580;
   font-size: 5vw;
   line-height: 1;
 }
+
 .playerBlueOp {
   position: relative;
-  top:0.35vw;
+  top: 0.35vw;
   color: #388dc5;
   -webkit-text-stroke: 0.2vw #165580;
   font-size: 4vw;
@@ -122,4 +130,53 @@
     width: 260px;
     padding: 1rem;
   }
+}
+
+.victoryButtonsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5vw;
+  width: 100%;
+  align-items: center;
+  margin-top: 1.5vw;
+}
+
+.victoryButtonsRow {
+  display: flex;
+  gap: 1.5vw;
+  justify-content: center;
+}
+
+.victoryButtonMenu {
+  background: radial-gradient(circle, #29c490, #0da572);
+  color: #f3f4f6;
+  border: solid 0.2vw #097753;
+  padding: 0.8vw 1.5vw 1.3vw 1.5vw;
+  font-size: 2.2vw;
+  border-radius: 1.7vw;
+  cursor: pointer;
+  transition: ease 0.5s;
+  -webkit-text-stroke: 0.12vw #3d4045;
+  line-height: 1;
+}
+
+.victoryButtonMenu:hover {
+  transform: scale(1.05);
+}
+
+.victoryButtonNext {
+  background: radial-gradient(circle, #2ec070, #0da551);
+  color: #f3f4f6;
+  border: solid 0.2vw #097753;
+  padding: 0.8vw 1.5vw 1.3vw 1.5vw;
+  font-size: 2.2vw;
+  border-radius: 1.7vw;
+  cursor: pointer;
+  transition: ease 0.5s;
+  -webkit-text-stroke: 0.12vw #3d4045;
+  line-height: 1;
+}
+
+.victoryButtonNext:hover {
+  transform: scale(1.05);
 }

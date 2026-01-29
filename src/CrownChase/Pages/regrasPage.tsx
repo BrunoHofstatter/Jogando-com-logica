@@ -2,6 +2,7 @@ import { useState } from "react";
 import styles from "../styles/regras.module.css";
 import { useNavigate } from "react-router-dom";
 import { useTutorialCompleted } from "../Components/DynamicTutorial";
+import { useDifficultyLock } from "../../Shared/Hooks/useDifficultyLock";
 
 type GameMode = "pvp" | "ai";
 
@@ -10,10 +11,20 @@ function CrownChaseRegras() {
   const [gameMode, setGameMode] = useState<GameMode>("ai");
   const [aiDifficulty, setAiDifficulty] = useState<1 | 2 | 3 | 4>(1);
   const [showDetailedRules, setShowDetailedRules] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [tutorialCompleted, resetTutorial] =
     useTutorialCompleted("crownchase_v1");
 
+  const { isUnlocked, unlockAll, resetProgress } =
+    useDifficultyLock("crownchase");
+
+  const difficultyUnlocked = isUnlocked(aiDifficulty);
+
   function jogarStop() {
+    if (gameMode === "ai" && !difficultyUnlocked) {
+      return;
+    }
+
     if (gameMode === "ai") {
       navigate("/crownchase-ai", { state: { difficulty: aiDifficulty } });
     } else {
@@ -24,6 +35,8 @@ function CrownChaseRegras() {
   const startTutorial = () => {
     resetTutorial(); // Clear the "completed" flag
     if (gameMode === "ai") {
+      // If selected difficulty is locked, default to 1 for tutorial or check logic
+      // But typically tutorial forces its own flow. We'll just pass current.
       navigate("/crownchase-ai", { state: { difficulty: aiDifficulty } });
     } else {
       navigate("/crownchasePg");
@@ -41,6 +54,34 @@ function CrownChaseRegras() {
     });
   };
 
+  const getDifficultyName = (diff: number) => {
+    switch (diff) {
+      case 1: return "Muito Fácil";
+      case 2: return "Fácil";
+      case 3: return "Médio";
+      case 4: return "Difícil";
+      default: return "";
+    }
+  };
+
+  const getTooltipText = () => {
+    const prevDiffName = getDifficultyName(aiDifficulty - 1);
+    const currDiffName = getDifficultyName(aiDifficulty);
+    return `Ganhe da dificuldade ${prevDiffName} para desbloquear ${currDiffName}`;
+  };
+
+  const handleCheat = () => {
+    unlockAll();
+    alert("Todas as dificuladades foram desbloqueadas");
+  };
+
+  const handleResetConfirm = () => {
+    resetProgress();
+    setShowResetConfirm(false);
+    // Optional: Reset local state if needed (e.g. set difficulty back to 1)
+    setAiDifficulty(1);
+  };
+
   return (
     <div className={styles.regrasPage}>
       {/* Left Side - Rules */}
@@ -55,7 +96,11 @@ function CrownChaseRegras() {
 
       {/* Right Side - Game Controls */}
       <div className={styles.botoes}>
-        <button className={styles.button} onClick={jogarStop}>
+        <button
+          className={`${styles.button} ${gameMode === 'ai' && !difficultyUnlocked ? styles.buttonDisabled : ''}`}
+          onClick={jogarStop}
+          disabled={gameMode === 'ai' && !difficultyUnlocked}
+        >
           <span>Jogar</span>
         </button>
 
@@ -74,8 +119,17 @@ function CrownChaseRegras() {
 
             </label>
             {gameMode === "ai" && (
-              <button className={styles.difficultyButton} onClick={toggleDifficulty}>
-                Nível: {aiDifficulty === 1 ? "Muito Fácil" : aiDifficulty === 2 ? "Fácil" : aiDifficulty === 3 ? "Médio" : "Difícil"}
+              <button
+                className={`${styles.difficultyButton} ${!difficultyUnlocked ? styles.locked : ''}`}
+                onClick={toggleDifficulty}
+              >
+                {!difficultyUnlocked && <span>🔒 </span>}
+                Nível: {getDifficultyName(aiDifficulty)}
+                {!difficultyUnlocked && (
+                  <div className={styles.difficultyTooltip}>
+                    {getTooltipText()}
+                  </div>
+                )}
               </button>
             )}
           </div>
@@ -109,6 +163,13 @@ function CrownChaseRegras() {
               className={styles.modalContent}
               onClick={(e) => e.stopPropagation()}
             >
+              <button
+                className={styles.resetProgressButton}
+                onClick={() => setShowResetConfirm(true)}
+              >
+                Deletar progresso
+              </button>
+
               <button
                 className={styles.closeButton}
                 onClick={() => setShowDetailedRules(false)}
@@ -258,8 +319,33 @@ function CrownChaseRegras() {
                   O jogo acaba imediatamente quando um Rei é capturado.
                 </p>
                 <p className={styles.rulesText}>
-                  O jogador que capturar o Rei adversário é o vencedor.
+                  O jogador que capturar o Rei adversário é o <span onClick={handleCheat} style={{ cursor: 'text' }}>vencedor</span>.
                 </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Reset Confirmation Modal */}
+        {showResetConfirm && (
+          <div className={styles.modalOverlay}>
+            <div className={styles.confirmModal} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.confirmText}>
+                Tem certeza que deseja deletar todo o progresso?
+              </div>
+              <div className={styles.confirmButtons}>
+                <button
+                  className={`${styles.confirmBtn} ${styles.yesBtn}`}
+                  onClick={handleResetConfirm}
+                >
+                  Sim
+                </button>
+                <button
+                  className={`${styles.confirmBtn} ${styles.noBtn}`}
+                  onClick={() => setShowResetConfirm(false)}
+                >
+                  Não
+                </button>
               </div>
             </div>
           </div>

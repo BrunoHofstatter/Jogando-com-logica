@@ -358,3 +358,121 @@
   transform: scale(1.05);
   background: radial-gradient(circle, #8b38cf, #602292);
 }
+
+.difficultyButton.locked {
+  filter: grayscale(1);
+  opacity: 0.8;
+}
+
+.difficultyTooltip {
+  position: absolute;
+  bottom: 130%;
+  left: 10%;
+  transform: translateX(-50%);
+  background: rgba(71, 71, 71, 0.9);
+  border: 0.2vw solid #d7d7d7;
+  border-radius: 1vw;
+  padding: 0.5vw;
+  width: 21vw;
+  color: #ffffff;
+  font-size: 1.4vw;
+  text-align: center;
+  z-index: 100;
+  -webkit-text-stroke: 0.1vw #030107;
+  pointer-events: none;
+  box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.buttonDisabled {
+  filter: grayscale(1);
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Reset Progress Modal Styles */
+
+.resetProgressButton {
+  position: absolute;
+  top: 2vw;
+  left: 3vw;
+  font-family: inherit;
+  font-size: 1.5vw;
+  color: #fbbf24;
+  background: radial-gradient(circle, #8b5cf6, #6d28d9);
+  border: 0.2vw solid #4c1d95;
+  border-radius: 1vw;
+  padding: 0.5vw 1.5vw;
+  cursor: pointer;
+  -webkit-text-stroke: 0.1vw #4c1d95;
+  box-shadow: 0 0 1vw rgba(0, 0, 0, 0.5);
+  transition: all 0.2s;
+  z-index: 20;
+}
+
+.resetProgressButton:hover {
+  transform: scale(1.05);
+  background: radial-gradient(circle, #a855f7, #7c3aed);
+}
+
+.confirmModal {
+  background: radial-gradient(circle, #9d6fee, #8154c9);
+  border: 0.5vw solid #4c1d95;
+  border-radius: 2vw;
+  padding: 2vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2vw;
+  width: 40vw;
+  box-shadow: 0 0 2vw #000;
+  text-align: center;
+}
+
+.confirmText {
+  font-size: 2.5vw;
+  color: #fbbf24;
+  -webkit-text-stroke: 0.15vw #4c1d95;
+}
+
+.confirmButtons {
+  display: flex;
+  gap: 2vw;
+}
+
+.confirmBtn {
+  font-family: inherit;
+  font-size: 2vw;
+  padding: 0.5vw 2vw;
+  border-radius: 1vw;
+  border: 0.2vw solid #4c1d95;
+  cursor: pointer;
+  -webkit-text-stroke: 0.1vw #4c1d95;
+  transition: transform 0.2s;
+  color: #fbbf24;
+}
+
+.confirmBtn:hover {
+  transform: scale(1.05);
+}
+
+.yesBtn {
+  background: radial-gradient(circle, #4caf50, #2e7d32);
+}
+
+.noBtn {
+  background: radial-gradient(circle, #f44336, #d32f2f);
+}

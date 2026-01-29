@@ -2,6 +2,7 @@ import { useState } from "react";
 import styles from "../Style/RegrasSPTTT.module.css";
 import { useNavigate } from "react-router-dom";
 import { useTutorialCompleted } from "../Components/DynamicTutorial";
+import { useDifficultyLock } from "../../Shared/Hooks/useDifficultyLock";
 
 type GameMode = "pvp" | "ai";
 
@@ -13,8 +14,12 @@ function JogoStop() {
   const [tutorialCompleted, resetTutorial] =
     useTutorialCompleted("spttt_v1");
 
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const { isUnlocked, unlockNext, resetProgress, unlockAll } = useDifficultyLock("spttt");
+
   function startGame() {
     if (gameMode === "ai") {
+      if (!isUnlocked(aiDifficulty)) return;
       navigate("/spttt-ai", { state: { winCondition: "line", difficulty: aiDifficulty } });
     } else {
       navigate("/jogospttt", { state: { winCondition: "line" } });
@@ -34,11 +39,34 @@ function JogoStop() {
     e.stopPropagation();
     e.preventDefault();
     setAiDifficulty((prev) => {
-      if (prev === 1) return 2;
-      if (prev === 2) return 3;
-      if (prev === 3) return 4;
-      return 1;
+      const next = prev === 4 ? 1 : (prev + 1 as 1 | 2 | 3 | 4);
+      return next;
     });
+  };
+
+  const difficultyUnlocked = isUnlocked(aiDifficulty);
+
+  const getDifficultyName = (level: number) => {
+    switch (level) {
+      case 1: return "Muito Fácil";
+      case 2: return "Fácil";
+      case 3: return "Médio";
+      case 4: return "Difícil";
+      default: return "Muito Fácil";
+    }
+  };
+
+  const getTooltipText = () => {
+    const prevLevel = aiDifficulty - 1;
+    const prevName = getDifficultyName(prevLevel);
+    const currentName = getDifficultyName(aiDifficulty);
+    return `Ganhe da dificuldade ${prevName} para desbloquear ${currentName}`;
+  };
+
+  const handleResetProgress = () => {
+    resetProgress();
+    setAiDifficulty(1);
+    setShowResetConfirm(false);
   };
 
   return (
@@ -55,7 +83,11 @@ function JogoStop() {
 
       {/* Right Side - Game Controls */}
       <div className={styles.botoes}>
-        <button className={styles.button} onClick={startGame}>
+        <button
+          className={`${styles.button} ${gameMode === "ai" && !difficultyUnlocked ? styles.playButtonDisabled : ''}`}
+          onClick={startGame}
+          disabled={gameMode === "ai" && !difficultyUnlocked}
+        >
           <span>Jogar</span>
         </button>
 
@@ -74,12 +106,21 @@ function JogoStop() {
               Contra Computador
             </label>
             {gameMode === "ai" && (
-              <button className={styles.difficultyButton} onClick={toggleDifficulty}>
-                Nível: {aiDifficulty === 1 ? "Muito Fácil" : aiDifficulty === 2 ? "Fácil" : aiDifficulty === 3 ? "Médio" : "Difícil"}
+              <button
+                className={`${styles.difficultyButton} ${!difficultyUnlocked ? styles.locked : ''}`}
+                onClick={toggleDifficulty}
+              >
+                {!difficultyUnlocked && <span>🔒 </span>}
+                Nível: {getDifficultyName(aiDifficulty)}
+                {!difficultyUnlocked && (
+                  <div className={styles.difficultyTooltip}>
+                    {getTooltipText()}
+                  </div>
+                )}
               </button>
             )}
           </div>
-          <label>
+          <label className={styles.contraJogador}>
             <input
               type="radio"
               name="gameMode"
@@ -109,6 +150,12 @@ function JogoStop() {
               onClick={() => setShowDetailedRules(false)}
             >
               X
+            </button>
+            <button
+              className={styles.resetProgressButton}
+              onClick={() => setShowResetConfirm(true)}
+            >
+              Deletar progresso
             </button>
 
             <div className={styles.detailedRules}>
@@ -150,8 +197,22 @@ function JogoStop() {
 
 
               <h3 className={styles.rulesTitle}>Empate</h3>
-              <p className={styles.rulesText}>O jogo termina em empate se todos os tabuleiros menores forem preenchidos ou decididos e <strong>nenhum jogador</strong> tiver conseguido uma <strong>Vitória Estratégica (três em linha)</strong>. Em caso de empate na quantidade de tabuleiros, a partida é considerada empatada.</p>
+              <p className={styles.rulesText}>O jogo termina em empate se todos os tabuleiros menores forem preenchidos ou decididos e <strong>nenhum jogador</strong> tiver conseguido uma <strong>Vitória Estratégica (três em linha)</strong>. Em caso de empate na quantidade de tabuleiros, a partida é considerada <span onClick={() => { unlockAll(); alert("Todas as dificuldades foram desbloqueadas!"); }}>empatada</span>.</p>
 
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reset Progress Confirmation Modal */}
+      {showResetConfirm && (
+        <div className={styles.confirmModalOverlay}>
+          <div className={styles.confirmModalContent}>
+            <div className={styles.confirmText}>Tem certeza?</div>
+            <div className={styles.confirmText} style={{ fontSize: "1.5vw" }}>Isso apagará todo o seu progresso no jogo.</div>
+            <div className={styles.confirmButtons}>
+              <button onClick={handleResetProgress} className={`${styles.confirmBtn} ${styles.yesBtn}`}>Sim</button>
+              <button onClick={() => setShowResetConfirm(false)} className={`${styles.confirmBtn} ${styles.noBtn}`}>Não</button>
             </div>
           </div>
         </div>

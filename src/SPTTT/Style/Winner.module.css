@@ -69,17 +69,73 @@
     padding: 5vw 6vw;
     min-width: 70vw;
   }
-  
+
   .winner-box h2 {
     font-size: 6vw;
   }
-  
+
   .winner-box .symbol {
     font-size: 8vw;
   }
-  
+
   .winner-box button {
     font-size: 4vw;
     padding: 2vw 4vw 2.5vw 4vw;
   }
+}
+
+.victoryButtonsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5vw;
+  width: 100%;
+  align-items: center;
+  margin-top: 1.5vw;
+}
+
+.victoryButtonsRow {
+  display: flex;
+  gap: 1.5vw;
+  justify-content: center;
+}
+
+.victoryButtonMenu {
+  background: radial-gradient(circle, #7d8182, #535556);
+  color: #a1e1ff;
+  border: solid 0.2vw #262929;
+  padding: 0.8vw 1.5vw 1.3vw 1.5vw;
+  font-size: 1.5vw;
+  border-radius: 1.7vw;
+  cursor: pointer;
+  transition: ease 0.5s;
+  -webkit-text-stroke: 0.12vw #242525;
+  line-height: 1;
+  font-family: inherit;
+  margin-top: 2vw;
+}
+
+.victoryButtonMenu:hover {
+  transform: scale(1.05) translateY(-0.5dvh);
+  background: radial-gradient(circle, #8d9192, #636566);
+}
+
+.victoryButtonNext {
+  background: radial-gradient(circle, #29a03b, #1b6b27);
+  color: #fff;
+  border: solid 0.2vw #0f3d17;
+  padding: 0.8vw 1.5vw 1.3vw 1.5vw;
+  font-size: 1.5vw;
+  border-radius: 1.7vw;
+  cursor: pointer;
+  transition: ease 0.5s;
+  -webkit-text-stroke: 0.12vw #242525;
+  line-height: 1;
+  width: 100%;
+  margin-top: 0.5vw;
+  font-family: inherit;
+}
+
+.victoryButtonNext:hover {
+  transform: scale(1.05);
+  background: radial-gradient(circle, #34bb4b, #228532);
 }

@@ -12,6 +12,9 @@ interface BoardProps {
   onGameStateChange?: (newState: GameState) => void;
   isAIMode?: boolean;
   difficulty?: number;
+  onMenu?: () => void;
+  onNextLevel?: () => void;
+  showNextLevel?: boolean;
 }
 
 const Board: React.FC<BoardProps> = ({
@@ -20,7 +23,10 @@ const Board: React.FC<BoardProps> = ({
   gameState: externalGameState,
   onGameStateChange,
   isAIMode = false,
-  difficulty
+  difficulty,
+  onMenu,
+  onNextLevel,
+  showNextLevel
 }) => {
   const engine = new GameEngine();
   const [internalGameState, setInternalGameState] = useState<GameState>(() =>
@@ -358,6 +364,9 @@ const Board: React.FC<BoardProps> = ({
             reason={finalWin.reason}
             onPlayAgain={handlePlayAgain}
             isAIMode={isAIMode}
+            onMenu={onMenu}
+            onNextLevel={onNextLevel}
+            showNextLevel={showNextLevel}
           />
         )}
       </div>

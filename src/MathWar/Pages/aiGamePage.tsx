@@ -2,16 +2,19 @@ import Board from "../Components/board-component";
 import { gameConfig } from "../Logic/gameConfig";
 import { gameRules } from "../Logic/gameRules";
 import { useState, useEffect } from 'react';
-import { useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import DynamicTutorial, { TutorialStep } from "../Components/DynamicTutorial";
 import { GameEngine } from "../Logic/gameEngine";
 import { GameState } from "../Logic/types";
 import { getAIMove } from "../Logic/aiPlayer";
 
 import { DiceAnimation } from "../Components/DiceAnimation";
+import { useDifficultyLock } from "../../Shared/Hooks/useDifficultyLock";
+
 
 export default function MathWarAIPage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const difficulty = location.state?.difficulty || 1;
   const [showTutorial, setShowTutorial] = useState(false);
   const [showDiceAnim, setShowDiceAnim] = useState(false);
@@ -24,6 +27,17 @@ export default function MathWarAIPage() {
     initialState.currentPlayer = 1;
     return initialState;
   });
+
+  const { unlockNext } = useDifficultyLock("mathwar");
+
+  // Reset game when difficulty changes (for Next Level feature)
+  useEffect(() => {
+    setGameState(() => {
+      const initialState = engine.initializeGame(gameConfig, gameRules);
+      initialState.currentPlayer = 1;
+      return initialState;
+    });
+  }, [difficulty]);
 
   // Check if tutorial should auto-start
   useEffect(() => {
@@ -86,7 +100,25 @@ export default function MathWarAIPage() {
 
   const handleGameStateChange = (newState: GameState) => {
     setGameState({ ...newState });
+
+    // Check for win condition
+    // Player 1 = Human (Blue)
+    if (newState.gamePhase === 'ended' && newState.winner === 1) {
+      unlockNext(difficulty);
+    }
   };
+
+  const handleMenu = () => {
+    navigate("/mathwarRg");
+  };
+
+  const handleNextLevel = () => {
+    // Navigate to the same page but with next difficulty
+    // Force replace so history doesn't get cluttered if they spam next
+    navigate("/mathwar-ai", { state: { difficulty: difficulty + 1 }, replace: true });
+  };
+
+  const showNextLevel = difficulty < 4;
 
   const tutorialSteps: TutorialStep[] = [
     {
@@ -235,6 +267,9 @@ export default function MathWarAIPage() {
       onGameStateChange={handleGameStateChange}
       isAIMode={true}
       difficulty={difficulty}
+      onMenu={handleMenu}
+      onNextLevel={handleNextLevel}
+      showNextLevel={showNextLevel}
     />
 
     {showTutorial && (

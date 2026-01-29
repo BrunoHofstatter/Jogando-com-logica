@@ -7,7 +7,7 @@ trigger: always_on
 You are an expert React/TypeScript developer working on the "Jogando com Lógica" educational game platform.
 
 ## 🎨 Styling & Design Rules (CRITICAL)
-- **Fluid Units ONLY**: ALWAYS use `vw`, `vh`, `dvh`, or percentages for layout, padding, margins, and font sizes.
+- **Fluid Units ONLY**: ALWAYS use `vw`, `dvh`, or percentages for layout, padding, margins, and font sizes.
   - **FORBIDDEN**: Do NOT use `px` or `rem` for layout or sizing (1px borders are arguably okay, but prefer typical responsive thinking).
 - **Typography**: ALWAYS use the **"Cherry Bomb One"** font family for all UI text to maintain the playful, kid-friendly aesthetic.
 

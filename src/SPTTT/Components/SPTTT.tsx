@@ -19,9 +19,13 @@ interface SPTTTProps {
   winCondition: "line" | "majority";
   isAiMode?: boolean;
   difficulty?: 1 | 2 | 3 | 4;
+  onUnlockNext?: () => void;
+  onMenu?: () => void;
+  onNextLevel?: () => void;
+  showNextLevel?: boolean;
 }
 
-export default function SPTTT({ winCondition, isAiMode = false, difficulty = 1 }: SPTTTProps) {
+export default function SPTTT({ winCondition, isAiMode = false, difficulty = 1, onUnlockNext, onMenu, onNextLevel, showNextLevel }: SPTTTProps) {
   const [boards, setBoards] = useState<UltimateBoard>(
     Array.from({ length: 9 }, () => Array(9).fill(null))
   );
@@ -170,6 +174,9 @@ export default function SPTTT({ winCondition, isAiMode = false, difficulty = 1 }
     if (bigWinner) {
       setTimeout(() => {
         setFinalWinner(bigWinner);
+        if (bigWinner === 'X' && isAiMode && onUnlockNext) {
+          onUnlockNext();
+        }
       }, 2000); // delay for animations if needed
     }
   };
@@ -327,7 +334,14 @@ export default function SPTTT({ winCondition, isAiMode = false, difficulty = 1 }
 
       {/* Winner Overlay */}
       {finalWinner && (
-        <WinnerOverlay winner={finalWinner} onRestart={restartGame} isAiMode={isAiMode} />
+        <WinnerOverlay
+          winner={finalWinner}
+          onRestart={restartGame}
+          isAiMode={isAiMode}
+          onMenu={onMenu}
+          onNextLevel={onNextLevel}
+          showNextLevel={showNextLevel}
+        />
       )}
     </div>
   );

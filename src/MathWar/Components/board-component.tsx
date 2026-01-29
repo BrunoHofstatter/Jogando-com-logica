@@ -20,6 +20,9 @@ interface BoardProps {
   onGameStateChange?: (newState: GameState) => void;
   isAIMode?: boolean;
   difficulty?: number;
+  onMenu?: () => void;
+  onNextLevel?: () => void;
+  showNextLevel?: boolean;
 }
 
 const Board: React.FC<BoardProps> = ({
@@ -28,7 +31,10 @@ const Board: React.FC<BoardProps> = ({
   gameState: externalGameState,
   onGameStateChange,
   isAIMode = false,
-  difficulty
+  difficulty,
+  onMenu,
+  onNextLevel,
+  showNextLevel
 }) => {
   const engine = new GameEngine();
   const [internalGameState, setInternalGameState] = useState<GameState>(() =>
@@ -274,11 +280,11 @@ const Board: React.FC<BoardProps> = ({
             </div>
           )}
           <div className={styles.currentPlayer} data-target='player'>
-            <div style={{ marginBottom: '0.5rem' }}>
-              Turno: {gameState.turnCount + 1}
+            <div className={styles.turnText}>
+              Turno {gameState.turnCount + 1}
             </div>
-            <div>
-              Turno do Jogador
+            <div className={styles.playerText}>
+              Jogador
               <span
                 className={`${styles.playerIndicator} ${gameState.currentPlayer === 0
                   ? styles.playerRed
@@ -287,9 +293,6 @@ const Board: React.FC<BoardProps> = ({
               >
                 {gameState.currentPlayer === 0 ? "●" : "●"}
               </span>
-            </div>
-            <div style={{ fontSize: '0.9rem', marginTop: '0.5rem', color: '#a0aec0' }}>
-              Próxima rolagem em: {3 - (gameState.turnCount % 3)} turnos
             </div>
           </div>
 
@@ -307,6 +310,12 @@ const Board: React.FC<BoardProps> = ({
                       )}
                     </strong>
                   </span>
+                </div>
+                <div className={styles.nextRollIndicator}>
+                  {(() => {
+                    const roundsLeft = 3 - (gameState.turnCount % 3);
+                    return `Próximo: ${roundsLeft} ${roundsLeft === 1 ? 'rodada' : 'rodadas'}`;
+                  })()}
                 </div>
               </div>
             )}
@@ -460,6 +469,9 @@ const Board: React.FC<BoardProps> = ({
             reason={finalWin.reason}
             onPlayAgain={handlePlayAgain}
             isAIMode={isAIMode}
+            onMenu={onMenu}
+            onNextLevel={onNextLevel}
+            showNextLevel={showNextLevel}
           />
         )}
       </div>

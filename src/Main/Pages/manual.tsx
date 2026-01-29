@@ -80,10 +80,10 @@ function Manual() {
         <p>
           Por meio de jogos educativos e dinâmicos, o projeto busca transformar o aprendizado lógico em algo divertido, competitivo e colaborativo — mostrando que pensar logicamente também pode ser brincar.
         </p>
-        <p>
-          Se puder, envie seu feedback para o formulário abaixo!
-        </p>
         <div className={styles.feedbackButtonContainer}>
+          <div className={styles.feedbackHighlight}>
+            Sua opinião é fundamental para o futuro do projeto!
+          </div>
           <button
             className={styles.feedbackButton}
             onClick={() =>
@@ -95,6 +95,12 @@ function Manual() {
           >
             Formulário de feedback
           </button>
+          <div className={styles.feedbackBox}>
+            <p>
+              Queremos melhorar o projeto para que ele atenda melhor as necessidades das crianças e professores.
+              Por favor, reserve alguns minutos para nos contar o que achou!
+            </p>
+          </div>
         </div>
       </section>
 
@@ -153,7 +159,7 @@ function Manual() {
           </div>
           <ul className={styles.gameDetails}>
             <li><strong>Número de jogadores:</strong> 1 (modo solo)</li>
-            <li><strong>Modos de jogo:</strong> 6 níveis de dificuldade (Fácil 1 até Difícil 2)</li>
+            <li><strong>Modos de jogo:</strong> 2 modos: Dificuldade Aleatória e Níveis</li>
             <li><strong>Tempo médio:</strong> 1 a 5 minutos por rodada</li>
             <li><em>(Planejado futuramente: modo multijogador, quem fizer em menos tempo ganha)</em></li>
           </ul>
@@ -169,7 +175,7 @@ function Manual() {
 
           <h3>Dificuldades e Séries Recomendadas</h3>
           <ul>
-            <li><strong>Dificuldades:</strong> a Fácil 1 tem adição e um pouco de subtração com números até 10; conforme a dificuldade aumenta, os número ficam maiores e multiplicação e divisão entram</li>
+            <li><strong>Dificuldades:</strong> Níveis iniciais com números pequenos e apenas adição. A dificuldade aumenta com números maiores e inclusão de subtração, multiplicação e divisão</li>
             <li><strong>Séries indicadas:</strong> 3º ao 7º ano</li>
           </ul>
         </div>
@@ -203,7 +209,7 @@ function Manual() {
             <div>
               <h3>Descrição do Jogo</h3>
               <p>
-                O Caça-Soma é um jogo de achar somas em uma tabela de 1 a 100. Cada rodada, o <strong>Número Mágico</strong> é sorteado e o jogador deve achar <strong>2 ou 3 números</strong> na tabela que somem ao número sorteado. Cada jogador faz uma rodada, e vence quem completar corretamente no menor tempo. O jogo continua até alguém conquistar 5 pontos.
+                O Caça-Soma gera um <strong>Número Mágico</strong> e o jogador deve escolher <strong>2 ou mais números</strong> na tabela que, somados, resultem nesse valor. A tabela pode ter 25, 49 ou 100 números dependendo do nível. Se a soma estiver correta, os números utilizados ficam indisponíveis para as próximas rodadas.
               </p>
 
             </div>
@@ -214,10 +220,13 @@ function Manual() {
             />
           </div>
           <ul className={styles.gameDetails}>
-            <li><strong>Número de jogadores:</strong> 2 (mesmo aparelho)</li>
-            <li><strong>Modos de jogo:</strong> partidas por rodada (melhor de 9)</li>
-            <li><strong>Tempo médio:</strong> 4 a 8 minutos por partida</li>
-            <li><strong>Dificuldade:</strong> varia conforme o adversário; números sorteados até 120</li>
+            <li><strong>Modos de jogo:</strong>
+              <ul>
+                <li><strong>2 Jogadores:</strong> Cada um joga uma rodada, quem for mais rápido ganha o ponto. Quem fizer 5 pontos vence. (Tempo médio: 4 a 8 min)</li>
+                <li><strong>Níveis:</strong> Joga-se uma série de rodadas. Dependendo do tempo e acertos, ganha-se 1, 2 ou 3 estrelas (2 para passar). (Tempo médio: 1 a 4 min)</li>
+              </ul>
+            </li>
+            <li><strong>Dificuldade:</strong> Os níveis começam com tabela de 25 números pequenos. Conforme avança, a tabela cresce e os números ficam maiores.</li>
           </ul>
 
           <h3>Habilidades e Conteúdos Trabalhados</h3>
@@ -324,7 +333,8 @@ function Manual() {
             />
           </div>
           <ul className={styles.gameDetails}>
-            <li><strong>Número de jogadores:</strong> 2 (mesmo aparelho)</li>
+            <li><strong>Modos de jogo:</strong> 2 Jogadores e Contra Computador</li>
+            <li><strong>Dificuldades:</strong> 4 níveis (Muito Fácil, Fácil, Médio e Difícil). O Muito Fácil é totalmente aleatório, enquanto o nível Difícil oferece um desafio lógico avançado, simulando um jogador experiente.</li>
             <li><strong>Tempo médio:</strong> 10 a 30 minutos</li>
           </ul>
 
@@ -381,7 +391,8 @@ function Manual() {
             />
           </div>
           <ul className={styles.gameDetails}>
-            <li><strong>Número de jogadores:</strong> 2 (mesmo aparelho)</li>
+            <li><strong>Modos de jogo:</strong> 2 Jogadores e Contra Computador</li>
+            <li><strong>Dificuldades:</strong> 4 níveis (Muito Fácil, Fácil, Médio e Difícil). O Muito Fácil é totalmente aleatório, enquanto o nível Difícil oferece um desafio lógico avançado.</li>
             <li><strong>Tempo médio:</strong> 5 a 20 minutos</li>
           </ul>
 
@@ -438,7 +449,8 @@ function Manual() {
             />
           </div>
           <ul className={styles.gameDetails}>
-            <li><strong>Número de jogadores:</strong> 2 (mesmo aparelho)</li>
+            <li><strong>Modos de jogo:</strong> 2 Jogadores e Contra Computador</li>
+            <li><strong>Dificuldades:</strong> 4 níveis (Muito Fácil, Fácil, Médio e Difícil). O Muito Fácil é totalmente aleatório, enquanto o nível Difícil oferece um desafio lógico avançado.</li>
             <li><strong>Tempo médio:</strong> 10 a 30 minutos</li>
           </ul>
 

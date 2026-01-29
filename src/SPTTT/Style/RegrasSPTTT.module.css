@@ -105,6 +105,8 @@
   font-size: 2vw;
   -webkit-text-stroke: 0.1vw #000000;
   color: #1565c0;
+  margin-bottom: 5vw;
+  z-index: 50;
 }
 
 .mode-select-rules label {
@@ -136,11 +138,14 @@
   flex-direction: row;
   align-items: center;
   position: relative;
+  gap: 2vw;
+}
+
+.contraJogador {
+  width: fit-content;
 }
 
 .difficultyButton {
-  left: 24vw;
-  margin-left: 1vw;
   font-family: "Cherry Bomb One", system-ui;
   font-size: 1.5vw;
   padding: 0.3vw 0.7vw;
@@ -151,8 +156,8 @@
   -webkit-text-stroke: 0.1vw #0a1929;
   cursor: pointer;
   transition: all 0.2s;
-  height: fit-content;
   position: absolute;
+  left: 24vw;
   min-width: 10vw;
 }
 
@@ -307,4 +312,129 @@
   -webkit-text-stroke: 0.25vw #0a1929;
   text-align: center;
   margin-bottom: 2vw;
+}
+
+/* difficulty locked styles */
+
+
+.difficultyButton.locked {
+  filter: grayscale(100%);
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+.difficultyButton.locked:hover {
+  transform: none;
+}
+
+/* Tooltip */
+.difficultyTooltip {
+  position: absolute;
+  bottom: 130%;
+  left: 10%;
+  transform: translateX(-50%);
+  background: rgba(71, 71, 71, 0.9);
+  color: #fff;
+  padding: 0.5vw 1vw;
+  border-radius: 1vw;
+  font-size: 1.4vw;
+
+  z-index: 1000;
+  pointer-events: none;
+  border: 0.2vw solid #a1e1ff;
+  width: 21vw;
+}
+
+/* Disabled Play Button */
+.playButtonDisabled {
+  filter: grayscale(100%);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.resetProgressButton {
+  position: absolute;
+  top: 0.5vw;
+  left: 1.5vw;
+  font-family: inherit;
+  font-size: 1.2vw;
+  color: #fbbf24;
+  background: radial-gradient(circle, #0288d1, #01579b);
+  border: 0.2vw solid #0a1929;
+  border-radius: 1vw;
+  padding: 0.3vw 1vw;
+  cursor: pointer;
+  -webkit-text-stroke: 0.08vw #0a1929;
+  box-shadow: 0 0 1vw rgba(0, 0, 0, 0.5);
+  transition: all 0.2s;
+  z-index: 20;
+}
+
+.resetProgressButton:hover {
+  transform: scale(1.05);
+  background: radial-gradient(circle, #039be5, #0277bd);
+}
+
+/* Confirm Modal - Matches Crown Chase Structure but SPTTT Colors */
+.confirmModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.confirmModalContent {
+  background: radial-gradient(circle, #2895b3, #135175);
+  border: 0.5vw solid #083e71;
+  border-radius: 2vw;
+  padding: 2vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2vw;
+  width: 40vw;
+  box-shadow: 0 0 2vw #000;
+  text-align: center;
+}
+
+.confirmText {
+  font-size: 2.5vw;
+  color: #a1e1ff;
+  -webkit-text-stroke: 0.13vw #0a1929;
+  font-family: "Cherry Bomb One", system-ui;
+}
+
+.confirmButtons {
+  display: flex;
+  gap: 2vw;
+}
+
+.confirmBtn {
+  font-family: inherit;
+  font-size: 2vw;
+  padding: 0.5vw 2vw;
+  border-radius: 1vw;
+  border: 0.2vw solid #0a1929;
+  cursor: pointer;
+  -webkit-text-stroke: 0.1vw #0a1929;
+  transition: transform 0.2s;
+  color: #fff;
+}
+
+.confirmBtn:hover {
+  transform: scale(1.05);
+}
+
+.yesBtn {
+  background: radial-gradient(circle, #ff4d4d, #cc0000);
+}
+
+.noBtn {
+  background: radial-gradient(circle, #29a03b, #1b6b27);
 }

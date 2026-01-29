@@ -1,7 +1,8 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import SPTTT from "../Components/SPTTT";
 import { useState, useEffect } from "react";
 import DynamicTutorial, { TutorialStep } from "../Components/DynamicTutorial";
+import { useDifficultyLock } from "../../Shared/Hooks/useDifficultyLock";
 
 export default function SPTTTAIPage() {
   const [showTutorial, setShowTutorial] = useState(false);
@@ -221,12 +222,46 @@ export default function SPTTTAIPage() {
   ];
 
   const location = useLocation();
+  const navigate = useNavigate();
   const winCondition = location.state?.winCondition || "line"; // default to "line" if not specified
-  const difficulty = location.state?.difficulty || 1;
+  const difficulty = Number(location.state?.difficulty || 1);
+  const { unlockNext } = useDifficultyLock("spttt");
+
+  // Key reset for forcing recreation when difficulty changes
+  const [gameKey, setGameKey] = useState(0);
+
+  useEffect(() => {
+    setGameKey(prev => prev + 1);
+  }, [difficulty]);
+
+
+  const handleUnlock = () => {
+    unlockNext(difficulty);
+  };
+
+  const handleMenu = () => {
+    navigate("/spttt");
+  };
+
+  const handleNextLevel = () => {
+    navigate("/spttt-ai", { state: { winCondition: "line", difficulty: difficulty + 1 }, replace: true });
+  };
+
+  const showNextLevel = difficulty < 4;
+
 
   return (
     <div className="spttt-page">
-      <SPTTT winCondition={winCondition} isAiMode={true} difficulty={difficulty} />
+      <SPTTT
+        key={gameKey}
+        winCondition={winCondition}
+        isAiMode={true}
+        difficulty={difficulty as 1 | 2 | 3 | 4}
+        onUnlockNext={handleUnlock}
+        onMenu={handleMenu}
+        onNextLevel={handleNextLevel}
+        showNextLevel={showNextLevel}
+      />
       {showTutorial && (
         <DynamicTutorial
           steps={tutorialSteps}

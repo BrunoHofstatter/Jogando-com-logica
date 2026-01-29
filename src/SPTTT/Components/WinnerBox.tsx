@@ -5,10 +5,16 @@ export function WinnerOverlay({
   winner,
   onRestart,
   isAiMode = false,
+  onMenu,
+  onNextLevel,
+  showNextLevel,
 }: {
   winner: "X" | "O" | "tie";
   onRestart: () => void;
   isAiMode?: boolean;
+  onMenu?: () => void;
+  onNextLevel?: () => void;
+  showNextLevel?: boolean;
 }) {
   let titleText = "Ganhador:";
   if (winner === "tie") {
@@ -33,7 +39,23 @@ export function WinnerOverlay({
             {!isAiMode && <Piece player={winner} />}
           </>
         )}
-        <button onClick={onRestart}>Jogar de novo</button>
+
+        <div className={styles.victoryButtonsContainer}>
+          <div className={styles.victoryButtonsRow}>
+            {isAiMode && onMenu && (
+              <button onClick={onMenu} className={styles.victoryButtonMenu}>
+                Menu
+              </button>
+            )}
+            <button onClick={onRestart}>Jogar de novo</button>
+          </div>
+
+          {showNextLevel && onNextLevel && (
+            <button onClick={onNextLevel} className={styles.victoryButtonNext}>
+              Próxima dificuldade
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

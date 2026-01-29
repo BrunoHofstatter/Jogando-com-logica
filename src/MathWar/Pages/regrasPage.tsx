@@ -2,6 +2,7 @@ import { useState } from "react";
 import styles from "../styles/regras.module.css";
 import { useNavigate } from "react-router-dom";
 import { useTutorialCompleted } from "../Components/DynamicTutorial";
+import { useDifficultyLock } from "../../Shared/Hooks/useDifficultyLock";
 
 type GameMode = "pvp" | "ai";
 
@@ -10,9 +11,17 @@ function MathWarRegras() {
   const [gameMode, setGameMode] = useState<GameMode>("ai");
   const [aiDifficulty, setAiDifficulty] = useState<1 | 2 | 3 | 4>(1);
   const [showDetailedRules, setShowDetailedRules] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [tutorialCompleted, resetTutorial] = useTutorialCompleted("mathwar_v1");
+  const { isUnlocked, unlockAll, resetProgress } = useDifficultyLock("mathwar");
+
+  const difficultyUnlocked = isUnlocked(aiDifficulty);
 
   function jogarStop() {
+    if (gameMode === "ai" && !difficultyUnlocked) {
+      return;
+    }
+
     if (gameMode === "ai") {
       navigate("/mathwar-ai", { state: { difficulty: aiDifficulty } });
     } else {
@@ -23,16 +32,44 @@ function MathWarRegras() {
   const startTutorial = () => {
     resetTutorial(); // Clear the "completed" flag
     if (gameMode === "ai") {
+      // If locked, maybe default to 1? Or let them try. Tutorial usually force guided.
       navigate("/mathwar-ai", { state: { difficulty: aiDifficulty } });
     } else {
       navigate("/mathwarPg");
     }
   };
 
+  const resetGameProgress = () => {
+    resetProgress();
+    setAiDifficulty(1);
+    setShowResetConfirm(false);
+  };
+
+  const handleCheat = () => {
+    unlockAll();
+    alert("Todas as dificuldades foram desbloqueadas!");
+  };
+
   const toggleDifficulty = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
     setAiDifficulty((prev) => (prev === 4 ? 1 : (prev + 1) as 1 | 2 | 3 | 4));
+  };
+
+  const getDifficultyName = (diff: number) => {
+    switch (diff) {
+      case 1: return "Muito Fácil";
+      case 2: return "Fácil";
+      case 3: return "Médio";
+      case 4: return "Difícil";
+      default: return "";
+    }
+  };
+
+  const getTooltipText = () => {
+    const prevDiffName = getDifficultyName(aiDifficulty - 1);
+    const currDiffName = getDifficultyName(aiDifficulty);
+    return `Ganhe da dificuldade ${prevDiffName} para desbloquear ${currDiffName}`;
   };
 
   return (
@@ -49,7 +86,11 @@ function MathWarRegras() {
 
       {/* Right Side - Game Controls */}
       <div className={styles.botoes}>
-        <button className={styles.button} onClick={jogarStop}>
+        <button
+          className={`${styles.button} ${gameMode === 'ai' && !difficultyUnlocked ? styles.buttonDisabled : ''}`}
+          onClick={jogarStop}
+          disabled={gameMode === 'ai' && !difficultyUnlocked}
+        >
           <span>Jogar</span>
         </button>
 
@@ -67,8 +108,17 @@ function MathWarRegras() {
               Contra Computador
             </label>
             {gameMode === "ai" && (
-              <button className={styles.difficultyButton} onClick={toggleDifficulty}>
-                Nível: {aiDifficulty === 1 ? "Muito Fácil" : aiDifficulty === 2 ? "Fácil" : aiDifficulty === 3 ? "Médio" : "Difícil"}
+              <button
+                className={`${styles.difficultyButton} ${!difficultyUnlocked ? styles.locked : ''}`}
+                onClick={toggleDifficulty}
+              >
+                {!difficultyUnlocked && <span>🔒 </span>}
+                Nível: {getDifficultyName(aiDifficulty)}
+                {!difficultyUnlocked && (
+                  <div className={styles.difficultyTooltip}>
+                    {getTooltipText()}
+                  </div>
+                )}
               </button>
             )}
           </div>
@@ -105,6 +155,13 @@ function MathWarRegras() {
               className={styles.modalContent}
               onClick={(e) => e.stopPropagation()}
             >
+              <button
+                className={styles.resetProgressButton}
+                onClick={() => setShowResetConfirm(true)}
+              >
+                Deletar progresso
+              </button>
+
               <button
                 className={styles.closeButton}
                 onClick={() => setShowDetailedRules(false)}
@@ -152,8 +209,7 @@ function MathWarRegras() {
                   <span className={styles.rulesStrong}>Capitão</span> do oponente.
                 </p>
                 <p className={styles.rulesText}>
-                  Se o Capitão for capturado, o jogador que o capturou vence{" "}
-                  <span className={styles.rulesStrong}>imediatamente</span>.
+                  Se o Capitão for capturado, o jogador que o capturou vence imediatamente.
                 </p>
 
                 <h3 className={styles.rulesTitle}>Preparação e Peças</h3>
@@ -287,7 +343,7 @@ function MathWarRegras() {
                 <p className={styles.rulesText}>
                   A única forma de vencer é{" "}
                   <span className={styles.rulesStrong}>
-                    capturar o Capitão inimigo
+                    capturar o Capitão <span className={styles.rulesStrong} onClick={handleCheat} style={{ cursor: 'text' }}>inimigo</span>
                   </span>
                   .
                 </p>
@@ -296,6 +352,20 @@ function MathWarRegras() {
           </div>
         )
       }
+
+      {/* Reset Confirmation Modal */}
+      {showResetConfirm && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.confirmModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.confirmText}>Tem certeza?</div>
+            <div className={styles.confirmText} style={{ fontSize: "1.5vw" }}>Isso apagará todo o seu progresso no jogo.</div>
+            <div className={styles.confirmButtons}>
+              <button onClick={resetGameProgress} className={`${styles.confirmBtn} ${styles.yesBtn}`}>Sim</button>
+              <button onClick={() => setShowResetConfirm(false)} className={`${styles.confirmBtn} ${styles.noBtn}`}>Não</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div >
   );
 }
