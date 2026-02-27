@@ -1,0 +1,171 @@
+/* ============================================================
+   Class1Dimensions.module.css
+   Split-screen desktop layout for Class 1: Dimensions
+   ============================================================ */
+
+/* --- Main container: 50/50 split ----------------------------- */
+.container {
+    display: flex;
+    height: 100dvh;
+    width: 100%;
+    overflow: hidden;
+}
+
+/* --- Aulas Back Button --- */
+.aulasButton {
+    position: absolute;
+    top: 2vw;
+    left: 2vw;
+    z-index: 1000;
+    font-family: "Cherry Bomb One", cursive;
+    font-size: 1.5vw;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 1vw;
+    padding: 0.8vw 1.5vw;
+    cursor: pointer;
+    box-shadow: 0 0.4vw 0.8vw rgba(231, 76, 60, 0.3);
+    transition: transform 0.2s, background 0.2s;
+}
+
+.aulasButton:hover {
+    background: #c0392b;
+    transform: scale(1.05);
+}
+
+/* --- Left panel: Cube visualization -------------------------- */
+.leftPanel {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0f2f5;
+    position: relative;
+}
+
+/* --- Right panel: Interaction -------------------------------- */
+.rightPanel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2.5vw;
+    padding: 3vw;
+    background: #ffffff;
+    overflow-y: auto;
+}
+
+/* --- Feedback Overlay: Center-Top ---------------------------- */
+.feedbackOverlay {
+    position: absolute;
+    top: 3dvh;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+    /* Let interactions pass through to the cube/buttons */
+    width: 100%;
+}
+
+/* --- Title --------------------------------------------------- */
+.title {
+    font-family: "Cherry Bomb One", cursive;
+    font-size: 2.8vw;
+    color: #2c3e50;
+    text-align: center;
+    margin: 0;
+}
+
+/* --- Hint card (inside overlay) ------------------------------ */
+.hintCard {
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    border-radius: 1vw;
+    padding: 1vw 2vw;
+    text-align: center;
+    font-family: "Cherry Bomb One", cursive;
+    font-size: 1.4vw;
+    color: #664d03;
+    box-shadow: 0 0.4vw 1.2vw rgba(0, 0, 0, 0.15);
+    animation: fadeSlideIn 0.4s ease-out;
+    pointer-events: auto;
+    /* Buttons/card itself should be interactive if needed */
+    max-width: 40vw;
+}
+
+.hintIcon {
+    margin-right: 0.5vw;
+    font-size: 1.6vw;
+}
+
+/* --- Options grid -------------------------------------------- */
+.optionsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2vw;
+    width: 80%;
+    max-width: 30vw;
+}
+
+/* --- Option buttons ------------------------------------------ */
+.optionButton {
+    font-family: "Cherry Bomb One", cursive;
+    font-size: 1.8vw;
+    padding: 1.2vw 0;
+    border: none;
+    border-radius: 1vw;
+    background: #3498db;
+    color: #ffffff;
+    cursor: pointer;
+    box-shadow: 0 0.4vw 0.8vw rgba(52, 152, 219, 0.3);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.optionButton:hover {
+    transform: translateY(-0.15vw);
+    box-shadow: 0 0.5vw 1.2vw rgba(52, 152, 219, 0.45);
+    background: #2980b9;
+}
+
+.optionButton:active {
+    transform: translateY(0.1vw);
+    box-shadow: 0 0.2vw 0.4vw rgba(52, 152, 219, 0.3);
+}
+
+.optionButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* --- Summary placeholder ------------------------------------- */
+.summaryPlaceholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100dvh;
+    width: 100%;
+    font-family: "Cherry Bomb One", cursive;
+    font-size: 3vw;
+    color: #2c3e50;
+    background: linear-gradient(135deg, #f0f2f5 0%, #e8eaed 100%);
+}
+
+/* --- Animations ---------------------------------------------- */
+@keyframes fadeSlideIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-1vw);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

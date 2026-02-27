@@ -1,6 +1,5 @@
 .classIcon {
   background: transparent;
-  border: none;
   padding: 2vw;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -14,7 +13,16 @@
   text-align: center;
 }
 
-.classIcon:hover{
+.classIcon.disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.classIcon.disabled:hover {
+  transform: none;
+}
+
+.classIcon:hover {
   transform: translateY(-0.5vw) scale(1.05);
 }
 
@@ -41,7 +49,7 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-  
+
 }
 
 .classLabel {
@@ -50,6 +58,45 @@
   text-align: center;
   line-height: 1.2;
   -webkit-text-stroke: 0.1vw black;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 1vw;
+  margin-top: 0.5vw;
+}
+
+.actionButton {
+  font-family: "Cherry Bomb One", system-ui;
+  color: white;
+  border: 0.2vw solid rgba(0, 0, 0, 0.2);
+  border-radius: 1vw;
+  padding: 0.5vw 1.5vw;
+  font-size: 1.2vw;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+  -webkit-text-stroke: 0;
+  /* Clear inherited stroke */
+}
+
+.btnLearn {
+  background: #3498db;
+  box-shadow: 0 0.4vw 0.8vw rgba(52, 152, 219, 0.3);
+}
+
+.btnLearn:hover {
+  transform: scale(1.05);
+  background: #2980b9;
+}
+
+.btnGame {
+  background: #e67e22;
+  box-shadow: 0 0.4vw 0.8vw rgba(230, 126, 34, 0.3);
+}
+
+.btnGame:hover {
+  transform: scale(1.05);
+  background: #d35400;
 }
 
 /* Responsive adjustments */

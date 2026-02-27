@@ -4,13 +4,18 @@ interface GameButtonProps {
   pagina: string;
   label: string;
   imageSrc?: string;
+  onClick?: () => void;
 }
 
-function GameButton({ pagina, label, imageSrc }: GameButtonProps) {
+function GameButton({ pagina, label, imageSrc, onClick }: GameButtonProps) {
   const navigate = useNavigate();
 
   const entrarJogo = () => {
-    navigate(`/${pagina}`);
+    if (onClick) {
+      onClick();
+    } else {
+      navigate(`/${pagina}`);
+    }
   };
 
   return (

@@ -5,15 +5,13 @@
   display: flex;
   max-height: 100dvh;
   overflow: hidden;
-  /* avoids double scrollbars */
-  border: 0dvh solid #9b0b16;
-  /* 1px remains 1dvh as it was already 1dvh */
   padding: 0vw;
   min-height: 100dvh;
   width: 100vw;
   justify-content: center;
   align-items: center;
-  background: radial-gradient(circle, #de9696, #ab3636);
+  background-color: #ffbaba;
+  /* Soft flat pinkish-red background to let elements pop */
 }
 
 .boxRegras {
@@ -28,15 +26,23 @@
 
 .gameTitle {
   font-size: clamp(3vw, 9dvh, 4.8vw);
-  color: #e2a01d;
-  -webkit-text-stroke: 0.3vw #080303;
+  color: #ffcf40;
+  /* Vibrant flat yellow/gold */
+  -webkit-text-stroke: 0.3vw #b4111e;
+  /* Match bright red for title stroke */
   margin-bottom: 4dvh;
+  text-shadow: 0 0.4vw 0 #da9500;
+  /* Flat 3D shadow for text */
 }
 
 .preview {
   height: clamp(20vw, 50dvh, 28vw);
   transition: all 0.5s ease;
   animation: pulsePreview 5s infinite;
+  border-radius: 2vw;
+  border: 0.4vw solid #e31f2f;
+  box-shadow: 0 0.6vw 0 #a11425;
+  /* Adjusted shadow */
 }
 
 @keyframes pulsePreview {
@@ -67,12 +73,13 @@
 }
 
 .button {
-  border: 1.8dvh solid #080303;
-  background: radial-gradient(circle, #b43636, #851616);
-  border-radius: 7vw;
+  border: 0.4vw solid #630000;
+  background-color: #e31f2f;
+  /* Solid bright red */
+  border-radius: 4vw;
   box-sizing: border-box;
-  color: #e2a01d;
-  -webkit-text-stroke: 0.42vw #080303;
+  color: #ffcf40;
+  -webkit-text-stroke: 0.3vw #630000;
   font-size: clamp(8.5vw, 20dvh, 11vw);
   display: flex;
   align-items: center;
@@ -80,71 +87,82 @@
   text-align: center;
   padding: 0.3vw 2.5vw 2vw 2.5vw;
   line-height: 1;
-  box-shadow: inset 0 0 1vw #dcdf45ff;
+  box-shadow: 0 1vw 0 #a11425;
+  /* Hard dark red bottom shadow for 3D effect */
   cursor: pointer;
   margin-bottom: 3.5vw;
-  transition: all 0.5s ease;
-  box-shadow: inset 0 0 3vw #00000070;
+  transition: all 0.1s ease;
+  /* Fast transition for snappy clicks */
 }
 
 .button:hover {
-  border: 1.8dvh solid #080303;
-  background: radial-gradient(circle, #b43636, #851616);
-  transform: scale(1.07) translateY(-1dvh);
-  -webkit-text-stroke: 0.42vw #080303;
+  background-color: #f5293a;
+  transform: translateY(-0.2vw);
+  box-shadow: 0 1.2vw 0 #a11425;
+}
+
+.button:active {
+  transform: translateY(0.8vw);
+  box-shadow: 0 0.2vw 0 #a11425;
+  /* Button presses down */
 }
 
 .tutorialButton {
   position: absolute;
   bottom: 4.2dvh;
   left: 3vw;
-  border: 0.26vw solid #080303;
-  /* Purple border */
-  background: radial-gradient(circle, #b43636, #851616);
-  /* Purple gradient */
+  border: 0.3vw solid #a11425;
+  background-color: #e31f2f;
   border-radius: 1.7vw;
   padding: 0.1vw 1vw 0.5vw 1vw;
-  color: #e2a01d;
-  -webkit-text-stroke: 0.17vw #080303;
-  /* Purple stroke */
+  color: #ffcf40;
+  -webkit-text-stroke: 0.15vw #a11425;
   font-size: clamp(1.5vw, 5dvh, 2.7vw);
   font-family: "Cherry Bomb One", system-ui;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.1s ease;
   z-index: 10;
+  box-shadow: 0 0.4vw 0 #a11425;
 }
 
 .tutorialButton:hover {
-  transform: scale(1.03) translateY(-0.5dvh);
-  background: radial-gradient(circle, #b43636, #b82a2a);
-  /* Lighter purple */
+  background-color: #f5293a;
+  transform: translateY(-0.1vw);
+  box-shadow: 0 0.5vw 0 #a11425;
+}
+
+.tutorialButton:active {
+  transform: translateY(0.3vw);
+  box-shadow: 0 0.1vw 0 #a11425;
 }
 
 .detailedRulesButton {
   position: absolute;
   bottom: 4.2dvh;
   right: 3vw;
-  border: 0.26vw solid #080303;
-  /* Purple border */
-  background: radial-gradient(circle, #b43636, #851616);
-  /* Purple gradient */
+  border: 0.3vw solid #a11425;
+  background-color: #e31f2f;
   border-radius: 1.7vw;
   padding: 0.1vw 1vw 0.5vw 1vw;
-  color: #e2a01d;
-  /* Gold text */
-  -webkit-text-stroke: 0.17vw #080303;
-  /* Purple stroke */
+  color: #ffcf40;
+  -webkit-text-stroke: 0.15vw #a11425;
   font-size: clamp(1.5vw, 5dvh, 2.7vw);
   font-family: "Cherry Bomb One", system-ui;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.1s ease;
   z-index: 10;
+  box-shadow: 0 0.4vw 0 #a11425;
 }
 
 .detailedRulesButton:hover {
-  transform: scale(1.03) translateY(-0.5dvh);
-  background: radial-gradient(circle, #b43636, #b82a2a);
-  /* Lighter purple */
+  background-color: #f5293a;
+  transform: translateY(-0.2vw);
+  box-shadow: 0 0.8vw 0 #a11425;
+}
+
+.detailedRulesButton:active {
+  transform: translateY(0.4vw);
+  box-shadow: 0 0.2vw 0 #a11425;
 }
 
 .difPart {
@@ -161,26 +179,33 @@
   align-items: center;
   gap: 1vw;
   padding: 0.5vw 1.5vw;
-  border: 0.4vw solid #080303;
+  border: 0.3vw solid #a11425;
   border-radius: 2vw;
-  background: radial-gradient(circle, #b43636, #851616);
-  box-shadow: inset 0 0 1vw #00000070;
-  transition: transform 0.2s ease;
+  background-color: #e31f2f;
+  box-shadow: 0 0.5vw 0 #a11425;
+  transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .difToggle:hover {
-  transform: scale(1.05);
+  background-color: #f5293a;
+  transform: translateY(-0.2vw);
+  box-shadow: 0 0.7vw 0 #a11425;
+}
+
+.difToggle:active {
+  transform: translateY(0.3vw);
+  box-shadow: 0 0.2vw 0 #a11425;
 }
 
 .difLabel {
-  color: #e2a01d;
-  -webkit-text-stroke: 0.2vw #080303;
+  color: #ffcf40;
+  -webkit-text-stroke: 0.15vw #a11425;
   font-size: 2.5vw;
   margin: 0;
 }
 
 .arrow {
-  color: #e2a01d;
+  color: #ffcf40;
   font-size: 2vw;
   font-weight: bold;
 }
@@ -189,14 +214,16 @@
   position: absolute;
   top: 100%;
   margin-top: 1vw;
-  background: radial-gradient(circle, #b43636, #851616);
-  border: 0.4vw solid #080303;
+  background-color: #ffbaba;
+  /* Menu box color */
+  border: 0.4vw solid #a11425;
   border-radius: 1.5vw;
   padding: 1vw;
   z-index: 10;
-  box-shadow: 0 0 1vw #000000aa;
+  box-shadow: 0 0.6vw 0 #a11425;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  gap: 0.5vw;
 }
 
 .difMenuItem {
@@ -206,24 +233,35 @@
   justify-content: center;
   align-items: center;
   line-height: 1.2;
-  color: #e2a01d;
-  -webkit-text-stroke: 0.1vw #080303;
+  color: #ffcf40;
+  -webkit-text-stroke: 0.15vw #a11425;
   font-size: 1.7vw;
   padding: 0.5vw 1vw;
   cursor: pointer;
   border-radius: 1vw;
   text-align: center;
-  transition: background 0.2s ease;
+  transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background-color: #e31f2f;
+  border: 0.2vw solid #a11425;
+  box-shadow: 0 0.3vw 0 #a11425;
 }
 
 .difMenuItem:hover {
-  background: radial-gradient(circle, #a02a2a, #751212);
+  background-color: #f5293a;
+  transform: translateY(-0.1vw);
+  box-shadow: 0 0.4vw 0 #a11425;
+}
+
+.difMenuItem:active {
+  transform: translateY(0.2vw);
+  box-shadow: 0 0.1vw 0 #a11425;
 }
 
 .difMenuItem.selected {
-  background: radial-gradient(circle, #8b4513, #a94317);
-  border: solid 0.05vw #9d6517;
-
+  background-color: #a11425;
+  box-shadow: none;
+  transform: translateY(0.3vw);
+  color: #ffd859;
 }
 
 
@@ -234,7 +272,10 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(69, 10, 10, 0.4);
+  /* Softer, tinted overlay */
+  backdrop-filter: blur(4px);
+  /* Modern blur effect */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -242,57 +283,73 @@
 }
 
 .modalContent {
-  background: radial-gradient(circle, #c6aeae, #564343);
-  /* Match boxRegras background */
-  border: 0.6vw solid #570505;
-  /* Dark red border */
-  border-radius: 3.3vw;
-  padding: 2vw 3vw;
+  background-color: #ffbaba;
+  /* Match page background exactly */
+  border: 0.4vw solid #a11425;
+  border-radius: 3vw;
+  padding: 2.5vw 3.5vw;
   margin: 5dvh auto 0;
-  max-width: 90%;
-  max-height: 92dvh;
+  max-width: 80%;
+  max-height: 85dvh;
   overflow-y: auto;
-  color: #ffffff;
-  /* White text */
-  -webkit-text-stroke: 0.1vw #080303;
-  /* Dark text stroke */
-  font-size: 1.5vw;
+  color: #630000;
+  /* Dark red text instead of white */
+  font-size: 1.8vw;
   position: relative;
+  box-shadow: 0 1.2vw 0 #630000;
+  /* Hard shadow for modal */
+}
+
+/* Scrollbar styling for modal */
+.modalContent::-webkit-scrollbar {
+  width: 0.8vw;
+}
+
+.modalContent::-webkit-scrollbar-track {
+  background: #ffbaba;
+  border-radius: 1vw;
+}
+
+.modalContent::-webkit-scrollbar-thumb {
+  background: #e31f2f;
+  border-radius: 1vw;
+  border: 0.2vw solid #630000;
 }
 
 .closeButton {
   border-radius: 50%;
   padding: 0 0 0.2vw 0;
-  background: radial-gradient(circle, #b43636, #851616);
-  /* Red gradient */
-  border: 0.3vw solid #570505;
-  /* Dark red border */
+  background-color: #e31f2f;
+  border: 0.3vw solid #630000;
   width: 4vw;
   height: 4vw;
-  color: #e2a01d;
-  /* Gold text */
-  -webkit-text-stroke: 0.2vw #080303;
-  /* Dark text stroke */
-  font-size: 2.5vw;
+  color: #ffcf40;
+  -webkit-text-stroke: 0.15vw #630000;
+  font-size: 2.2vw;
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 10;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-  /* Prevent the button from being affected by scrolling */
+  box-shadow: 0 0.4vw 0 #a11425;
   position: sticky;
   float: right;
-  margin-top: 0.5vw;
+  margin-top: -1vw;
   margin-right: -1.5vw;
-  top: -1.5vw;
+  top: -1vw;
   right: -1.5vw;
+  transition: all 0.1s ease;
 }
 
 .closeButton:hover {
-  transform: scale(1.05) translateY(-0.5dvh);
-  background: radial-gradient(circle, #d14a4a, #a02a2a);
-  /* Brighter red */
+  background-color: #f5293a;
+  transform: translateY(-0.1vw);
+  box-shadow: 0 0.5vw 0 #a11425;
+}
+
+.closeButton:active {
+  transform: translateY(0.3vw);
+  box-shadow: 0 0.1vw 0 #a11425;
 }
 
 .detailedRules {
@@ -301,67 +358,79 @@
 }
 
 .detailedRules h3 {
-  color: #e2a01d;
-  /* Gold text */
-  -webkit-text-stroke: 0.21vw #080303;
-  /* Dark text stroke */
-  font-size: 3vw;
+  color: #ffcf40;
+  -webkit-text-stroke: 0.15vw #a11425;
+  font-size: 2.8vw;
   margin-bottom: 1.5vw;
+  margin-top: 2vw;
+  text-shadow: 0 0.2vw 0 #da9500;
 }
 
 .detailedRules p {
-  font-size: 2.1vw;
-  -webkit-text-stroke: 0.17vw #080303;
-  /* Dark text stroke */
+  font-size: 2vw;
   margin-bottom: 1.5vw;
   color: #ffffff;
-  /* White text */
-  line-height: 1.4;
+  /* White reading text */
+  -webkit-text-stroke: 0.12vw #a11425;
+  font-family: "Cherry Bomb One", system-ui;
+  /* Match the playful theme */
+  font-weight: 200;
+  line-height: 1.5;
 }
 
 .detailedRules h2 {
-  font-size: 4.5vw;
-  color: #e2a01d;
-  /* Gold text */
-  -webkit-text-stroke: 0.25vw #080303;
-  /* Dark text stroke */
+  font-size: 4vw;
+  color: #ffcf40;
+  -webkit-text-stroke: 0.2vw #a11425;
+  text-shadow: 0 0.3vw 0 #da9500;
   text-align: center;
-  margin-bottom: 2vw;
+  margin-bottom: 2.5vw;
 }
 
-/* Mode selector for rules page - Adapted from CrownChase to match Stop Theme */
+/* Mode selector for rules page */
 .mode-select-rules {
   display: flex;
   flex-direction: column;
-  gap: 1vw;
-  font-size: 2vw;
-  -webkit-text-stroke: 0.1vw #080303;
-  color: #e2a01d;
+  gap: 1.2vw;
+  font-size: 2.2vw;
+  -webkit-text-stroke: 0.15vw #a11425;
+  color: #ffcf40;
   margin-bottom: 5vw;
+  width: 100%;
+  align-items: center;
 }
 
 .mode-select-rules label {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5vw;
-  background: radial-gradient(circle, #b43636, #851616);
-  border: 0.2vw solid #080303;
+  background-color: #e31f2f;
+  border: 0.3vw solid #a11425;
   border-radius: 2vw;
-  padding: 0.8vw 1.5vw;
+  padding: 0.8vw 2vw;
   cursor: pointer;
-  transition: all 0.3s;
-  color: #e2a01d;
+  transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  color: #ffcf40;
+  box-shadow: 0 0.5vw 0 #a11425;
+  width: 60%;
 }
 
 .mode-select-rules label:hover {
-  transform: scale(1.03);
-  background: radial-gradient(circle, #c43e3e, #961919);
+  background-color: #f5293a;
+  transform: translateY(-0.2vw);
+  box-shadow: 0 0.7vw 0 #a11425;
+}
+
+.mode-select-rules label:active {
+  transform: translateY(0.3vw);
+  box-shadow: 0 0.2vw 0 #a11425;
 }
 
 .mode-select-rules input[type="radio"] {
-  width: 1.2vw;
-  height: 1.2vw;
-  accent-color: #e2a01d;
+  width: 1.5vw;
+  height: 1.5vw;
+  accent-color: #ffcf40;
 }
 
 /* Container for the "Levels" row to allow the small button next to it */
@@ -369,36 +438,41 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
   position: relative;
+  width: 100%;
 }
 
 /* Small square button for Levels Menu */
 .levelsButton {
-  margin-left: 1vw;
+  margin-left: 1.5vw;
   font-family: "Cherry Bomb One", system-ui;
-  font-size: 1.7vw;
-  padding: 0.3vw 0.7vw;
-  border-radius: 0.8vw;
-  border: 0.2vw solid #080303;
-  background: radial-gradient(circle, #e2a01d, #ae7c17);
-  /* Gold gradient */
-  color: #aa1c1c;
-  /* Dark red text */
-  -webkit-text-stroke: 0.13vw #080303;
+  font-size: 1.5vw;
+  padding: 0.5vw 1vw;
+  border-radius: 1vw;
+  border: 0.25vw solid #a11425;
+  background-color: #ffcf40;
+  color: #e31f2f;
+  -webkit-text-stroke: 0.15vw #a11425;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   height: fit-content;
   position: absolute;
-  left: 100%;
+  left: 85%;
   white-space: nowrap;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 0.4vw 0 #da9500;
 }
 
 .levelsButton:hover {
-  transform: scale(1.05);
-  background: radial-gradient(circle, #f0b030, #cda70d);
+  background-color: #ffd859;
+  transform: translateY(-0.1vw);
+  box-shadow: 0 0.5vw 0 #da9500;
 }
 
-/* Removed specific classes for Levels Menu (moved to levelsMenu.module.css) */
+.levelsButton:active {
+  transform: translateY(0.3vw);
+  box-shadow: 0 0.1vw 0 #da9500;
+}

@@ -1,0 +1,279 @@
+/* ============================================================
+   RubiksCube.module.css
+   Pure CSS 3D Rubik's Cube — dynamic sizing via CSS variables.
+   ============================================================ */
+
+/* --- Scene: provides perspective ----------------------------- */
+.scene {
+  perspective: 800px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cube-size);
+  height: var(--cube-size);
+}
+
+/* --- Cube: the 3D container ---------------------------------- */
+.cube {
+  width: var(--cube-size);
+  height: var(--cube-size);
+  position: relative;
+  transform-style: preserve-3d;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  will-change: transform;
+}
+
+/* Mode: auto-spin (CSS keyframes drive the rotation) */
+.autoRotate {
+  animation: rotateCube var(--spin-duration) linear infinite;
+}
+
+/* Mode: user is actively dragging (no transition for instant feedback) */
+.dragging {
+  cursor: grabbing;
+  transition: none !important;
+}
+
+/* Mode: locked to front view (smooth snap transition) */
+.locked {
+  transition: transform 0.6s ease;
+  cursor: default;
+}
+
+/* --- Inner Solid Core ---------------------------------------- */
+.innerCore {
+  position: absolute;
+  /* Make the inner core slightly smaller than the outer extent of the faces */
+  width: calc(var(--cube-size) * 0.98);
+  height: calc(var(--cube-size) * 0.98);
+  /* Center the inner core inside the cube container */
+  top: calc(var(--cube-size) * 0.01);
+  left: calc(var(--cube-size) * 0.01);
+  transform-style: preserve-3d;
+}
+
+.innerCoreFace {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #111;
+  /* Very dark, slightly distinct from #232533 outer edge */
+  border-radius: clamp(3px, 0.6vw, 10px);
+}
+
+.innerFront {
+  transform: rotateY(0deg) translateZ(calc(var(--cube-size) * 0.49));
+}
+
+.innerBack {
+  transform: rotateY(180deg) translateZ(calc(var(--cube-size) * 0.49));
+}
+
+.innerRight {
+  transform: rotateY(90deg) translateZ(calc(var(--cube-size) * 0.49));
+}
+
+.innerLeft {
+  transform: rotateY(-90deg) translateZ(calc(var(--cube-size) * 0.49));
+}
+
+.innerTop {
+  transform: rotateX(90deg) translateZ(calc(var(--cube-size) * 0.49));
+}
+
+.innerBottom {
+  transform: rotateX(-90deg) translateZ(calc(var(--cube-size) * 0.49));
+}
+
+/* --- Faces --------------------------------------------------- */
+.face {
+  position: absolute;
+  width: var(--cube-size);
+  height: var(--cube-size);
+  display: grid;
+  grid-template-columns: repeat(var(--grid-size), 1fr);
+  grid-template-rows: repeat(var(--grid-size), 1fr);
+  gap: clamp(2px, 0.4vw, 5px);
+  padding: clamp(2px, 0.4vw, 5px);
+  box-sizing: border-box;
+  backface-visibility: visible;
+  /* Scale radius with sticker size, not viewport — fixes small cube instances */
+  border-radius: calc(var(--cube-size) / var(--grid-size) * 0.07);
+  /* Sticker cell size — inherited by children for proportional shadow scaling */
+  --ss: calc(var(--cube-size) / var(--grid-size));
+}
+
+/* Face transforms — translateZ = half cube size */
+.front {
+  transform: rotateY(0deg) translateZ(calc(var(--cube-size) / 2));
+  background: #232533;
+}
+
+.back {
+  transform: rotateY(180deg) translateZ(calc(var(--cube-size) / 2));
+  background: #232533;
+}
+
+.right {
+  transform: rotateY(90deg) translateZ(calc(var(--cube-size) / 2));
+  background: #232533;
+}
+
+.left {
+  transform: rotateY(-90deg) translateZ(calc(var(--cube-size) / 2));
+  background: #232533;
+}
+
+.top {
+  transform: rotateX(90deg) translateZ(calc(var(--cube-size) / 2));
+  background: #232533;
+}
+
+.bottom {
+  transform: rotateX(-90deg) translateZ(calc(var(--cube-size) / 2));
+  background: #232533;
+}
+
+/* --- Stickers ------------------------------------------------ */
+.sticker {
+  /* Scale radius with sticker size, not viewport — fixes small cube instances */
+  border-radius: calc(var(--cube-size) / var(--grid-size) * 0.07);
+  width: 100%;
+  height: 100%;
+  /* Bubbly candy look with crisp fixed-pixel 3D inset lighting */
+  box-shadow:
+    inset 0px 0px 3px rgba(255, 255, 255, 0.6),
+    inset -1.5px -1.5px 4px rgba(0, 0, 0, 0.25),
+    0 1px 2px rgba(0, 0, 0, 0.15);
+  /* Border scales down with sticker size — larger grids get slightly thinner borders */
+  border: max(0.5px, calc(var(--ss) * 0.03)) solid rgba(255, 255, 255, 0.3);
+}
+
+/* Standard Rubik's color scheme (Vibrant/Candy) */
+.colorGreen {
+  background: linear-gradient(135deg, #4ceb6a 0%, #17b841 100%);
+}
+
+.colorBlue {
+  background: linear-gradient(135deg, #5f9aff 0%, #2f5ceb 100%);
+}
+
+.colorWhite {
+  background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
+}
+
+.colorYellow {
+  background: linear-gradient(135deg, #fff05a 0%, #f0b70a 100%);
+}
+
+.colorOrange {
+  background: linear-gradient(135deg, #ff9f45 0%, #eb5e0b 100%);
+}
+
+.colorRed {
+  background: linear-gradient(135deg, #ff6b6b 0%, #e01b1b 100%);
+}
+
+/* --- Highlight & Dim system ---------------------------------- */
+
+/* Dimmed stickers (not in the highlighted region) */
+.dimmed {
+  opacity: 0.25;
+  filter: grayscale(40%);
+  transition: opacity 0.4s ease, filter 0.4s ease;
+}
+
+/* Highlighted stickers — pulsing glow + gentle brightness lift */
+.highlighted {
+  z-index: 2;
+  filter: brightness(1.15);
+  box-shadow:
+    inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.9),
+    inset -1.5px -1.5px 5px rgba(0, 0, 0, 0.3),
+    0 0 8px rgba(255, 255, 255, 0.6),
+    0 0 14px rgba(255, 255, 255, 0.3);
+  animation: pulseGlow 2s ease-in-out infinite;
+  transition: filter 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Disable glow animation when spinning fast to save GPU */
+.cube.fastSpin .highlighted {
+  animation: none !important;
+}
+
+/* --- Counting index numbers ---------------------------------- */
+
+.stickerIndex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-family: "Cherry Bomb One", cursive;
+  font-size: calc(var(--cube-size) / var(--grid-size) * 0.55);
+  font-weight: bold;
+  color: #fff;
+  -webkit-text-stroke: 1.5px #000;
+  text-shadow: 0px 3px 6px rgba(0, 0, 0, 0.7);
+  /* Staggered pop-in via --i CSS variable */
+  animation: popIn 0.4s ease-out backwards;
+  animation-delay: calc(var(--i) * 0.4s);
+}
+
+/* Dark text for light-colored stickers */
+.darkText {
+  color: #1a1a1a;
+  -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.7);
+  text-shadow: 0px 2px 4px rgba(255, 255, 255, 0.5);
+}
+
+/* --- Animations ---------------------------------------------- */
+
+@keyframes pulseGlow {
+
+  0%,
+  100% {
+    box-shadow:
+      inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.9),
+      inset -1.5px -1.5px 5px rgba(0, 0, 0, 0.3),
+      0 0 5px rgba(255, 255, 255, 0.5),
+      0 0 10px rgba(255, 255, 255, 0.2);
+  }
+
+  50% {
+    box-shadow:
+      inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.9),
+      inset -1.5px -1.5px 5px rgba(0, 0, 0, 0.3),
+      0 0 12px rgba(255, 255, 255, 0.9),
+      0 0 24px rgba(255, 255, 255, 0.4);
+  }
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+
+  70% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes rotateCube {
+  0% {
+    transform: rotateX(var(--auto-x, -25deg)) rotateY(0deg);
+  }
+
+  100% {
+    transform: rotateX(var(--auto-x, -25deg)) rotateY(360deg);
+  }
+}

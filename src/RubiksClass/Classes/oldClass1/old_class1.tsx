@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import styles from "./class1.module.css";
-import hintStyles from "./class1hint.module.css";
+import styles from "./old_class1.module.css";
+import hintStyles from "./old_class1hitns.module.css";
 import Hint from "../../Components/hintButton";
 import { CheckCircle, XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -26,8 +26,8 @@ const Dimensions: React.FC = () => {
   const [showCorrections, setShowCorrections] = useState(false);
 
   const goToNextClass = () => {
-  navigate("/class2"); // Adjust the path based on your routing
-};
+    navigate("/class2"); // Adjust the path based on your routing
+  };
 
   // Function to get image path based on cube size
   const getCubeImage = (size: CubeSize) => {
@@ -250,9 +250,8 @@ const Dimensions: React.FC = () => {
                   return (
                     <div
                       key={image.id}
-                      className={`${styles.cubeImage} ${
-                        isPlaced ? styles.placed : ""
-                      }`}
+                      className={`${styles.cubeImage} ${isPlaced ? styles.placed : ""
+                        }`}
                       draggable={!isPlaced && !isChecking}
                       onDragStart={(e) =>
                         !isPlaced && !isChecking && handleDragStart(e, image.id)

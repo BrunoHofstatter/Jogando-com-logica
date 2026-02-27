@@ -121,9 +121,9 @@ function LevelsMenuPage() {
                                 className={styles.levelButton}
                                 style={{
                                     background: unlocked
-                                        ? 'radial-gradient(circle, #a02b2b, #851616)'
-                                        : 'radial-gradient(circle, #5e1e1e, #3a0f0f)',
-                                    border: '0.4vw solid #080303',
+                                        ? '#e63946'
+                                        : '#a11425',
+                                    border: '0.4vw solid #a11425',
                                     borderRadius: '2vw',
                                     aspectRatio: '1',
                                     display: 'flex',
@@ -131,15 +131,18 @@ function LevelsMenuPage() {
                                     justifyContent: 'center',
                                     alignItems: 'center',
                                     cursor: unlocked ? 'pointer' : 'default',
-                                    filter: unlocked ? 'none' : 'grayscale(0.8)',
-                                    position: 'relative'
+                                    position: 'relative',
+                                    boxShadow: unlocked ? '0 0.8vw 0 #a11425' : 'none',
+                                    transition: 'all 0.1s ease',
+                                    transform: unlocked ? 'translateY(0)' : 'translateY(0.4vw)'
                                 }}
                             >
                                 <div style={{
                                     fontSize: '4vw',
-                                    color: unlocked ? '#e2a01d' : '#888',
-                                    WebkitTextStroke: '0.2vw #080303',
-                                    fontFamily: 'inherit'
+                                    color: unlocked ? '#ffcf40' : '#fff9f9',
+                                    WebkitTextStroke: unlocked ? '0.15vw #a11425' : '0.1vw #860e1d',
+                                    fontFamily: 'inherit',
+                                    textShadow: unlocked ? '0 0.2vw 0 #da9500' : 'none'
                                 }}>
                                     {level.id}
                                 </div>
@@ -149,8 +152,9 @@ function LevelsMenuPage() {
                                         {[1, 2, 3].map(s => (
                                             <span key={s} style={{
                                                 fontSize: '1.5vw',
-                                                color: s <= stars ? '#ffd700' : '#4a1515',
-                                                WebkitTextStroke: '0.1vw #080303'
+                                                color: s <= stars ? '#ffcf40' : '#ffbaba',
+                                                WebkitTextStroke: '0.1vw #a11425',
+                                                textShadow: s <= stars ? '0 0.2vw 0 #da9500' : 'none'
                                             }}>★</span>
                                         ))}
                                     </div>
@@ -171,7 +175,7 @@ function LevelsMenuPage() {
 
             <button
                 className={styles.button}
-                style={{ fontSize: '3vw', padding: '1vw 3vw' }}
+                style={{ fontSize: '3vw', padding: '1vw 3vw', boxShadow: '0 0.5vw 0 #a11425' }}
                 onClick={() => navigate("/jogoStop")}
             >
                 Voltar

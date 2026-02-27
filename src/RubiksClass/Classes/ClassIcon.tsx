@@ -7,25 +7,41 @@ interface ClassIconProps {
   imageSrc?: string;
 }
 
-function ClassIcon({ pagina, label, imageSrc}: ClassIconProps) {
+function ClassIcon({ pagina, label, imageSrc }: ClassIconProps) {
   const navigate = useNavigate();
 
-  const handleClick = () => {
-   navigate(`/${pagina}`);
+  const isDisabled = label === "Em Breve" || !pagina;
+
+  const handleLearnClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isDisabled) return;
+    navigate(`/${pagina}`);
+  }
+
+  const handleGameClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isDisabled) return;
+    navigate(`/${pagina}?mode=game`);
   }
 
   return (
-    <button
-      onClick={handleClick}
-      className={styles.classIcon} 
+    <div
+      onClick={isDisabled ? undefined : handleLearnClick}
+      className={`${styles.classIcon} ${isDisabled ? styles.disabled : ""}`}
     >
       <div className={styles.classIconInner}>
+        <span className={styles.classLabel}>{label}</span>
         <div className={styles.classIconContainer}>
           {imageSrc && <img src={imageSrc} className={styles.classIconImg} alt={label} />}
         </div>
-        <span className={styles.classLabel}>{label}</span>
+        {!isDisabled && (
+          <div className={styles.buttonGroup}>
+            <button className={`${styles.actionButton} ${styles.btnLearn}`} onClick={handleLearnClick}>Aprender</button>
+            <button className={`${styles.actionButton} ${styles.btnGame}`} onClick={handleGameClick}>Jogar</button>
+          </div>
+        )}
       </div>
-    </button>
+    </div>
   );
 }
 

@@ -1,4 +1,4 @@
-/* RegrasDamas.css - Styled Rules Page - Purple/Gold Theme */
+/* RegrasDamas.css - Styled Rules Page - Purple/Gold Theme (Neo-Brutalism) */
 
 .regrasPage {
   font-family: "Cherry Bomb One", system-ui;
@@ -7,13 +7,13 @@
   display: flex;
   max-height: 100dvh;
   overflow: hidden;
-  border: 0dvh solid #6b46c1;
   padding: 0vw;
   min-height: 100dvh;
   width: 100vw;
   justify-content: center;
   align-items: center;
-  background: radial-gradient(circle, #bd90f0, #9867cf);
+  background-color: #e9d5ff;
+  /* Soft flat light purple background */
   gap: 0vw;
 }
 
@@ -29,14 +29,22 @@
 
 .gameTitle {
   font-size: clamp(3vw, 10.5dvh, 5.5vw);
-  -webkit-text-stroke: 0.3vw #4c1d95;
   color: #fbbf24;
+  /* Vibrant flat gold */
+  -webkit-text-stroke: 0.25vw #610fa8;
+  /* Deep purple stroke */
+  margin-bottom: 2vw;
+  text-shadow: 0 0.4vw 0 #581c87;
+  /* Flat 3D shadow */
 }
 
 .preview {
   height: clamp(30vw, 73dvh, 40vw);
   transition: all 0.5s ease;
   animation: pulsePreview 5s infinite;
+  border-radius: 2vw;
+  border: 0.4vw solid #7e22ce;
+  box-shadow: 0 0.8vw 0 #581c87;
 }
 
 @keyframes pulsePreview {
@@ -67,12 +75,13 @@
 }
 
 .button {
-  border: 1.8dvh solid #c1c424;
-  background: radial-gradient(circle, #7c3aed, #5b21b6);
-  border-radius: 7vw;
+  border: 0.4vw solid #4c1d95;
+  background-color: #a855f7;
+  /* Solid bright purple */
+  border-radius: 4vw;
   box-sizing: border-box;
   color: #fbbf24;
-  -webkit-text-stroke: 0.42vw #4c1d95;
+  -webkit-text-stroke: 0.3vw #4c1d95;
   font-size: clamp(8.5vw, 20dvh, 11vw);
   display: flex;
   align-items: center;
@@ -80,57 +89,77 @@
   text-align: center;
   padding: 0.3vw 2.5vw 2vw 2.5vw;
   line-height: 1;
-  box-shadow: inset 0 0 1vw #dcdf45ff;
+  box-shadow: 0 1vw 0 #581c87;
+  /* Hard dark purple bottom shadow */
   cursor: pointer;
   margin-bottom: 4vw;
-  transition: all 0.5s ease;
+  transition: all 0.1s ease;
 }
 
-
-
-.button:hover {
-  border: 1.8dvh solid #c1c424;
-  background: radial-gradient(circle, #8041ec, #672cc5);
-  transform: scale(1.07) translateY(-1dvh);
-  -webkit-text-stroke: 0.42vw #5725a1;
+.buttonDisabled {
+  filter: grayscale(1);
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: 0 1vw 0 #555 !important;
+  background-color: #999 !important;
+  border-color: #555 !important;
+  -webkit-text-stroke: 0.3vw #444 !important;
 }
 
+.button:not(.buttonDisabled):hover {
+  background-color: #c084fc;
+  transform: translateY(-0.2vw);
+  box-shadow: 0 1.2vw 0 #581c87;
+}
 
-
+.button:not(.buttonDisabled):active {
+  transform: translateY(0.8vw);
+  box-shadow: 0 0.2vw 0 #581c87;
+}
 
 /* Mode selector for rules page */
 .mode-select-rules {
   display: flex;
   flex-direction: column;
-  gap: 1vw;
-  font-size: 2vw;
-  -webkit-text-stroke: 0.1vw #4c1d95;
+  gap: 1.2vw;
+  font-size: 2.2vw;
+  -webkit-text-stroke: 0.15vw #4c1d95;
   color: #fbbf24;
   margin-bottom: 5vw;
+  width: 100%;
+  align-items: center;
 }
 
 .mode-select-rules label {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5vw;
-  background: radial-gradient(circle, #7c3aed, #5b21b6);
-  border: 0.2vw solid #c1c424;
+  background-color: #a855f7;
+  border: 0.3vw solid #4c1d95;
   border-radius: 2vw;
-  padding: 0.8vw 1.5vw;
+  padding: 0.8vw 2vw;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   color: #fbbf24;
-
+  box-shadow: 0 0.5vw 0 #581c87;
+  width: 60%;
 }
 
 .mode-select-rules label:hover {
-  transform: scale(1.03);
-  background: radial-gradient(circle, #8041ec, #672cc5);
+  background-color: #c084fc;
+  transform: translateY(-0.2vw);
+  box-shadow: 0 0.7vw 0 #581c87;
+}
+
+.mode-select-rules label:active {
+  transform: translateY(0.3vw);
+  box-shadow: 0 0.2vw 0 #581c87;
 }
 
 .mode-select-rules input[type="radio"] {
-  width: 1.2vw;
-  height: 1.2vw;
+  width: 1.5vw;
+  height: 1.5vw;
   accent-color: #fbbf24;
 }
 
@@ -138,61 +167,67 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
   position: relative;
+  width: 100%;
 }
 
 .tutorialButton {
   position: absolute;
   bottom: 4.2dvh;
   left: 3vw;
-  border: 0.26vw solid #342075;
-  /* Purple border */
-  background: radial-gradient(circle, #8b5cf6, #6d28d9);
-  /* Purple gradient */
+  border: 0.3vw solid #4c1d95;
+  background-color: #a855f7;
   border-radius: 1.7vw;
   padding: 0.1vw 1vw 0.5vw 1vw;
   color: #fbbf24;
-  /* Gold text */
-  -webkit-text-stroke: 0.17vw #4c1d95;
-  /* Purple stroke */
+  -webkit-text-stroke: 0.15vw #4c1d95;
   font-size: clamp(1.5vw, 5dvh, 2.7vw);
   font-family: "Cherry Bomb One", system-ui;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.1s ease;
   z-index: 10;
+  box-shadow: 0 0.4vw 0 #581c87;
 }
 
 .tutorialButton:hover {
-  transform: scale(1.03) translateY(-0.5dvh);
-  background: radial-gradient(circle, #a855f7, #7c3aed);
-  /* Lighter purple */
+  background-color: #c084fc;
+  transform: translateY(-0.1vw);
+  box-shadow: 0 0.5vw 0 #581c87;
+}
+
+.tutorialButton:active {
+  transform: translateY(0.3vw);
+  box-shadow: 0 0.1vw 0 #581c87;
 }
 
 .detailedRulesButton {
   position: absolute;
   bottom: 4.2dvh;
   right: 3vw;
-  border: 0.26vw solid #342075;
-  /* Purple border */
-  background: radial-gradient(circle, #8b5cf6, #6d28d9);
-  /* Purple gradient */
+  border: 0.3vw solid #4c1d95;
+  background-color: #a855f7;
   border-radius: 1.7vw;
   padding: 0.1vw 1vw 0.5vw 1vw;
   color: #fbbf24;
-  /* Gold text */
-  -webkit-text-stroke: 0.17vw #4c1d95;
-  /* Purple stroke */
+  -webkit-text-stroke: 0.15vw #4c1d95;
   font-size: clamp(1.5vw, 5dvh, 2.7vw);
   font-family: "Cherry Bomb One", system-ui;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.1s ease;
   z-index: 10;
+  box-shadow: 0 0.4vw 0 #581c87;
 }
 
 .detailedRulesButton:hover {
-  transform: scale(1.03) translateY(-0.5dvh);
-  background: radial-gradient(circle, #a855f7, #7c3aed);
-  /* Lighter purple */
+  background-color: #c084fc;
+  transform: translateY(-0.1vw);
+  box-shadow: 0 0.5vw 0 #581c87;
+}
+
+.detailedRulesButton:active {
+  transform: translateY(0.3vw);
+  box-shadow: 0 0.1vw 0 #581c87;
 }
 
 /* Modal Overlay */
@@ -202,7 +237,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(43, 8, 82, 0.4);
+  backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -210,57 +246,73 @@
 }
 
 .modalContent {
-  background: radial-gradient(circle, #9d6fee, #8154c9);
-  /* Purple gradient */
-  border: 0.6vw solid #4c1d95;
-  /* Purple border */
-  border-radius: 3.3vw;
-  padding: 2vw 3vw;
-  margin-top: 5dvh;
+  background-color: #e9d5ff;
+  /* Match page background exactly */
+  border: 0.4vw solid #7e22ce;
+  border-radius: 3vw;
+  padding: 2.5vw 3.5vw;
+  margin: 5dvh auto 0;
   max-width: 90%;
-  max-height: 92dvh;
+  max-height: 85dvh;
   overflow-y: auto;
-  color: #ffffff;
-  /* White text */
-  -webkit-text-stroke: 0.1vw #2d1b69;
-  /* Purple stroke */
-  font-size: 1.5vw;
+  color: #4c1d95;
+  /* Dark purple text */
+  font-size: 1.8vw;
   position: relative;
+  box-shadow: 0 1.2vw 0 #4c1d95;
+  /* Hard shadow for modal */
+}
+
+/* Scrollbar styling for modal */
+.modalContent::-webkit-scrollbar {
+  width: 0.8vw;
+}
+
+.modalContent::-webkit-scrollbar-track {
+  background: #e9d5ff;
+  border-radius: 1vw;
+}
+
+.modalContent::-webkit-scrollbar-thumb {
+  background: #a855f7;
+  border-radius: 1vw;
+  border: 0.2vw solid #4c1d95;
 }
 
 .closeButton {
   border-radius: 50%;
   padding: 0 0 0.2vw 0;
-  background: radial-gradient(circle, #a855f7, #7c3aed);
-  /* Purple gradient */
+  background-color: #a855f7;
   border: 0.3vw solid #4c1d95;
-  /* Purple border */
   width: 4vw;
   height: 4vw;
-  color: #ffc228;
-  /* White text */
-  -webkit-text-stroke: 0.2vw #4c1d95;
-  /* Purple stroke */
-  font-size: 2.5vw;
+  color: #fbbf24;
+  -webkit-text-stroke: 0.15vw #4c1d95;
+  font-size: 2.2vw;
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 10;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-  /* Prevent the button from being affected by scrolling */
+  box-shadow: 0 0.4vw 0 #581c87;
   position: sticky;
   float: right;
-  margin-top: 0.5vw;
+  margin-top: -1vw;
   margin-right: -1.5vw;
-  top: -1.5vw;
+  top: -1vw;
   right: -1.5vw;
+  transition: all 0.1s ease;
 }
 
 .closeButton:hover {
-  transform: scale(1.05) translateY(-0.5dvh);
-  background: radial-gradient(circle, #c084fc, #a855f7);
-  /* Brighter purple */
+  background-color: #c084fc;
+  transform: translateY(-0.1vw);
+  box-shadow: 0 0.5vw 0 #581c87;
+}
+
+.closeButton:active {
+  transform: translateY(0.3vw);
+  box-shadow: 0 0.1vw 0 #581c87;
 }
 
 .detailedRules {
@@ -270,54 +322,63 @@
 
 .detailedRules h3 {
   color: #fbbf24;
-  -webkit-text-stroke: 0.21vw #421980;
-  font-size: 3.5vw;
-  margin-top: 4vw;
+  -webkit-text-stroke: 0.15vw #4c1d95;
+  font-size: 2.8vw;
+  margin-bottom: 1.5vw;
+  margin-top: 2vw;
+  text-shadow: 0 0.2vw 0 #581c87;
 }
 
 .detailedRules p {
-  font-size: 2.1vw;
-  -webkit-text-stroke: 0.17vw #421980;
-  /* Purple stroke */
+  font-size: 2vw;
   margin-bottom: 1.5vw;
-  color: #f5f5a9;
+  color: #fff;
+  -webkit-text-stroke: 0.12vw #4c1d95;
+  font-family: "Cherry Bomb One", system-ui;
+  font-weight: 200;
+  line-height: 1.5;
 }
 
 .detailedRules h2 {
-  font-size: 4.5vw;
+  font-size: 4vw;
   color: #fbbf24;
-  /* Bright gold text */
-  -webkit-text-stroke: 0.25vw #421980;
-  /* Purple stroke */
+  -webkit-text-stroke: 0.2vw #4c1d95;
+  text-shadow: 0 0.3vw 0 #581c87;
   text-align: center;
-  margin-bottom: 2vw;
+  margin-bottom: 2.5vw;
 }
 
 .rulesSpan {
-  color: #fdd264;
+  color: #fbbf24;
   font-size: 2.3vw;
-  -webkit-text-stroke: 0.18vw #421980;
+  -webkit-text-stroke: 0.12vw #4c1d95;
 }
 
 .rulesStrong {
-  color: #f58a33;
+  color: #f87171;
+  /* A nice red/orange for emphasis */
+  text-shadow: 0 0.2vw 0 #7f1d1d;
+  -webkit-text-stroke: 0.12vw #7f1d1d;
 }
 
 .detailedRules li {
   font-size: 1.7vw;
-  -webkit-text-stroke: 0.13vw #421980;
-  /* Purple stroke */
-  color: #f5f5a9;
+  -webkit-text-stroke: 0.12vw #4c1d95;
+  color: #fff;
 }
 
 .pieceImage {
   width: 3vw;
   margin-bottom: 0.6vw;
+  vertical-align: middle;
 }
 
 .boardImage {
   width: 40vw;
-  padding: 2vw 0vw 0 5vw;
+  border: 0.4vw solid #7e22ce;
+  border-radius: 2vw;
+  box-shadow: 0 0.6vw 0 #581c87;
+  background-color: #a855f7;
 }
 
 .boardDiv {
@@ -326,61 +387,93 @@
   align-items: center;
   justify-content: center;
   gap: 4vw;
+  margin-bottom: 2vw;
 }
 
 .legend {
-  width: 40vw;
+  width: 25vw;
   display: flex;
   flex-direction: column;
   gap: 2vw;
   list-style-type: none;
+  background-color: #a855f7;
+  border: 0.3vw solid #7e22ce;
+  border-radius: 2vw;
+  padding: 1.5vw;
+  box-shadow: 0 0.6vw 0 #581c87;
 }
 
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 1vw;
+  font-size: 2vw;
+}
+
+/* Difficulty Toggle Button next to AI */
 .difficultyButton {
-  left: 24vw;
-  margin-left: 1vw;
+  margin-left: 1.5vw;
   font-family: "Cherry Bomb One", system-ui;
-  font-size: 1.5vw;
-  padding: 0.3vw 0.7vw;
-  border-radius: 0.8vw;
-  border: 0.2vw solid #c1c424;
-  background: radial-gradient(circle, #9c3aed, #6f22ad);
-  color: #fbbf24;
-  -webkit-text-stroke: 0.1vw #4c1d95;
+  font-size: 1.6vw;
+  padding: 0.5vw 1vw;
+  border-radius: 1vw;
+  border: 0.25vw solid #4c1d95;
+  background-color: #fbbf24;
+  /* Gold button for contrast */
+  color: #e9d5ff;
+  /* Bright purple text color to improve readability */
+  -webkit-text-stroke: 0.15vw #4c1d95;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   height: fit-content;
   position: absolute;
-  min-width: 10vw;
+  left: 82%;
+  /* Positioned outside the label */
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0.4vw 0 #b45309;
 }
 
 .difficultyButton:hover {
-  transform: scale(1.05);
-  background: radial-gradient(circle, #8b38cf, #602292);
+  background-color: #fcd34d;
+  transform: translateY(-0.1vw);
+  box-shadow: 0 0.5vw 0 #b45309;
+}
+
+.difficultyButton:active {
+  transform: translateY(0.3vw);
+  box-shadow: 0 0.1vw 0 #b45309;
 }
 
 .difficultyButton.locked {
   filter: grayscale(1);
   opacity: 0.8;
+  background-color: #ccc;
+  color: #555;
+  border-color: #555;
+  -webkit-text-stroke: 0.1vw #333;
+  box-shadow: 0 0.4vw 0 #777;
 }
 
 .difficultyTooltip {
   position: absolute;
   bottom: 130%;
-  left: 10%;
+  left: 50%;
   transform: translateX(-50%);
-  background: rgba(71, 71, 71, 0.9);
-  border: 0.2vw solid #d7d7d7;
+  background: #a855f7;
+  border: 0.3vw solid #4c1d95;
   border-radius: 1vw;
-  padding: 0.5vw;
+  padding: 0.8vw;
   width: 21vw;
-  color: #ffffff;
+  color: #fbbf24;
   font-size: 1.4vw;
   text-align: center;
   z-index: 100;
-  -webkit-text-stroke: 0.1vw #030107;
+  -webkit-text-stroke: 0.1vw #4c1d95;
   pointer-events: none;
-  box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0.5vw 0 #581c87;
   animation: fadeIn 0.3s ease;
 }
 
@@ -396,49 +489,49 @@
   }
 }
 
-.buttonDisabled {
-  filter: grayscale(1);
-  cursor: not-allowed;
-  transform: none !important;
-  box-shadow: none !important;
-}
-
 /* Reset Progress Modal Styles */
-
 .resetProgressButton {
   position: absolute;
-  top: 2vw;
-  left: 3vw;
+  top: 1.5vw;
+  left: 2vw;
   font-family: inherit;
   font-size: 1.5vw;
-  color: #fbbf24;
-  background: radial-gradient(circle, #8b5cf6, #6d28d9);
-  border: 0.2vw solid #4c1d95;
+  color: #fff;
+  background-color: #ef4444;
+  /* Red button for destructive action */
+  border: 0.3vw solid #7f1d1d;
   border-radius: 1vw;
   padding: 0.5vw 1.5vw;
   cursor: pointer;
-  -webkit-text-stroke: 0.1vw #4c1d95;
-  box-shadow: 0 0 1vw rgba(0, 0, 0, 0.5);
-  transition: all 0.2s;
+  -webkit-text-stroke: 0.1vw #7f1d1d;
+  transition: all 0.1s ease;
   z-index: 20;
+  box-shadow: 0 0.4vw 0 #991b1b;
 }
 
 .resetProgressButton:hover {
-  transform: scale(1.05);
-  background: radial-gradient(circle, #a855f7, #7c3aed);
+  background-color: #f87171;
+  transform: translateY(-0.1vw);
+  box-shadow: 0 0.5vw 0 #991b1b;
+}
+
+.resetProgressButton:active {
+  transform: translateY(0.3vw);
+  box-shadow: 0 0.1vw 0 #991b1b;
 }
 
 .confirmModal {
-  background: radial-gradient(circle, #9d6fee, #8154c9);
-  border: 0.5vw solid #4c1d95;
+  background-color: #e9d5ff;
+  /* Match page background */
+  border: 0.4vw solid #7e22ce;
   border-radius: 2vw;
-  padding: 2vw;
+  padding: 3vw;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2vw;
   width: 40vw;
-  box-shadow: 0 0 2vw #000;
+  box-shadow: 0 1vw 0 #4c1d95;
   text-align: center;
 }
 
@@ -446,6 +539,7 @@
   font-size: 2.5vw;
   color: #fbbf24;
   -webkit-text-stroke: 0.15vw #4c1d95;
+  text-shadow: 0 0.2vw 0 #581c87;
 }
 
 .confirmButtons {
@@ -458,21 +552,45 @@
   font-size: 2vw;
   padding: 0.5vw 2vw;
   border-radius: 1vw;
-  border: 0.2vw solid #4c1d95;
+  border: 0.3vw solid #4c1d95;
   cursor: pointer;
   -webkit-text-stroke: 0.1vw #4c1d95;
-  transition: transform 0.2s;
-  color: #fbbf24;
-}
-
-.confirmBtn:hover {
-  transform: scale(1.05);
+  transition: all 0.1s ease;
+  color: #fff;
 }
 
 .yesBtn {
-  background: radial-gradient(circle, #4caf50, #2e7d32);
+  background-color: #22c55e;
+  border-color: #14532d;
+  -webkit-text-stroke: 0.1vw #14532d;
+  box-shadow: 0 0.5vw 0 #166534;
+}
+
+.yesBtn:hover {
+  background-color: #4ade80;
+  transform: translateY(-0.1vw);
+  box-shadow: 0 0.6vw 0 #166534;
+}
+
+.yesBtn:active {
+  transform: translateY(0.4vw);
+  box-shadow: 0 0.1vw 0 #166534;
 }
 
 .noBtn {
-  background: radial-gradient(circle, #f44336, #d32f2f);
+  background-color: #ef4444;
+  border-color: #7f1d1d;
+  -webkit-text-stroke: 0.1vw #7f1d1d;
+  box-shadow: 0 0.5vw 0 #991b1b;
+}
+
+.noBtn:hover {
+  background-color: #f87171;
+  transform: translateY(-0.1vw);
+  box-shadow: 0 0.6vw 0 #991b1b;
+}
+
+.noBtn:active {
+  transform: translateY(0.4vw);
+  box-shadow: 0 0.1vw 0 #991b1b;
 }

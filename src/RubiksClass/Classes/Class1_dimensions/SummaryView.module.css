@@ -1,0 +1,295 @@
+/* ============================================================
+   SummaryView.module.css
+   Matching Phase for Class 1: Dimensions
+   ============================================================ */
+
+/* --- Main Layout --- */
+.container {
+    display: flex;
+    height: 100dvh;
+    width: 100%;
+    overflow: hidden;
+    background: #f0f2f5;
+}
+
+/* --- Aulas Back Button --- */
+.aulasButton {
+    position: absolute;
+    top: 2vw;
+    left: 2vw;
+    z-index: 1000;
+    font-family: "Cherry Bomb One", cursive;
+    font-size: 1.5vw;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 1vw;
+    padding: 0.8vw 1.5vw;
+    cursor: pointer;
+    box-shadow: 0 0.4vw 0.8vw rgba(231, 76, 60, 0.3);
+    transition: transform 0.2s, background 0.2s;
+}
+
+.aulasButton:hover {
+    background: #c0392b;
+    transform: scale(1.05);
+}
+
+/* --- Left Panel: The Pile --- */
+.leftPanel {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 3vw;
+    padding: 4vw;
+    background: #e8eaed;
+    border-right: 2px dashed #bdc3c7;
+}
+
+/* Individual Cube Wrapper */
+.cubeWrapper {
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s ease, opacity 0.3s ease;
+    border-radius: 1vw;
+    padding: 1vw;
+}
+
+.cubeWrapper.selected {
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 1.5vw rgba(52, 152, 219, 0.6));
+    background: rgba(52, 152, 219, 0.1);
+    border: 0.2vw solid #3498db;
+}
+
+.cubeWrapper.matched {
+    opacity: 0.5;
+    filter: grayscale(100%);
+    pointer-events: none;
+    transform: scale(0.9);
+}
+
+/* --- Right Panel: Labels --- */
+.rightPanel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: #ffffff;
+    padding: 3vw;
+    gap: 1.5vw;
+}
+
+.title {
+    font-family: "Cherry Bomb One", cursive;
+    font-size: 2.5vw;
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 2vw;
+}
+
+.labelsList {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2vw;
+    width: 60%;
+    max-width: 25vw;
+}
+
+/* Option Button */
+.labelButton {
+    font-family: "Cherry Bomb One", cursive;
+    font-size: 2vw;
+    padding: 1vw 0;
+    border: none;
+    border-radius: 1vw;
+    background: #ecf0f1;
+    color: #2c3e50;
+    cursor: pointer;
+    box-shadow: 0 0.3vw 0.6vw rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.labelButton:hover:not(:disabled) {
+    background: #bdc3c7;
+    transform: translateY(-0.1vw);
+}
+
+.labelButton.matched {
+    background: #2ecc71;
+    color: white;
+    box-shadow: 0 0.2vw 0.4vw rgba(46, 204, 113, 0.4);
+    cursor: default;
+    animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.labelButton.shake {
+    animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    background: #e74c3c;
+    color: white;
+}
+
+/* --- Feedback Overlay --- */
+.feedbackOverlay {
+    position: absolute;
+    top: 3dvh;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.feedbackBubble {
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    border-radius: 1vw;
+    padding: 1vw 2vw;
+    text-align: center;
+    font-family: "Cherry Bomb One", cursive;
+    font-size: 1.4vw;
+    color: #664d03;
+    box-shadow: 0 0.4vw 1.2vw rgba(0, 0, 0, 0.15);
+    animation: fadeSlideIn 0.4s ease-out;
+    pointer-events: none;
+}
+
+/* --- Completion Modal --- */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    background: rgba(44, 62, 80, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.4s ease;
+}
+
+.modalContent {
+    background: white;
+    padding: 4vw;
+    border-radius: 2vw;
+    text-align: center;
+    box-shadow: 0 1vw 3vw rgba(0, 0, 0, 0.3);
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5vw;
+    align-items: center;
+}
+
+.modalTitle {
+    font-family: "Cherry Bomb One", cursive;
+    font-size: 3.5vw;
+    color: #f1c40f;
+    margin: 0;
+    text-shadow: 0 0.2vw 0.5vw rgba(0, 0, 0, 0.1);
+}
+
+.modalStats {
+    font-family: "Cherry Bomb One", cursive;
+    font-size: 1.8vw;
+    color: #34495e;
+    margin: 0;
+}
+
+.modalButton {
+    font-family: "Cherry Bomb One", cursive;
+    font-size: 1.8vw;
+    padding: 1vw 3vw;
+    border: none;
+    border-radius: 1vw;
+    background: #3498db;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 0.4vw 0.8vw rgba(52, 152, 219, 0.3);
+    transition: transform 0.2s, background 0.2s;
+    margin-top: 1vw;
+}
+
+.modalButton:hover {
+    background: #2980b9;
+    transform: scale(1.05);
+}
+
+/* --- Animations --- */
+
+@keyframes fadeSlideIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-2vw);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes shake {
+
+    10%,
+    90% {
+        transform: translate3d(-1px, 0, 0);
+    }
+
+    20%,
+    80% {
+        transform: translate3d(2px, 0, 0);
+    }
+
+    30%,
+    50%,
+    70% {
+        transform: translate3d(-4px, 0, 0);
+    }
+
+    40%,
+    60% {
+        transform: translate3d(4px, 0, 0);
+    }
+}
+
+@keyframes pop {
+    0% {
+        transform: scale(0.9);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

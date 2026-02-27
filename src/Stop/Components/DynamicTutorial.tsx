@@ -80,10 +80,10 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
   // ============================================================================
 
   useEffect(() => {
-  onStart?.();
-  // initial notify
-  onStepChange?.(0);
-}, [onStart, onStepChange]);
+    onStart?.();
+    // initial notify
+    onStepChange?.(0);
+  }, [onStart, onStepChange]);
 
   // ============================================================================
   // POSITIONING LOGIC
@@ -250,26 +250,26 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
   // ============================================================================
 
   const handleNext = () => {
-  if (currentStepIndex < steps.length - 1) {
-    setCurrentStepIndex((prev) => {
-      const next = prev + 1;
-      onStepChange?.(next);
-      return next;
-    });
-  } else {
-    handleFinish(false);
-  }
-};
+    if (currentStepIndex < steps.length - 1) {
+      setCurrentStepIndex((prev) => {
+        const next = prev + 1;
+        onStepChange?.(next);
+        return next;
+      });
+    } else {
+      handleFinish(false);
+    }
+  };
 
-const handleBack = () => {
-  if (currentStepIndex > 0) {
-    setCurrentStepIndex((prev) => {
-      const next = prev - 1;
-      onStepChange?.(next);
-      return next;
-    });
-  }
-};
+  const handleBack = () => {
+    if (currentStepIndex > 0) {
+      setCurrentStepIndex((prev) => {
+        const next = prev - 1;
+        onStepChange?.(next);
+        return next;
+      });
+    }
+  };
 
   const handleSkip = () => {
     handleFinish(true);
@@ -337,22 +337,34 @@ const handleBack = () => {
           padding: "0.7vw 1.3vw 1.2vw 1.3vw",
           fontSize: "2.5vw",
           borderRadius: "1.5vw",
-          border: "0.25vw solid #fbbf24",
-          background:
-            "radial-gradient(circle, #ec6262 50%, #db2d2d)",
-          color: "#e2a01d",
-          WebkitTextStroke: "0.24vw #080303",
+          border: "0.3vw solid #a11425",
+          backgroundColor: "#f5a623",
+          color: "#ffcf40",
+          WebkitTextStroke: "0.15vw #a11425",
           lineHeight: "1",
           cursor: "pointer",
           fontFamily: "Cherry Bomb One",
-          transition: "all 0.2s",
+          transition: "all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
           zIndex: 100001,
+          boxShadow: "0 0.5vw 0 #a11425",
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.transform = "scale(1.05)";
+          e.currentTarget.style.transform = "translateY(-0.2vw)";
+          e.currentTarget.style.boxShadow = "0 0.7vw 0 #a11425";
+          e.currentTarget.style.backgroundColor = "#ffb347";
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.transform = "scale(1)";
+          e.currentTarget.style.transform = "translateY(0)";
+          e.currentTarget.style.boxShadow = "0 0.5vw 0 #a11425";
+          e.currentTarget.style.backgroundColor = "#f5a623";
+        }}
+        onMouseDown={(e) => {
+          e.currentTarget.style.transform = "translateY(0.3vw)";
+          e.currentTarget.style.boxShadow = "0 0.2vw 0 #a11425";
+        }}
+        onMouseUp={(e) => {
+          e.currentTarget.style.transform = "translateY(-0.2vw)";
+          e.currentTarget.style.boxShadow = "0 0.7vw 0 #a11425";
         }}
       >
         {t.skip}
@@ -367,12 +379,11 @@ const handleBack = () => {
             left: spotlightRect.left - 10,
             width: spotlightRect.width + 20,
             height: spotlightRect.height + 20,
-            border: "4px solid #fbbf24",
+            border: "0.5vw solid #ffcf40",
             borderRadius: "16px",
-            boxShadow: "0 0 0 99999px rgba(0, 0, 0, 1), 0 0 30px #fbbf24",
+            boxShadow: "0 0 0 99999px rgba(0, 0, 0, 0.4), 0 0.6vw 0 #da9500",
             zIndex: 99999,
             pointerEvents: "none",
-            animation: "tutorialPulse 2s infinite",
           }}
         />
       )}
@@ -385,14 +396,13 @@ const handleBack = () => {
           top: tooltipPosition.top,
           left: tooltipPosition.left,
           zIndex: 100000,
-          background:
-            "radial-gradient(circle, #ec6262bb 50%, #db2d2ddd)",
-          borderRadius: "20px",
-          padding: "24px", 
+          backgroundColor: "#fb4b3aff",
+          borderRadius: "3vw",
+          padding: "2vw",
           minWidth: "20vw",
           maxWidth: "35vw",
-          boxShadow: "0 10px 40px rgba(0, 0, 0, 0.5)",
-          border: "0.5vw solid #fbbf24",
+          boxShadow: "0 1vw 0 #c2410c",
+          border: "0.5vw solid #ffcf40",
           fontFamily: '"Cherry Bomb One", system-ui',
         }}
       >
@@ -407,9 +417,9 @@ const handleBack = () => {
               height: 0,
               borderLeft: "14px solid transparent",
               borderRight: "14px solid transparent",
-              borderTop: "14px solid #fbbf24",
+              borderTop: "1vw solid #ffcf40",
               transform: `translate(-50%, -50%) rotate(${arrowPosition.rotation}deg)`,
-              filter: "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))",
+              filter: "drop-shadow(0 0.6vw 0 #da9500)",
               zIndex: 1,
             }}
           />
@@ -419,10 +429,11 @@ const handleBack = () => {
         {currentStep.title && (
           <h3
             style={{
-              margin: "0 0 16px 0",
+              margin: "0 0 1vw 0",
               fontSize: "3vw",
-              color: "#e2a01d",
-              WebkitTextStroke: "0.24vw #080303",
+              color: "#ffcf40",
+              WebkitTextStroke: "0.15vw #a11425",
+              textShadow: "0 0.2vw 0 #da9500",
               lineHeight: 1.2,
             }}
           >
@@ -448,11 +459,12 @@ const handleBack = () => {
         {/* Body */}
         <div
           style={{
-            fontSize: "20px",
-            color: "#e2a01d",
-            marginBottom: "24px",
+            fontSize: "2vw",
+            color: "#ffcf40",
+            marginBottom: "1.5vw",
             lineHeight: 1.5,
-            WebkitTextStroke: "0.5px #4c1d95",
+            WebkitTextStroke: "0.1vw #a11425",
+            textShadow: "0 0.15vw 0 #da9500",
           }}
         >
           {currentStep.body}
@@ -474,22 +486,35 @@ const handleBack = () => {
               style={{
                 cursor: "pointer",
                 fontFamily: "inherit",
-                transition: "all 0.2s",
+                transition: "all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
                 marginLeft: "1vw",
                 padding: "0.5vw 1.5vw 0.8vw 1.5vw",
                 fontSize: "2.5vw",
                 borderRadius: "1.5vw",
-                border: "0.25vw solid #fbbf24",
-                background:
-                  "radial-gradient(circle, #b43636, #851616)",
-                color: "#fbbf24",
+                border: "0.3vw solid #ffcf40",
+                backgroundColor: "#e08e09ff",
+                color: "#ffcf40",
                 lineHeight: "1",
+                boxShadow: "0 0.5vw 0 #da9500",
+                WebkitTextStroke: "0.15vw #c2410c",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "scale(1.05)";
+                e.currentTarget.style.transform = "translateY(-0.2vw)";
+                e.currentTarget.style.boxShadow = "0 0.7vw 0 #da9500";
+                e.currentTarget.style.backgroundColor = "#ffb347";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "scale(1)";
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 0.5vw 0 #da9500";
+                e.currentTarget.style.backgroundColor = "#e08e09ff";
+              }}
+              onMouseDown={(e) => {
+                e.currentTarget.style.transform = "translateY(0.3vw)";
+                e.currentTarget.style.boxShadow = "0 0.2vw 0 #da9500";
+              }}
+              onMouseUp={(e) => {
+                e.currentTarget.style.transform = "translateY(-0.2vw)";
+                e.currentTarget.style.boxShadow = "0 0.7vw 0 #da9500";
               }}
             >
               <ArrowBigLeftDash size='3.3vw' />
@@ -509,24 +534,35 @@ const handleBack = () => {
               style={{
                 cursor: "pointer",
                 fontFamily: "inherit",
-                transition: "all 0.2s",
+                transition: "all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
                 marginRight: "1vw",
                 padding: "0.5vw 1.5vw 0.8vw 1.5vw",
                 fontSize: "2.5vw",
                 borderRadius: "1.5vw",
-                border: "0.25vw solid #fbbf24",
-                background:
-                  "radial-gradient(circle, #b43636, #851616)",
-                color: "#fbbf24",
+                border: "0.3vw solid #ffcf40",
+                backgroundColor: "#e08e09ff",
+                color: "#ffcf40",
                 lineHeight: "1",
+                boxShadow: "0 0.5vw 0 #da9500",
+                WebkitTextStroke: "0.15vw #c2410c",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "scale(1.05)";
-                e.currentTarget.style.backgroundColor = "#8b5cf6";
+                e.currentTarget.style.transform = "translateY(-0.2vw)";
+                e.currentTarget.style.boxShadow = "0 0.7vw 0 #da9500";
+                e.currentTarget.style.backgroundColor = "#ffb347";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "scale(1)";
-                e.currentTarget.style.backgroundColor = "#7c3aed";
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 0.5vw 0 #da9500";
+                e.currentTarget.style.backgroundColor = "#e08e09ff";
+              }}
+              onMouseDown={(e) => {
+                e.currentTarget.style.transform = "translateY(0.3vw)";
+                e.currentTarget.style.boxShadow = "0 0.2vw 0 #da9500";
+              }}
+              onMouseUp={(e) => {
+                e.currentTarget.style.transform = "translateY(-0.2vw)";
+                e.currentTarget.style.boxShadow = "0 0.7vw 0 #da9500";
               }}
             >
               <ArrowBigRightDash size='3.3vw' />
@@ -535,16 +571,7 @@ const handleBack = () => {
         </div>
       </div>
 
-      {/* Animations */}
       <style>{`
-        @keyframes tutorialPulse {
-          0%, 100% {
-            box-shadow: 0 0 0 99999px rgba(0, 0, 0, 0.4), 0 0 30px #fbbf24;
-          }
-          50% {
-            box-shadow: 0 0 0 99999px rgba(0, 0, 0, 0.4), 0 0 30px #fbbf24;
-          }
-        }
       `}</style>
     </>
   );

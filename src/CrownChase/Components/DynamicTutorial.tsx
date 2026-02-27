@@ -325,22 +325,31 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
           padding: "0.7vw 1.3vw 1.2vw 1.3vw",
           fontSize: "2.5vw",
           borderRadius: "1.5vw",
-          border: "0.25vw solid #fbbf24",
-          background:
-            "radial-gradient(circle, rgba(199, 110, 185,1)50%, rgba(143, 70, 148, 1))",
-          color: "#fbbf24",
-          WebkitTextStroke: "0.17vw #241555ff",
+          border: "0.3vw solid #b45309",
+          backgroundColor: "#fbbf24",
+          boxShadow: "0 0.5vw 0 #b45309",
+          color: "#b45309",
           lineHeight: "1",
           cursor: "pointer",
           fontFamily: "Cherry Bomb One",
-          transition: "all 0.2s",
+          transition: "all 0.1s ease",
           zIndex: 100001,
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.transform = "scale(1.05)";
+          e.currentTarget.style.transform = "translateY(-0.2vw)";
+          e.currentTarget.style.boxShadow = "0 0.7vw 0 #b45309";
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.transform = "scale(1)";
+          e.currentTarget.style.transform = "translateY(0)";
+          e.currentTarget.style.boxShadow = "0 0.5vw 0 #b45309";
+        }}
+        onMouseDown={(e) => {
+          e.currentTarget.style.transform = "translateY(0.4vw)";
+          e.currentTarget.style.boxShadow = "0 0.1vw 0 #b45309";
+        }}
+        onMouseUp={(e) => {
+          e.currentTarget.style.transform = "translateY(-0.2vw)";
+          e.currentTarget.style.boxShadow = "0 0.7vw 0 #b45309";
         }}
       >
         {t.skip}
@@ -355,12 +364,12 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
             left: spotlightRect.left - 10,
             width: spotlightRect.width + 20,
             height: spotlightRect.height + 20,
-            border: "4px solid #fbbf24",
+            border: "6px solid #dd01ffff",
             borderRadius: "16px",
-            boxShadow: "0 0 0 99999px rgba(0, 0, 0, 1), 0 0 30px #fbbf24",
+            boxShadow: "0 0 0 99999px rgba(0, 0, 0, 0.4)",
             zIndex: 99999,
             pointerEvents: "none",
-            animation: "tutorialPulse 2s infinite",
+            animation: "tutorialBounce 1.5s infinite",
           }}
         />
       )}
@@ -373,14 +382,13 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
           top: tooltipPosition.top,
           left: tooltipPosition.left,
           zIndex: 100000,
-          background:
-            "radial-gradient(circle,rgba(169, 87, 175, 0.8)50%,rgba(133, 58, 138,1))",
-          borderRadius: "20px",
-          padding: "24px", 
+          backgroundColor: "#d946ef", // Pink-leaning vivid purple
+          border: "0.5vw solid #86198f",
+          borderRadius: "2vw",
+          padding: "24px",
           minWidth: "20vw",
           maxWidth: "35vw",
-          boxShadow: "0 10px 40px rgba(0, 0, 0, 0.5)",
-          border: "0.5vw solid #fbbf24",
+          boxShadow: "0 1vw 0 #86198f", // Hard block shadow
           fontFamily: '"Cherry Bomb One", system-ui',
         }}
       >
@@ -395,9 +403,10 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
               height: 0,
               borderLeft: "14px solid transparent",
               borderRight: "14px solid transparent",
-              borderTop: "14px solid #fbbf24",
+              borderTop: "14px solid #d946ef",
               transform: `translate(-50%, -50%) rotate(${arrowPosition.rotation}deg)`,
-              filter: "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))",
+              // Pseudo elements for an arrow border
+              filter: "drop-shadow(0 0.4vw 0 #86198f)",
               zIndex: 1,
             }}
           />
@@ -409,9 +418,10 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
             style={{
               margin: "0 0 16px 0",
               fontSize: "3vw",
-              color: "#fbbf24",
-              WebkitTextStroke: "0.24vw #241555ff",
+              color: "#fde047",
+              WebkitTextStroke: "0.15vw #6b21a8",
               lineHeight: 1.2,
+              textShadow: "0 0.3vw 0 #86198f"
             }}
           >
             {currentStep.title}
@@ -429,6 +439,7 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
               objectFit: "contain",
               borderRadius: "12px",
               marginBottom: "16px",
+              border: "0.3vw solid #86198f",
             }}
           />
         )}
@@ -437,10 +448,10 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
         <div
           style={{
             fontSize: "20px",
-            color: "#fbbf24",
+            color: "#fde047",
             marginBottom: "24px",
             lineHeight: 1.5,
-            WebkitTextStroke: "0.5px #4c1d95",
+            WebkitTextStroke: "0.1vw #6b21a8",
           }}
         >
           {currentStep.body}
@@ -462,29 +473,39 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
               style={{
                 cursor: "pointer",
                 fontFamily: "inherit",
-                transition: "all 0.2s",
+                transition: "all 0.1s ease",
                 marginLeft: "1vw",
                 padding: "0.5vw 1.5vw 0.8vw 1.5vw",
                 fontSize: "2.5vw",
                 borderRadius: "1.5vw",
-                border: "0.25vw solid #fbbf24",
-                background:
-                  "radial-gradient(circle, rgba(113, 49, 151, 1)50%,  rgba(82, 30, 112, 1))",
-                color: "#fbbf24",
+                border: "0.3vw solid #b45309",
+                backgroundColor: "#fbbf24",
+                boxShadow: "0 0.5vw 0 #b45309",
+                color: "#b45309",
                 lineHeight: "1",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "scale(1.05)";
+                e.currentTarget.style.transform = "translateY(-0.2vw)";
+                e.currentTarget.style.boxShadow = "0 0.7vw 0 #b45309";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "scale(1)";
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 0.5vw 0 #b45309";
+              }}
+              onMouseDown={(e) => {
+                e.currentTarget.style.transform = "translateY(0.4vw)";
+                e.currentTarget.style.boxShadow = "0 0.1vw 0 #b45309";
+              }}
+              onMouseUp={(e) => {
+                e.currentTarget.style.transform = "translateY(-0.2vw)";
+                e.currentTarget.style.boxShadow = "0 0.7vw 0 #b45309";
               }}
             >
               <ArrowBigLeftDash size='3.3vw' />
             </button>
           )}
 
-          {/* Next button container - takes remaining space and pushes button to right */}
+          {/* Next button container */}
           <div
             style={{
               flex: 1,
@@ -497,24 +518,32 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
               style={{
                 cursor: "pointer",
                 fontFamily: "inherit",
-                transition: "all 0.2s",
+                transition: "all 0.1s ease",
                 marginRight: "1vw",
                 padding: "0.5vw 1.5vw 0.8vw 1.5vw",
                 fontSize: "2.5vw",
                 borderRadius: "1.5vw",
-                border: "0.25vw solid #fbbf24",
-                background:
-                  "radial-gradient(circle, rgba(113, 49, 151, 1)50%,  rgba(82, 30, 112, 1))",
-                color: "#fbbf24",
+                border: "0.3vw solid #b45309",
+                backgroundColor: "#fbbf24",
+                boxShadow: "0 0.5vw 0 #b45309",
+                color: "#b45309",
                 lineHeight: "1",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "scale(1.05)";
-                e.currentTarget.style.backgroundColor = "#8b5cf6";
+                e.currentTarget.style.transform = "translateY(-0.2vw)";
+                e.currentTarget.style.boxShadow = "0 0.7vw 0 #b45309";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "scale(1)";
-                e.currentTarget.style.backgroundColor = "#7c3aed";
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 0.5vw 0 #b45309";
+              }}
+              onMouseDown={(e) => {
+                e.currentTarget.style.transform = "translateY(0.4vw)";
+                e.currentTarget.style.boxShadow = "0 0.1vw 0 #b45309";
+              }}
+              onMouseUp={(e) => {
+                e.currentTarget.style.transform = "translateY(-0.2vw)";
+                e.currentTarget.style.boxShadow = "0 0.7vw 0 #b45309";
               }}
             >
               <ArrowBigRightDash size='3.3vw' />
@@ -525,15 +554,17 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
 
       {/* Animations */}
       <style>{`
-        @keyframes tutorialPulse {
-          0%, 100% {
-            box-shadow: 0 0 0 99999px rgba(0, 0, 0, 0.4), 0 0 30px #fbbf24;
+          @keyframes tutorialBounce {
+            0%, 100% {
+              transform: translateY(-0.2vw);
+              box-shadow: 0 0 0 99999px rgba(0, 0, 0, 0.4), 0 0.8vw 0 rgba(0,0,0,0.4);
+            }
+            50% {
+              transform: translateY(-0.4vw);
+              box-shadow: 0 0 0 99999px rgba(0, 0, 0, 0.4), 0 1vw 0 rgba(0,0,0,0.4);
+            }
           }
-          50% {
-            box-shadow: 0 0 0 99999px rgba(0, 0, 0, 0.4), 0 0 30px #fbbf24;
-          }
-        }
-      `}</style>
+        `}</style>
     </>
   );
 };

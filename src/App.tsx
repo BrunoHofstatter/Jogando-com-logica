@@ -23,13 +23,16 @@ import CrownChaseRegras from "./CrownChase/Pages/regrasPage";
 import CrownChaseAIPage from "./CrownChase/Pages/aiGamePage";
 import CacaSomaRegras from "./Caca_soma/Pages/Regras_CacaSoma";
 import ClassMenu from "./RubiksClass/Classes/ClassMenu";
-import Dimensions from "./RubiksClass/Classes/Dimensions/class1";
+import Dimensions from "./RubiksClass/Classes/oldClass1/old_class1.tsx";
+import CubeTestPage from "./RubiksClass/Classes/Class1_dimensions/CubeTestPage";
+import Class1Dimensions from "./RubiksClass/Classes/Class1_dimensions/Class1Dimensions";
+import Class2FaceArea from "./RubiksClass/Classes/Class2_faceArea/Class2FaceArea";
 import MathWarRegras from "./MathWar/Pages/regrasPage"
 import MathWarPage from "./MathWar/Pages/baseGamePage"
 import MathWarAIPage from "./MathWar/Pages/aiGamePage"
 import Manual from "./Main/Pages/manual"
 import LevelsMenuPage from "./Stop/Pages/LevelsMenuPage";
-import Class2 from "./RubiksClass/Classes/FaceArea/class2.tsx"
+
 
 function BackButton() {
   const location = useLocation();
@@ -83,7 +86,10 @@ function App() {
         <Route path="/mathwarPg" element={<MathWarPage />} />
         <Route path="/mathwar-ai" element={<MathWarAIPage />} />
         <Route path="/manual" element={<Manual />} />
-        <Route path="/class2" element={<Class2 />} />
+        <Route path="/cube-test" element={<CubeTestPage />} />
+        <Route path="/class1" element={<Class1Dimensions />} />
+        <Route path="/class2" element={<Class2FaceArea />} />
+
       </Routes>
     </main>
   );

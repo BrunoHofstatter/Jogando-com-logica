@@ -3,14 +3,23 @@
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  transition: all 0.2s ease;
+  transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
   user-select: none;
   border-radius: 50%;
   font-size: 2.5vw !important;
   -webkit-text-stroke: 0vw #4c1d95;
   color: #1a0e47;
-  box-shadow: 0 0.2vw 0.4vw rgba(0, 0, 0, 0.2);
+  /* Hard 3D shadow for all pieces to look like physical tokens */
+  box-shadow: 0 0.5vw 0 rgba(0, 0, 0, 0.4);
+  margin-bottom: 0.5vw;
+  /* Keeps them from clipping the shadow */
+}
+
+/* Hover slightly pushes the piece further down */
+.piece:hover:not(.pieceSelected) {
+  transform: translateY(-0.2vw);
+  box-shadow: 0 0.7vw 0 rgba(0, 0, 0, 0.5);
 }
 
 .pieceCircle {
@@ -20,22 +29,26 @@
 .pieceSquare {
   border-radius: 15%;
 }
+
 .pieceHexagon {
   border-radius: 0;
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 }
 
 .pieceSelected {
-  border: 3px solid #f1c40f;
+  /* Lift the piece violently into the air when selected */
+  transform: translateY(-0.8vw) scale(1.05);
+  border: 0.3vw solid #fbbf24;
+  box-shadow: 0 1.3vw 0 rgba(0, 0, 0, 0.4);
 }
 
 .pieceSpecial {
-  border: 2px solid #f39c12;
-  box-shadow: 0 0 8px rgba(241, 196, 15, 0.6);
+  border: 0.3vw solid #f59e0b;
+  box-shadow: 0 0.5vw 0 #b45309;
 }
 
 .piecePromoted {
-  border: 2px solid #9b59b6;
+  border: 0.3vw solid #c084fc;
 }
 
 .pieceMoved {
@@ -72,14 +85,16 @@
   align-items: center;
   justify-content: center;
   color: white;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  /* Crisp border for the blip */
 }
 
 .piecePromotedIndicator {
-  background-color: #9b59b6;
+  background-color: #a855f7;
 }
 
 .pieceSpecialIndicator {
-  background-color: #f39c12;
+  background-color: #f59e0b;
 }
 
 .pieceMovementIndicator {
@@ -90,53 +105,65 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: #e67e22;
+  background-color: #f97316;
+  border: 1px solid rgba(0, 0, 0, 0.5);
 }
 
 .pieceCaptain {
-  border: 2px solid gold;
-  box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+  border: 0.3vw solid #fbbf24;
+  box-shadow: 0 0.6vw 0 #b45309;
 }
 
+/* Base Team Colors */
 .pieceRed {
-  border: 0.2vw solid #a02c1f !important;
+  border: 0.3vw solid #7f1d1d !important;
 }
 
 .pieceBlue {
-  border: 0.2vw solid #1c6392 !important;
+  border: 0.3vw solid #1e3a8a !important;
 }
 
+/* Individual Piece Classes */
 .captain {
-  background: radial-gradient(circle, #f39c12, #e67e22);
-  border-color: #f1c40f;
-  box-shadow: 0 0.3vw 0.6vw rgba(241, 196, 15, 0.4);
+  background-color: #f59e0b;
+  /* Solid vibrant orange */
+  border-color: #b45309;
 }
 
 .checker {
-  background: radial-gradient(circle, #95a5a6, #7f8c8d);
-  border-color: #bdc3c7;
+  background-color: #94a3b8;
+  /* Solid flat grey */
+  border-color: #475569;
 }
 
 .killer {
-  background: radial-gradient(circle, #2d1b69, #1a0e47);
-  border-color: #808080;
-  box-shadow: inset 1vw 4vw 1vw #1d1d1d3b;
-
+  background-color: #2e1065;
+  /* Deep solid violet dark */
+  border-color: #1e1b4b;
+  color: #fff;
 }
 
 .jumper {
-  background: radial-gradient(circle, #ba68c8, #9c27b0);
-  border-color: #c3c53a;
-  -webkit-text-stroke: 0.3vw #fbbf24;
+  background-color: #d946ef;
+  /* Bright fuchsia solid */
+  border-color: #86198f;
+  -webkit-text-stroke: 0vw #b45309;
+  color: #fbbf24;
 }
 
 .king {
-  background: radial-gradient(circle, #fff176, #c3c53a);
-  border-color: #9c27b0;
-  box-shadow: inset 0 4vw 0.8vw rgba(195, 197, 58, 0.3);
+  background-color: #fbbf24;
+  /* Solid shiny gold */
+  border-color: #b45309;
   transform: scale(1.05);
-  -webkit-text-stroke: 0.01vw #8f6c13;
-  color: #1a0e47;
+  -webkit-text-stroke: 0vw #78350f;
+  /* No stroke right on the icon, rely on piece color */
+  color: #78350f;
+}
+
+/* Lift king up off the board shadow so it stays consistently stacked */
+.king:hover:not(.pieceSelected) {
+  transform: translateY(-0.2vw) scale(1.05);
 }
 
 .pieceKingCrown {
@@ -145,6 +172,8 @@
   left: 50%;
   transform: translateX(-50%);
   font-size: 3.5vw;
-  color: #ffd700;
-  text-shadow: 0 0 4px rgba(255, 215, 0, 0.8);
+  color: #fbbf24;
+  /* Removed soft blurry float glow, added solid crispy stroke */
+  -webkit-text-stroke: 0.15vw #b45309;
+  text-shadow: 0 0.3vw 0 #78350f;
 }

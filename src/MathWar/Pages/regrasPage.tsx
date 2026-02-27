@@ -53,7 +53,12 @@ function MathWarRegras() {
   const toggleDifficulty = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    setAiDifficulty((prev) => (prev === 4 ? 1 : (prev + 1) as 1 | 2 | 3 | 4));
+    setAiDifficulty((prev) => {
+      if (prev === 1) return 2;
+      if (prev === 2) return 3;
+      if (prev === 3) return 4;
+      return 1;
+    });
   };
 
   const getDifficultyName = (diff: number) => {
@@ -143,10 +148,7 @@ function MathWarRegras() {
         >
           Regras
         </button>
-      </div>
-
-      {
-        showDetailedRules && (
+        {showDetailedRules && (
           <div
             className={styles.modalOverlay}
             onClick={() => setShowDetailedRules(false)}
@@ -350,22 +352,22 @@ function MathWarRegras() {
               </div>
             </div>
           </div>
-        )
-      }
+        )}
 
-      {/* Reset Confirmation Modal */}
-      {showResetConfirm && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.confirmModal} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.confirmText}>Tem certeza?</div>
-            <div className={styles.confirmText} style={{ fontSize: "1.5vw" }}>Isso apagará todo o seu progresso no jogo.</div>
-            <div className={styles.confirmButtons}>
-              <button onClick={resetGameProgress} className={`${styles.confirmBtn} ${styles.yesBtn}`}>Sim</button>
-              <button onClick={() => setShowResetConfirm(false)} className={`${styles.confirmBtn} ${styles.noBtn}`}>Não</button>
+        {/* Reset Confirmation Modal */}
+        {showResetConfirm && (
+          <div className={styles.modalOverlay}>
+            <div className={styles.confirmModal} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.confirmText}>Tem certeza?</div>
+              <div className={styles.confirmSubText}>Isso apagará todo o seu progresso no jogo.</div>
+              <div className={styles.confirmButtons}>
+                <button onClick={resetGameProgress} className={`${styles.confirmBtn} ${styles.yesBtn}`}>Sim</button>
+                <button onClick={() => setShowResetConfirm(false)} className={`${styles.confirmBtn} ${styles.noBtn}`}>Não</button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div >
   );
 }

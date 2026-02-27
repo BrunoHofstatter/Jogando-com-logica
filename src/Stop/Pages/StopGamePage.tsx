@@ -76,8 +76,8 @@ function StopGamePage() {
         <div
           style={{
             fontSize: "2vw",
-            color: "#e2a01d",
-            WebkitTextStroke: "0.15vw #080303",
+            color: "#ffcf40",
+            WebkitTextStroke: "0.15vw #a11425",
             marginBottom: "24px",
             lineHeight: 1.5,
             display: "flex",
@@ -89,8 +89,8 @@ function StopGamePage() {
             - O{" "}
             <span
               style={{
-                color: "#f81c1cff",
-                fontSize: "2.3vw",
+                color: "#e31f2f",
+                fontSize: "2.2vw",
               }}
             >
               Número Mágico{" "}
@@ -101,8 +101,8 @@ function StopGamePage() {
             - Preste{" "}
             <span
               style={{
-                color: "#f81c1cff",
-                fontSize: "2.3vw",
+                color: "#e31f2f",
+                fontSize: "2.2vw",
               }}
             >
               atenção{" "}
@@ -122,8 +122,8 @@ function StopGamePage() {
         <div
           style={{
             fontSize: "2vw",
-            color: "#e2a01d",
-            WebkitTextStroke: "0.15vw #080303",
+            color: "#ffcf40",
+            WebkitTextStroke: "0.15vw #a11425",
             marginBottom: "24px",
             lineHeight: 1.5,
             display: "flex",
@@ -135,8 +135,8 @@ function StopGamePage() {
             - Use o Número mágico para fazer os{" "}
             <span
               style={{
-                color: "#f81c1cff",
-                fontSize: "2.3vw",
+                color: "#e31f2f",
+                fontSize: "2.2vw",
               }}
             >
               cálculos{" "}
@@ -146,8 +146,8 @@ function StopGamePage() {
             - Cada cálculo usa o{" "}
             <span
               style={{
-                color: "#f81c1cff",
-                fontSize: "2.3vw",
+                color: "#e31f2f",
+                fontSize: "2.2vw",
               }}
             >
               mesmo{" "}
@@ -167,8 +167,8 @@ function StopGamePage() {
         <div
           style={{
             fontSize: "2vw",
-            color: "#e2a01d",
-            WebkitTextStroke: "0.15vw #080303",
+            color: "#ffcf40",
+            WebkitTextStroke: "0.15vw #a11425",
             marginBottom: "24px",
             lineHeight: 1.5,
             display: "flex",
@@ -180,8 +180,8 @@ function StopGamePage() {
             - Quando{" "}
             <span
               style={{
-                color: "#f81c1cff",
-                fontSize: "2.3vw",
+                color: "#e31f2f",
+                fontSize: "2.2vw",
               }}
             >
               terminar{" "}
@@ -189,8 +189,8 @@ function StopGamePage() {
             os cálculos, clique em{" "}
             <span
               style={{
-                color: "#f81c1cff",
-                fontSize: "2.3vw",
+                color: "#e31f2f",
+                fontSize: "2.2vw",
               }}
             >
               STOP{" "}
@@ -200,8 +200,8 @@ function StopGamePage() {
             - E veja sua{" "}
             <span
               style={{
-                color: "#f81c1cff",
-                fontSize: "2.3vw",
+                color: "#e31f2f",
+                fontSize: "2.2vw",
               }}
             >
               pontuação{" "}
@@ -209,8 +209,8 @@ function StopGamePage() {
             e{" "}
             <span
               style={{
-                color: "#f81c1cff",
-                fontSize: "2.3vw",
+                color: "#e31f2f",
+                fontSize: "2.2vw",
               }}
             >
               tempo{" "}
