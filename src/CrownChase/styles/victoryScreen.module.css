@@ -11,66 +11,80 @@
 .victorySidebar {
   position: fixed;
   width: 47vw;
-  /* slightly wider to avoid cramping text */
   background: transparent;
-  /* let the game board show fully */
   color: #ecf0f1;
   padding: 8px;
-  /* outer padding so the inner box never touches edges */
   box-shadow: none;
-  /* shadow is on the inner box */
   z-index: 1000;
   display: flex;
   flex-direction: column;
   pointer-events: auto;
-  /* Re-enable pointer events for the sidebar */
 }
 
 .victoryContent {
   position: relative;
   display: flex;
   flex-direction: column;
-  border: 0.6vw solid #fbbf24;
-  background: radial-gradient(circle, #5b2d79bb, #951acecc);
+  border: 0.6vw solid #4c1d95;
+  /* Thick dark purple border */
+  background-color: #a855f7;
+  /* Solid bright purple */
   padding: 2vw;
-  border-radius: 2vw;
+  border-radius: 3vw;
   text-align: center;
   max-width: 100%;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 1.5vw 0 #4c1d95;
+  /* Hard block drop shadow */
   margin: 0vw 0vw 0vw 0vw;
-  /* keep distance from the sidebar edges, esp. left */
   align-items: center;
+  font-family: "Cherry Bomb One", system-ui;
 }
 
 .victoryTitle {
   color: #fbbf24;
   font-size: 5.5vw;
   margin-bottom: 0;
-  text-shadow: 0 1.2vw 2.4vw rgba(0, 0, 0, 0.4);
-  -webkit-text-stroke: 0.35vw #26155e;
+  text-shadow: 0 0.8vw 0 #581c87;
+  /* Flat 3d shadow for title */
+  -webkit-text-stroke: 0.3vw #4c1d95;
 }
 
 .victoryReason {
-  -webkit-text-stroke: 0.2vw #211252;
+  -webkit-text-stroke: 0.15vw #4c1d95;
   color: #fbbf24;
   font-size: 2.3vw;
+  text-shadow: 0 0.4vw 0 #581c87;
 }
 
 .victoryButton {
-  background: radial-gradient(circle, #8b5cf6, #6d28d9);
-  color: #fbbf24;
-  border: solid 0.2vw #2d1b69;
+  background-color: #fbbf24;
+  /* Solid Gold */
+  color: #b45309;
+  /* Dark orange text */
+  border: solid 0.4vw #b45309;
+  /* Dark orange border */
   padding: 0.8vw 1.5vw 1.3vw 1.5vw;
   font-size: 2.2vw;
-  border-radius: 1.7vw;
+  border-radius: 2vw;
   cursor: pointer;
-  transition: ease 0.5s;
-  -webkit-text-stroke: 0.12vw #242525;
+  transition: all 0.1s ease;
+  -webkit-text-stroke: 0vw #b45309;
+  /* Removed stroke for cleaner button text */
   line-height: 1;
+  box-shadow: 0 0.6vw 0 #78350f;
+  /* Hard brown shadow */
+  font-family: "Cherry Bomb One", system-ui;
 }
 
 .victoryButton:hover {
-  transform: scale(1.05) translateY(-0.5dvh);
+  background-color: #fcd34d;
+  transform: translateY(-0.2vw);
+  box-shadow: 0 0.8vw 0 #78350f;
+}
+
+.victoryButton:active {
+  transform: translateY(0.4vw);
+  box-shadow: 0 0.2vw 0 #78350f;
 }
 
 .victoryButtonsContainer {
@@ -87,44 +101,65 @@
   justify-content: center;
 }
 
+/* Menu Button */
 .victoryButtonMenu {
-  background: radial-gradient(circle, #8b5cf6, #6d28d9);
+  background-color: #8b5cf6;
+  /* Solid vivid purple */
   color: #fbbf24;
-  border: solid 0.2vw #262929;
+  /* Gold text */
+  border: solid 0.4vw #4c1d95;
   padding: 0.8vw 1.5vw 1.3vw 1.5vw;
   font-size: 2.2vw;
-  border-radius: 1.7vw;
+  border-radius: 2vw;
   cursor: pointer;
-  transition: ease 0.5s;
-  -webkit-text-stroke: 0.12vw #242525;
+  transition: all 0.1s ease;
+  -webkit-text-stroke: 0.15vw #4c1d95;
   line-height: 1;
+  box-shadow: 0 0.6vw 0 #581c87;
+  /* Hard dark purple shadow */
+  font-family: "Cherry Bomb One", system-ui;
 }
 
 .victoryButtonMenu:hover {
-  transform: scale(1.05) translateY(-0.5dvh);
+  background-color: #a855f7;
+  transform: translateY(-0.2vw);
+  box-shadow: 0 0.8vw 0 #581c87;
 }
 
+.victoryButtonMenu:active {
+  transform: translateY(0.4vw);
+  box-shadow: 0 0.2vw 0 #581c87;
+}
+
+/* Next Button (Pink) */
 .victoryButtonNext {
-  background: radial-gradient(circle, #e777da, #b443a6);
+  background-color: #d946ef;
+  /* Solid vivid pink */
   color: #fbbf24;
-  border: solid 0.2vw #0f3d17;
+  border: solid 0.4vw #701a75;
   padding: 0.8vw 1.5vw 1.3vw 1.5vw;
   font-size: 2.2vw;
-  border-radius: 1.7vw;
+  border-radius: 2vw;
   cursor: pointer;
-  transition: ease 0.5s;
-  -webkit-text-stroke: 0.12vw #242525;
+  transition: all 0.1s ease;
+  -webkit-text-stroke: 0.15vw #701a75;
   line-height: 1;
   width: fit-content;
-  /* Make it span/fill nicely if in column or specific width */
   margin-top: 0.5vw;
+  box-shadow: 0 0.6vw 0 #831843;
+  font-family: "Cherry Bomb One", system-ui;
 }
 
 .victoryButtonNext:hover {
-  transform: scale(1.05) translateY(-0.5dvh);
+  background-color: #e879f9;
+  transform: translateY(-0.2vw);
+  box-shadow: 0 0.8vw 0 #831843;
 }
 
-/* Sidebar layout to keep the board visible */
+.victoryButtonNext:active {
+  transform: translateY(0.4vw);
+  box-shadow: 0 0.2vw 0 #831843;
+}
 
 .victoryMessage {
   margin: 1rem 0 1.25rem;
@@ -135,44 +170,51 @@
   color: #fbbf24;
   font-size: 2.5vw;
   margin: 0.75rem 0 0.5rem;
-  -webkit-text-stroke: 0.2vw #211252;
+  -webkit-text-stroke: 0.15vw #4c1d95;
+  text-shadow: 0 0.4vw 0 #581c87;
 }
 
-/* Player color accents */
+/* Player color accents - Using main board exact colors */
 .playerRed {
   position: relative;
   top: 0.5vw;
-  color: #cd4535;
-  -webkit-text-stroke: 0.25vw #a02c1f;
+  color: #ef4444;
+  /* Vivid solid red */
+  -webkit-text-stroke: 0.25vw #7f1d1d;
   font-size: 5vw;
   line-height: 1;
+  text-shadow: 0 0.4vw 0 #7f1d1d;
 }
 
 .playerRedOp {
   position: relative;
   top: 0.35vw;
-  color: #cd4535;
-  -webkit-text-stroke: 0.2vw #a02c1f;
+  color: #ef4444;
+  -webkit-text-stroke: 0.2vw #7f1d1d;
   font-size: 4vw;
   line-height: 1;
+  text-shadow: 0 0.3vw 0 #7f1d1d;
 }
 
 .playerBlue {
   position: relative;
   top: 0.5vw;
-  color: #388dc5;
-  -webkit-text-stroke: 0.25vw #165580;
+  color: #3b82f6;
+  /* Vivid solid blue */
+  -webkit-text-stroke: 0.25vw #1e3a8a;
   font-size: 5vw;
   line-height: 1;
+  text-shadow: 0 0.4vw 0 #1e3a8a;
 }
 
 .playerBlueOp {
   position: relative;
   top: 0.35vw;
-  color: #388dc5;
-  -webkit-text-stroke: 0.2vw #165580;
+  color: #3b82f6;
+  -webkit-text-stroke: 0.2vw #1e3a8a;
   font-size: 4vw;
   line-height: 1;
+  text-shadow: 0 0.3vw 0 #1e3a8a;
 }
 
 @media (max-width: 768px) {

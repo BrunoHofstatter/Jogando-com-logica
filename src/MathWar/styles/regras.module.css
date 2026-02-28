@@ -40,8 +40,6 @@
   transition: all 0.5s ease;
   animation: pulsePreview 5s infinite;
   border-radius: 2vw;
-  border: 0.4vw solid #047857;
-  box-shadow: 0 0.8vw 0 #064e3b;
 }
 
 @keyframes pulsePreview {
@@ -401,7 +399,6 @@
 }
 
 .difficultyButton {
-  margin-left: 1.5vw;
   font-family: "Cherry Bomb One", system-ui;
   font-size: 1.6vw;
   padding: 0.5vw 1vw;
@@ -416,7 +413,8 @@
   transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   height: fit-content;
   position: absolute;
-  left: 82%;
+  left: 67%;
+  bottom: 75%;
   white-space: nowrap;
   display: flex;
   align-items: center;
@@ -455,6 +453,7 @@
   border-radius: 1vw;
   padding: 0.8vw;
   width: 21vw;
+  white-space: normal;
   color: #f3f4f6;
   font-size: 1.4vw;
   text-align: center;

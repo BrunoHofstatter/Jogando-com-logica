@@ -38,12 +38,7 @@ const Class2FaceArea: React.FC = () => {
 
                 {isTransition && (
                     <div
-                        className={styles.hintCard}
-                        style={{
-                            background: "#d4edda",
-                            borderColor: "#28a745",
-                            color: "#155724",
-                        }}
+                        className={styles.successCard}
                     >
                         <span className={styles.hintIcon}>✅</span>
                         {uiProps.feedbackText}

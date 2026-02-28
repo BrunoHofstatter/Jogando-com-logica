@@ -49,17 +49,17 @@ export default function MathWarPage() {
         color: '#f3f4f6',
         marginBottom: '24px',
         lineHeight: 1.5,
-        WebkitTextStroke: '0.15vw #414549ff',
+        WebkitTextStroke: '0.15vw #022c22',
         display: 'flex',
         flexDirection: 'column',
         gap: '1vw'
       }}>
         <span>- Pode ser <span style={{
-          color: '#3da2e6ff',
+          color: '#d1fae5',
           fontSize: '2.3vw',
         }}>qualquer </span> peça </span>
         <span>- Se ele for capturado, o jogo <span style={{
-          color: '#3da2e6ff',
+          color: '#d1fae5',
           fontSize: '2.3vw',
         }}>acaba </span> </span>
       </div>
@@ -75,18 +75,18 @@ export default function MathWarPage() {
         color: '#f3f4f6',
         marginBottom: '24px',
         lineHeight: 1.5,
-        WebkitTextStroke: '0.15vw #414549ff',
+        WebkitTextStroke: '0.15vw #022c22',
         display: 'flex',
         flexDirection: 'column',
         gap: '1vw'
       }}>
         <span>- Se move somente em <span style={{
-          color: '#3da2e6ff',
+          color: '#d1fae5',
           fontSize: '2.3vw',
           fontWeight: 'bold' // Added bold for consistency if desired, or remove if not in original
         }}>linha reta </span> </span>
         <span>- O número na peça é seu <span style={{
-          color: '#3da2e6ff',
+          color: '#d1fae5',
           fontSize: '2.3vw'
         }}>valor </span> </span>
       </div>
@@ -102,17 +102,17 @@ export default function MathWarPage() {
         color: '#f3f4f6',
         marginBottom: '24px',
         lineHeight: 1.5,
-        WebkitTextStroke: '0.15vw #414549ff',
+        WebkitTextStroke: '0.15vw #022c22',
         display: 'flex',
         flexDirection: 'column',
         gap: '1vw'
       }}>
         <span>- Se move somente em <span style={{
-          color: '#3da2e6ff',
+          color: '#d1fae5',
           fontSize: '2.3vw'
         }}>diagonal </span> </span>
         <span>- O número na peça é seu <span style={{
-          color: '#3da2e6ff',
+          color: '#d1fae5',
           fontSize: '2.3vw'
         }}>valor </span> </span>
       </div>
@@ -128,20 +128,20 @@ export default function MathWarPage() {
         color: '#f3f4f6',
         marginBottom: '24px',
         lineHeight: 1.5,
-        WebkitTextStroke: '0.15vw #414549ff',
+        WebkitTextStroke: '0.15vw #022c22',
         display: 'flex',
         flexDirection: 'column',
         gap: '1vw'
       }}>
         <span>- Toda rodada o <span style={{
-          color: '#3da2e6ff',
+          color: '#d1fae5',
           fontSize: '2.3vw'
         }}>dado </span> gera um número de <span style={{
-          color: '#3da2e6ff',
+          color: '#d1fae5',
           fontSize: '2.3vw'
         }}>2 a 10 </span>  </span>
         <span>- O valor de cada peça + o dado = <span style={{
-          color: '#3da2e6ff',
+          color: '#d1fae5',
           fontSize: '2.3vw'
         }}>energia </span> da peça </span>
       </div>
@@ -157,20 +157,20 @@ export default function MathWarPage() {
         color: '#f3f4f6',
         marginBottom: '24px',
         lineHeight: 1.5,
-        WebkitTextStroke: '0.15vw #414549ff',
+        WebkitTextStroke: '0.15vw #022c22',
         display: 'flex',
         flexDirection: 'column',
         gap: '1vw'
       }}>
         <span>- Para andar <span style={{
-          color: '#3da2e6ff',
+          color: '#d1fae5',
           fontSize: '2.3vw'
         }}>1 </span> espaço gasta <span style={{
-          color: '#3da2e6ff',
+          color: '#d1fae5',
           fontSize: '2.3vw'
         }}>2 </span> de energia  </span>
         <span>- Para capturar uma peça gasta <span style={{
-          color: '#3da2e6ff',
+          color: '#d1fae5',
           fontSize: '2.3vw'
         }}>mais 2 </span> de energia </span>
       </div>

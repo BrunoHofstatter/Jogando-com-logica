@@ -1,10 +1,15 @@
 .manualPage {
-  max-width: 86vw;
-  margin: 0 auto;
-  padding: 2vw 1vw;
-  color: #eee;
-  -webkit-text-stroke: clamp(0.06vw, 0.1vw, 0.6vw) #000000;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 2vw 7vw 5vw 7vw;
+  min-height: 100dvh;
+  color: #fff;
+  -webkit-text-stroke: 0.15vw #060e13;
   line-height: 1.6;
+  font-family: "Cherry Bomb One", system-ui;
+  background-color: #68c2e0;
+  overflow-x: hidden;
 }
 
 @import url("https://fonts.googleapis.com/css2?family=Cherry+One&display=swap");
@@ -13,9 +18,6 @@
   text-align: center;
   margin-bottom: 4vw;
   padding: 0;
-  background: transparent;
-  color: white;
-  -webkit-text-stroke: clamp(0.06vw, 0.12vw, 0.6vw) #000000;
 }
 
 .manualPage h1 {
@@ -23,80 +25,83 @@
   font-size: 5vw;
   font-family: "Cherry Bomb One", system-ui;
   font-weight: 400;
-  -webkit-text-stroke: clamp(0.06vw, 0.3vw, 0.6vw) #000000;
+  color: #ffcf40;
+  -webkit-text-stroke: 0.3vw #060e13;
+  text-shadow: 0 0.6vw 0 #060e13;
 }
 
 .manualPage h2 {
-  color: white;
-  -webkit-text-stroke: clamp(0.07vw, 0.27vw, 0.6vw) #000000;
+  color: #ffcf40;
+  -webkit-text-stroke: 0.2vw #060e13;
+  text-shadow: 0 0.4vw 0 #060e13;
   margin-top: 2.5vw;
   padding-bottom: 2vw;
-  border-bottom: 0.12vw solid #eaeaea;
-  font-size: 3.6vw;
+  border-bottom: 0.4vw solid #060e13;
+  font-size: 4vw;
 }
 
 .manualPage h3 {
-  color: white;
-  -webkit-text-stroke: clamp(0.06vw, 0.2vw, 0.6vw) #000000;
+  color: #ffcf40;
+  -webkit-text-stroke: 0.15vw #060e13;
   margin: 1.5vw 0 1.3vw;
   font-size: 2.5vw;
 }
 
 .manualPage p {
   margin-bottom: 1vw;
-  color: white;
+  color: #fff;
   font-size: 1.7vw;
-  -webkit-text-stroke: clamp(0.05vw, 0.14vw, 0.6vw) #000000;
+  -webkit-text-stroke: 0.15vw #060e13;
 }
 
 .manualPage strong {
-  font-weight: 600;
+  font-weight: 400;
   font-size: 1.9vw;
-  color: white;
-  -webkit-text-stroke: clamp(0.055vw, 0.1vw, 0.6vw) #000000;
+  color: #ffcf40;
+  -webkit-text-stroke: 0.15vw #060e13;
 }
 
 .manualPage em {
-  font-style: italic;
-  color: white;
-  -webkit-text-stroke: clamp(0.045vw, 0.11vw, 0.6vw) #000000;
+  font-style: normal;
+  color: #fff;
+  -webkit-text-stroke: 0.1vw #060e13;
 }
 
 .manualPage ul {
   padding-left: 3vw;
   margin: 1vw 0;
   font-size: 1.6vw;
-  -webkit-text-stroke: clamp(0.05vw, 0.125vw, 0.6vw) #000000;
+  -webkit-text-stroke: 0.15vw #060e13;
 }
 
 .manualPage li {
   margin-bottom: 0.75vw;
   position: relative;
   padding-left: 0.5vw;
-  color: white;
+  color: #fff;
+  list-style-type: none;
 }
 
 .manualPage li:before {
-  color: #3498db;
-  font-weight: bold;
+  content: "•";
+  color: #ffcf40;
+  -webkit-text-stroke: 0.15vw #060e13;
   position: absolute;
-  left: 0;
+  left: -2vw;
+  font-size: 2vw;
 }
 
 /* New class for game detail lists */
 .gameDetails {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.2);
   padding: 1vw 1.5vw;
-  border-radius: 0.5vw;
+  border-radius: 1vw;
   margin: 1vw 0;
+  border: 0.3vw solid #060e13;
 }
 
 .gameDetails li {
   margin-bottom: 0.5vw;
-}
-
-.gameDetails li:before {
-  color: #2980b9;
 }
 
 /* Scroll to top button */
@@ -105,22 +110,25 @@
   top: 1vw;
   left: 50%;
   transform: translateX(-50%);
-  background-color: rgba(52, 152, 219, 0.3);
-  color: black;
-  border: 0.2vw solid rgba(255, 255, 255, 0.5);
+  background-color: #ffd75e;
+  color: #fff;
+  border: 0.4vw solid #060e13;
   border-radius: 50%;
   width: 5vw;
   height: 5vw;
-  font-size: 4vw;
+  font-size: 3vw;
   cursor: pointer;
   opacity: 0;
   visibility: hidden;
-  transition: all 0.3s ease;
+  transition: all 0.1s ease;
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0.12vw 0.6vw rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0.6vw 0 #060e13;
+  -webkit-text-stroke: 0.15vw #060e13;
+  font-family: inherit;
+  padding-bottom: 0.5vw;
 }
 
 .scrollTopButton.visible {
@@ -129,8 +137,14 @@
 }
 
 .scrollTopButton:hover {
-  background-color: rgba(52, 152, 219, 0.6);
-  transform: translateX(-50%) scale(1.1);
+  transform: translateX(-50%) translateY(-0.2vw);
+  box-shadow: 0 0.8vw 0 #060e13;
+  background-color: #ffcf40;
+}
+
+.scrollTopButton:active {
+  transform: translateX(-50%) translateY(0.4vw);
+  box-shadow: 0 0.2vw 0 #060e13;
 }
 
 /* Rules button for game sections */
@@ -138,22 +152,28 @@
   position: absolute;
   top: 2vw;
   right: 2vw;
-  color: white;
-  border: 0.2vw solid black;
-  padding: 0vw 1vw 0.2vw 1vw;
+  color: #fff;
+  border: 0.4vw solid #060e13;
+  padding: 0.5vw 1.5vw 0.8vw 1.5vw;
   border-radius: 2vw;
   cursor: pointer;
   font-size: 1.4vw;
-  transition: all 0.3s ease;
-  box-shadow: 0 0.12vw 0.5vw rgba(0, 0, 0, 0.2);
-  -webkit-text-stroke: clamp(0.06vw, 0.1vw, 0.6vw) #000000;
+  transition: all 0.1s ease;
+  box-shadow: 0 0.6vw 0 #060e13;
+  -webkit-text-stroke: 0.15vw #060e13;
   z-index: 10;
+  font-family: inherit;
+  background-color: #286a83;
 }
 
 .rulesButton:hover {
-  background-color: rgba(41, 128, 185, 1);
-  transform: translateY(-0.12vw);
-  box-shadow: 0 0.25vw 0.75vw rgba(0, 0, 0, 0.3);
+  transform: translateY(-0.2vw);
+  box-shadow: 0 0.8vw 0 #060e13;
+}
+
+.rulesButton:active {
+  transform: translateY(0.4vw);
+  box-shadow: 0 0.2vw 0 #060e13;
 }
 
 /* Game content layout with image */
@@ -168,357 +188,547 @@
   height: auto;
   border-radius: 1vw;
   object-fit: contain;
+  border: 0.4vw solid #060e13;
+  box-shadow: 0 0.8vw 0 #060e13;
 }
 
 /* Card styles for game sections */
 .gameSection {
-  border-radius: 3vw;
+  border-radius: 2vw;
   padding: 2vw;
-  margin-bottom: 2.5vw;
-  box-shadow: 0 0.12vw 0.9vw rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  -webkit-text-stroke: clamp(0.06vw, 0.1vw, 0.6vw) #000000;
-  border: clamp(0.36vw, 0.75vw, 2.4vw) solid #3498db;
-  background-color: #3498db30;
+  margin-bottom: 4vw;
+  box-shadow: 0 1vw 0 #060e13;
+  border: 0.5vw solid #060e13;
+  background-color: #ffcf40;
   position: relative;
-}
-
-.gameSection:hover {
-  transform: translateY(-0.18vw);
-  box-shadow: 0 0.3vw 1.2vw rgba(0, 0, 0, 0.1);
 }
 
 /* ============================================
    COLOR CUSTOMIZATION SECTION
-   Change colors for each game below
    ============================================ */
 
-/* STOP MATEMÁTICO - Orange/Brown theme */
-.gameSection[data-game-id="stop-matematico"] {
-  border-color: #000000;
-  background: radial-gradient(circle, #de9696bb, #ab3636bb);
+/* 1. STOP MATEMÁTICO - Red-Orange theme */
+.gameSection[data-game-id="stop-matematico"],
+.gameCard[data-game-id="stop-matematico"] {
+  background-color: #fb4b3a;
+  border-color: #ffcf40;
+  box-shadow: 0 1vw 0 #c2410c;
+}
+
+.gameCard[data-game-id="stop-matematico"]:hover {
+  transform: translateY(-0.2vw);
+  box-shadow: 0 1.2vw 0 #c2410c;
 }
 
 .gameSection[data-game-id="stop-matematico"] h2,
 .gameSection[data-game-id="stop-matematico"] h3,
+.gameCard[data-game-id="stop-matematico"] h3 {
+  color: #ffcf40;
+  -webkit-text-stroke-color: #c2410c;
+  text-shadow: 0 0.4vw 0 #c2410c;
+  border-color: #ffcf40;
+}
+
 .gameSection[data-game-id="stop-matematico"] p,
 .gameSection[data-game-id="stop-matematico"] li,
 .gameSection[data-game-id="stop-matematico"] strong,
-.gameSection[data-game-id="stop-matematico"] em {
-  color: #e2a01d;
-  /* CHANGE TEXT COLOR HERE */
-  border-color: #e2a01d;
-}
-
-.gameSection[data-game-id="stop-matematico"] strong,
-.gameSection[data-game-id="stop-matematico"] h3 {
-  color: #f0611f;
-}
-
-.gameSection[data-game-id="stop-matematico"] .rulesButton {
-  border: 0.26vw solid #080303;
-  /* Purple border */
-  background: radial-gradient(circle, #b43636, #851616);
-  color: #e2a01d;
-}
-
-.gameCard[data-game-id="stop-matematico"] {
-  border-color: #000000;
-  background: radial-gradient(circle, #de9696bb, #ab3636bb);
-}
-
-.gameCard[data-game-id="stop-matematico"] h3,
+.gameSection[data-game-id="stop-matematico"] em,
 .gameCard[data-game-id="stop-matematico"] p {
-  color: #e2a01d;
+  color: #ffcf40;
+  -webkit-text-stroke-color: #a11425;
 }
 
+.gameSection[data-game-id="stop-matematico"] li:before {
+  color: #ffcf40;
+  -webkit-text-stroke-color: #a11425;
+}
+
+.gameSection[data-game-id="stop-matematico"] .rulesButton,
 .gameCard[data-game-id="stop-matematico"] button {
-  border: 0.26vw solid #080303;
-  /* Purple border */
-  background: radial-gradient(circle, #b43636, #851616);
-  color: #e2a01d;
+  background-color: #f5a623;
+  color: #ffcf40;
+  border-color: #a11425;
+  box-shadow: 0 0.6vw 0 #a11425;
+  -webkit-text-stroke-color: #a11425;
 }
 
-/* CAÇA-SOMA - Green theme */
-.gameSection[data-game-id="caca-soma"] {
-  border-color: #a11313;
-  background: radial-gradient(circle, #eacdcdbb, #716262bb);
+.gameSection[data-game-id="stop-matematico"] .rulesButton:hover,
+.gameCard[data-game-id="stop-matematico"] button:hover {
+  box-shadow: 0 0.8vw 0 #a11425;
+  background-color: #ffb347;
+}
+
+.gameSection[data-game-id="stop-matematico"] .rulesButton:active,
+.gameCard[data-game-id="stop-matematico"] button:active {
+  box-shadow: 0 0.2vw 0 #a11425;
+}
+
+/* 2. CAÇA-SOMA - Flat Mid-Red/Gray theme */
+.gameSection[data-game-id="caca-soma"],
+.gameCard[data-game-id="caca-soma"] {
+  background-color: #d18d8d;
+  border-color: #c62828;
+  box-shadow: 0 1vw 0 #7f0000;
+}
+
+.gameCard[data-game-id="caca-soma"]:hover {
+  transform: translateY(-0.2vw);
+  box-shadow: 0 1.2vw 0 #7f0000;
 }
 
 .gameSection[data-game-id="caca-soma"] h2,
 .gameSection[data-game-id="caca-soma"] h3,
+.gameCard[data-game-id="caca-soma"] h3 {
+  color: #fff;
+  -webkit-text-stroke-color: #7f0000;
+  text-shadow: 0 0.4vw 0 #5c0000;
+  border-color: #c62828;
+}
+
 .gameSection[data-game-id="caca-soma"] p,
 .gameSection[data-game-id="caca-soma"] li,
 .gameSection[data-game-id="caca-soma"] strong,
-.gameSection[data-game-id="caca-soma"] em {
-  color: white;
-  /* CHANGE TEXT COLOR HERE */
-  -webkit-text-stroke-color: #791111;
-
-}
-
-.gameSection[data-game-id="caca-soma"] strong,
-.gameSection[data-game-id="caca-soma"] h3 {
-  color: #ffb5b5;
-}
-
-.gameSection[data-game-id="caca-soma"] .rulesButton {
-  border-color: #a11313;
-  /* Red border */
-  background: radial-gradient(circle, #be7676, #ac4c4c);
-  -webkit-text-stroke-color: #791111;
-}
-
-.gameCard[data-game-id="caca-soma"] h3,
+.gameSection[data-game-id="caca-soma"] em,
 .gameCard[data-game-id="caca-soma"] p {
-  -webkit-text-stroke-color: #791111;
+  color: #fff;
+  -webkit-text-stroke-color: #7f0000;
 }
 
-.gameCard[data-game-id="caca-soma"] {
-  border-color: #a11313;
-  background: radial-gradient(circle, #b39898, #867575);
+.gameSection[data-game-id="caca-soma"] li:before {
+  color: #fff;
+  -webkit-text-stroke-color: #7f0000;
 }
 
+.gameSection[data-game-id="caca-soma"] .rulesButton,
 .gameCard[data-game-id="caca-soma"] button {
-  border-color: #a11313;
-  /* Red border */
-  background: radial-gradient(circle, #be7676, #ac4c4c);
-  -webkit-text-stroke-color: #791111;
+  background-color: #da3e3e;
+  color: #fff;
+  border-color: #7f0000;
+  box-shadow: 0 0.6vw 0 #5c0000;
+  -webkit-text-stroke-color: #7f0000;
 }
 
-/* CUBO MÁGICO - Green theme */
-.gameSection[data-game-id="cubo-magico"] {
-  border-color: #dadada;
-  background: radial-gradient(circle, #55b5dfbb, #0e668bbb);
+.gameSection[data-game-id="caca-soma"] .rulesButton:hover,
+.gameCard[data-game-id="caca-soma"] button:hover {
+  box-shadow: 0 0.8vw 0 #5c0000;
+  background-color: #e35a5a;
+}
+
+.gameSection[data-game-id="caca-soma"] .rulesButton:active,
+.gameCard[data-game-id="caca-soma"] button:active {
+  box-shadow: 0 0.2vw 0 #5c0000;
+}
+
+/* 3. CUBO MÁGICO - Solid Blue theme */
+.gameSection[data-game-id="cubo-magico"],
+.gameCard[data-game-id="cubo-magico"] {
+  background-color: #286a83;
+  border-color: #060e13;
+  box-shadow: 0 1vw 0 #060e13;
+}
+
+.gameCard[data-game-id="cubo-magico"]:hover {
+  transform: translateY(-0.2vw);
+  box-shadow: 0 1.2vw 0 #060e13;
 }
 
 .gameSection[data-game-id="cubo-magico"] h2,
 .gameSection[data-game-id="cubo-magico"] h3,
+.gameCard[data-game-id="cubo-magico"] h3 {
+  color: #fff;
+  -webkit-text-stroke-color: #060e13;
+  text-shadow: 0 0.4vw 0 #060e13;
+  border-color: #060e13;
+}
+
 .gameSection[data-game-id="cubo-magico"] p,
 .gameSection[data-game-id="cubo-magico"] li,
 .gameSection[data-game-id="cubo-magico"] strong,
-.gameSection[data-game-id="cubo-magico"] em {
-  color: white;
-  /* CHANGE TEXT COLOR HERE */
+.gameSection[data-game-id="cubo-magico"] em,
+.gameCard[data-game-id="cubo-magico"] p {
+  color: #fff;
+  -webkit-text-stroke-color: #060e13;
 }
 
-.gameSection[data-game-id="cubo-magico"] .rulesButton {
-  background: radial-gradient(circle, #2d90d1, #2272a8);
+.gameSection[data-game-id="cubo-magico"] li:before {
+  color: #fff;
+  -webkit-text-stroke-color: #060e13;
 }
 
-
-.gameCard[data-game-id="cubo-magico"] {
-  border-color: #dadada;
-  background: radial-gradient(circle, #48a4ccbb, #0e668bbb);
-}
-
+.gameSection[data-game-id="cubo-magico"] .rulesButton,
 .gameCard[data-game-id="cubo-magico"] button {
-  background: radial-gradient(circle, #2d90d1, #2272a8);
+  background-color: #ffd75e;
+  color: #286a83;
+  border-color: #060e13;
+  box-shadow: 0 0.6vw 0 #060e13;
+  -webkit-text-stroke-color: #060e13;
 }
 
-/* SUPER JOGO DA VELHA - Teal/Dark cyan theme */
-.gameSection[data-game-id="super-velha"] {
-  border-color: #0a1929;
-  background: radial-gradient(circle, #629cd2bb, #2c5689bb);
+.gameSection[data-game-id="cubo-magico"] .rulesButton:hover,
+.gameCard[data-game-id="cubo-magico"] button:hover {
+  box-shadow: 0 0.8vw 0 #060e13;
+  background-color: #ffcf40;
+}
+
+.gameSection[data-game-id="cubo-magico"] .rulesButton:active,
+.gameCard[data-game-id="cubo-magico"] button:active {
+  box-shadow: 0 0.2vw 0 #060e13;
+}
+
+/* 4. SUPER JOGO DA VELHA - Sky Blue theme */
+.gameSection[data-game-id="super-velha"],
+.gameCard[data-game-id="super-velha"] {
+  background-color: #0ea5e9;
+  border-color: #0c4a6e;
+  box-shadow: 0 1vw 0 #0c4a6e;
+}
+
+.gameCard[data-game-id="super-velha"]:hover {
+  transform: translateY(-0.2vw);
+  box-shadow: 0 1.2vw 0 #0c4a6e;
 }
 
 .gameSection[data-game-id="super-velha"] h2,
 .gameSection[data-game-id="super-velha"] h3,
+.gameCard[data-game-id="super-velha"] h3 {
+  color: #ffffff;
+  -webkit-text-stroke-color: #0c4a6e;
+  text-shadow: 0 0.4vw 0 #075985;
+  border-color: #0c4a6e;
+}
+
 .gameSection[data-game-id="super-velha"] p,
 .gameSection[data-game-id="super-velha"] li,
 .gameSection[data-game-id="super-velha"] strong,
-.gameSection[data-game-id="super-velha"] em {
-  color: #8ddafd;
-  /* CHANGE TEXT COLOR HERE */
-  -webkit-text-stroke-color: #0a1929;
-}
-
-.gameSection[data-game-id="super-velha"] strong,
-.gameSection[data-game-id="super-velha"] h3 {
-  color: #2eb6f5;
-}
-
-.gameSection[data-game-id="super-velha"] .rulesButton {
-  border-color: #0a1929;
-  /* Purple border */
-  background: radial-gradient(circle, #3d6d9c, #2a527a);
-  -webkit-text-stroke-color: #0a1929;
-  color: #6bcdfa;
-}
-
-.gameCard[data-game-id="super-velha"] h3,
+.gameSection[data-game-id="super-velha"] em,
 .gameCard[data-game-id="super-velha"] p {
-  color: #6bcdfa;
-  /* CHANGE TEXT COLOR HERE */
-  -webkit-text-stroke-color: #0a1929;
+  color: #ffffff;
+  -webkit-text-stroke-color: #0c4a6e;
 }
 
-.gameCard[data-game-id="super-velha"] {
-  border-color: #0a1929;
-  background: radial-gradient(circle, #548dc2, #2c5689);
+.gameSection[data-game-id="super-velha"] li:before {
+  color: #ffffff;
+  -webkit-text-stroke-color: #0c4a6e;
 }
 
+.gameSection[data-game-id="super-velha"] .rulesButton,
 .gameCard[data-game-id="super-velha"] button {
-  border-color: #0a1929;
-  /* Purple border */
-  background: radial-gradient(circle, #3d6d9c, #2a527a);
-  -webkit-text-stroke-color: #0a1929;
-  color: #6bcdfa;
+  background-color: #e0f2fe;
+  color: #0284c7;
+  border-color: #0c4a6e;
+  box-shadow: 0 0.6vw 0 #0c4a6e;
+  -webkit-text-stroke-color: #0c4a6e;
 }
 
-/* CAÇA-COROA - Red/Burgundy theme */
-.gameSection[data-game-id="caca-coroa"] {
-  border-color: #fbbf24;
-  background: radial-gradient(circle, #bd90f0bb, #9867cfbb);
+.gameSection[data-game-id="super-velha"] .rulesButton:hover,
+.gameCard[data-game-id="super-velha"] button:hover {
+  box-shadow: 0 0.8vw 0 #0c4a6e;
+  background-color: #f0f9ff;
+}
+
+.gameSection[data-game-id="super-velha"] .rulesButton:active,
+.gameCard[data-game-id="super-velha"] button:active {
+  box-shadow: 0 0.2vw 0 #0c4a6e;
+}
+
+/* 5. CAÇA-COROA - Pink-Purple theme */
+.gameSection[data-game-id="caca-coroa"],
+.gameCard[data-game-id="caca-coroa"] {
+  background-color: #d946ef;
+  border-color: #86198f;
+  box-shadow: 0 1vw 0 #86198f;
+}
+
+.gameCard[data-game-id="caca-coroa"]:hover {
+  transform: translateY(-0.2vw);
+  box-shadow: 0 1.2vw 0 #86198f;
 }
 
 .gameSection[data-game-id="caca-coroa"] h2,
 .gameSection[data-game-id="caca-coroa"] h3,
+.gameCard[data-game-id="caca-coroa"] h3 {
+  color: #fde047;
+  -webkit-text-stroke-color: #6b21a8;
+  text-shadow: 0 0.4vw 0 #86198f;
+  border-color: #86198f;
+}
+
 .gameSection[data-game-id="caca-coroa"] p,
 .gameSection[data-game-id="caca-coroa"] li,
 .gameSection[data-game-id="caca-coroa"] strong,
-.gameSection[data-game-id="caca-coroa"] em {
-  color: #fbbf24;
-  /* CHANGE TEXT COLOR HERE */
-  border-color: #fbbf24;
-  -webkit-text-stroke-color: #270757;
-}
-
-.gameSection[data-game-id="caca-coroa"] strong,
-.gameSection[data-game-id="caca-coroa"] h3 {
-  color: #fb8c24;
-}
-
-.gameSection[data-game-id="caca-coroa"] .rulesButton {
-  background: radial-gradient(circle, #7f52e9, #6d28d9);
-  border: 0.26vw solid #342075;
-  color: #fbbf24;
-  /* Gold text */
-  -webkit-text-stroke: 0.1vw #4c1d95;
-}
-
-.gameCard[data-game-id="caca-coroa"] {
-  border-color: #fbbf24;
-  background: radial-gradient(circle, #bd90f099, #9867cf99);
-}
-
-.gameCard[data-game-id="caca-coroa"] h3 {
-  color: #fbbf24;
-  /* Gold text */
-  -webkit-text-stroke: 0.17vw #2b0b5c;
-}
-
+.gameSection[data-game-id="caca-coroa"] em,
 .gameCard[data-game-id="caca-coroa"] p {
-  color: #fbbf24;
-  /* Gold text */
-  -webkit-text-stroke: 0.13vw #2b0b5c;
+  color: #fde047;
+  -webkit-text-stroke-color: #6b21a8;
 }
 
+.gameSection[data-game-id="caca-coroa"] li:before {
+  color: #fde047;
+  -webkit-text-stroke-color: #6b21a8;
+}
+
+.gameSection[data-game-id="caca-coroa"] .rulesButton,
 .gameCard[data-game-id="caca-coroa"] button {
-  background: radial-gradient(circle, #7f52e9, #6d28d9);
-  border: 0.26vw solid #342075;
-  color: #fbbf24;
-  /* Gold text */
-  -webkit-text-stroke: 0.13vw #2b0b5c;
+  background-color: #fbbf24;
+  color: #b45309;
+  border-color: #b45309;
+  box-shadow: 0 0.6vw 0 #b45309;
+  -webkit-text-stroke-color: #b45309;
 }
 
-/* GUERRA MATEMÁTICA - Orange/Brown theme */
-.gameSection[data-game-id="guerra-matematica"] {
-  border-color: #0e9c6d;
-  background: radial-gradient(circle, #97cfbdbb, #53b997bb);
+.gameSection[data-game-id="caca-coroa"] .rulesButton:hover,
+.gameCard[data-game-id="caca-coroa"] button:hover {
+  box-shadow: 0 0.8vw 0 #b45309;
+  background-color: #fcd34d;
+}
+
+.gameSection[data-game-id="caca-coroa"] .rulesButton:active,
+.gameCard[data-game-id="caca-coroa"] button:active {
+  box-shadow: 0 0.2vw 0 #b45309;
+}
+
+/* 6. GUERRA MATEMÁTICA - Green theme */
+.gameSection[data-game-id="guerra-matematica"],
+.gameCard[data-game-id="guerra-matematica"] {
+  background-color: #059669;
+  border-color: #064e3b;
+  box-shadow: 0 1vw 0 #064e3b;
+}
+
+.gameCard[data-game-id="guerra-matematica"]:hover {
+  transform: translateY(-0.2vw);
+  box-shadow: 0 1.2vw 0 #064e3b;
 }
 
 .gameSection[data-game-id="guerra-matematica"] h2,
 .gameSection[data-game-id="guerra-matematica"] h3,
+.gameCard[data-game-id="guerra-matematica"] h3 {
+  color: #f3f4f6;
+  -webkit-text-stroke-color: #064e3b;
+  text-shadow: 0 0.4vw 0 #064e3b;
+  border-color: #064e3b;
+}
+
 .gameSection[data-game-id="guerra-matematica"] p,
 .gameSection[data-game-id="guerra-matematica"] li,
 .gameSection[data-game-id="guerra-matematica"] strong,
-.gameSection[data-game-id="guerra-matematica"] em {
-  color: white;
-  /* CHANGE TEXT COLOR HERE */
-  -webkit-text-stroke-color: #32363a;
-}
-
-.gameSection[data-game-id="guerra-matematica"] strong,
-.gameSection[data-game-id="guerra-matematica"] h3 {
-  color: #55f5c0;
-}
-
-
-.gameSection[data-game-id="guerra-matematica"] .rulesButton {
-  border-color: #097753;
-  /* Purple border */
-  background: radial-gradient(circle, #10b981, #0da572);
-  -webkit-text-stroke-color: #32363a;
-}
-
-
-.gameCard[data-game-id="guerra-matematica"] {
-  border-color: #0e9c6d;
-  background: radial-gradient(circle, #97cfbdbb, #53b997bb);
-}
-
-.gameCard[data-game-id="guerra-matematica"] h3,
+.gameSection[data-game-id="guerra-matematica"] em,
 .gameCard[data-game-id="guerra-matematica"] p {
-  -webkit-text-stroke-color: #32363a;
+  color: #f3f4f6;
+  -webkit-text-stroke-color: #064e3b;
 }
 
+.gameSection[data-game-id="guerra-matematica"] li:before {
+  color: #f3f4f6;
+  -webkit-text-stroke-color: #064e3b;
+}
+
+.gameSection[data-game-id="guerra-matematica"] .rulesButton,
 .gameCard[data-game-id="guerra-matematica"] button {
-  border-color: #097753;
-  /* Purple border */
-  background: radial-gradient(circle, #10b981, #0da572);
-  -webkit-text-stroke-color: #32363a;
+  background-color: #10b981;
+  color: #f3f4f6;
+  border-color: #064e3b;
+  box-shadow: 0 0.6vw 0 #064e3b;
+  -webkit-text-stroke-color: #064e3b;
+}
+
+.gameSection[data-game-id="guerra-matematica"] .rulesButton:hover,
+.gameCard[data-game-id="guerra-matematica"] button:hover {
+  box-shadow: 0 0.8vw 0 #064e3b;
+  background-color: #34d399;
+}
+
+.gameSection[data-game-id="guerra-matematica"] .rulesButton:active,
+.gameCard[data-game-id="guerra-matematica"] button:active {
+  box-shadow: 0 0.2vw 0 #064e3b;
 }
 
 /* ============================================
    END COLOR CUSTOMIZATION SECTION
    ============================================ */
 
-/* Responsive design */
+/* Style for the games list */
+.gamesList {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, auto);
+  gap: 2vw;
+  margin: 2vw 0 4vw 0;
+}
+
+.gameCard {
+  padding: 1.5vw;
+  border-radius: 2vw;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  padding-bottom: 5vw;
+  border-width: 0.4vw;
+  border-style: solid;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.gameCard h3 {
+  margin-top: 0;
+  font-size: 2.5vw;
+  margin-bottom: 0.5vw;
+}
+
+.gameCard p {
+  margin: 0 0 1vw 0;
+  font-size: 1.8vw;
+  flex-grow: 1;
+}
+
+.viewButton {
+  border: 0.4vw solid #060e13;
+  padding: 0.5vw 1vw 0.8vw 1vw;
+  border-radius: 2vw;
+  cursor: pointer;
+  font-size: 1.5vw;
+  transition: all 0.1s ease;
+  position: absolute;
+  bottom: 1.5vw;
+  left: 2vw;
+  right: 2vw;
+  text-align: center;
+  font-family: inherit;
+}
+
+.viewButton:active {
+  transform: translateY(0.4vw);
+}
+
+/* Feedback button under introdução */
+.feedbackButtonContainer {
+  margin-top: 5vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2vw;
+}
+
+.feedbackHighlight {
+  font-size: 2.5vw;
+  color: #ffd75e;
+  text-align: center;
+  max-width: 80%;
+  -webkit-text-stroke: 0.2vw #060e13;
+  text-shadow: 0 0.4vw 0 #060e13;
+  font-family: "Cherry Bomb One", system-ui;
+  line-height: 1.2;
+}
+
+.feedbackButton {
+  background-color: #286a83;
+  color: #fff;
+  border-radius: 2vw;
+  border: 0.4vw solid #060e13;
+  padding: 0.8vw 3vw 1.2vw;
+  font-size: 2.5vw;
+  cursor: pointer;
+  -webkit-text-stroke: 0.15vw #060e13;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  box-shadow: 0 0.8vw 0 #060e13;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.feedbackButton:hover {
+  transform: translateY(-0.2vw);
+  box-shadow: 0 1vw 0 #060e13;
+  background-color: #3aa6d1;
+}
+
+.feedbackButton:active {
+  transform: translateY(0.4vw);
+  box-shadow: 0 0.2vw 0 #060e13;
+}
+
+.feedbackBox {
+  background: #ffcf40;
+  border: 0.4vw solid #060e13;
+  border-radius: 1vw;
+  padding: 1.5vw;
+  max-width: 70%;
+  text-align: center;
+  box-shadow: 0 0.6vw 0 #060e13;
+}
+
+.feedbackBox p {
+  margin: 0;
+  font-size: 1.5vw;
+  color: #fff;
+  -webkit-text-stroke: 0.15vw #060e13;
+}
+
+/* Highlight for important notes */
+.note {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-left: 0.4vw solid #ffcf40;
+  padding: 1vw 1.5vw;
+  margin: 1.5vw 0;
+  border-radius: 0 1vw 1vw 0;
+}
+
+/* Responsive typography */
+@media (min-width: 1200px) {
+  .manualPage {
+    font-size: 1.1vw;
+  }
+}
+
 @media (max-width: 768px) {
   .manualPage {
-    padding: 2vw;
+    padding: 2vw 4vw;
   }
 
   .manualPage h1 {
-    font-size: 5vw;
+    font-size: 7vw;
   }
 
   .gameSection {
     padding: 3vw;
-    padding-top: 8vw;
+    padding-top: 12vw;
   }
 
   .rulesButton {
-    top: 2vw;
-    right: 2vw;
-    left: 2vw;
-    font-size: 2.5vw;
-    padding: 1.5vw 2vw;
+    top: 3vw;
+    right: 3vw;
+    left: 3vw;
+    font-size: 3.5vw;
+    padding: 1.5vw 2vw 2vw;
   }
 
   .scrollTopButton {
-    width: 8vw;
-    height: 8vw;
-    font-size: 4vw;
+    width: 10vw;
+    height: 10vw;
+    font-size: 5vw;
   }
 
-  .gameContent {
+  .descriptionWithImage {
     flex-direction: column;
   }
 
   .preview {
     width: 100%;
-    max-width: 60vw;
+    max-width: 70vw;
     align-self: center;
+    margin-top: 2vw;
   }
 
   .manualPage h2 {
-    font-size: 4vw;
+    font-size: 5.5vw;
   }
 
   .manualPage h3 {
-    font-size: 3.5vw;
+    font-size: 4.5vw;
+  }
+
+  .gamesList {
+    grid-template-columns: 1fr;
+    gap: 4vw;
   }
 }
 
@@ -563,156 +773,4 @@
 
 .gameSection:nth-child(6) {
   animation-delay: 0.6s;
-}
-
-/* Style for the games list */
-.gamesList {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(2, auto);
-  gap: 1.5vw;
-  margin: 2vw 0;
-}
-
-.gameCard {
-  background: #3498db20;
-  padding: 1.5vw;
-  border-radius: 2vw;
-  box-shadow: 0 0.12vw 0.6vw rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-  border: clamp(0.24vw, 0.5vw, 1.8vw) solid #3498db;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  position: relative;
-  padding-bottom: 4vw;
-}
-
-.gameCard:hover {
-  transform: translateY(-0.18vw);
-  box-shadow: 0 0.25vw 0.9vw rgba(0, 0, 0, 0.1);
-}
-
-.gameCard h3 {
-  margin-top: 0;
-  color: white;
-  -webkit-text-stroke: 0.17vw black;
-  font-size: 2.5vw;
-  margin-bottom: 0.5vw;
-}
-
-.gameCard p {
-  margin: 0 0 1vw 0;
-  color: white;
-  -webkit-text-stroke: 0.14vw black;
-  font-size: 1.8vw;
-  flex-grow: 1;
-}
-
-.viewButton {
-  background: radial-gradient(circle at center, #408bbd, #2177b1);
-  color: white;
-  border: none;
-  padding: 0vw 1vw;
-  border-radius: 3vw;
-  border: 0.2vw solid black;
-  cursor: pointer;
-  font-size: 1.5vw;
-  transition: background-color 0.2s ease;
-  -webkit-text-stroke: 0.12vw black;
-  position: absolute;
-  bottom: 1vw;
-  left: 4vw;
-  right: 4vw;
-  text-align: center;
-  transition: transform 0.2s ease;
-}
-
-.viewButton:hover {
-  transform: scale(1.05) translateY(-0.18vw);
-}
-
-/* Feedback button under introdução */
-.feedbackButtonContainer {
-  margin-top: 5vw;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2vw;
-}
-
-.feedbackHighlight {
-  font-size: 2.5vw;
-  color: #fbbf24;
-  text-align: center;
-  max-width: 80%;
-  -webkit-text-stroke: 0.15vw black;
-  font-family: "Cherry Bomb One", system-ui;
-  line-height: 1.2;
-}
-
-.feedbackButton {
-  background: radial-gradient(circle at center, #0ca371, #047857);
-  color: white;
-  border-radius: 3vw;
-  border: 0.22vw solid black;
-  padding: 0.6vw 2.4vw 0.9vw;
-  font-size: 2.5vw;
-  cursor: pointer;
-  -webkit-text-stroke: 0.18vw black;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 0.18vw 0.8vw rgba(0, 0, 0, 0.35);
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.05);
-  }
-
-  100% {
-    transform: scale(1);
-  }
-}
-
-.feedbackButton:hover {
-  transform: scale(1.1) translateY(-0.12vw);
-  box-shadow: 0 0.25vw 1vw rgba(0, 0, 0, 0.45);
-  animation: none;
-}
-
-.feedbackBox {
-  background: rgba(0, 0, 0, 0.2);
-  border: 0.15vw solid rgba(255, 255, 255, 0.3);
-  border-radius: 1vw;
-  padding: 1.5vw;
-  max-width: 70%;
-  text-align: center;
-}
-
-.feedbackBox p {
-  margin: 0;
-  font-size: 1.5vw;
-  color: #eee;
-  -webkit-text-stroke: 0.08vw black;
-}
-
-/* Highlight for important notes */
-.note {
-  background-color: #f8f9fa;
-  border-left: 0.25vw solid #3498db;
-  padding: 1vw 1.5vw;
-  margin: 1.5vw 0;
-  border-radius: 0 0.25vw 0.25vw 0;
-}
-
-/* Responsive typography */
-@media (min-width: 1200px) {
-  .manualPage {
-    font-size: 1.1vw;
-  }
 }

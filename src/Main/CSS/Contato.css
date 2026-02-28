@@ -1,69 +1,131 @@
-.contText {
-  font-size: clamp(20px, 2.5vw, 999px);
-  text-align: center;
-  margin-bottom: clamp(17px, 2vw, 50px);
-  -webkit-text-stroke: clamp(1.5px, 0.2vw, 10px) #000000;
-
-}
-
-p {
-  font-size: clamp(15px, 1.8vw, 1000px);
-  -webkit-text-stroke: clamp(1px, 0.13vw, 10px) #000000;
-}
-
-
-iframe {
-  width: clamp(300px, 80vw, 800px);
-  aspect-ratio: 3 / 4;
-  border: 2px solid black;
-}
-
-strong {
-  font-weight: 400;
-}
-
-h2 {
-  color: #eee;
-  font-size: clamp(45px, 6vw, 200px);
-  text-align: center;
-  margin-bottom: 3rem;
-  -webkit-text-stroke: clamp(3px, 0.35vw, 14px) #000000;
-}
-
-
 .contato {
   font-family: "Cherry Bomb One", system-ui;
   font-weight: 200;
   font-style: normal;
-  color: #eee;
+  color: #ffcf40;
+  /* Yellow text for contrast against background */
   margin: 0 auto;
-  -webkit-text-stroke: clamp(1px, 0.1vw, 10px) #000000;
-  width: 100%;
+  -webkit-text-stroke: 0.2vw #060e13;
+  /* Consistent dark stroke */
+  width: 100vw;
+  min-height: 100dvh;
   box-sizing: border-box;
-  padding: 1rem 3rem;
-  padding: 1vw clamp(20px, 6vw, 800px);
+  padding: 5dvh 5vw;
+  background-color: #68c2e0;
+  /* The new unified background color */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
+h2 {
+  color: #ffcf40;
+  font-size: min(15vw, 12dvh);
+  text-align: center;
+  margin: 0 0 4dvh 0;
+  -webkit-text-stroke: 0.4vw #060e13;
+  text-shadow: 0 0.6vw 0 #000000;
+  /* Hard 3D title shadow */
+  line-height: 1;
+}
+
+.contText {
+  font-size: min(4.5vw, 4.5dvh);
+  /* Increased font size */
+  text-align: left;
+  /* Changed alignment */
+  margin-bottom: 4dvh;
+  -webkit-text-stroke: 0.25vw #060e13;
+  color: #ffffff;
+  /* White text for readability */
+  max-width: 1200px;
+  /* Increased max width */
+  text-shadow: 0 0.3vw 0 #000000;
+  line-height: 1.2;
+}
+
+p {
+  font-size: min(4vw, 4dvh);
+  /* Increased font size */
+  -webkit-text-stroke: 0.2vw #060e13;
+  color: #ffffff;
+  text-align: left;
+  /* Changed alignment */
+  line-height: 1.4;
+  margin-bottom: 2dvh;
+  width: 100%;
+  max-width: 1200px;
+  /* Increased max width */
+}
+
+p a {
+  color: #ffcf40;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+p a:hover {
+  color: #ffea99;
+}
+
+strong {
+  font-weight: normal;
+  color: #e31f2f;
+  /* Red highlights for labels */
+  -webkit-text-stroke: 0.25vw #630000;
+}
+
+
 .feedbackButtonContainer {
-  margin-top: 5vw;
+  margin-top: 5dvh;
   display: flex;
   justify-content: center;
 }
 
 .feedbackButton {
-  background: radial-gradient(circle at center, #0ca371, #047857);
-  color: white;
-  border-radius: 3vw;
-  border: 0.2vw solid black;
-  padding: 0.6vw 2.4vw 0.9vw;
-  font-size: 1.6vw;
+  all: unset;
   cursor: pointer;
-  -webkit-text-stroke: 0.12vw black;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 0.18vw 0.8vw rgba(0, 0, 0, 0.35);
+  background-color: #28a745;
+  /* Solid flat green */
+  color: #ffefc2;
+  /* Pale yellow text */
+  font-size: min(4vw, 4dvh);
+  border: 0.4vw solid #0f4a1f;
+  /* Thick dark green border */
+  border-radius: 2vw;
+  /* Blocky radius */
+  padding: 1.5dvh 3vw 2.5dvh 3vw;
+  -webkit-text-stroke: 0.2vw #0f4a1f;
+  transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 0.8vw 0 #0f4a1f;
+  /* Hard 3D button shadow */
+  transform: translateY(0);
+  text-align: center;
+  display: inline-block;
+  line-height: 1;
 }
 
 .feedbackButton:hover {
-  transform: scale(1.05) translateY(-0.12vw);
-  box-shadow: 0 0.25vw 1vw rgba(0, 0, 0, 0.45);
+  background-color: #34ce57;
+  transform: translateY(-0.2vw);
+  box-shadow: 0 1vw 0 #0f4a1f;
+}
+
+.feedbackButton:active {
+  transform: translateY(0.6vw);
+  box-shadow: 0 0.2vw 0 #0f4a1f;
+}
+
+.formBox {
+  margin-top: 6dvh;
+  width: 100%;
+  max-width: 1200px;
+  /* Matched the text max width */
+  display: flex;
+  justify-content: center;
+}
+
+/* Base styles for the Form component inside formBox */
+.formBox>* {
+  width: 100%;
 }

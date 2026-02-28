@@ -1,4 +1,4 @@
-/* RegrasSPTTT.css - Styled Rules Page */
+/* RegrasSPTTT.module.css - Styled Rules Page - Blue Theme (Neo-Brutalism) */
 
 .regrasPage {
   font-family: "Cherry Bomb One", system-ui;
@@ -7,13 +7,13 @@
   display: flex;
   max-height: 100dvh;
   overflow: hidden;
-  border: 0dvh solid #9b0b16;
   padding: 0vw;
   min-height: 100dvh;
   width: 100vw;
   justify-content: center;
   align-items: center;
-  background: radial-gradient(circle, #629cd2, #2c5689);
+  background-color: #e0f2fe;
+  gap: 0vw;
 }
 
 .boxRegras {
@@ -27,15 +27,18 @@
 }
 
 .gameTitle {
-  font-size: clamp(3vw, 8.4dvh, 4.5vw);
-  color: #4fc3f7;
-  -webkit-text-stroke: 0.3vw #0a1929;
+  font-size: clamp(3vw, 10.5dvh, 5.5vw);
+  color: #bae6fd;
+  -webkit-text-stroke: 0.25vw #0c4a6e;
+  margin-bottom: 2vw;
+  text-shadow: 0 0.4vw 0 #075985;
 }
 
 .preview {
-  height: clamp(30vw, 77dvh, 42vw);
+  height: clamp(30vw, 73dvh, 40vw);
   transition: all 0.5s ease;
   animation: pulsePreview 5s infinite;
+  border-radius: 2vw;
 }
 
 @keyframes pulsePreview {
@@ -52,7 +55,6 @@
   }
 }
 
-
 .botoes {
   gap: 0vw;
   width: 47%;
@@ -64,16 +66,15 @@
   justify-content: center;
   min-height: 100vh;
   position: relative;
-
 }
 
 .button {
-  border: 1.7dvh solid #0a1929;
-  background: radial-gradient(circle, #1e88e5, #1565c0);
-  border-radius: 7vw;
+  border: 0.4vw solid #0c4a6e;
+  background-color: #0ea5e9;
+  border-radius: 4vw;
   box-sizing: border-box;
-  color: #4fc3f7;
-  -webkit-text-stroke: 0.42vw #0a1929;
+  color: #bae6fd;
+  -webkit-text-stroke: 0.3vw #0c4a6e;
   font-size: clamp(8.5vw, 20dvh, 11vw);
   display: flex;
   align-items: center;
@@ -81,146 +82,144 @@
   text-align: center;
   padding: 0.3vw 2.5vw 2vw 2.5vw;
   line-height: 1;
-  box-shadow: inset 0 0 1vw #dcdf45ff;
+  box-shadow: 0 1vw 0 #075985;
   cursor: pointer;
-  margin-bottom: 5vw;
-  transition: all 0.5s ease;
-  box-shadow: 0 0 3vw rgba(0, 0, 0, 0.3), inset 0 0 1vw rgba(0, 0, 0, 0.3);
+  margin-bottom: 4vw;
+  transition: transform 0.1s ease, background-color 0.1s ease, box-shadow 0.1s ease;
 }
 
-.button:hover {
-  border: 1.7dvh solid #0a1929;
-  background: radial-gradient(circle, #2196f3, #1976d2);
-  transform: scale(1.07) translateY(-1dvh);
-  -webkit-text-stroke: 0.42vw #0a1929;
-  box-shadow: 0 0 3vw rgba(249, 251, 253, 0.3),
-    inset 0 0 1vw rgba(255, 255, 255, 0.3);
+.buttonDisabled {
+  filter: grayscale(1);
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: 0 1vw 0 #555 !important;
+  background-color: #999 !important;
+  border-color: #555 !important;
+  -webkit-text-stroke: 0.3vw #444 !important;
 }
 
-/* Win mode selector for rules page */
+.button:not(.buttonDisabled):hover {
+  background-color: #38bdf8;
+  transform: translateY(-0.2vw);
+  box-shadow: 0 1.2vw 0 #075985;
+}
+
+.button:not(.buttonDisabled):active {
+  transform: translateY(0.8vw);
+  box-shadow: 0 0.2vw 0 #075985;
+}
+
+/* Mode selector */
 .mode-select-rules {
   display: flex;
   flex-direction: column;
-  gap: 1vw;
-  font-size: 2vw;
-  -webkit-text-stroke: 0.1vw #000000;
-  color: #1565c0;
+  gap: 1.2vw;
+  font-size: 2.2vw;
+  -webkit-text-stroke: 0.15vw #0c4a6e;
+  color: #bae6fd;
   margin-bottom: 5vw;
-  z-index: 50;
+  width: 100%;
+  align-items: center;
 }
 
 .mode-select-rules label {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5vw;
-  background: radial-gradient(circle, #2e5984, #1a3a5c);
-  border: 0.2vw solid #0a1929;
-  border-radius: 1vw;
-  padding: 0.8vw 1.5vw;
+  background-color: #0ea5e9;
+  border: 0.3vw solid #0c4a6e;
+  border-radius: 2vw;
+  padding: 0.8vw 2vw;
   cursor: pointer;
-  transition: all 0.3s;
-  color: #4fc3f7;
+  transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  color: #bae6fd;
+  box-shadow: 0 0.5vw 0 #075985;
+  width: 60%;
 }
 
 .mode-select-rules label:hover {
-  transform: scale(1.03);
-  background: radial-gradient(circle, #3a6b94, #214463);
+  background-color: #38bdf8;
+  transform: translateY(-0.2vw);
+  box-shadow: 0 0.7vw 0 #075985;
+}
+
+.mode-select-rules label:active {
+  transform: translateY(0.3vw);
+  box-shadow: 0 0.2vw 0 #075985;
 }
 
 .mode-select-rules input[type="radio"] {
-  width: 1.2vw;
-  height: 1.2vw;
-  accent-color: #29b6f6;
+  width: 1.5vw;
+  height: 1.5vw;
+  accent-color: #bae6fd;
 }
 
 .contraComputador {
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
   position: relative;
-  gap: 2vw;
+  width: 100%;
 }
-
-.contraJogador {
-  width: fit-content;
-}
-
-.difficultyButton {
-  font-family: "Cherry Bomb One", system-ui;
-  font-size: 1.5vw;
-  padding: 0.3vw 0.7vw;
-  border-radius: 0.8vw;
-  border: 0.2vw solid #0a1929;
-  background: radial-gradient(circle, #2e5984, #1a3a5c);
-  color: #4fc3f7;
-  -webkit-text-stroke: 0.1vw #0a1929;
-  cursor: pointer;
-  transition: all 0.2s;
-  position: absolute;
-  left: 24vw;
-  min-width: 10vw;
-}
-
-.difficultyButton:hover {
-  transform: scale(1.05);
-  background: radial-gradient(circle, #437497, #386389);
-}
-
-
-
 
 .tutorialButton {
   position: absolute;
   bottom: 4.2dvh;
   left: 3vw;
-  border: 0.26vw solid #0a1929;
-  /* Purple border */
-  background: radial-gradient(circle, #2e5984, #1a3a5c);
-  /* Purple gradient */
+  border: 0.3vw solid #0c4a6e;
+  background-color: #0ea5e9;
   border-radius: 1.7vw;
   padding: 0.1vw 1vw 0.5vw 1vw;
-  color: #4fc3f7;
-  /* Gold text */
-  -webkit-text-stroke: 0.17vw #0a1929;
-  /* Purple stroke */
+  color: #bae6fd;
+  -webkit-text-stroke: 0.15vw #0c4a6e;
   font-size: clamp(1.5vw, 5dvh, 2.7vw);
   font-family: "Cherry Bomb One", system-ui;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.1s ease;
   z-index: 10;
+  box-shadow: 0 0.4vw 0 #075985;
 }
 
 .tutorialButton:hover {
-  transform: scale(1.03) translateY(-0.5dvh);
-  background: radial-gradient(circle, #437497, #386389);
-  /* Lighter purple */
+  background-color: #38bdf8;
+  transform: translateY(-0.1vw);
+  box-shadow: 0 0.5vw 0 #075985;
+}
+
+.tutorialButton:active {
+  transform: translateY(0.3vw);
+  box-shadow: 0 0.1vw 0 #075985;
 }
 
 .detailedRulesButton {
   position: absolute;
   bottom: 4.2dvh;
   right: 3vw;
-  border: 0.26vw solid #0a1929;
-  /* Purple border */
-  background: radial-gradient(circle, #2e5984, #1a3a5c);
-  /* Purple gradient */
+  border: 0.3vw solid #0c4a6e;
+  background-color: #0ea5e9;
   border-radius: 1.7vw;
   padding: 0.1vw 1vw 0.5vw 1vw;
-  color: #4fc3f7;
-  /* Gold text */
-  -webkit-text-stroke: 0.17vw #0a1929;
-  /* Purple stroke */
+  color: #bae6fd;
+  -webkit-text-stroke: 0.15vw #0c4a6e;
   font-size: clamp(1.5vw, 5dvh, 2.7vw);
   font-family: "Cherry Bomb One", system-ui;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.1s ease;
   z-index: 10;
+  box-shadow: 0 0.4vw 0 #075985;
 }
 
-
 .detailedRulesButton:hover {
-  transform: scale(1.03) translateY(-0.5dvh);
-  background: radial-gradient(circle, #437497, #386389);
+  background-color: #38bdf8;
+  transform: translateY(-0.1vw);
+  box-shadow: 0 0.5vw 0 #075985;
+}
+
+.detailedRulesButton:active {
+  transform: translateY(0.3vw);
+  box-shadow: 0 0.1vw 0 #075985;
 }
 
 /* Modal Overlay */
@@ -230,7 +229,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(6, 44, 66, 0.4);
+  backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -238,176 +238,268 @@
 }
 
 .modalContent {
-  background: radial-gradient(circle, #7fa4c2, #537692);
-  border: 0.6vw solid #0c2d50;
-  border-radius: 3.3vw;
-  padding: 2vw 3vw;
-  margin-top: 5dvh;
+  background-color: #e0f2fe;
+  border: 0.4vw solid #0284c7;
+  border-radius: 3vw;
+  padding: 2.5vw 3.5vw;
+  margin: 5dvh auto 0;
   max-width: 90%;
-  max-height: 92dvh;
-  /* Changed from top: 13vw to max-height */
+  max-height: 85dvh;
   overflow-y: auto;
-  /* Ensure scrolling is enabled */
-  color: #e3f2fd;
-  -webkit-text-stroke: 0.1vw #000000;
-  font-size: 1.5vw;
+  color: #0c4a6e;
+  font-size: 1.8vw;
   position: relative;
+  box-shadow: 0 1.2vw 0 #0c4a6e;
+}
+
+.modalContent::-webkit-scrollbar {
+  width: 0.8vw;
+}
+
+.modalContent::-webkit-scrollbar-track {
+  background: #e0f2fe;
+  border-radius: 1vw;
+}
+
+.modalContent::-webkit-scrollbar-thumb {
+  background: #0ea5e9;
+  border-radius: 1vw;
+  border: 0.2vw solid #0c4a6e;
 }
 
 .closeButton {
-  background: radial-gradient(circle, #1e88e5, #1565c0);
-  border: 0.3vw solid #0a1929;
   border-radius: 50%;
-  padding: 0 0 0.1vw 0;
+  padding: 0 0 0.2vw 0;
+  background-color: #0ea5e9;
+  border: 0.3vw solid #0c4a6e;
   width: 4vw;
   height: 4vw;
-  color: #4fc3f7;
-  -webkit-text-stroke: 0.2vw #0a1929;
-  font-size: 2.5vw;
+  color: #bae6fd;
+  -webkit-text-stroke: 0.15vw #0c4a6e;
+  font-size: 2.2vw;
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 10;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-  /* Prevent the button from being affected by scrolling */
+  box-shadow: 0 0.4vw 0 #075985;
   position: sticky;
   float: right;
-  margin-top: 0.5vw;
+  margin-top: -1vw;
   margin-right: -1.5vw;
-  top: -1.5vw;
+  top: -1vw;
   right: -1.5vw;
+  transition: all 0.1s ease;
 }
 
 .closeButton:hover {
-  transform: scale(2);
+  background-color: #38bdf8;
   transform: translateY(-0.1vw);
-  background: radial-gradient(circle, #2791ee, #1e6fcb);
+  box-shadow: 0 0.5vw 0 #075985;
+}
+
+.closeButton:active {
+  transform: translateY(0.3vw);
+  box-shadow: 0 0.1vw 0 #075985;
 }
 
 .detailedRules {
   max-height: 100%;
-  /* Allow content to expand but be constrained by parent */
   overflow-y: visible;
-  /* Let the parent handle scrolling */
 }
 
 .detailedRules h3 {
-  color: #dff3fd;
-  -webkit-text-stroke: 0.21vw #0a1929;
-  font-size: 3vw;
+  color: #bae6fd;
+  -webkit-text-stroke: 0.15vw #0c4a6e;
+  font-size: 2.8vw;
+  margin-bottom: 1.5vw;
+  margin-top: 2vw;
+  text-shadow: 0 0.2vw 0 #075985;
 }
 
 .detailedRules p {
-  font-size: 2.1vw;
-  color: #3bafe6;
-  -webkit-text-stroke: 0.17vw #0a1929;
+  font-size: 2vw;
   margin-bottom: 1.5vw;
-  /* Add some spacing between paragraphs */
+  color: #fff;
+  -webkit-text-stroke: 0.12vw #0c4a6e;
+  font-family: "Cherry Bomb One", system-ui;
+  font-weight: 200;
+  line-height: 1.5;
 }
 
 .detailedRules h2 {
-  font-size: 4.5vw;
-  color: #1985ff;
-  -webkit-text-stroke: 0.25vw #0a1929;
+  font-size: 4vw;
+  color: #bae6fd;
+  -webkit-text-stroke: 0.2vw #0c4a6e;
+  text-shadow: 0 0.3vw 0 #075985;
   text-align: center;
-  margin-bottom: 2vw;
+  margin-bottom: 2.5vw;
 }
 
-/* difficulty locked styles */
+.detailedRules h4 {
+  font-size: 2.5vw;
+  color: #38bdf8;
+  -webkit-text-stroke: 0.12vw #0c4a6e;
+  margin-bottom: 1vw;
+  margin-top: 2vw;
+  text-shadow: 0 0.1vw 0 #075985;
+}
 
+.winTitle {
+  font-size: 2.5vw;
+  color: #38bdf8;
+  -webkit-text-stroke: 0.12vw #0c4a6e;
+  margin-bottom: 1vw;
+  margin-top: 2vw;
+}
+
+.winText {
+  font-size: 2vw;
+  margin-bottom: 1.5vw;
+  color: #fff;
+  -webkit-text-stroke: 0.12vw #0c4a6e;
+  font-family: "Cherry Bomb One", system-ui;
+  font-weight: 200;
+  line-height: 1.5;
+}
+
+.rulesSpan {
+  color: #bae6fd;
+  font-size: 2.3vw;
+  -webkit-text-stroke: 0.12vw #0c4a6e;
+}
+
+.rulesStrong {
+  color: #f87171;
+  text-shadow: 0 0.2vw 0 #7f1d1d;
+  -webkit-text-stroke: 0.12vw #7f1d1d;
+}
+
+.difficultyButton {
+  font-family: "Cherry Bomb One", system-ui;
+  font-size: 1.6vw;
+  padding: 0.5vw 1vw;
+  border-radius: 1vw;
+  border: 0.25vw solid #0c4a6e;
+  background-color: #bae6fd;
+  color: #55c1ff;
+  -webkit-text-stroke: 0.08vw #0c4a6e;
+  cursor: pointer;
+  transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  height: fit-content;
+  position: absolute;
+  left: 67%;
+  bottom: 75%;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0.4vw 0 #075985;
+}
+
+.difficultyButton:hover {
+  background-color: #e0f2fe;
+  transform: translateY(-0.1vw);
+  box-shadow: 0 0.5vw 0 #075985;
+}
+
+.difficultyButton:active {
+  transform: translateY(0.3vw);
+  box-shadow: 0 0.1vw 0 #075985;
+}
 
 .difficultyButton.locked {
-  filter: grayscale(100%);
+  filter: grayscale(1);
   opacity: 0.8;
-  cursor: not-allowed;
+  background-color: #ccc;
+  color: #555;
+  border-color: #555;
+  -webkit-text-stroke: 0.1vw #333;
+  box-shadow: 0 0.4vw 0 #777;
 }
 
-.difficultyButton.locked:hover {
-  transform: none;
-}
-
-/* Tooltip */
 .difficultyTooltip {
   position: absolute;
   bottom: 130%;
-  left: 10%;
+  left: 50%;
   transform: translateX(-50%);
-  background: rgba(71, 71, 71, 0.9);
-  color: #fff;
-  padding: 0.5vw 1vw;
+  background: #0ea5e9;
+  border: 0.3vw solid #0c4a6e;
   border-radius: 1vw;
-  font-size: 1.4vw;
-
-  z-index: 1000;
-  pointer-events: none;
-  border: 0.2vw solid #a1e1ff;
+  padding: 0.8vw;
   width: 21vw;
-}
-
-/* Disabled Play Button */
-.playButtonDisabled {
-  filter: grayscale(100%);
-  opacity: 0.6;
+  white-space: normal;
+  color: #bae6fd;
+  font-size: 1.4vw;
+  text-align: center;
+  z-index: 100;
+  -webkit-text-stroke: 0.1vw #0c4a6e;
   pointer-events: none;
+  box-shadow: 0 0.5vw 0 #075985;
+  animation: fadeIn 0.3s ease;
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* Reset Modal */
 .resetProgressButton {
   position: absolute;
-  top: 0.5vw;
-  left: 1.5vw;
+  top: 1.5vw;
+  left: 2vw;
   font-family: inherit;
-  font-size: 1.2vw;
-  color: #fbbf24;
-  background: radial-gradient(circle, #0288d1, #01579b);
-  border: 0.2vw solid #0a1929;
+  font-size: 1.5vw;
+  color: #fff;
+  background-color: #ef4444;
+  border: 0.3vw solid #7f1d1d;
   border-radius: 1vw;
-  padding: 0.3vw 1vw;
+  padding: 0.5vw 1.5vw;
   cursor: pointer;
-  -webkit-text-stroke: 0.08vw #0a1929;
-  box-shadow: 0 0 1vw rgba(0, 0, 0, 0.5);
-  transition: all 0.2s;
+  -webkit-text-stroke: 0.1vw #7f1d1d;
+  transition: all 0.1s ease;
   z-index: 20;
+  box-shadow: 0 0.4vw 0 #991b1b;
 }
 
 .resetProgressButton:hover {
-  transform: scale(1.05);
-  background: radial-gradient(circle, #039be5, #0277bd);
+  background-color: #f87171;
+  transform: translateY(-0.1vw);
+  box-shadow: 0 0.5vw 0 #991b1b;
 }
 
-/* Confirm Modal - Matches Crown Chase Structure but SPTTT Colors */
-.confirmModalOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
+.resetProgressButton:active {
+  transform: translateY(0.3vw);
+  box-shadow: 0 0.1vw 0 #991b1b;
 }
 
-.confirmModalContent {
-  background: radial-gradient(circle, #2895b3, #135175);
-  border: 0.5vw solid #083e71;
+.confirmModal {
+  background-color: #e0f2fe;
+  border: 0.4vw solid #0284c7;
   border-radius: 2vw;
-  padding: 2vw;
+  padding: 3vw;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2vw;
   width: 40vw;
-  box-shadow: 0 0 2vw #000;
+  box-shadow: 0 1vw 0 #0c4a6e;
   text-align: center;
 }
 
 .confirmText {
   font-size: 2.5vw;
-  color: #a1e1ff;
-  -webkit-text-stroke: 0.13vw #0a1929;
-  font-family: "Cherry Bomb One", system-ui;
+  color: #bae6fd;
+  -webkit-text-stroke: 0.15vw #0c4a6e;
+  text-shadow: 0 0.2vw 0 #075985;
 }
 
 .confirmButtons {
@@ -420,21 +512,45 @@
   font-size: 2vw;
   padding: 0.5vw 2vw;
   border-radius: 1vw;
-  border: 0.2vw solid #0a1929;
+  border: 0.3vw solid #0c4a6e;
   cursor: pointer;
-  -webkit-text-stroke: 0.1vw #0a1929;
-  transition: transform 0.2s;
+  -webkit-text-stroke: 0.1vw #0c4a6e;
+  transition: all 0.1s ease;
   color: #fff;
 }
 
-.confirmBtn:hover {
-  transform: scale(1.05);
+.yesBtn {
+  background-color: #22c55e;
+  border-color: #14532d;
+  -webkit-text-stroke: 0.1vw #14532d;
+  box-shadow: 0 0.5vw 0 #166534;
 }
 
-.yesBtn {
-  background: radial-gradient(circle, #ff4d4d, #cc0000);
+.yesBtn:hover {
+  background-color: #4ade80;
+  transform: translateY(-0.1vw);
+  box-shadow: 0 0.6vw 0 #166534;
+}
+
+.yesBtn:active {
+  transform: translateY(0.4vw);
+  box-shadow: 0 0.1vw 0 #166534;
 }
 
 .noBtn {
-  background: radial-gradient(circle, #29a03b, #1b6b27);
+  background-color: #ef4444;
+  border-color: #7f1d1d;
+  -webkit-text-stroke: 0.1vw #7f1d1d;
+  box-shadow: 0 0.5vw 0 #991b1b;
+}
+
+.noBtn:hover {
+  background-color: #f87171;
+  transform: translateY(-0.1vw);
+  box-shadow: 0 0.6vw 0 #991b1b;
+}
+
+.noBtn:active {
+  transform: translateY(0.4vw);
+  box-shadow: 0 0.1vw 0 #991b1b;
 }

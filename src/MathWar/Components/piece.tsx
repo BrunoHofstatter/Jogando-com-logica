@@ -189,7 +189,7 @@ const PieceComponent: React.FC<PieceProps> = ({
     if (piece.owner >= 0) {
       title += ` (Player ${piece.owner + 1})`;
     }
-  
+
     if (isPromoted) {
       title += " - Promoted";
     }
@@ -204,9 +204,8 @@ const PieceComponent: React.FC<PieceProps> = ({
 
   return (
     <div
-      className={`${styles.piece} ${piece.owner === 0 ? styles.pieceRed : styles.pieceBlue} ${styles[piece.type] || ''} ${
-        display.shape === "square" ? styles.pieceSquare : styles.pieceCircle
-      } ${isSelected ? styles.pieceSelected : ""} ${isSpecial ? styles.pieceSpecial : ""} ${isPromoted ? styles.piecePromoted : ""} ${hasMoved ? styles.pieceMoved : ""} ${piece.type === "barrier" ? styles.pieceBarrier : ""}`}
+      className={`${styles.piece} ${piece.owner === 0 ? styles.pieceRed : styles.pieceBlue} ${styles[piece.type] || ''} ${display.shape === "square" ? styles.pieceSquare : styles.pieceCircle
+        } ${isSelected ? styles.pieceSelected : ""} ${isSpecial ? styles.pieceSpecial : ""} ${isPromoted ? styles.piecePromoted : ""} ${hasMoved ? styles.pieceMoved : ""} ${piece.type === "barrier" ? styles.pieceBarrier : ""}`}
       style={{
         width: display.shape === "square" ? "70%" : "75%",
         height: display.shape === "square" ? "70%" : "75%",
@@ -224,12 +223,12 @@ const PieceComponent: React.FC<PieceProps> = ({
     >
       {/* Main piece symbol */}
       <div className={styles.pieceContent}>
-        <div >
+        <div style={hasValue ? { fontSize: "1.7vw", WebkitTextStroke: "0.1vw #031d16ff" } : undefined}>
           {display.symbol}
         </div>
 
         {/* Show value for Math War pieces */}
-        
+
       </div>
 
       {/* Captain indicator */}

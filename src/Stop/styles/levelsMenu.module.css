@@ -111,7 +111,7 @@
 }
 
 .confirmModal {
-    background-color: #fff9f9;
+    background-color: #ffc1c1;
     border: 0.4vw solid #a11425;
     border-radius: 2vw;
     padding: 2.5vw;
@@ -126,7 +126,7 @@
 
 .confirmText {
     font-size: 2.5vw;
-    color: #e31f2f;
+    color: #ffcf40;
     -webkit-text-stroke: 0.1vw #a11425;
 }
 

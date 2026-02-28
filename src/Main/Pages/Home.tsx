@@ -1,7 +1,7 @@
 //import MainMenu from "../Components/mainMenu";
 import "../CSS/Home.css";
 import { useNavigate } from "react-router-dom";
-
+import RubiksCube from "../../RubiksClass/Components/RubiksCube";
 
 function Home() {
   const navigate = useNavigate();
@@ -12,7 +12,9 @@ function Home() {
     <div className="homePage">
       <div className="imagens">
         <img src={`${import.meta.env.BASE_URL}imagemXadrez.png`} className="imagemXadrez" />
-        <img src={`${import.meta.env.BASE_URL}imagemCubo.png`} className="imagemCubo" />
+        <div className="imagemCuboWrapper">
+          <RubiksCube size={3} cubeSize={15} />
+        </div>
       </div>
       <div className="logo">
         {/* <picture>

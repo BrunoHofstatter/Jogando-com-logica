@@ -191,7 +191,7 @@ export default function SPTTT({ winCondition, isAiMode = false, difficulty = 1, 
   };
 
   return (
-    <div className={styles["jogo-SPTTT"]}>
+    <div className={`${styles["jogo-SPTTT"]} ${finalWinner ? styles["game-over"] : ""}`}>
       <div className={styles.statWrap}>
         {/* Turn indicator */}
         <div className={styles["turn-indicator"]} data-target="player">
@@ -233,9 +233,11 @@ export default function SPTTT({ winCondition, isAiMode = false, difficulty = 1, 
               <div
                 key={boardIndex}
                 data-target={`smallboard-${boardIndex}`}
-                className={`${styles["small-board"]} ${activeBoard === null || activeBoard === boardIndex
-                  ? styles.playable
-                  : ""
+                className={`${styles["small-board"]} ${activeBoard === null
+                  ? styles.playableStatic
+                  : activeBoard === boardIndex
+                    ? styles.playable
+                    : ""
                   } ${winners[boardIndex]
                     ? winners[boardIndex] === "tie"
                       ? styles.tied

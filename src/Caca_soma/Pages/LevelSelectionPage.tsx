@@ -130,10 +130,13 @@ function LevelSelectionPage() {
                 onClick={() => handleLevelClick(level.levelId)}
                 className={styles.levelButton}
                 style={{
-                  background: unlocked
-                    ? 'radial-gradient(circle, #d38c8c, #ac4c4c)'
-                    : 'radial-gradient(circle, #8a8a8a, #555555)',
-                  border: '0.4vw solid #a11313',
+                  backgroundColor: unlocked
+                    ? '#da3e3e' /* main flat red */
+                    : '#9c8080', /* board gray for locked */
+                  border: '0.4vw solid #7f0000',
+                  boxShadow: unlocked ? '0 0.6vw 0 #5c0000' : '0 0.6vw 0 #5c4a4a',
+                  transform: 'translateY(0)',
+                  transition: 'all 0.1s ease',
                   borderRadius: '2vw',
                   aspectRatio: '1',
                   display: 'flex',
@@ -147,8 +150,9 @@ function LevelSelectionPage() {
               >
                 <div style={{
                   fontSize: '4vw',
-                  color: unlocked ? '#eee' : '#ccc',
-                  WebkitTextStroke: '0.2vw #af2020',
+                  color: unlocked ? '#ffffff' : '#e0e0e0',
+                  WebkitTextStroke: unlocked ? '0.15vw #7f0000' : '0.15vw #4a3c3c',
+                  textShadow: unlocked ? '0 0.3vw 0 #5c0000' : 'none',
                   fontFamily: 'inherit'
                 }}>
                   {level.levelId}
@@ -159,8 +163,8 @@ function LevelSelectionPage() {
                     {[1, 2, 3].map(s => (
                       <span key={s} style={{
                         fontSize: '1.5vw',
-                        color: s <= stars ? '#ffd700' : '#716262',
-                        WebkitTextStroke: '0.1vw #af2020'
+                        color: s <= stars ? '#ffcf40' : '#d18d8d',
+                        WebkitTextStroke: '0.15vw #7f0000'
                       }}>★</span>
                     ))}
                   </div>

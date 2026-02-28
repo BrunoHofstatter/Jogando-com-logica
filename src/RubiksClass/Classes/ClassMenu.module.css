@@ -1,97 +1,46 @@
+/* ============================================================
+   ClassMenu.module.css
+   Soft Purple Neo-Brutalist Theme
+   ============================================================ */
+
 .container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  justify-content: flex-start;
+  min-height: 100dvh;
+  width: 100%;
+  background-color: #d8b4ff;
+  /* Soft Light Purple */
   font-family: "Cherry Bomb One", system-ui;
   text-align: center;
-  padding: 2vw;
+  padding: 0vw 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .header {
-  margin-bottom: 5vw;
+  margin-bottom: 4vw;
+  margin-top: 2vw;
 }
 
-.header h1 {
+.title {
+  font-family: inherit;
   font-size: 5vw;
-  margin: 0 0 2vw 0;
-  -webkit-text-stroke: 0.3vw black;
-  text-shadow: 0.3vw 0.3vw 0.6vw rgba(0, 0, 0, 0.5);
-}
-
-.header p {
-  font-size: 2.5vw;
   margin: 0;
-  -webkit-text-stroke: 0.1vw black;
-  opacity: 0.9;
+  color: #ffffff;
+  -webkit-text-stroke: 0.25vw #541686;
+  /* Dark Purple */
+  text-shadow: 0 0.6vw 0 #541686;
+  line-height: 1.0;
 }
 
 .classGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 3vw;
-  width: 100vw;
-  padding: 0 12vw;
-}
-
-.backButton {
-  padding: 1vw 2.5vw;
-  font-size: 2vw;
-  background: radial-gradient(circle, #e74c3c, #c0392b);
-  color: white;
-  border: 0.2vw solid black;
-  border-radius: 2vw;
-  cursor: pointer;
-  font-family: "Cherry Bomb One", system-ui;
-  -webkit-text-stroke: 0.13vw black;
-  box-shadow: 0 0.5vw 1.5vw rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease;
-}
-
-.backButton:hover {
-  background: radial-gradient(circle, #c0392b, #a93226);
-  transform: translateY(-0.3vw) scale(1.05);
-  box-shadow: 0 0.8vw 2vw rgba(0, 0, 0, 0.4);
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .container {
-    padding: 4vw;
-  }
-
-  .header h1 {
-    font-size: 8vw;
-  }
-
-  .header p {
-    font-size: 4vw;
-  }
-
-  .classGrid {
-    grid-template-columns: 1fr;
-    gap: 5vw;
-    max-width: 80vw;
-  }
-}
-
-@media (max-width: 480px) {
-  .container {
-    padding: 5vw;
-  }
-
-  .header h1 {
-    font-size: 10vw;
-  }
-
-  .header p {
-    font-size: 5vw;
-  }
-
-  .classGrid {
-    max-width: 90vw;
-  }
+  width: 100%;
+  max-width: 96vw;
+  padding: 0 2vw;
 }

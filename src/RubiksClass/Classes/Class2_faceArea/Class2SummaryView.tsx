@@ -201,7 +201,7 @@ const Class2SummaryView: React.FC<Class2SummaryViewProps> = ({ totalFlags }) => 
                     <RubiksCube
                         size={size}
                         cubeSize={10} // small preview size
-                        resetToFront={false}
+                        resetToFront={true}
                         highlightRegion={null}
                         dimInactive={false}
                         showIndices={false}
@@ -239,12 +239,12 @@ const Class2SummaryView: React.FC<Class2SummaryViewProps> = ({ totalFlags }) => 
 
             {/* Left Cubes (2, 3, 4) */}
             <div className={`${styles.sidePanel} ${styles.leftPanel}`}>
-                {CUBES_LEFT.map((size) => renderCube(size, true))}
+                {React.useMemo(() => CUBES_LEFT.map((size) => renderCube(size, true)), [matchedSizes, shakingCube, selectedBoxId])}
             </div>
 
             {/* Right Cubes (5, 6) */}
             <div className={`${styles.sidePanel} ${styles.rightPanel}`}>
-                {CUBES_RIGHT.map((size) => renderCube(size, false))}
+                {React.useMemo(() => CUBES_RIGHT.map((size) => renderCube(size, false)), [matchedSizes, shakingCube, selectedBoxId])}
             </div>
 
             {/* Falling Area */}
@@ -287,7 +287,7 @@ const Class2SummaryView: React.FC<Class2SummaryViewProps> = ({ totalFlags }) => 
                             <br />
                             Cliques errados nas caixas: {mistakes}
                             <br />
-                            <strong>Total de Erros: {totalFlags + mistakes}</strong>
+                            <span>Total de Erros: {totalFlags + mistakes}</span>
                         </p>
                         <button
                             className={styles.modalButton}

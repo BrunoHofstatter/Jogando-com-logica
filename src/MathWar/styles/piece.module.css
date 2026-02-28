@@ -3,13 +3,19 @@
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  transition: all 0.2s ease;
+  transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
   user-select: none;
   border-radius: 50%;
   font-size: 1.85vw !important;
-  
-  box-shadow: 0 0.2vw 0.4vw rgba(0, 0, 0, 0.2);
+  color: #1a0e47;
+  box-shadow: 0 0.5vw 0 rgba(0, 0, 0, 0.4);
+  margin-bottom: 0.5vw;
+}
+
+.piece:hover:not(.pieceSelected) {
+  transform: translateY(-0.2vw);
+  box-shadow: 0 0.7vw 0 rgba(0, 0, 0, 0.5);
 }
 
 .pieceCircle {
@@ -21,7 +27,9 @@
 }
 
 .pieceSelected {
-  border: 0.5vw solid #f1c40f;
+  transform: translateY(-0.8vw) scale(1.05);
+  border: 0.3vw solid #fbbf24;
+  box-shadow: 0 1.3vw 0 rgba(0, 0, 0, 0.4);
 }
 
 
@@ -48,62 +56,59 @@
 
 
 .pieceRed {
-  border: 0.2vw solid #a02c1f !important;
-  -webkit-text-stroke: 0.11vw #79190e ;
+  border: 0.3vw solid #7f1d1d !important;
 }
 
 .pieceBlue {
-  border: 0.2vw solid #1c6392 !important;
-  -webkit-text-stroke: 0.11vw #145077;
+  border: 0.3vw solid #1e3a8a !important;
 }
 
 .captain {
-  background: radial-gradient(circle, #f39c12, #e67e22)!important;
-  border-color: #f1c40f;
-  box-shadow: 0 0.3vw 0.6vw rgba(241, 196, 15, 0.4);
+  background-color: #f59e0b;
+  border-color: #b45309;
 }
 
 .checker {
-  background: radial-gradient(circle, #95a5a6, #7f8c8d);
-  border-color: #bdc3c7;
+  background-color: #94a3b8;
+  border-color: #475569;
 }
 
 .jumper {
-  background: radial-gradient(circle, #ba68c8, #9c27b0);
-  border-color: #c3c53a;
-  animation: jumperBounce 1.5s ease-in-out infinite alternate;
-}
-
-@keyframes jumperBounce {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-0.2vw); }
+  background-color: #d946ef;
+  border-color: #86198f;
+  -webkit-text-stroke: 0vw #b45309;
+  color: #fbbf24;
 }
 
 .killer {
-  background: radial-gradient(circle, #4c1d95, #2d1b69);
-  border-color: #e74c3c;
-  box-shadow: 0 0.3vw 0.6vw rgba(231, 76, 60, 0.4);
+  background-color: #2e1065;
+  border-color: #1e1b4b;
+  color: #fff;
 }
 
 .king {
-  background: radial-gradient(circle, #fff176, #c3c53a);
-  border-color: #9c27b0;
-  box-shadow: 0 0.4vw 0.8vw rgba(156, 39, 176, 0.3);
+  background-color: #fbbf24;
+  border-color: #b45309;
   transform: scale(1.05);
-  -webkit-text-stroke: 0vw #4c1d95;
+  -webkit-text-stroke: 0vw #78350f;
+  color: #78350f;
+}
+
+.king:hover:not(.pieceSelected) {
+  transform: translateY(-0.2vw) scale(1.05);
 }
 
 .pieceCaptainIndicator {
   position: absolute;
   top: -0.5vw;
   right: -0.5vw;
-  background: gold;
+  background-color: #fbbf24;
   color: #000;
   border-radius: 50%;
   width: 1.2vw;
   height: 1.2vw;
   font-size: 1vw;
-  border: 0.1vw solid #b79307;
+  border: 0.15vw solid #b45309;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -6,10 +6,13 @@
 .container {
     position: relative;
     height: 100dvh;
-    width: 100%;
+    width: 100vw;
     overflow: hidden;
-    background: linear-gradient(180deg, #87CEEB 0%, #E0F6FF 100%);
+    background: #e0f2fe;
+    /* Light Soft Blue */
     display: flex;
+    font-family: "Cherry Bomb One", system-ui;
+    box-sizing: border-box;
 }
 
 /* --- Aulas Back Button --- */
@@ -18,21 +21,30 @@
     top: 2vw;
     left: 2vw;
     z-index: 1000;
-    font-family: "Cherry Bomb One", cursive;
-    font-size: 1.5vw;
-    background: #e74c3c;
-    color: white;
-    border: none;
+    font-family: inherit;
+    font-size: 2vw;
+    background: #a855f7;
+    /* Purple */
+    color: #ffffff;
+    border: 0.3vw solid #6b21a8;
+    /* Dark purple border */
     border-radius: 1vw;
-    padding: 0.8vw 1.5vw;
+    padding: 0.5vw 1.5vw;
     cursor: pointer;
-    box-shadow: 0 0.4vw 0.8vw rgba(231, 76, 60, 0.3);
-    transition: transform 0.2s, background 0.2s;
+    box-shadow: 0 0.6vw 0 #6b21a8;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    -webkit-text-stroke: 0.15vw #6b21a8;
 }
 
 .aulasButton:hover {
-    background: #c0392b;
-    transform: scale(1.05);
+    background: #c084fc;
+    transform: translateY(-0.2vw);
+    box-shadow: 0 0.8vw 0 #6b21a8;
+}
+
+.aulasButton:active {
+    transform: translateY(0.4vw);
+    box-shadow: 0 0.2vw 0 #6b21a8;
 }
 
 /* --- Feedback Overlay --- */
@@ -46,17 +58,19 @@
 }
 
 .feedbackBubble {
-    background: #fff3cd;
-    border: 2px solid #ffc107;
+    background: #ffe874;
+    /* Soft yellow bg */
+    border: 0.4vw solid #ca8a04;
     border-radius: 1vw;
-    padding: 1vw 2vw;
+    padding: 0.8vw 1.8vw;
     text-align: center;
-    font-family: "Cherry Bomb One", cursive;
-    font-size: 1.4vw;
-    color: #664d03;
-    box-shadow: 0 0.4vw 1.2vw rgba(0, 0, 0, 0.15);
-    animation: fadeSlideIn 0.4s ease-out;
+    font-family: inherit;
+    font-size: 1.8vw;
+    color: #ffffff;
+    box-shadow: 0 0.6vw 0 #a16207;
+    animation: fadeSlideIn 0.3s ease-out;
     pointer-events: none;
+    -webkit-text-stroke: 0.15vw #ca8a04;
 }
 
 /* --- Title --- */
@@ -70,15 +84,13 @@
 }
 
 .titleText {
-    font-family: "Cherry Bomb One", cursive;
-    font-size: 2.5vw;
-    color: #2c3e50;
-    text-shadow: 0 0.2vw 0.5vw rgba(255, 255, 255, 0.8);
+    font-family: inherit;
+    font-size: 3.5vw;
+    color: #ffffff;
+    text-shadow: 0 0.4vw 0 #013873;
+    -webkit-text-stroke: 0.2vw #013873;
     margin: 0;
-    background: rgba(255, 255, 255, 0.6);
-    display: inline-block;
-    padding: 0.5vw 2vw;
-    border-radius: 2vw;
+    line-height: 1.2;
 }
 
 /* --- Parked Cubes Panels --- */
@@ -92,6 +104,7 @@
     justify-content: space-around;
     align-items: center;
     z-index: 5;
+    background: transparent;
 }
 
 .leftPanel {
@@ -104,62 +117,66 @@
 
 .cubeWrapper {
     cursor: pointer;
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s ease, opacity 0.3s ease;
-    border-radius: 1vw;
-    padding: 1vw;
+    transition: transform 0.1s ease, filter 0.1s ease;
+    border-radius: 50%;
+    padding: 0 1.5vw;
     position: relative;
+    background: transparent;
+    border: none;
+    box-shadow: none;
 }
 
 /* When a number is held, pulse the cubes to invite a click */
 .cubeWrapper.pulse {
     animation: gentlePulse 2s infinite ease-in-out;
-    border: 0.2vw dashed rgba(52, 152, 219, 0.5);
-    background: rgba(255, 255, 255, 0.3);
+    /* Use a performant box-shadow instead of filter: drop-shadow */
+    box-shadow: 0 0 0vw rgba(56, 189, 248, 0);
 }
 
 .cubeWrapper:hover:not(.matched) {
-    transform: scale(1.1);
-    background: rgba(255, 255, 255, 0.5);
+    transform: translateY(-0.5vw) scale(1.05);
+    /* Inexpensive hover shadow for a circular wrapper */
+    box-shadow: 0 1vw 0.5vw rgba(2, 132, 199, 0.4);
 }
 
 .cubeWrapper.matched {
-    opacity: 0.5;
+    opacity: 0.4;
     filter: grayscale(100%);
     pointer-events: none;
-    transform: scale(0.9);
+    transform: translateY(1vw) scale(0.9);
 }
 
 .cubeWrapper.shake {
-    animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
-/* The docked number that sits next to a matched cube */
 /* The docked number that sits next to a matched cube */
 .dockedNumber {
     position: absolute;
     top: 50%;
-    background: #2ecc71;
+    background: #5ee991;
+    /* Soft green */
     color: white;
-    font-family: "Cherry Bomb One", cursive;
+    font-family: inherit;
     font-size: 5vw;
-    /* Much larger as requested! */
     padding: 1vw 2vw;
     border-radius: 2vw;
-    border: 0.4vw solid white;
-    box-shadow: 0 0.8vw 1.6vw rgba(0, 0, 0, 0.2);
+    border: 0.4vw solid #16a34a;
+    box-shadow: 0 0.6vw 0 #15803d;
+    -webkit-text-stroke: 0.15vw #16a34a;
     z-index: 10;
 }
 
 .dockedRight {
     left: 80%;
     transform: translateY(-50%) translateX(2vw) scale(0);
-    animation: popInDockRight 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    animation: popInDockRight 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
 .dockedLeft {
     right: 80%;
     transform: translateY(-50%) translateX(-2vw) scale(0);
-    animation: popInDockLeft 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    animation: popInDockLeft 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
 /* --- Falling Area & Numbers --- */
@@ -175,14 +192,15 @@
 
 .fallingBox {
     position: absolute;
-    font-family: "Cherry Bomb One", cursive;
+    font-family: inherit;
     font-size: 2.5vw;
-    background: #ffffff;
-    color: #34495e;
-    border: 0.3vw solid #34495e;
+    background: #98defc;
+    /* Soft dark blue */
+    color: #ffffff;
+    border: 0.4vw solid #013873;
     border-radius: 1vw;
     padding: 1vw 1.5vw;
-    box-shadow: 0 0.6vw 1.2vw rgba(0, 0, 0, 0.15);
+    box-shadow: 0 0.6vw 0 #013873;
     cursor: pointer;
     pointer-events: auto;
     user-select: none;
@@ -190,28 +208,33 @@
     align-items: center;
     justify-content: center;
     /* Smooth transform so pausing/clicking looks nice */
-    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease, background 0.2s ease;
+    transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.1s ease, background 0.1s ease;
     transform: translateX(-50%);
-    /* Centered on its left coordinate */
+    -webkit-text-stroke: 0.15vw #013873;
+    text-shadow: 0 0.2vw 0 #013873;
 }
 
 .fallingBox:hover:not(.paused) {
-    transform: translateX(-50%) scale(1.1);
+    transform: translateX(-50%) translateY(-0.2vw) scale(1.05);
+    box-shadow: 0 0.8vw 0 #013873;
+    background: #7dd3fc;
 }
 
 .fallingBox.paused {
-    border-color: #3498db;
-    color: #3498db;
-    box-shadow: 0 0 1.5vw rgba(52, 152, 219, 0.8);
-    transform: translateX(-50%) scale(1.2);
+    background: #bae6fd;
+    border-color: #013873;
+    color: #ffffff;
+    box-shadow: 0 1vw 0 #013873;
+    transform: translateX(-50%) scale(1.15) translateY(-0.2vw);
     z-index: 50;
 }
 
 .fallingBox.shake {
-    animation: boxShake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-    background: #e74c3c;
+    animation: boxShake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    background: #ef4444;
+    /* Red */
+    border-color: #991b1b;
     color: white;
-    border-color: #c0392b;
 }
 
 /* --- Completion Modal --- */
@@ -221,22 +244,24 @@
     left: 0;
     width: 100vw;
     height: 100dvh;
-    background: rgba(44, 62, 80, 0.85);
+    background: rgba(49, 134, 177, 0.65);
+    /* Deep flat blue tint */
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 9999;
     backdrop-filter: blur(4px);
-    animation: fadeIn 0.4s ease;
+    animation: fadeIn 0.3s ease;
 }
 
 .modalContent {
-    background: white;
+    background: #bae6fd;
     padding: 4vw;
+    border: 0.5vw solid #0284c7;
     border-radius: 2vw;
     text-align: center;
-    box-shadow: 0 1vw 3vw rgba(0, 0, 0, 0.3);
-    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 1.5vw 0 #0284c7;
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     display: flex;
     flex-direction: column;
     gap: 1.5vw;
@@ -244,37 +269,47 @@
 }
 
 .modalTitle {
-    font-family: "Cherry Bomb One", cursive;
-    font-size: 3.5vw;
-    color: #f1c40f;
+    font-family: inherit;
+    font-size: 4.5vw;
+    color: #fbe67b;
     margin: 0;
-    text-shadow: 0 0.2vw 0.5vw rgba(0, 0, 0, 0.1);
+    -webkit-text-stroke: 0.25vw #ca8a04;
+    text-shadow: 0 0.6vw 0 #a16207;
+    line-height: 1.2;
 }
 
 .modalStats {
-    font-family: "Cherry Bomb One", cursive;
-    font-size: 1.8vw;
-    color: #34495e;
+    font-family: inherit;
+    font-size: 2.2vw;
+    color: #ffffff;
+    -webkit-text-stroke: 0.14vw #0284c7;
     margin: 0;
 }
 
 .modalButton {
-    font-family: "Cherry Bomb One", cursive;
-    font-size: 1.8vw;
-    padding: 1vw 3vw;
-    border: none;
+    font-family: inherit;
+    font-size: 2.2vw;
+    padding: 1vw 3vw 1.2vw;
+    border: 0.4vw solid #6b21a8;
     border-radius: 1vw;
-    background: #3498db;
-    color: white;
+    background: #a855f7;
+    color: #ffffff;
     cursor: pointer;
-    box-shadow: 0 0.4vw 0.8vw rgba(52, 152, 219, 0.3);
-    transition: transform 0.2s, background 0.2s;
+    box-shadow: 0 0.8vw 0 #6b21a8;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
     margin-top: 1vw;
+    -webkit-text-stroke: 0.15vw #6b21a8;
 }
 
 .modalButton:hover {
-    background: #2980b9;
-    transform: scale(1.05);
+    background: #c084fc;
+    transform: translateY(-0.2vw);
+    box-shadow: 0 1vw 0 #6b21a8;
+}
+
+.modalButton:active {
+    transform: translateY(0.4vw);
+    box-shadow: 0 0.2vw 0 #6b21a8;
 }
 
 /* --- Animations --- */
@@ -295,23 +330,23 @@
 
     10%,
     90% {
-        transform: translate3d(-2px, 0, 0);
+        transform: translate3d(-0.2vw, 0, 0);
     }
 
     20%,
     80% {
-        transform: translate3d(4px, 0, 0);
+        transform: translate3d(0.4vw, 0, 0);
     }
 
     30%,
     50%,
     70% {
-        transform: translate3d(-8px, 0, 0);
+        transform: translate3d(-0.8vw, 0, 0);
     }
 
     40%,
     60% {
-        transform: translate3d(8px, 0, 0);
+        transform: translate3d(0.8vw, 0, 0);
     }
 }
 
@@ -319,40 +354,41 @@
 
     10%,
     90% {
-        transform: translateX(-50%) translate3d(-2px, 0, 0);
+        transform: translateX(-50%) translate3d(-0.2vw, 0, 0);
     }
 
     20%,
     80% {
-        transform: translateX(-50%) translate3d(4px, 0, 0);
+        transform: translateX(-50%) translate3d(0.4vw, 0, 0);
     }
 
     30%,
     50%,
     70% {
-        transform: translateX(-50%) translate3d(-8px, 0, 0);
+        transform: translateX(-50%) translate3d(-0.8vw, 0, 0);
     }
 
     40%,
     60% {
-        transform: translateX(-50%) translate3d(8px, 0, 0);
+        transform: translateX(-50%) translate3d(0.8vw, 0, 0);
     }
 }
 
 @keyframes gentlePulse {
     0% {
         transform: scale(1);
-        box-shadow: 0 0 0 rgba(52, 152, 219, 0);
+        box-shadow: 0 0 0vw rgba(56, 189, 248, 0);
     }
 
     50% {
         transform: scale(1.03);
-        box-shadow: 0 0 1.5vw rgba(52, 152, 219, 0.4);
+        /* Large blurry circular glow behind the cube */
+        box-shadow: 0 0 3vw 1vw rgba(56, 189, 248, 0.6);
     }
 
     100% {
         transform: scale(1);
-        box-shadow: 0 0 0 rgba(52, 152, 219, 0);
+        box-shadow: 0 0 0vw rgba(56, 189, 248, 0);
     }
 }
 
@@ -368,36 +404,12 @@
 
 @keyframes popIn {
     0% {
-        transform: scale(0.5);
+        transform: scale(0.8) translateY(2vw);
         opacity: 0;
     }
 
     100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-@keyframes popInDockRight {
-    0% {
-        transform: translateY(-50%) translateX(2vw) scale(0);
-        opacity: 0;
-    }
-
-    100% {
-        transform: translateY(-50%) translateX(2vw) scale(1);
-        opacity: 1;
-    }
-}
-
-@keyframes popInDockLeft {
-    0% {
-        transform: translateY(-50%) translateX(-2vw) scale(0);
-        opacity: 0;
-    }
-
-    100% {
-        transform: translateY(-50%) translateX(-2vw) scale(1);
+        transform: scale(1) translateY(0);
         opacity: 1;
     }
 }

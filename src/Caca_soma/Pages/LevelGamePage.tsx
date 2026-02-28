@@ -49,16 +49,17 @@ function LevelGamePage() {
       body: (
         <div style={{
           fontSize: '2vw',
-          color: '#eee',
+          color: '#ffffff',
           marginBottom: '24px',
           lineHeight: 1.5,
-          WebkitTextStroke: '0.15vw #720b0bff',
+          WebkitTextStroke: '0.15vw #7f0000',
+          textShadow: '0 0.2vw 0 #5c0000',
           display: 'flex',
           flexDirection: 'column',
           gap: '1vw'
         }}>
-          <span>- O <span style={{ color: '#ffb224ff', fontSize: '2.3vw' }}>Número Mágico</span> vai ser sorteado</span>
-          <span>- Clique em <span style={{ color: '#ffb224ff', fontSize: '2.3vw' }}>Começar</span> para iniciar</span>
+          <span>- O <span style={{ color: '#ffcf40', WebkitTextStroke: '0.15vw #b28900', fontSize: '2.3vw' }}>Número Mágico</span> vai ser sorteado</span>
+          <span>- Clique em <span style={{ color: '#ffcf40', WebkitTextStroke: '0.15vw #b28900', fontSize: '2.3vw' }}>Começar</span> para iniciar</span>
         </div>
       )
     },
@@ -71,16 +72,17 @@ function LevelGamePage() {
       body: (
         <div style={{
           fontSize: '2vw',
-          color: '#eee',
+          color: '#ffffff',
           marginBottom: '24px',
           lineHeight: 1.5,
-          WebkitTextStroke: '0.15vw #720b0bff',
+          WebkitTextStroke: '0.15vw #7f0000',
+          textShadow: '0 0.2vw 0 #5c0000',
           display: 'flex',
           flexDirection: 'column',
           gap: '1vw'
         }}>
-          <span>- Selecione <span style={{ color: '#ffb224ff', fontSize: '2.3vw' }}>2 números</span></span>
-          <span>- A soma deles deve ser <span style={{ color: '#ffb224ff', fontSize: '2.3vw' }}>igual</span> ao Número Mágico</span>
+          <span>- Selecione <span style={{ color: '#ffcf40', WebkitTextStroke: '0.15vw #b28900', fontSize: '2.3vw' }}>2 números</span></span>
+          <span>- A soma deles deve ser <span style={{ color: '#ffcf40', WebkitTextStroke: '0.15vw #b28900', fontSize: '2.3vw' }}>igual</span> ao Número Mágico</span>
         </div>
       )
     },
@@ -93,15 +95,16 @@ function LevelGamePage() {
       body: (
         <div style={{
           fontSize: '2vw',
-          color: '#eee',
+          color: '#ffffff',
           marginBottom: '24px',
           lineHeight: 1.5,
-          WebkitTextStroke: '0.15vw #720b0bff',
+          WebkitTextStroke: '0.15vw #7f0000',
+          textShadow: '0 0.2vw 0 #5c0000',
           display: 'flex',
           flexDirection: 'column',
           gap: '1vw'
         }}>
-          <span>- Clique <span style={{ color: '#ffb224ff', fontSize: '2.3vw' }}>Fora do Tabuleiro</span> quando terminar</span>
+          <span>- Clique <span style={{ color: '#ffcf40', WebkitTextStroke: '0.15vw #b28900', fontSize: '2.3vw' }}>Fora do Tabuleiro</span> quando terminar</span>
         </div>
       )
     },
@@ -114,16 +117,17 @@ function LevelGamePage() {
       body: (
         <div style={{
           fontSize: '2vw',
-          color: '#eee',
+          color: '#ffffff',
           marginBottom: '24px',
           lineHeight: 1.5,
-          WebkitTextStroke: '0.15vw #720b0bff',
+          WebkitTextStroke: '0.15vw #7f0000',
+          textShadow: '0 0.2vw 0 #5c0000',
           display: 'flex',
           flexDirection: 'column',
           gap: '1vw'
         }}>
-          <span>- Este é seu <span style={{ color: '#ffb224ff', fontSize: '2.3vw' }}>tempo total</span></span>
-          <span>- Tente ser <span style={{ color: '#ffb224ff', fontSize: '2.3vw' }}>rápido!</span></span>
+          <span>- Este é seu <span style={{ color: '#ffcf40', WebkitTextStroke: '0.15vw #b28900', fontSize: '2.3vw' }}>tempo total</span></span>
+          <span>- Tente ser <span style={{ color: '#ffcf40', WebkitTextStroke: '0.15vw #b28900', fontSize: '2.3vw' }}>rápido!</span></span>
         </div>
       )
     },
@@ -136,15 +140,16 @@ function LevelGamePage() {
       body: (
         <div style={{
           fontSize: '2vw',
-          color: '#eee',
+          color: '#ffffff',
           marginBottom: '24px',
           lineHeight: 1.5,
-          WebkitTextStroke: '0.15vw #720b0bff',
+          WebkitTextStroke: '0.15vw #7f0000',
+          textShadow: '0 0.2vw 0 #5c0000',
           display: 'flex',
           flexDirection: 'column',
           gap: '1vw'
         }}>
-          <span>- Acerte todas as rodadas para ganhar <span style={{ color: '#ffb224ff', fontSize: '2.3vw' }}>3 estrelas</span></span>
+          <span>- Acerte todas as rodadas para ganhar <span style={{ color: '#ffcf40', WebkitTextStroke: '0.15vw #b28900', fontSize: '2.3vw' }}>3 estrelas</span></span>
         </div>
       )
     }

@@ -22,20 +22,23 @@ function Caca_soma() {
       title: 'Número Mágico',
       body: <div style={{
         fontSize: '2vw',
-        color: '#eee;',
+        color: '#ffffff',
         marginBottom: '24px',
         lineHeight: 1.5,
-        WebkitTextStroke: '0.15vw #720b0bff',
+        WebkitTextStroke: '0.15vw #7f0000',
+        textShadow: '0 0.2vw 0 #5c0000',
         display: 'flex',
         flexDirection: 'column',
         gap: '1vw'
       }}>
         <span>- O <span style={{
-          color: '#ffb224ff',
+          color: '#ffcf40',
+          WebkitTextStroke: '0.15vw #b28900',
           fontSize: '2.3vw',
         }}>Número Mágico</span> vai ser sorteado</span>
         <span>- Clique em <span style={{
-          color: '#ffb224ff',
+          color: '#ffcf40',
+          WebkitTextStroke: '0.15vw #b28900',
           fontSize: '2.3vw',
         }}>Começar</span> para iniciar o jogo </span>
       </div>
@@ -48,30 +51,36 @@ function Caca_soma() {
       title: 'Tabuleiro',
       body: <div style={{
         fontSize: '2vw',
-        color: '#eee;',
+        color: '#ffffff',
         marginBottom: '24px',
         lineHeight: 1.5,
-        WebkitTextStroke: '0.15vw #720b0bff',
+        WebkitTextStroke: '0.15vw #7f0000',
+        textShadow: '0 0.2vw 0 #5c0000',
         display: 'flex',
         flexDirection: 'column',
         gap: '1vw'
       }}>
         <span>- <span style={{
-          color: '#ffb224ff',
+          color: '#ffcf40',
+          WebkitTextStroke: '0.15vw #b28900',
           fontSize: '2.3vw',
         }}>Monte</span> o Número Mágico com <span style={{
-          color: '#ffb224ff',
+          color: '#ffcf40',
+          WebkitTextStroke: '0.15vw #b28900',
           fontSize: '2.3vw',
         }}>2 ou 3</span> números. </span>
         <span>- A <span style={{
-          color: '#ffb224ff',
+          color: '#ffcf40',
+          WebkitTextStroke: '0.15vw #b28900',
           fontSize: '2.3vw',
         }}>soma</span> desses números tem que ser <span style={{
-          color: '#ffb224ff',
+          color: '#ffcf40',
+          WebkitTextStroke: '0.15vw #b28900',
           fontSize: '2.3vw',
         }}>igual</span> ao Número Mágico</span>
         <span>- Clique <span style={{
-          color: '#ffb224ff',
+          color: '#ffcf40',
+          WebkitTextStroke: '0.15vw #b28900',
           fontSize: '2.3vw',
         }}>Fora do Tabuleiro</span> quando terminar</span>
       </div>
@@ -84,27 +93,32 @@ function Caca_soma() {
       title: 'Placar',
       body: <div style={{
         fontSize: '2vw',
-        color: '#eee;',
+        color: '#ffffff',
         marginBottom: '24px',
         lineHeight: 1.5,
-        WebkitTextStroke: '0.15vw #720b0bff',
+        WebkitTextStroke: '0.15vw #7f0000',
+        textShadow: '0 0.2vw 0 #5c0000',
         display: 'flex',
         flexDirection: 'column',
         gap: '1vw'
       }}>
         <span>- Veja quanto <span style={{
-          color: '#ffb224ff',
+          color: '#ffcf40',
+          WebkitTextStroke: '0.15vw #b28900',
           fontSize: '2.3vw',
         }}>tempo</span> o jogador levou </span>
         <span>- Depois que os dois jogadores jogarem, quem acertar com menos tempo ganha <span style={{
-          color: '#ffb224ff',
+          color: '#ffcf40',
+          WebkitTextStroke: '0.15vw #b28900',
           fontSize: '2.3vw',
         }}>1 ponto</span> </span>
         <span>- Quem fizer <span style={{
-          color: '#ffb224ff',
+          color: '#ffcf40',
+          WebkitTextStroke: '0.15vw #b28900',
           fontSize: '2.3vw',
         }}>5 pontos</span> primeiro <span style={{
-          color: '#ffb224ff',
+          color: '#ffcf40',
+          WebkitTextStroke: '0.15vw #b28900',
           fontSize: '2.3vw',
         }}>ganha</span> o jogo </span>
       </div>

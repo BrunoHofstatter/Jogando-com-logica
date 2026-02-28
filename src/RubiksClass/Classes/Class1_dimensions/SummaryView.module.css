@@ -1,15 +1,17 @@
 /* ============================================================
    SummaryView.module.css
-   Matching Phase for Class 1: Dimensions
    ============================================================ */
 
 /* --- Main Layout --- */
 .container {
     display: flex;
     height: 100dvh;
-    width: 100%;
+    width: 100vw;
     overflow: hidden;
-    background: #f0f2f5;
+    background: #e0f2fe;
+    /* Light Soft Blue */
+    font-family: "Cherry Bomb One", system-ui;
+    box-sizing: border-box;
 }
 
 /* --- Aulas Back Button --- */
@@ -18,21 +20,30 @@
     top: 2vw;
     left: 2vw;
     z-index: 1000;
-    font-family: "Cherry Bomb One", cursive;
-    font-size: 1.5vw;
-    background: #e74c3c;
-    color: white;
-    border: none;
+    font-family: inherit;
+    font-size: 2vw;
+    background: #a855f7;
+    /* Purple */
+    color: #ffffff;
+    border: 0.3vw solid #6b21a8;
+    /* Dark purple border */
     border-radius: 1vw;
-    padding: 0.8vw 1.5vw;
+    padding: 0.5vw 1.5vw;
     cursor: pointer;
-    box-shadow: 0 0.4vw 0.8vw rgba(231, 76, 60, 0.3);
-    transition: transform 0.2s, background 0.2s;
+    box-shadow: 0 0.6vw 0 #6b21a8;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    -webkit-text-stroke: 0.15vw #6b21a8;
 }
 
 .aulasButton:hover {
-    background: #c0392b;
-    transform: scale(1.05);
+    background: #c084fc;
+    transform: translateY(-0.2vw);
+    box-shadow: 0 0.8vw 0 #6b21a8;
+}
+
+.aulasButton:active {
+    transform: translateY(0.4vw);
+    box-shadow: 0 0.2vw 0 #6b21a8;
 }
 
 /* --- Left Panel: The Pile --- */
@@ -42,32 +53,43 @@
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    gap: 3vw;
-    padding: 4vw;
-    background: #e8eaed;
-    border-right: 2px dashed #bdc3c7;
+    padding: 15dvh 0 5dvh 0;
+    gap: 2vw;
+    row-gap: 0vw;
+    background: #e0f2fe;
+    border-right: 0.4vw dashed #0284c7;
 }
 
 /* Individual Cube Wrapper */
 .cubeWrapper {
     cursor: pointer;
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s ease, opacity 0.3s ease;
-    border-radius: 1vw;
-    padding: 1vw;
+    transition: transform 0.1s ease, filter 0.1s ease;
+    border-radius: 50%;
+    /* Give it a round hit box if you want, but no visible border */
+    padding: 0 1.5vw;
+    /* Transparent background, NO BORDER, NO BOX SHADOW as requested */
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.cubeWrapper:hover {
+    transform: translateY(-0.5vw) scale(1.05);
+    /* Soft hover effect, maybe drop shadow on the model itself */
+    filter: drop-shadow(0 1vw 0.5vw rgba(2, 132, 199, 0.4));
 }
 
 .cubeWrapper.selected {
-    transform: scale(1.15);
-    filter: drop-shadow(0 0 1.5vw rgba(52, 152, 219, 0.6));
-    background: rgba(52, 152, 219, 0.1);
-    border: 0.2vw solid #3498db;
+    transform: scale(1.15) translateY(-0.5vw);
+    /* Soft blue glow effect to indicate selection without adding a square border */
+    filter: drop-shadow(0 0 1.5vw #0284c7) drop-shadow(0 1vw 0.5vw rgba(2, 132, 199, 0.6));
 }
 
 .cubeWrapper.matched {
-    opacity: 0.5;
+    opacity: 0.4;
     filter: grayscale(100%);
     pointer-events: none;
-    transform: scale(0.9);
+    transform: translateY(1vw) scale(0.9);
 }
 
 /* --- Right Panel: Labels --- */
@@ -77,59 +99,79 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: #ffffff;
+    background: #bae6fd;
+    /* Slightly darker flat blue */
     padding: 3vw;
-    gap: 1.5vw;
+    gap: 2vw;
 }
 
 .title {
-    font-family: "Cherry Bomb One", cursive;
-    font-size: 2.5vw;
-    color: #2c3e50;
+    font-family: inherit;
+    font-size: 3.5vw;
+    color: #ffffff;
     text-align: center;
     margin-bottom: 2vw;
+    -webkit-text-stroke: 0.2vw #013873;
+    text-shadow: 0 0.5vw 0 #013873;
+    line-height: 1.2;
 }
 
 .labelsList {
     display: flex;
     flex-direction: column;
-    gap: 1.2vw;
-    width: 60%;
+    gap: 1.5vw;
+    width: 40%;
     max-width: 25vw;
 }
 
 /* Option Button */
 .labelButton {
-    font-family: "Cherry Bomb One", cursive;
+    font-family: inherit;
     font-size: 2vw;
-    padding: 1vw 0;
-    border: none;
+    /* smaller text */
+    padding: 0.8vw 0;
+    border: 0.4vw solid #013873;
     border-radius: 1vw;
-    background: #ecf0f1;
-    color: #2c3e50;
+    background: #98defc;
+    color: #ffffff;
     cursor: pointer;
-    box-shadow: 0 0.3vw 0.6vw rgba(0, 0, 0, 0.1);
-    transition: all 0.2s ease;
+    box-shadow: 0 0.6vw 0 #013873;
+    transition: all 0.1s ease;
     position: relative;
     overflow: hidden;
+    -webkit-text-stroke: 0.15vw #013873;
+    text-shadow: 0 0.2vw 0 #013873;
 }
 
 .labelButton:hover:not(:disabled) {
-    background: #bdc3c7;
-    transform: translateY(-0.1vw);
+    background: #7dd3fc;
+    transform: translateY(-0.2vw);
+    box-shadow: 0 0.8vw 0 #013873;
+}
+
+.labelButton:active:not(:disabled) {
+    transform: translateY(0.4vw);
+    box-shadow: 0 0.2vw 0 #013873;
 }
 
 .labelButton.matched {
-    background: #2ecc71;
+    background: #5ee991;
+    /* Soft green */
+    border-color: #16a34a;
+    -webkit-text-stroke: 0.15vw #16a34a;
+    text-shadow: 0 0.2vw 0 #16a34a;
     color: white;
-    box-shadow: 0 0.2vw 0.4vw rgba(46, 204, 113, 0.4);
+    box-shadow: 0 0.2vw 0 #16a34a;
     cursor: default;
-    animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform: translateY(0.4vw);
+    animation: pop 0.2s ease-out;
 }
 
 .labelButton.shake {
-    animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-    background: #e74c3c;
+    animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    background: #ef4444;
+    /* Red */
+    border-color: #991b1b;
     color: white;
 }
 
@@ -144,17 +186,21 @@
 }
 
 .feedbackBubble {
-    background: #fff3cd;
-    border: 2px solid #ffc107;
+    background: #fde047;
+    /* Yellow background */
+    border: 0.4vw solid #ca8a04;
+    /* Yellow border */
     border-radius: 1vw;
-    padding: 1vw 2vw;
+    padding: 0.8vw 1.8vw;
     text-align: center;
-    font-family: "Cherry Bomb One", cursive;
-    font-size: 1.4vw;
-    color: #664d03;
-    box-shadow: 0 0.4vw 1.2vw rgba(0, 0, 0, 0.15);
-    animation: fadeSlideIn 0.4s ease-out;
+    font-family: inherit;
+    font-size: 1.8vw;
+    color: #ffffff;
+    box-shadow: 0 0.6vw 0 #a16207;
+    /* Darker yellow drop shadow */
+    animation: fadeSlideIn 0.3s ease-out;
     pointer-events: none;
+    -webkit-text-stroke: 0.15vw #ca8a04;
 }
 
 /* --- Completion Modal --- */
@@ -164,22 +210,24 @@
     left: 0;
     width: 100vw;
     height: 100dvh;
-    background: rgba(44, 62, 80, 0.85);
+    background: rgba(49, 134, 177, 0.65);
+    /* Deep flat blue tint */
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 9999;
     backdrop-filter: blur(4px);
-    animation: fadeIn 0.4s ease;
+    animation: fadeIn 0.3s ease;
 }
 
 .modalContent {
-    background: white;
+    background: #bae6fd;
     padding: 4vw;
+    border: 0.5vw solid #0284c7;
     border-radius: 2vw;
     text-align: center;
-    box-shadow: 0 1vw 3vw rgba(0, 0, 0, 0.3);
-    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 1.5vw 0 #0284c7;
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     display: flex;
     flex-direction: column;
     gap: 1.5vw;
@@ -187,37 +235,47 @@
 }
 
 .modalTitle {
-    font-family: "Cherry Bomb One", cursive;
-    font-size: 3.5vw;
-    color: #f1c40f;
+    font-family: inherit;
+    font-size: 4.5vw;
+    color: #fbe67b;
     margin: 0;
-    text-shadow: 0 0.2vw 0.5vw rgba(0, 0, 0, 0.1);
+    -webkit-text-stroke: 0.25vw #ca8a04;
+    text-shadow: 0 0.6vw 0 #a16207;
+    line-height: 1.2;
 }
 
 .modalStats {
-    font-family: "Cherry Bomb One", cursive;
-    font-size: 1.8vw;
-    color: #34495e;
+    font-family: inherit;
+    font-size: 2.2vw;
+    color: #ffffff;
+    -webkit-text-stroke: 0.14vw #0284c7;
     margin: 0;
 }
 
 .modalButton {
-    font-family: "Cherry Bomb One", cursive;
-    font-size: 1.8vw;
-    padding: 1vw 3vw;
-    border: none;
+    font-family: inherit;
+    font-size: 2.2vw;
+    padding: 1vw 3vw 1.2vw;
+    border: 0.4vw solid #6b21a8;
     border-radius: 1vw;
-    background: #3498db;
-    color: white;
+    background: #a855f7;
+    color: #ffffff;
     cursor: pointer;
-    box-shadow: 0 0.4vw 0.8vw rgba(52, 152, 219, 0.3);
-    transition: transform 0.2s, background 0.2s;
+    box-shadow: 0 0.8vw 0 #6b21a8;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
     margin-top: 1vw;
+    -webkit-text-stroke: 0.15vw #6b21a8;
 }
 
 .modalButton:hover {
-    background: #2980b9;
-    transform: scale(1.05);
+    background: #c084fc;
+    transform: translateY(-0.2vw);
+    box-shadow: 0 1vw 0 #6b21a8;
+}
+
+.modalButton:active {
+    transform: translateY(0.4vw);
+    box-shadow: 0 0.2vw 0 #6b21a8;
 }
 
 /* --- Animations --- */
@@ -238,37 +296,37 @@
 
     10%,
     90% {
-        transform: translate3d(-1px, 0, 0);
+        transform: translate3d(-0.2vw, 0, 0);
     }
 
     20%,
     80% {
-        transform: translate3d(2px, 0, 0);
+        transform: translate3d(0.4vw, 0, 0);
     }
 
     30%,
     50%,
     70% {
-        transform: translate3d(-4px, 0, 0);
+        transform: translate3d(-0.8vw, 0, 0);
     }
 
     40%,
     60% {
-        transform: translate3d(4px, 0, 0);
+        transform: translate3d(0.8vw, 0, 0);
     }
 }
 
 @keyframes pop {
     0% {
-        transform: scale(0.9);
+        transform: scale(0.9) translateY(0.4vw);
     }
 
     50% {
-        transform: scale(1.05);
+        transform: scale(1.05) translateY(0.4vw);
     }
 
     100% {
-        transform: scale(1);
+        transform: scale(1) translateY(0.4vw);
     }
 }
 
@@ -284,12 +342,12 @@
 
 @keyframes popIn {
     0% {
-        transform: scale(0.5);
+        transform: scale(0.8) translateY(2vw);
         opacity: 0;
     }
 
     100% {
-        transform: scale(1);
+        transform: scale(1) translateY(0);
         opacity: 1;
     }
 }

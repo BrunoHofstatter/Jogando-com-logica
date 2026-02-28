@@ -37,7 +37,7 @@ const Class1Dimensions: React.FC = () => {
                 )}
 
                 {isTransition && (
-                    <div className={styles.hintCard} style={{ background: "#d4edda", borderColor: "#28a745", color: "#155724" }}>
+                    <div className={styles.successCard}>
                         <span className={styles.hintIcon}>✅</span>
                         {uiProps.feedbackText}
                     </div>

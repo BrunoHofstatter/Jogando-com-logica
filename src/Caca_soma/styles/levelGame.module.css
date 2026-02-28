@@ -4,15 +4,13 @@
   font-weight: 200;
   display: flex;
   justify-content: center;
-  /* Align content to right */
   align-items: center;
   gap: 0vw;
-  /* Gap between panel and board */
   min-height: 100dvh;
   width: 100vw;
-  background: radial-gradient(circle, #d6baba, #5a4e4e);
+  background-color: #efc9c9;
+  /* Flat light gray */
   padding: 0 0 0 10vw;
-  /* Gap from right border */
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -23,22 +21,24 @@
   flex-direction: column;
   gap: 1vw;
   width: 30vw;
-  /* Wider panel */
   flex-shrink: 0;
   justify-content: center;
 }
 
 /* Control Box */
 .controlsBox {
-  background: radial-gradient(circle, #8a8a8a, #5e5e5e);
-  border: 0.5vw solid #b71c1c;
+  background-color: #d18d8d;
+  /* Lighter flat gray */
+  border: 0.4vw solid #c62828;
+  /* Crimson red border */
   border-radius: 2vw;
   padding: 1vw;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.5vw;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0.8vw 0 #7f0000;
+  /* Deep red drop shadow */
 }
 
 /* Typography elements */
@@ -57,16 +57,17 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 1vw;
-  /* Align text to right, closer to number */
   line-height: 1;
 }
 
 .magicNumberTitle {
   font-size: 2.5vw;
-  color: #eee;
-  -webkit-text-stroke: 0.18vw #961212;
+  color: #fff;
+  -webkit-text-stroke: 0.18vw #7f0000;
   margin: 0;
   text-align: right;
+  text-shadow: 0 0.2vw 0 #5c0000;
+  /* Subtle text pop */
 }
 
 .magicNumberDisplay {
@@ -74,16 +75,20 @@
   font-size: 5vw;
   color: #fff;
   font-weight: bold;
-  background: radial-gradient(circle, #fc7979, #c35a5a);
-  -webkit-text-stroke: 0.2vw #b71c1c;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  background-color: #c62828;
+  /* Solid crimson red */
+  -webkit-text-stroke: 0.2vw #7f0000;
+  text-shadow: 0 0.3vw 0 #5c0000;
+  /* Flat text shadow */
   padding: 0.5vw 1vw 1vw 1vw;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 0.3vw solid #b71c1c;
+  border: 0.3vw solid #7f0000;
   border-radius: 2vw;
   line-height: 1;
+  box-shadow: 0 0.5vw 0 #7f0000;
+  /* Button-like pop */
 }
 
 /* Timer Display */
@@ -97,8 +102,9 @@
 
 .timerLabel {
   font-size: 2vw;
-  color: #ddd;
-  -webkit-text-stroke: 0.14vw #961212;
+  color: #ffffff;
+  -webkit-text-stroke: 0.14vw #7f0000;
+  text-shadow: 0 0.2vw 0 #5c0000;
 }
 
 .timerValue {
@@ -106,7 +112,8 @@
   font-size: 2.5vw;
   font-weight: bold;
   color: #fff;
-  -webkit-text-stroke: 0.12vw #961212;
+  -webkit-text-stroke: 0.12vw #7f0000;
+  text-shadow: 0 0.2vw 0 #5c0000;
 }
 
 /* Round Tracker */
@@ -121,20 +128,23 @@
   width: 2vw;
   height: 2vw;
   border-radius: 50%;
-  border: 0.3vw solid #b71c1c;
-  background: #555;
+  border: 0.3vw solid #7f0000;
+  background-color: #c62828;
+  /* Red default dot */
+  box-shadow: inset 0 0.2vw 0 rgba(0, 0, 0, 0.2);
 }
 
 .roundDotActive {
-  background: #ffeb3b;
-  box-shadow: 0 0 8px #ffeb3b;
+  background-color: #ffcf40;
+  /* Yellow active */
+  box-shadow: inset 0 0.2vw 0 rgba(0, 0, 0, 0.1);
 }
 
 .roundDotCompleted {
-  background: #4caf50;
+  background-color: #4caf50;
+  /* Green completed */
+  box-shadow: inset 0 0.2vw 0 rgba(0, 0, 0, 0.2);
 }
-
-
 
 /* Right Panel - Board Container */
 .rightPanel {
@@ -148,12 +158,16 @@
 /* Board Grid */
 .board {
   display: grid;
-  gap: 0.5vw;
-  background: radial-gradient(circle, #a9a9a9, #6e6e6e);
+  gap: 0.8vw;
+  /* Slightly increased gap for 3D cells to breathe */
+  background-color: #9c8080;
+  /* Solid mid-gray background */
   padding: 1.5vw;
-  border: 0.5vw solid #b71c1c;
+  border: 0.5vw solid #c62828;
+  /* Crimson border */
   border-radius: 2vw;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 1vw 0 #7f0000;
+  /* Hard dark red base shadow */
   box-sizing: border-box;
 
   /* FIXED HEIGHT as requested */
@@ -169,98 +183,151 @@
   align-items: center;
   justify-content: center;
 
-  /* Dynamic font size: 
-     If board is 10x10, --board-size=10. 85vh height -> 8.5vh cell. Font ~ 4vh.
-     If board is 5x5, --board-size=5. 85vh height -> 17vh cell. Font ~ 8vh.
-     Calculation: 40vh / size (approx half of cell size)
-  */
-  font-size: calc(40dvh / var(--board-size, 10));
+  font-size: calc(36dvh / var(--board-size, 10));
 
   font-weight: bold;
-  color: #eee;
-  -webkit-text-stroke: 0.13vw #550505;
-  border: 0.22vw solid #b71c1c;
+  color: #fff;
+  -webkit-text-stroke: 0.15vw #7f0000;
+  border: 0.3vw solid #7f0000;
   border-radius: 1vw;
   cursor: pointer;
-  transition: transform 0.1s;
+  transition: all 0.1s ease;
   user-select: none;
+
+  /* Baseline 3D look for cells */
+  box-shadow: 0 0.5vw 0 #5c0000;
+  transform: translateY(0);
 }
 
 .celula:hover {
-  transform: scale(1.05);
-  z-index: 2;
+  transform: translateY(-0.2vw);
+  box-shadow: 0 0.7vw 0 #5c0000;
+}
+
+.celula:active {
+  transform: translateY(0.4vw);
+  box-shadow: 0 0.1vw 0 #5c0000;
+  /* Squish down into board */
 }
 
 .cellDefault {
-  background: radial-gradient(circle, #b48c8c, #955858);
+  background-color: #da3e3e;
+  /* Red tiles */
 }
 
 .cellSelected {
-  background: radial-gradient(circle, #ffeb3b, #fbc02d);
-  color: #333;
-  -webkit-text-stroke: 1px #333;
-  border-color: #f57f17;
-  transform: scale(1.05);
-  z-index: 2;
+  background-color: #ffcf40;
+  /* Vibrant yellow */
+  color: #fff;
+  -webkit-text-stroke: 0.15vw #b28900;
+  border-color: #b28900;
+  box-shadow: 0 0.5vw 0 #da9500;
+  transform: translateY(0.2vw);
+  /* Depressed state while selected */
+}
+
+.cellSelected:hover {
+  transform: translateY(0);
+  box-shadow: 0 0.7vw 0 #da9500;
+}
+
+.cellSelected:active {
+  transform: translateY(0.4vw);
+  box-shadow: 0 0.1vw 0 #da9500;
 }
 
 .cellCorrect {
-  background: radial-gradient(circle, #4caf50, #2e7d32);
+  background-color: #4caf50;
   border-color: #1b5e20;
+  -webkit-text-stroke: 0.15vw #1b5e20;
+  box-shadow: 0 0.5vw 0 #2e7d32;
+}
+
+.cellCorrect:hover {
+  transform: translateY(-0.1vw);
+  box-shadow: 0 0.6vw 0 #2e7d32;
 }
 
 /* Game Buttons */
 .gameButton {
   font-family: "Cherry Bomb One", system-ui;
-  font-size: 1.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 12px;
-  border: 3px solid #b71c1c;
+  font-size: 2.2vw;
+  padding: 0.5vw 1.5vw 1vw 1.5vw;
+  border-radius: 1.5vw;
+  border: 0.3vw solid #7f0000;
   cursor: pointer;
-  transition: all 0.3s ease;
-  color: #eee;
-  -webkit-text-stroke: 1px #961212;
+  transition: all 0.1s ease;
+  color: #fff;
+  -webkit-text-stroke: 0.15vw #7f0000;
   width: 100%;
+  box-shadow: 0 0.6vw 0 #5c0000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .comecarButton {
-  background: radial-gradient(circle, #4caf50, #2e7d32);
+  background-color: #4caf50;
   border-color: #1b5e20;
-  -webkit-text-stroke: 1px #1b5e20;
+  -webkit-text-stroke: 0.15vw #1b5e20;
+  box-shadow: 0 0.6vw 0 #1b5e20;
 }
 
 .comecarButton:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 12px rgba(76, 175, 80, 0.6);
+  background-color: #66bb6a;
+  transform: translateY(-0.1vw);
+  box-shadow: 0 0.7vw 0 #1b5e20;
+}
+
+.comecarButton:active {
+  transform: translateY(0.4vw);
+  box-shadow: 0 0.2vw 0 #1b5e20;
 }
 
 .enviarButton {
-  background: radial-gradient(circle, #ff9800, #f57c00);
+  background-color: #ff9800;
   border-color: #e65100;
-  -webkit-text-stroke: 1px #e65100;
+  -webkit-text-stroke: 0.15vw #e65100;
+  box-shadow: 0 0.6vw 0 #e65100;
 }
 
 .enviarButton:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 12px rgba(255, 152, 0, 0.6);
+  background-color: #ffa726;
+  transform: translateY(-0.1vw);
+  box-shadow: 0 0.7vw 0 #e65100;
+}
+
+.enviarButton:active {
+  transform: translateY(0.4vw);
+  box-shadow: 0 0.2vw 0 #e65100;
 }
 
 .waitButton {
-  background: #777;
+  background-color: #9e9e9e;
+  border-color: #616161;
+  -webkit-text-stroke: 0.15vw #616161;
+  box-shadow: 0 0.6vw 0 #616161;
   cursor: not-allowed;
-  opacity: 0.7;
+  opacity: 0.9;
 }
 
-
+.waitButton:hover {
+  transform: translateY(0);
+  box-shadow: 0 0.6vw 0 #616161;
+}
 
 .instructionText {
-  font-size: 1.7vw;
-  color: #ddd;
-  -webkit-text-stroke: 0.1vw #961212;
+  font-size: 1.8vw;
+  color: #fff;
+  -webkit-text-stroke: 0.15vw #7f0000;
   font-family: inherit;
   text-align: center;
-  background-color: rgba(0, 0, 0, 0.2);
-  padding: 0.5rem;
-  border-radius: 8px;
+  background-color: #ce4242;
+  padding: 0.8vw;
+  border-radius: 1vw;
   width: 100%;
+  border: 0.3vw solid #7f0000;
+  box-shadow: inset 0 0.2vw 0 rgba(0, 0, 0, 0.2);
+  /* Inset shadow to look like a screen */
+  box-sizing: border-box;
 }

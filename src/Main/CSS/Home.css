@@ -4,6 +4,9 @@
   align-items: center;
   gap: 4dvh;
   min-height: 100dvh;
+  background-color: #68c2e0;
+  /* Very soft pale yellow background */
+  overflow: hidden;
 }
 
 .buttonsHome {
@@ -15,42 +18,81 @@
   justify-content: center;
   flex-direction: column;
   align-items: center;
-  gap: 20dvh;
+  gap: 15dvh;
   z-index: 1;
 }
 
 .buttonJogar {
-  color: #ddd;
+  color: #ffd75e;
+  /* Vibrant yellow text */
   font-size: min(9vw, 16.5dvh);
-  border: 1.1dvh solid #000;
-  border-radius: 13dvh;
-  background: radial-gradient(circle, #b82a1d, #691008);
-  -webkit-text-stroke: 1dvh #000000;
-  padding: 0 min(2.7vw, 5.5dvh) 4.2dvh min(2.7vw, 5.5dvh);
+  border: 0.8dvh solid #630000;
+  /* Thick dark red border */
+  border-radius: 6dvh;
+  /* More blocky radius */
+  background-color: #e31f2f;
+  /* Solid bright red */
+  -webkit-text-stroke: 0.6dvh #630000;
+  padding: 0.5dvh 7dvh 3.5dvh 7dvh;
   line-height: 1;
-  box-shadow: 0px 20px 46px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 1.5dvh 0 #630000;
+  /* Massive hard drop shadow */
+  cursor: pointer;
+  transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform: translateY(0);
+  text-shadow: 0 0.5dvh 0 #630000;
+  /* hard text shadow */
+  display: flex;
+  align-items: center;
+  line-height: 1;
+  justify-content: center;
 }
 
-.buttonSobre {
-  color: #ddd;
-  font-size: 8dvh;
-  border: 0.7dvh solid #000;
-  border-radius: 10dvh;
-  background: radial-gradient(circle, #207994aa, #054255aa);
-  -webkit-text-stroke: 0.5dvh #000000;
-  padding: 0 4dvh 2dvh 4dvh;
-  line-height: 1;
+.buttonJogar:hover {
+  background-color: #f5293a;
+  transform: translateY(-0.5dvh);
+  box-shadow: 0 2dvh 0 #630000;
 }
 
+.buttonJogar:active {
+  transform: translateY(1.2dvh);
+  box-shadow: 0 0.3dvh 0 #630000;
+}
+
+
+.buttonSobre,
 .buttonContato {
-  color: #ddd;
+  color: #ffd75e;
   font-size: 8dvh;
-  border: 0.7dvh solid #000;
-  border-radius: 10dvh;
-  background: radial-gradient(circle, #207994aa, #054255aa);
-  -webkit-text-stroke: 0.5dvh #000000;
-  padding: 0 4dvh 2dvh 4dvh;
+  border: 0.6dvh solid #060e13;
+  /* Thick dark blue border */
+  border-radius: 4dvh;
+  background-color: #286a83;
+  /* Solid blue */
+  -webkit-text-stroke: 0.4dvh #060e13;
+  padding: 1.5dvh 5dvh 2dvh 5dvh;
   line-height: 1;
+  box-shadow: 0 1.2dvh 0 #060e13;
+  cursor: pointer;
+  transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform: translateY(0);
+  text-shadow: 0 0.3dvh 0 #060e13;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.buttonSobre:hover,
+.buttonContato:hover {
+  background-color: #2d7a96;
+  transform: translateY(-0.3dvh);
+  box-shadow: 0 1.5dvh 0 #060e13;
+}
+
+.buttonSobre:active,
+.buttonContato:active {
+  transform: translateY(0.9dvh);
+  box-shadow: 0 0.3dvh 0 #060e13;
 }
 
 .buttonManual {
@@ -60,17 +102,36 @@
   font-family: "Cherry Bomb One", system-ui;
   font-weight: 200;
   font-style: normal;
-  color: #ddd;
+  color: #ffefc2;
+  /* Pale yellow text */
   font-size: 3.5dvh;
-  border: 0.7dvh solid #000;
+  border: 0.4dvh solid #0f4a1f;
+  /* Thick dark green border */
   border-radius: 2dvh;
-  background: radial-gradient(circle, #28a745, #1e7e34);
-  -webkit-text-stroke: 0.3dvh #000000;
-  padding: 1dvh 2dvh;
+  background-color: #28a745;
+  /* Solid green */
+  -webkit-text-stroke: 0.2dvh #0f4a1f;
+  padding: 1.5dvh 3dvh 2dvh 3dvh;
   line-height: 1;
-  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0.8dvh 0 #0f4a1f;
   z-index: 1000;
   cursor: pointer;
+  transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform: translateY(0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.buttonManual:hover {
+  background-color: #34ce57;
+  transform: translateY(-0.2dvh);
+  box-shadow: 0 1dvh 0 #0f4a1f;
+}
+
+.buttonManual:active {
+  transform: translateY(0.6dvh);
+  box-shadow: 0 0.2dvh 0 #0f4a1f;
 }
 
 .buttonRow {
@@ -78,24 +139,9 @@
   justify-content: center;
   flex-direction: row;
   align-items: center;
-  gap: 10dvh;
+  gap: 10vw;
 }
 
-.buttonJogar:hover {
-  transform: scale(1.07);
-}
-
-.buttonSobre:hover {
-  transform: scale(1.02);
-}
-
-.buttonContato:hover {
-  transform: scale(1.02);
-}
-
-.buttonManual:hover {
-  transform: scale(1.02);
-}
 
 .logoTexto {
   width: clamp(0px, 125dvh, 66vw);
@@ -109,7 +155,7 @@
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  margin: 5dvh 0 10dvh 0;
+  margin: 5dvh 0 8dvh 0;
   padding: 0;
   line-height: 1;
   animation: subtlePulse 3s ease-in-out infinite;
@@ -117,66 +163,55 @@
 }
 
 @keyframes subtlePulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.03);
   }
 }
 
 .jogando {
-  background: linear-gradient(135deg, #D84545 0%, #B83838 50%, #983030 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #e31f2f;
+  /* Solid flat red */
   font-size: clamp(52px, 15dvh, 7.5vw);
-  -webkit-text-stroke: clamp(3px, 0.9dvh, 22px) #000000;
-  filter: 
-    drop-shadow(0 0 1dvh rgba(255, 255, 255, 0.8))
-    drop-shadow(0 0 2dvh rgba(255, 255, 255, 0.6))
-    drop-shadow(0 0 3dvh rgba(255, 255, 255, 0.2))
-    drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.3))
-    drop-shadow(4px 4px 0 rgba(0, 0, 0, 0.2))
-    drop-shadow(6px 6px 0 rgba(0, 0, 0, 0.1));
+  -webkit-text-stroke: clamp(3px, 0.6dvh, 22px) #380000;
+  filter: drop-shadow(0 0.6dvh 0 #380000);
+  /* Hard flat shadow */
   text-align: right;
   padding-right: 2dvh;
+  position: relative;
+  z-index: 2;
 }
 
 .com {
-  background: linear-gradient(135deg, #4A7BB7 0%, #2E5A8F 50%, #1E3A5F 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #3687a5;
+  /* Solid flat yellow */
   font-size: clamp(46px, 13.5dvh, 6.75vw);
-  -webkit-text-stroke: clamp(2px, 0.7dvh, 17px) #000000;
-  filter: 
-    drop-shadow(0 0 1dvh rgba(255, 255, 255, 0.8))
-    drop-shadow(0 0 2dvh rgba(255, 255, 255, 0.6))
-    drop-shadow(0 0 3dvh rgba(255, 255, 255, 0.2))
-    drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.3))
-    drop-shadow(4px 4px 0 rgba(0, 0, 0, 0.2))
-    drop-shadow(6px 6px 0 rgba(0, 0, 0, 0.1));
+  -webkit-text-stroke: clamp(2px, 0.5dvh, 17px) #060e13;
+  filter: drop-shadow(0 0.5dvh 0 #060e13);
+  /* Hard flat shadow */
   text-align: center;
   padding: 0 3dvh;
+  position: relative;
+  z-index: 1;
+  /* Sits slightly behind the bigger words if they overlap */
 }
 
 .logica {
-  background: linear-gradient(135deg, #D84545 0%, #B83838 50%, #983030 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #e31f2f;
+  /* Solid flat blue */
   font-size: clamp(60px, 18dvh, 9vw);
-  -webkit-text-stroke: clamp(3px, 0.9dvh, 22px) #000000;
-  filter: 
-    drop-shadow(0 0 1dvh rgba(255, 255, 255, 0.8))
-    drop-shadow(0 0 2dvh rgba(255, 255, 255, 0.6))
-    drop-shadow(0 0 3dvh rgba(255, 255, 255, 0.2))
-    drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.3))
-    drop-shadow(4px 4px 0 rgba(0, 0, 0, 0.2))
-    drop-shadow(6px 6px 0 rgba(0, 0, 0, 0.1));
+  -webkit-text-stroke: clamp(3px, 0.7dvh, 22px) #380000;
+  filter: drop-shadow(0 0.6dvh 0 #380000);
+  /* Hard flat shadow */
   text-align: left;
   padding-left: 2dvh;
+  position: relative;
+  z-index: 2;
 }
 
 .logo {
@@ -186,30 +221,41 @@
   justify-content: center;
   margin-right: 0dvh;
 }
+
 .imagens {
   position: absolute;
   display: flex;
   justify-content: center;
   flex-direction: row;
-  align-items: center;
-  min-height: 99dvh;
-  gap: 38vw;
-  padding-top: 8dvh;
-  padding-right: 2dvh;
+  min-height: 100dvh;
+  width: 100vw;
+  /* Let clicks pass through the container */
 }
 
-.imagemCubo {
-  margin-top: 7dvh;
-  height: 25vw;
+.imagemCuboWrapper {
+  position: absolute;
+  pointer-events: auto;
+  right: 10vw;
+  top: 40dvh
+    /* enable interactions on the cube itself */
 }
 
 .imagemXadrez {
+  position: absolute;
   width: 28vw;
+  left: 5vw;
+  top: 37dvh;
+  filter: drop-shadow(0 1vw 0 rgba(0, 0, 0, 0.15));
+  /* Flat drop shadow */
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: auto;
+  /* enable hover interactions on the image itself */
 }
-.imagemXadrez:hover,
-.imagemCubo:hover {
-  transform: scale(1.02);
+
+.imagemXadrez:hover {
+  transform: scale(1.05) translateY(-1vw);
 }
+
 @media (orientation: portrait) {
   .homePage {
     gap: 12dvh;
@@ -261,7 +307,7 @@
   }
 
   .logoTexto {
-    width: min(38dvh,80vw);
+    width: min(38dvh, 80vw);
     transform: scale(1);
   }
 
@@ -290,12 +336,14 @@
     margin-top: 7dvh;
     margin-right: 0;
   }
+
   .imagens {
     min-height: 99dvh;
     gap: 20vw;
     padding-top: 0dvh;
     padding-right: 0dvh;
   }
+
   .imagemCubo {
     margin: 0;
     width: 27vw;
@@ -305,6 +353,7 @@
     width: 30vw;
     margin: 0;
   }
+
   .imagemXadrez:hover,
   .imagemCubo:hover {
     transform: scale(1.02);

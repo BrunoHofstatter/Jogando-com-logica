@@ -325,22 +325,35 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
           padding: "0.7vw 1.3vw 1.2vw 1.3vw",
           fontSize: "2.5vw",
           borderRadius: "1.5vw",
-          border: "0.25vw solid #f51c1cff",
-          background:
-            "radial-gradient(circle, #d38c8cbb 50%, #ac4c4cee 100%)",
-          color: "#eee",
-          WebkitTextStroke: "0.17vw #880e0eff",
+          border: "0.4vw solid #7f0000",
+          backgroundColor: "#da3e3e",
+          color: "#fff",
+          WebkitTextStroke: "0.15vw #7f0000",
+          boxShadow: "0 0.6vw 0 #5c0000",
           lineHeight: "1",
           cursor: "pointer",
           fontFamily: "Cherry Bomb One",
-          transition: "all 0.2s",
+          transition: "all 0.1s ease",
           zIndex: 100001,
+          transform: "translateY(0)",
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.transform = "scale(1.05)";
+          e.currentTarget.style.transform = "translateY(-0.2vw)";
+          e.currentTarget.style.boxShadow = "0 0.8vw 0 #5c0000";
+          e.currentTarget.style.backgroundColor = "#e35a5a";
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.transform = "scale(1)";
+          e.currentTarget.style.transform = "translateY(0)";
+          e.currentTarget.style.boxShadow = "0 0.6vw 0 #5c0000";
+          e.currentTarget.style.backgroundColor = "#da3e3e";
+        }}
+        onMouseDown={(e) => {
+          e.currentTarget.style.transform = "translateY(0.4vw)";
+          e.currentTarget.style.boxShadow = "0 0.2vw 0 #5c0000";
+        }}
+        onMouseUp={(e) => {
+          e.currentTarget.style.transform = "translateY(-0.2vw)";
+          e.currentTarget.style.boxShadow = "0 0.8vw 0 #5c0000";
         }}
       >
         {t.skip}
@@ -355,12 +368,11 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
             left: spotlightRect.left - 10,
             width: spotlightRect.width + 20,
             height: spotlightRect.height + 20,
-            border: "4px solid #f51c1cff",
+            border: "0.5vw solid #ffcf40", /* Flat Yellow */
             borderRadius: "16px",
-            boxShadow: "0 0 0 99999px rgba(0, 0, 0, 1), 0 0 30px #f51c1cff",
+            boxShadow: "0 0 0 99999px rgba(0, 0, 0, 0.5), 0 0.8vw 0 #da9500", /* Hard shadow for frame */
             zIndex: 99999,
             pointerEvents: "none",
-            animation: "tutorialPulse 2s infinite",
           }}
         />
       )}
@@ -373,14 +385,13 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
           top: tooltipPosition.top,
           left: tooltipPosition.left,
           zIndex: 100000,
-          background:
-            "radial-gradient(circle, #d38c8cbb 50%, #ac4c4cee 100%)",
-          borderRadius: "20px",
-          padding: "24px", 
+          backgroundColor: "#d18d8d", /* Flat Mid-Gray */
+          borderRadius: "2vw",
+          padding: "24px",
           minWidth: "20vw",
           maxWidth: "35vw",
-          boxShadow: "0 10px 40px rgba(0, 0, 0, 0.5)",
-          border: "0.5vw solid #f51c1cff",
+          boxShadow: "0 1vw 0 #7f0000", /* Flat Hard Shadow */
+          border: "0.4vw solid #c62828", /* Crimson Border */
           fontFamily: '"Cherry Bomb One", system-ui',
         }}
       >
@@ -395,9 +406,9 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
               height: 0,
               borderLeft: "14px solid transparent",
               borderRight: "14px solid transparent",
-              borderTop: "14px solid #f51c1cff",
+              borderTop: "14px solid #c62828", /* Match modal border */
               transform: `translate(-50%, -50%) rotate(${arrowPosition.rotation}deg)`,
-              filter: "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))",
+              filter: "drop-shadow(0 0.5vw 0 #7f0000)", /* Match flat shadow style */
               zIndex: 1,
             }}
           />
@@ -408,10 +419,12 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
           <h3
             style={{
               margin: "0 0 16px 0",
-              fontSize: "3vw",
-              color: "#eee",
-              WebkitTextStroke: "0.24vw #880e0eff",
+              fontSize: "3.5vw",
+              color: "#fff",
+              WebkitTextStroke: "0.2vw #7f0000",
+              textShadow: "0 0.3vw 0 #5c0000",
               lineHeight: 1.2,
+              textAlign: "center",
             }}
           >
             {currentStep.title}
@@ -437,10 +450,10 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
         <div
           style={{
             fontSize: "20px",
-            color: "#eee",
+            color: "#fff",
             marginBottom: "24px",
             lineHeight: 1.5,
-            WebkitTextStroke: "0.5px #af2020",
+            WebkitTextStroke: "0.15vw #7f0000",
           }}
         >
           {currentStep.body}
@@ -462,22 +475,35 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
               style={{
                 cursor: "pointer",
                 fontFamily: "inherit",
-                transition: "all 0.2s",
+                transition: "all 0.1s ease",
                 marginLeft: "1vw",
                 padding: "0.5vw 1.5vw 0.8vw 1.5vw",
                 fontSize: "2.5vw",
                 borderRadius: "1.5vw",
-                border: "0.25vw solid #da1919ff",
-                background:
-                  "radial-gradient(circle, #b2b2b2, #727272)",
-                color: "#da1919ff",
+                border: "0.3vw solid #7f0000",
+                backgroundColor: "#da3e3e",
+                color: "#fff",
+                boxShadow: "0 0.6vw 0 #5c0000",
                 lineHeight: "1",
+                transform: "translateY(0)",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "scale(1.05)";
+                e.currentTarget.style.transform = "translateY(-0.2vw)";
+                e.currentTarget.style.boxShadow = "0 0.8vw 0 #5c0000";
+                e.currentTarget.style.backgroundColor = "#e35a5a";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "scale(1)";
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 0.6vw 0 #5c0000";
+                e.currentTarget.style.backgroundColor = "#da3e3e";
+              }}
+              onMouseDown={(e) => {
+                e.currentTarget.style.transform = "translateY(0.4vw)";
+                e.currentTarget.style.boxShadow = "0 0.2vw 0 #5c0000";
+              }}
+              onMouseUp={(e) => {
+                e.currentTarget.style.transform = "translateY(-0.2vw)";
+                e.currentTarget.style.boxShadow = "0 0.8vw 0 #5c0000";
               }}
             >
               <ArrowBigLeftDash size='3.3vw' />
@@ -497,24 +523,35 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
               style={{
                 cursor: "pointer",
                 fontFamily: "inherit",
-                transition: "all 0.2s",
+                transition: "all 0.1s ease",
                 marginRight: "1vw",
                 padding: "0.5vw 1.5vw 0.8vw 1.5vw",
                 fontSize: "2.5vw",
                 borderRadius: "1.5vw",
-                border: "0.25vw solid #da1919ff",
-                background:
-                  "radial-gradient(circle, #b2b2b2, #727272)",
-                color: "#da1919ff",
+                border: "0.3vw solid #7f0000",
+                backgroundColor: "#da3e3e",
+                color: "#fff",
+                boxShadow: "0 0.6vw 0 #5c0000",
                 lineHeight: "1",
+                transform: "translateY(0)",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "scale(1.05)";
-                e.currentTarget.style.backgroundColor = "#8b5cf6";
+                e.currentTarget.style.transform = "translateY(-0.2vw)";
+                e.currentTarget.style.boxShadow = "0 0.8vw 0 #5c0000";
+                e.currentTarget.style.backgroundColor = "#e35a5a";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "scale(1)";
-                e.currentTarget.style.backgroundColor = "#7c3aed";
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 0.6vw 0 #5c0000";
+                e.currentTarget.style.backgroundColor = "#da3e3e";
+              }}
+              onMouseDown={(e) => {
+                e.currentTarget.style.transform = "translateY(0.4vw)";
+                e.currentTarget.style.boxShadow = "0 0.2vw 0 #5c0000";
+              }}
+              onMouseUp={(e) => {
+                e.currentTarget.style.transform = "translateY(-0.2vw)";
+                e.currentTarget.style.boxShadow = "0 0.8vw 0 #5c0000";
               }}
             >
               <ArrowBigRightDash size='3.3vw' />

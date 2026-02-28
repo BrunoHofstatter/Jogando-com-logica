@@ -1,5 +1,5 @@
 /* ========================================
-   LEVEL RESULTS MODAL
+   LEVEL RESULTS MODAL (Neo-Brutalist)
    ======================================== */
 
 .modalOverlay {
@@ -8,7 +8,9 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(30, 30, 30, 0.5);
+    /* slightly darker overlay */
+    backdrop-filter: blur(4px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -16,24 +18,25 @@
 }
 
 .levelResultModal {
-    background: radial-gradient(circle, #e6c8c8, #6d5b5b);
-    /* Slightly lighter than container for contrast */
-    border: 0.6vw solid #550505;
-    border-radius: 3vw;
+    background-color: #d18d8d;
+    /* Flat Mid-Gray */
+    border: 0.5vw solid #c62828;
+    /* Thick Crimson Border */
+    border-radius: 2vw;
+    /* Matched levels menu border radius */
     padding: 3vw;
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 60vw;
     max-height: 90vh;
-    /* Ensure it fits on screen */
-    box-shadow: 0 0 3vw #000;
+    box-shadow: 0 1vw 0 #7f0000;
+    /* Hard drop shadow */
     animation: fadeIn 0.3s ease;
     justify-content: center;
     align-items: center;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     position: relative;
-    /* Ensure nested absolute elements are relative to this */
 }
 
 .modalExpanded {
@@ -42,8 +45,9 @@
 
 .levelTitle {
     font-size: 4.5vw;
-    color: #eee;
-    -webkit-text-stroke: 0.25vw #550505;
+    color: #fff;
+    -webkit-text-stroke: 0.2vw #7f0000;
+    text-shadow: 0 0.3vw 0 #5c0000;
     text-align: center;
     width: 100%;
 }
@@ -57,20 +61,23 @@
 
 .starFilled {
     font-size: 6vw;
-    color: #e2a01d;
-    -webkit-text-stroke: 0.2vw #080303;
+    color: #ffcf40;
+    /* Vibrant Yellow */
+    -webkit-text-stroke: 0.15vw #b28900;
+    text-shadow: 0 0.3vw 0 #da9500;
 }
 
 .starEmpty {
     font-size: 6vw;
-    color: #555;
-    -webkit-text-stroke: 0.2vw #080303;
+    color: #9c8080;
+    /* Board Gray (inset look) */
+    -webkit-text-stroke: 0.15vw #5c4a4a;
 }
 
 .resultStats {
     font-size: 2.5vw;
-    color: #eee;
-    -webkit-text-stroke: 0.1vw #550505;
+    color: #fff;
+    -webkit-text-stroke: 0.1vw #7f0000;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -94,54 +101,94 @@
     font-size: 2vw;
     padding: 0.5vw 2vw;
     border-radius: 2vw;
-    border: 0.3vw solid #550505;
-    background: #fff;
-    color: #b71c1c;
+    border: 0.3vw solid #7f0000;
+    /* Deep red borders */
+    background-color: #da3e3e;
+    /* Theme red default */
+    color: #fff;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     text-transform: uppercase;
     font-weight: bold;
-    -webkit-text-stroke: 0.1vw #550505;
+    -webkit-text-stroke: 0.1vw #7f0000;
+    box-shadow: 0 0.6vw 0 #5c0000;
+    /* Flat shadow */
 }
 
 .actionBtn:hover {
-    transform: scale(1.05);
+    transform: translateY(-0.2vw);
+    box-shadow: 0 0.8vw 0 #5c0000;
+    background-color: #e35a5a;
 }
 
+.actionBtn:active {
+    transform: translateY(0.4vw);
+    box-shadow: 0 0.2vw 0 #5c0000;
+}
+
+/* Specific buttons logic if there's any differentiation */
 .actionBtn:nth-child(1) {
-    background: radial-gradient(circle, #d57f7f, #7b5050);
-    color: #eee;
+    /* Voltar/Return typically */
+    background-color: #d18d8d;
+    /* Use the mid-gray for softer action */
+    border-color: #c62828;
+    color: #fff;
+    box-shadow: 0 0.6vw 0 #7f0000;
+}
+
+.actionBtn:nth-child(1):hover {
+    background-color: #e09d9d;
+    box-shadow: 0 0.8vw 0 #7f0000;
+}
+
+.actionBtn:nth-child(1):active {
+    box-shadow: 0 0.2vw 0 #7f0000;
 }
 
 .actionBtn:nth-child(2) {
-    background: radial-gradient(circle, #d34b4b, #9a3a3a);
-    color: #eee;
+    /* Rejogar typically */
+    background-color: #da3e3e;
+    color: #fff;
 }
 
+/* Main action -> Next level */
 .primaryBtn {
-    background: radial-gradient(circle, #4caf50, #2e7d32) !important;
-    color: #eee !important;
+    background-color: #4caf50 !important;
+    /* Green */
+    color: #fff !important;
     border-color: #1b5e20 !important;
     -webkit-text-stroke: 0.1vw #1b5e20 !important;
     font-size: 2.5vw;
+    box-shadow: 0 0.6vw 0 #1b5e20;
 }
+
+.primaryBtn:hover {
+    background-color: #66bb6a !important;
+    box-shadow: 0 0.8vw 0 #1b5e20;
+}
+
+.primaryBtn:active {
+    box-shadow: 0 0.2vw 0 #1b5e20 !important;
+}
+
 
 /* Toggle Details Button */
 .detailsToggle {
     background: none;
     border: none;
-    color: #eee;
+    color: #fff;
     font-family: inherit;
     font-size: 1.8vw;
     cursor: pointer;
     margin-top: 1vw;
-    -webkit-text-stroke: 0.1vw #550505;
+    -webkit-text-stroke: 0.1vw #7f0000;
     text-decoration: underline;
-    transition: transform 0.2s;
+    transition: all 0.1s ease;
 }
 
 .detailsToggle:hover {
-    transform: scale(1.05);
+    transform: translateY(-0.1vw);
+    color: #ffcf40;
 }
 
 /* Details Modal Overlay */
@@ -153,14 +200,12 @@
     transform: translateX(-50%);
     width: 90%;
     max-height: 40vh;
-    /* As requested */
-    background: radial-gradient(circle, #8a8a8a, #5e5e5e);
-    /* Match controlsBox background */
-    border: 0.4vw solid #b71c1c;
-    /* Match game theme border */
+    background-color: #9c8080;
+    /* Board Gray Background */
+    border: 0.4vw solid #c62828;
     border-radius: 2vw;
     padding: 1.5vw;
-    box-shadow: 0 1vw 2vw rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0.8vw 0 #7f0000;
     display: flex;
     flex-direction: column;
     z-index: 10;
@@ -182,7 +227,6 @@
 
 .detailsHeader {
     display: none;
-    /* Removed as requested */
 }
 
 /* Click outside backdrop */
@@ -193,7 +237,6 @@
     width: 100vw;
     height: 100vh;
     z-index: 9;
-    /* Below details (10) but above everything else */
     cursor: default;
 }
 
@@ -212,11 +255,13 @@
 }
 
 .detailsList::-webkit-scrollbar-track {
-    background: #5e5e5e;
+    background: #d18d8d;
+    /* Matches the parent Modal */
+    border-radius: 0.25vw;
 }
 
 .detailsList::-webkit-scrollbar-thumb {
-    background: #b71c1c;
+    background: #c62828;
     border-radius: 0.25vw;
 }
 
@@ -228,17 +273,20 @@
     border-radius: 0.8vw;
     font-size: 1.5vw;
     color: #fff;
-    -webkit-text-stroke: 0.08vw #000;
+    -webkit-text-stroke: 0.08vw #080303;
+    border: 0.2vw solid #7f0000;
 }
 
 .detailCorrect {
-    background: rgba(76, 175, 80, 0.8);
-    border: 0.15vw solid #2e7d32;
+    background-color: #4caf50;
+    border-color: #1b5e20;
+    -webkit-text-stroke: 0.1vw #1b5e20;
 }
 
 .detailIncorrect {
-    background: rgba(244, 67, 54, 0.8);
-    border: 0.15vw solid #c62828;
+    background-color: #da3e3e;
+    border-color: #c62828;
+    -webkit-text-stroke: 0.1vw #7f0000;
 }
 
 .detailRound {
@@ -257,10 +305,12 @@
     from {
         opacity: 0;
         transform: scale(0.9);
+        /* Start slightly smaller */
     }
 
     to {
         opacity: 1;
         transform: scale(1);
+        /* Reach full 1:1 scale */
     }
 }

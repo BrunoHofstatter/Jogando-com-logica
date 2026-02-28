@@ -84,13 +84,12 @@ function JogoStop() {
       {/* Right Side - Game Controls */}
       <div className={styles.botoes}>
         <button
-          className={`${styles.button} ${gameMode === "ai" && !difficultyUnlocked ? styles.playButtonDisabled : ''}`}
+          className={`${styles.button} ${gameMode === "ai" && !difficultyUnlocked ? styles.buttonDisabled : ''}`}
           onClick={startGame}
           disabled={gameMode === "ai" && !difficultyUnlocked}
         >
           <span>Jogar</span>
         </button>
-
 
         {/* Game mode selector */}
         <div className={styles['mode-select-rules']}>
@@ -131,6 +130,7 @@ function JogoStop() {
             Dois Jogadores
           </label>
         </div>
+
         <button className={styles.tutorialButton} onClick={startTutorial}>
           <span>Tutorial</span>
         </button>
@@ -161,43 +161,30 @@ function JogoStop() {
             <div className={styles.detailedRules}>
               <h2>Regras do Super Jogo da Velha</h2>
 
-
               <h3 className={styles.rulesTitle}>Como Jogar</h3>
-              <p className={styles.rulesText}>Início: O jogador <strong>X</strong> começa a partida.</p>
-              <p className={styles.rulesText}>Jogada: Em seu turno, o jogador escolhe uma casa em um dos <strong>tabuleiros menores</strong> disponíveis e coloca o seu símbolo ("X" ou "O").</p>
-              <p className={styles.rulesText}>Direcionamento o próximo movimento: A localização da casa escolhida <em>dentro</em> do tabuleiro menor determina em <em>qual tabuleiro menor o próximo jogador deve jogar</em>.</p>
-              <p className={styles.rulesText}>Exemplo:Se você jogar no quadrado central (posição 5) de um tabuleiro menor, o próximo jogador será enviado para o tabuleiro menor que está na posição central do tabuleiro principal.</p>
-
-
+              <p className={styles.rulesText}>Início: O jogador <span className={styles.rulesStrong}>X</span> começa a partida.</p>
+              <p className={styles.rulesText}><span className={styles.rulesSpan}>Jogada:</span> Em seu turno, o jogador escolhe uma casa em um dos <span className={styles.rulesStrong}>tabuleiros menores</span> disponíveis e coloca o seu símbolo ("X" ou "O").</p>
+              <p className={styles.rulesText}><span className={styles.rulesSpan}>O próximo movimento:</span> A localização da casa escolhida <span className={styles.rulesStrong}>dentro</span> do tabuleiro menor determina em <span className={styles.rulesStrong}>qual tabuleiro menor o próximo jogador deve jogar</span>.</p>
+              <p className={styles.rulesText}><span className={styles.rulesSpan}>Exemplo:</span> Se você jogar no quadrado central (posição 5) de um tabuleiro menor, o próximo jogador será enviado para o tabuleiro menor que está na posição central do tabuleiro principal.</p>
 
               <h3 className={styles.rulesTitle}>Jogando em Tabuleiros Já Decididos</h3>
-              <p className={styles.rulesText}>Se o próximo jogador for direcionado para um tabuleiro menor que já foi <strong>vencido ou empatado</strong>, ele ganha a liberdade de jogar em <strong>qualquer outro tabuleiro menor</strong> que ainda esteja em andamento (aberto).</p>
-
-
+              <p className={styles.rulesText}>Se o próximo jogador for direcionado para um tabuleiro menor que já foi <span className={styles.rulesStrong}>vencido ou empatado</span>, ele ganha a liberdade de jogar em <span className={styles.rulesStrong}>qualquer outro tabuleiro menor</span> que ainda esteja em andamento (aberto).</p>
 
               <h3 className={styles.rulesTitle}>Vencendo um Tabuleiro Menor</h3>
               <p className={styles.rulesText}>Um tabuleiro menor é vencido quando um jogador consegue alinhar 3 dos seus símbolos (em linha, coluna ou diagonal).</p>
-              <p className={styles.rulesText}>Esse tabuleiro é então marcado no tabuleiro principal com um <strong>X grande</strong> ou <strong>O grande</strong> e não pode mais ser jogado.</p>
-
-
+              <p className={styles.rulesText}>Esse tabuleiro é então marcado no tabuleiro principal com um <span className={styles.rulesStrong}>X grande</span> ou <span className={styles.rulesStrong}>O grande</span> e não pode mais ser jogado.</p>
 
               <h3 className={styles.rulesTitle}>Vencendo o Jogo Geral</h3>
-              <p className={styles.rulesText}>Existem <strong>duas maneiras</strong> de vencer a partida. O jogo termina imediatamente quando um jogador atinge uma delas:</p>
-
+              <p className={styles.rulesText}>Existem <span className={styles.rulesStrong}>duas maneiras</span> de vencer a partida. O jogo termina imediatamente quando um jogador atinge uma delas:</p>
 
               <h4 className={styles.winTitle}>Vitória Estratégica (Três em Linha)</h4>
-              <p className={styles.winText}>Conquistar <strong>3 tabuleiros menores em sequência</strong> no tabuleiro gigante (em linha, coluna ou diagonal).</p>
-
-
+              <p className={styles.winText}>Conquistar <span className={styles.rulesStrong}>3 tabuleiros menores em sequência</span> no tabuleiro gigante (em linha, coluna ou diagonal).</p>
 
               <h4 className={styles.winTitle}>Vitória por Pontos (Maioria)</h4>
-              <p className={styles.winText}>Conquistar a <strong>maior quantidade de tabuleiros menores</strong>. Este é o critério de desempate final se ninguém conseguir uma vitória estratégica. O jogador com mais tabuleiros conquistados ao final da partida é declarado vencedor.</p>
-
-
-
+              <p className={styles.winText}>Conquistar a <span className={styles.rulesStrong}>maior quantidade de tabuleiros menores</span>. Este é o critério de desempate final se ninguém conseguir uma vitória estratégica. O jogador com mais tabuleiros conquistados ao final da partida é declarado vencedor.</p>
 
               <h3 className={styles.rulesTitle}>Empate</h3>
-              <p className={styles.rulesText}>O jogo termina em empate se todos os tabuleiros menores forem preenchidos ou decididos e <strong>nenhum jogador</strong> tiver conseguido uma <strong>Vitória Estratégica (três em linha)</strong>. Em caso de empate na quantidade de tabuleiros, a partida é considerada <span onClick={() => { unlockAll(); alert("Todas as dificuldades foram desbloqueadas!"); }}>empatada</span>.</p>
+              <p className={styles.rulesText}>O jogo termina em empate se todos os tabuleiros menores forem preenchidos ou decididos e <span className={styles.rulesStrong}>nenhum jogador</span> tiver conseguido uma <span className={styles.rulesStrong}>Vitória Estratégica (três em linha)</span>. Em caso de empate na quantidade de tabuleiros, a partida é considerada <span onClick={() => { unlockAll(); alert("Todas as dificuldades foram desbloqueadas!"); }} style={{ cursor: 'text' }}>empatada</span>.</p>
 
             </div>
           </div>
@@ -206,13 +193,24 @@ function JogoStop() {
 
       {/* Reset Progress Confirmation Modal */}
       {showResetConfirm && (
-        <div className={styles.confirmModalOverlay}>
-          <div className={styles.confirmModalContent}>
-            <div className={styles.confirmText}>Tem certeza?</div>
-            <div className={styles.confirmText} style={{ fontSize: "1.5vw" }}>Isso apagará todo o seu progresso no jogo.</div>
+        <div className={styles.modalOverlay}>
+          <div className={styles.confirmModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.confirmText}>
+              Tem certeza que deseja deletar todo o progresso?
+            </div>
             <div className={styles.confirmButtons}>
-              <button onClick={handleResetProgress} className={`${styles.confirmBtn} ${styles.yesBtn}`}>Sim</button>
-              <button onClick={() => setShowResetConfirm(false)} className={`${styles.confirmBtn} ${styles.noBtn}`}>Não</button>
+              <button
+                className={`${styles.confirmBtn} ${styles.yesBtn}`}
+                onClick={handleResetProgress}
+              >
+                Sim
+              </button>
+              <button
+                className={`${styles.confirmBtn} ${styles.noBtn}`}
+                onClick={() => setShowResetConfirm(false)}
+              >
+                Não
+              </button>
             </div>
           </div>
         </div>

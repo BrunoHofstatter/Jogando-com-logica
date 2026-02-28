@@ -30,16 +30,14 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  border: 0.6vw solid #0c8b61;
-  background: radial-gradient(circle, #aabfbbbb, #729d8ccc);
-  background: radial-gradient(circle, #82dfb4bb, #41a774cc);
+  border: 0.4vw solid #064e3b;
+  background-color: #d1fae5;
   padding: 2vw;
   border-radius: 2vw;
   text-align: center;
   max-width: 100%;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 1.5vw 0 #064e3b;
   margin: 0vw 0vw 0vw 0vw;
-  /* keep distance from the sidebar edges, esp. left */
   align-items: center;
 }
 
@@ -47,31 +45,39 @@
   color: #f3f4f6;
   font-size: 5.5vw;
   margin-bottom: 0;
-  text-shadow: 0 1.2vw 2.4vw rgba(0, 0, 0, 0.4);
-  -webkit-text-stroke: 0.35vw #53585e;
+  text-shadow: 0 0.4vw 0 #064e3b;
+  -webkit-text-stroke: 0.25vw #064e3b;
 }
 
 .victoryReason {
-  -webkit-text-stroke: 0.2vw #53585e;
+  -webkit-text-stroke: 0.15vw #064e3b;
+  text-shadow: 0 0.2vw 0 #064e3b;
   color: #f3f4f6;
   font-size: 2.3vw;
 }
 
 .victoryButton {
-  background: radial-gradient(circle, #29c490, #0da572);
+  background-color: #10b981;
   color: #f3f4f6;
-  border: solid 0.2vw #097753;
+  border: solid 0.3vw #064e3b;
   padding: 0.8vw 1.5vw 1.3vw 1.5vw;
   font-size: 2.2vw;
   border-radius: 1.7vw;
   cursor: pointer;
-  transition: ease 0.5s;
-  -webkit-text-stroke: 0.12vw #3d4045;
+  transition: all 0.1s ease;
+  -webkit-text-stroke: 0.15vw #064e3b;
   line-height: 1;
+  box-shadow: 0 0.8vw 0 #064e3b;
 }
 
 .victoryButton:hover {
-  transform: scale(1.05) translateY(-0.5dvh);
+  transform: translateY(-0.2vw);
+  box-shadow: 0 1vw 0 #064e3b;
+}
+
+.victoryButton:active {
+  transform: translateY(0.4vw);
+  box-shadow: 0 0.2vw 0 #064e3b;
 }
 
 /* Sidebar layout to keep the board visible */
@@ -85,7 +91,8 @@
   color: #f3f4f6;
   font-size: 2.5vw;
   margin: 0.75rem 0 0.5rem;
-  -webkit-text-stroke: 0.2vw #53585e;
+  -webkit-text-stroke: 0.15vw #064e3b;
+  text-shadow: 0 0.3vw 0 #064e3b;
 }
 
 /* Player color accents */
@@ -148,35 +155,49 @@
 }
 
 .victoryButtonMenu {
-  background: radial-gradient(circle, #29c490, #0da572);
+  background-color: #10b981;
   color: #f3f4f6;
-  border: solid 0.2vw #097753;
+  border: solid 0.3vw #064e3b;
   padding: 0.8vw 1.5vw 1.3vw 1.5vw;
   font-size: 2.2vw;
   border-radius: 1.7vw;
   cursor: pointer;
-  transition: ease 0.5s;
-  -webkit-text-stroke: 0.12vw #3d4045;
+  transition: all 0.1s ease;
+  -webkit-text-stroke: 0.15vw #064e3b;
   line-height: 1;
+  box-shadow: 0 0.8vw 0 #064e3b;
 }
 
 .victoryButtonMenu:hover {
-  transform: scale(1.05);
+  transform: translateY(-0.2vw);
+  box-shadow: 0 1vw 0 #064e3b;
+}
+
+.victoryButtonMenu:active {
+  transform: translateY(0.4vw);
+  box-shadow: 0 0.2vw 0 #064e3b;
 }
 
 .victoryButtonNext {
-  background: radial-gradient(circle, #2ec070, #0da551);
+  background-color: #059669;
   color: #f3f4f6;
-  border: solid 0.2vw #097753;
+  border: solid 0.3vw #064e3b;
   padding: 0.8vw 1.5vw 1.3vw 1.5vw;
   font-size: 2.2vw;
   border-radius: 1.7vw;
   cursor: pointer;
-  transition: ease 0.5s;
-  -webkit-text-stroke: 0.12vw #3d4045;
+  transition: all 0.1s ease;
+  -webkit-text-stroke: 0.15vw #064e3b;
   line-height: 1;
+  box-shadow: 0 0.8vw 0 #064e3b;
 }
 
 .victoryButtonNext:hover {
-  transform: scale(1.05);
+  transform: translateY(-0.2vw);
+  box-shadow: 0 1vw 0 #064e3b;
+}
+
+.victoryButtonNext:active {
+  transform: translateY(0.4vw);
+  box-shadow: 0 0.2vw 0 #064e3b;
 }

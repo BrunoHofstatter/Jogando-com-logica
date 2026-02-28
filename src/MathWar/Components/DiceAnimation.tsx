@@ -53,26 +53,26 @@ export const DiceAnimation: React.FC<DiceAnimationProps> = ({ targetValue, onCom
             fontFamily: '"Cherry Bomb One", system-ui',
         }}>
             <div style={{
-                background: 'radial-gradient(circle, rgba(32, 179, 103, 0.6), rgba(21, 152, 84, 0.73))',
+                backgroundColor: '#059669', /* Distinct darker green than the board */
                 padding: '3vw',
-                borderRadius: '6vw',
-                boxShadow: '0 0 3.5vw rgba(16, 185, 129, 0.4), inset 0 0 1.5vw rgba(52, 211, 153, 0.2)',
+                borderRadius: '4vw',
+                boxShadow: '0 1.5vw 0 #064e3b',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                border: '0.25vw solid #04573dff',
-                transform: isFinal ? 'scale(1.1)' : 'scale(1)',
-                transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                border: '0.4vw solid #064e3b',
+                transform: isFinal ? 'scale(1.05) translateY(-1vw)' : 'scale(1) translateY(0)',
+                transition: 'all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
             }}>
                 <h2 style={{
-                    color: '#e2e8f0',
+                    color: '#f3f4f6',
                     fontSize: '4vw',
                     marginBottom: '1.5vw',
                     marginTop: 0,
-                    textShadow: '0 0.15vw 0.3vw rgba(0,0,0,0.5)',
+                    textShadow: '0 0.3vw 0 #064e3b',
                     fontWeight: 'normal',
                     letterSpacing: '0.08vw',
-                    WebkitTextStroke: '0.27vw #064e3b',
+                    WebkitTextStroke: '0.15vw #064e3b',
                 }}>
                     {isFinal ? 'Resultado:' : 'Rolando Dado...'}
                 </h2>
@@ -81,12 +81,13 @@ export const DiceAnimation: React.FC<DiceAnimationProps> = ({ targetValue, onCom
                     fontSize: '11vw',
                     fontWeight: 'normal',
                     lineHeight: 1,
-                    color: isFinal ? '#4ade80' : '#6ee7b7',
+                    color: '#e3fff6', /* Extremely light mint to pop */
                     textShadow: isFinal
-                        ? '0 0 2vw rgba(74, 222, 128, 0.6), 0.15vw 0.15vw 0px #064e3b'
-                        : '0 0 0.75vw rgba(110, 231, 183, 0.4)',
-                    WebkitTextStroke: '0.3vw #064e3b',
-                    transition: 'all 0.3s ease'
+                        ? '0 0.6vw 0 #064e3b'
+                        : '0 0.3vw 0 #064e3b',
+                    WebkitTextStroke: '0.25vw #064e3b',
+                    transition: 'all 0.1s ease',
+                    transform: isFinal ? 'translateY(-0.3vw)' : 'translateY(0)'
                 }}>
                     {displayValue}
                 </div>

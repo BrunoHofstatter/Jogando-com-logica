@@ -5,31 +5,32 @@
     display: flex;
     max-height: 100dvh;
     overflow: hidden;
-    /* avoids double scrollbars */
-    border: 0dvh solid #b71c1c;
-    /* 1px remains 1dvh as it was already 1dvh */
     padding: 0vw;
     min-height: 100dvh;
     width: 100vw;
     justify-content: center;
     align-items: center;
-    background: radial-gradient(circle, #eacdcd, #716262);
+    background-color: #efc9c9;
+    /* Flat Light Gray variant */
 }
 
 .gameTitle {
     font-size: clamp(3vw, 9dvh, 4.8vw);
-    color: #eee;
-    -webkit-text-stroke: 0.3vw #af2020;
+    color: #fff;
+    -webkit-text-stroke: 0.3vw #7f0000;
     margin: 3dvh 0 2dvh 0;
+    text-shadow: 0 0.4vw 0 #5c0000;
+    /* Flat deep red shadow */
 }
 
 .button {
-    border: 0.4vw solid #a11313;
-    background: radial-gradient(circle, #d38c8c, #ac4c4c);
-    border-radius: 7vw;
+    border: 0.4vw solid #7f0000;
+    background-color: #da3e3e;
+    /* Main flat red */
+    border-radius: 4vw;
     box-sizing: border-box;
-    color: #eee;
-    -webkit-text-stroke: 0.22vw #af2020;
+    color: #fff;
+    -webkit-text-stroke: 0.22vw #7f0000;
     font-size: clamp(8.5vw, 20dvh, 11vw);
     display: flex;
     align-items: center;
@@ -37,24 +38,34 @@
     text-align: center;
     padding: 0.3vw 2.5vw 2vw 2.5vw;
     line-height: 1;
-    box-shadow: inset 0 0 1vw rgba(0, 0, 0, 0.3);
     cursor: pointer;
     margin-bottom: 3.5vw;
-    transition: all 0.5s ease;
-    box-shadow: 0 0 3vw rgba(0, 0, 0, 0.3), inset 0 0 1vw rgba(0, 0, 0, 0.3);
+    transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 0.8vw 0 #7f0000;
+    /* Reduced to match STOP */
 }
 
 .button:hover {
-    background: radial-gradient(circle, #e19c9c, #ba5555);
-    transform: scale(1.07) translateY(-1dvh);
+    background-color: #e35a5a;
+    transform: translateY(-0.2vw);
+    box-shadow: 0 1vw 0 #7f0000;
+}
+
+.button:active {
+    transform: translateY(0.6vw);
+    box-shadow: 0 0.2vw 0 #7f0000;
 }
 
 .levelButton {
-    transition: all 0.5s ease;
+    transition: all 0.1s ease;
 }
 
 .levelButton:hover {
-    transform: scale(1.07) translateY(-1dvh);
+    transform: translateY(-0.2vw);
+}
+
+.levelButton:active {
+    transform: translateY(0.4vw);
 }
 
 .modalOverlay {
@@ -63,7 +74,8 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(30, 30, 30, 0.4);
+    backdrop-filter: blur(4px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -71,49 +83,60 @@
 }
 
 /* Specific Styles for Levels Menu */
-
 .resetProgressButton {
     position: absolute;
     bottom: 2dvh;
     left: 3vw;
     font-family: inherit;
     font-size: 1.5vw;
-    color: #eee;
-    background: radial-gradient(circle, #d38c8c, #ac4c4c);
-    border: 0.2vw solid #a11313;
+    color: #efc9c9;
+    /* Gray matching background tint */
+    background-color: #9c8080;
+    /* Board Gray Background */
+    border: 0.2vw solid #5c4a4a;
     border-radius: 1vw;
     padding: 0.5vw 1.5vw;
     cursor: pointer;
-    -webkit-text-stroke: 0.05vw #af2020;
-    box-shadow: 0 0 1vw rgba(0, 0, 0, 0.5);
+    -webkit-text-stroke: 0.05vw #5c4a4a;
+    box-shadow: 0 0.3vw 0 #5c4a4a;
+    /* Flat gray shadow */
     text-decoration: none;
     opacity: 1;
-    transition: all 0.2s;
+    transition: all 0.1s ease;
 }
 
 .resetProgressButton:hover {
-    transform: scale(1.05);
-    background: radial-gradient(circle, #e19c9c, #ba5555);
+    background-color: #a88a8a;
+    transform: translateY(-0.1vw);
+    box-shadow: 0 0.4vw 0 #5c4a4a;
 }
 
+.resetProgressButton:active {
+    transform: translateY(0.2vw);
+    box-shadow: 0 0.1vw 0 #5c4a4a;
+}
+
+/* Modal Windows */
 .confirmModal {
-    background: radial-gradient(circle, #b2b2b2, #727272);
-    border: 0.5vw solid #a11313;
+    background-color: #d18d8d;
+    /* Control Panel Mid-Gray */
+    border: 0.4vw solid #c62828;
     border-radius: 2vw;
-    padding: 2vw;
+    padding: 2.5vw;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 2vw;
     width: 40vw;
-    box-shadow: 0 0 2vw #000;
+    box-shadow: 0 0.8vw 0 #7f0000;
     text-align: center;
 }
 
 .confirmText {
     font-size: 2.5vw;
-    color: #eee;
-    -webkit-text-stroke: 0.15vw #af2020;
+    color: #fff;
+    -webkit-text-stroke: 0.15vw #7f0000;
+    text-shadow: 0 0.2vw 0 #5c0000;
 }
 
 .confirmButtons {
@@ -126,60 +149,79 @@
     font-size: 2vw;
     padding: 0.5vw 2vw;
     border-radius: 1vw;
-    border: 0.2vw solid #080303;
+    border: 0.3vw solid #7f0000;
     cursor: pointer;
-    -webkit-text-stroke: 0.1vw #080303;
-    transition: transform 0.2s;
+    -webkit-text-stroke: 0.1vw #7f0000;
+    transition: all 0.1s ease;
+    box-shadow: 0 0.4vw 0 #5c0000;
 }
 
 .confirmBtn:hover {
-    transform: scale(1.05);
+    transform: translateY(-0.1vw);
+    box-shadow: 0 0.5vw 0 #5c0000;
+}
+
+.confirmBtn:active {
+    transform: translateY(0.3vw);
+    box-shadow: 0 0.1vw 0 #5c0000;
 }
 
 .yesBtn {
-    background: radial-gradient(circle, #4caf50, #2e7d32);
+    background-color: #4caf50;
     color: #fff;
+    border-color: #1b5e20;
+    -webkit-text-stroke: 0.1vw #1b5e20;
+    box-shadow: 0 0.4vw 0 #1b5e20;
+}
+
+.yesBtn:hover {
+    background-color: #66bb6a;
+    box-shadow: 0 0.5vw 0 #1b5e20;
+}
+
+.yesBtn:active {
+    box-shadow: 0 0.1vw 0 #1b5e20;
 }
 
 .noBtn {
-    background: radial-gradient(circle, #f44336, #d32f2f);
+    background-color: #da3e3e;
+    /* Main flat red */
     color: #fff;
 }
 
+.noBtn:hover {
+    background-color: #e35a5a;
+}
+
+
 /* Level Info Modal */
 .levelInfoModal {
-    background: radial-gradient(circle, #b2b2b2, #727272);
-    /* Match detailedRules */
-    border: 0.4vw solid #a11313;
+    background-color: #d18d8d;
+    /* Mid-Gray */
+    border: 0.4vw solid #c62828;
     border-radius: 3vw;
-    padding: 1.5vw 2vw;
-    /* Reduced */
+    padding: 3vw 2.5vw 2vw 2.5vw;
     width: 50vw;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5vw;
-    /* Reduced */
-    box-shadow: 0 0 3vw #000;
+    gap: 0.8vw;
+    box-shadow: 0 1vw 0 #7f0000;
     position: relative;
     animation: fadeIn 0.3s ease;
     color: #fff;
-    max-height: 80dvh;
-    /* Restrict height */
-    overflow-y: auto;
-    /* Enable scroll if needed */
+    max-height: 85dvh;
+    overflow-y: visible;
 }
 
 .levelInfoTitle {
     font-size: 3.5vw;
-    /* Reduced */
-    color: #eee;
-    /* White */
-    -webkit-text-stroke: 0.2vw #af2020;
+    color: #fff;
+    -webkit-text-stroke: 0.2vw #7f0000;
     margin-bottom: 0.5vw;
-    /* Reduced */
     line-height: 1;
     text-align: center;
+    text-shadow: 0 0.3vw 0 #5c0000;
 }
 
 .starCriteriaContainer {
@@ -187,12 +229,13 @@
     flex-direction: column;
     gap: 0;
     width: 100%;
-    background: rgba(0, 0, 0, 0.3);
+    background-color: #efc9c9;
+    /* Light flat gray */
     padding: 0;
     border-radius: 1.5vw;
-    border: 0.2vw solid #a11313;
+    border: 0.4vw solid #c62828;
     box-sizing: border-box;
-    /* overflow: hidden removed to avoid clipping content */
+    box-shadow: 0 0.5vw 0 #7f0000;
 }
 
 .starCriteriaRow {
@@ -201,15 +244,13 @@
     gap: 1.5vw;
     width: 100%;
     padding: 1vw 1.5vw;
-    /* Reduced padding */
-    border-bottom: 0.15vw solid rgba(255, 255, 255, 0.1);
+    border-bottom: 0.2vw solid #c62828;
     background: transparent;
     border-radius: 0;
     border-left: none;
     border-right: none;
     border-top: none;
     flex-shrink: 0;
-    /* Prevent collapsing */
 }
 
 .starCriteriaRow:last-child {
@@ -218,81 +259,84 @@
 
 .starIcon {
     font-size: 2.5vw;
-    /* Reduced font size */
-    color: #ffd700;
-    -webkit-text-stroke: 0.1vw #080303;
+    color: #ffcf40;
+    -webkit-text-stroke: 0.15vw #b28900;
     min-width: 6vw;
-    /* Reduced width */
     text-align: center;
     display: flex;
     justify-content: center;
+    text-shadow: 0 0.2vw 0 #da9500;
 }
 
 .starText {
-    font-size: 1.5vw;
-    /* Reduced font size */
-    color: #ffffff;
-    -webkit-text-stroke: 0.08vw #080303;
+    font-size: 1.8vw;
+    color: #fff;
+    -webkit-text-stroke: 0.1vw #7f0000;
     font-weight: bold;
     flex: 1;
     text-align: left;
 }
 
 .playLevelButton {
-    border: 0.4vw solid #a11313;
-    background: radial-gradient(circle, #d38c8c, #ac4c4c);
+    border: 0.4vw solid #7f0000;
+    background-color: #da3e3e;
+    /* Changed back to theme red */
     border-radius: 10vw;
     box-sizing: border-box;
-    color: #eee;
-    -webkit-text-stroke: 0.2vw #af2020;
+    color: #fff;
+    -webkit-text-stroke: 0.15vw #7f0000;
     font-size: 3.5vw;
-    /* Reduced font size */
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 0.3vw 3vw;
-    /* Reduced padding */
+    padding: 0.5vw 3vw 1vw 3vw;
     cursor: pointer;
-    margin-top: 1vw;
-    /* Reduced margin */
-    transition: all 0.2s ease;
-    box-shadow: inset 0 0 0.1vw rgba(255, 255, 255, 0.3);
-}
-
-.playLevelButton:active {
-    transform: translateY(0.5vw);
-    box-shadow: 0 0 0 #006400;
+    margin-top: 1.5vw;
+    transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 0.8vw 0 #7f0000;
 }
 
 .playLevelButton:hover {
-    transform: scale(1.05);
-    background: radial-gradient(circle, #e19c9c, #ba5555);
+    background-color: #e35a5a;
+    transform: translateY(-0.2vw);
+    box-shadow: 0 1vw 0 #7f0000;
+}
+
+.playLevelButton:active {
+    transform: translateY(0.6vw);
+    box-shadow: 0 0.2vw 0 #7f0000;
 }
 
 .closeModalX {
     position: absolute;
-    top: 1vw;
-    right: 1.5vw;
-    font-size: 2vw;
-    /* Reduced font size */
-    color: #eee;
-    cursor: pointer;
-    -webkit-text-stroke: 0.15vw #af2020;
-    transition: transform 0.2s;
-    background: radial-gradient(circle, #d38c8c, #ac4c4c);
-    width: 3vw;
-    /* Reduced size */
-    height: 3vw;
-    /* Reduced size */
+    top: -1.5vw;
+    right: -1.5vw;
+    background-color: #da3e3e;
+    border: 0.3vw solid #7f0000;
     border-radius: 50%;
+    width: 4vw;
+    height: 4vw;
+    cursor: pointer;
     display: flex;
-    align-items: center;
     justify-content: center;
-    border: 0.15vw solid #a11313;
+    align-items: center;
+    color: #fff;
+    -webkit-text-stroke: 0.1vw #7f0000;
+    z-index: 1001;
+    transition: all 0.1s ease;
+    box-shadow: 0 0.4vw 0 #7f0000;
+    font-size: 2vw;
+    font-family: "Cherry Bomb One", system-ui;
 }
 
 .closeModalX:hover {
-    transform: scale(1.1);
-    background: radial-gradient(circle, #e19c9c, #ba5555);
+    background-color: #e35a5a;
+    transform: translateY(-0.1vw);
+    box-shadow: 0 0.5vw 0 #7f0000;
+}
+
+.closeModalX:active {
+    transform: translateY(0.3vw);
+    box-shadow: 0 0.1vw 0 #7f0000;
 }

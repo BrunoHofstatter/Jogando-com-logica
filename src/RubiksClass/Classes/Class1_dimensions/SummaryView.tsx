@@ -155,7 +155,7 @@ const SummaryView: React.FC<SummaryViewProps> = ({ totalFlags }) => {
                             <br />
                             Erros no final: {mistakes}
                             <br />
-                            <strong>Total de Erros: {totalFlags + mistakes}</strong>
+                            <span>Total de Erros: {totalFlags + mistakes}</span>
                         </p>
                         <button
                             className={styles.modalButton}

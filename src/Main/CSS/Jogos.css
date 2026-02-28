@@ -7,83 +7,155 @@
   align-items: center;
   min-height: 100dvh;
   width: 100vw;
-  padding: 2dvh 0;
+  height: 100dvh;
+  padding: 1dvh 0;
   box-sizing: border-box;
+  background-color: #68c2e0;
+  justify-content: center;
+  /* Flat light blue background for the page */
 }
 
 .jogosHeader {
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-bottom: 4dvh;
-  margin-top: -4dvh;
+  position: absolute;
+  top: 0;
+
+
 }
 
-.jogosHeader h2 {
-  color: #bcd0d8;
-  -webkit-text-stroke: 0.4vw #071117;
+.jogosTitle {
+  color: #ffd75e;
+  /* Vibrant yellow/gold */
+  -webkit-text-stroke: 0.3vw #060e13;
+  /* Thick dark border */
   font-size: 8vw;
-  text-align: center;
-  margin: 0;
-  padding: 0;
-  text-shadow: 0 0 1vw #000000aa;
+  line-height: 1;
+  position: relative;
+  top: 2dvh;
+  text-shadow: 0 0.4vw 0 #000000;
+  /* Flat hard drop shadow */
+}
+
+.jogos-carousel-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 90%;
+  max-width: 1200px;
+  gap: 2vw;
+}
+
+.nav-arrow {
+  all: unset;
+  cursor: pointer;
+  width: 4vw;
+  height: 4vw;
+  background-color: #e31f2f;
+  /* Solid chunky red */
+  border: 0.4vw solid #060e13;
+  border-radius: 1vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0.6vw 0 #060e13;
+  transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform: translateY(0);
+  flex-shrink: 0;
+}
+
+.nav-arrow::before {
+  content: '';
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+.prev-arrow::before {
+  border-width: 1vw 1.5vw 1vw 0;
+  border-color: transparent #ffcf40 transparent transparent;
+  margin-right: 0.5vw;
+  /* visual center adjustment */
+  filter: drop-shadow(0.2vw 0 0 #060e13) drop-shadow(-0.2vw 0 0 #060e13) drop-shadow(0 0.2vw 0 #060e13) drop-shadow(0 -0.2vw 0 #060e13);
+}
+
+.next-arrow::before {
+  border-width: 1vw 0 1vw 1.5vw;
+  border-color: transparent transparent transparent #ffcf40;
+  margin-left: 0.5vw;
+  /* visual center adjustment */
+  filter: drop-shadow(0.2vw 0 0 #060e13) drop-shadow(-0.2vw 0 0 #060e13) drop-shadow(0 0.2vw 0 #060e13) drop-shadow(0 -0.2vw 0 #060e13);
+}
+
+.nav-arrow:hover {
+  background-color: #f5293a;
+  transform: translateY(-0.2vw);
+  box-shadow: 0 0.8vw 0 #060e13;
+}
+
+.nav-arrow:active {
+  transform: translateY(0.4vw);
+  box-shadow: 0 0.2vw 0 #060e13;
+}
+
+.nav-arrow.disabled {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
 }
 
 .grade_jogos {
-  row-gap: 1dvh;
+  margin-top: 15dvh;
+  row-gap: 4dvh;
+  column-gap: 5vw;
+  /* Widened horizontal gap */
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  
-  padding: 2vw 3vw;
-  width: 90%;
-  border: 0.4vw solid #060e13;
-  border-radius: 4vw;
-  background: radial-gradient(circle, #286a83b7, #103a4bb7);
-  box-shadow: inset 0 0 2vw #00000070, 0 0 1.5vw #000000aa;
+  flex-grow: 1;
+  justify-items: center;
+  /* Removed: border, border-radius, background-color, box-shadow */
   box-sizing: border-box;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .grade_jogos {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 3vw;
-    padding: 2vw;
-  }
-  
-  .jogosHeader h2 {
-    font-size: 8vw;
-  }
-}
 
-@media (max-width: 480px) {
-  .grade_jogos {
-    grid-template-columns: 1fr;
-    gap: 4vw;
-  }
-  
-  .jogosHeader h2 {
-    font-size: 10vw;
-  }
-}
 .game-button {
   all: unset;
   cursor: pointer;
-  transition: all 0.3s ease;
-  border: 0vw solid #080303;
-  transition: all 0.5s ease;
+  transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100%;
-  width: 100%;
+  width: 22vw;
   box-sizing: border-box;
- 
+  background-color: #286a83;
+  /* Solid slightly lighter blue for cards */
+  border: 0.4vw solid #060e13;
+  /* Thick border around each game */
+  border-radius: 2vw;
+  padding: 1.4dvh 1.5vw;
+  box-shadow: 0 0.8vw 0 #060e13;
+  /* Tactile hard shadow */
+  transform: translateY(0);
+  /* Default sitting state */
 }
 
 .game-button:hover {
-  transform: scale(1.05) translateY(-1vw);
+  background-color: #2d7a96;
+  /* Brighter color on hover */
+  transform: translateY(-0.3vw);
+  /* Lifts up slightly */
+  box-shadow: 0 1.1vw 0 #060e13;
+  /* Shadow grows slightly */
+}
+
+.game-button:active {
+  transform: translateY(0.5vw);
+  /* Squish down */
+  box-shadow: 0 0.3vw 0 #060e13;
+  /* Shadow shrinks */
 }
 
 .game-button-inner {
@@ -99,45 +171,31 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 0.5dvh;
+  margin-bottom: 2dvh;
   flex: 1;
 }
 
 .game-icon {
-  height: 11vw;
-  width: 12vw;
+  height: 18dvh;
+
   object-fit: contain;
   max-height: 100%;
+  filter: drop-shadow(0 0.4vw 0 #060e13);
+  /* Flat hard shadow on the images themselves */
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.game-button:hover .game-icon {
+  transform: scale(1.15) translateY(-0.5vw);
 }
 
 .game-label {
   color: #bcd0d8;
-  -webkit-text-stroke: 0.15vw #080303;
-  font-size: 2vw;
+  -webkit-text-stroke: 0.15vw #060e13;
+  /* Dark stroke on text */
+  font-size: 1.9vw;
   text-align: center;
-  padding: 0dvh 1vw 1dvh 1vw;
-  width: fit-content;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .game-icon {
-    height: 16vw;
-    width: 16vw;
-  }
-  
-  .game-label {
-    font-size: 2.8vw;
-  }
-}
-
-@media (max-width: 480px) {
-  .game-icon {
-    height: 25vw;
-    width: 25vw;
-  }
-  
-  .game-label {
-    font-size: 4vw;
-  }
+  width: auto;
+  text-shadow: 0 0.2vw 0 #000000;
+  /* Subtle hard flat shadow for text */
 }

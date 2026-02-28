@@ -6,9 +6,12 @@
 .container {
     display: flex;
     height: 100dvh;
-    width: 100%;
+    width: 100vw;
     overflow: hidden;
-    background: #f0f2f5;
+    background-color: #e0f2fe;
+    /* Light soft blue base */
+    font-family: "Cherry Bomb One", system-ui;
+    box-sizing: border-box;
 }
 
 /* --- Feedback Overlay: Center-Top ---------------------------- */
@@ -24,6 +27,7 @@
     pointer-events: none;
     /* Let interactions pass through */
     width: 100%;
+    gap: 1vw;
 }
 
 /* --- Aulas Back Button --- */
@@ -32,21 +36,30 @@
     top: 2vw;
     left: 2vw;
     z-index: 1000;
-    font-family: "Cherry Bomb One", cursive;
-    font-size: 1.5vw;
-    background: #e74c3c;
-    color: white;
-    border: none;
+    font-family: inherit;
+    font-size: 2vw;
+    background: #a855f7;
+    /* Purple */
+    color: #ffffff;
+    border: 0.3vw solid #6b21a8;
+    /* Dark purple border */
     border-radius: 1vw;
-    padding: 0.8vw 1.5vw;
+    padding: 0.5vw 1.5vw;
     cursor: pointer;
-    box-shadow: 0 0.4vw 0.8vw rgba(231, 76, 60, 0.3);
-    transition: transform 0.2s, background 0.2s;
+    box-shadow: 0 0.6vw 0 #6b21a8;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    -webkit-text-stroke: 0.15vw #6b21a8;
 }
 
 .aulasButton:hover {
-    background: #c0392b;
-    transform: scale(1.05);
+    background: #c084fc;
+    transform: translateY(-0.2vw);
+    box-shadow: 0 0.8vw 0 #6b21a8;
+}
+
+.aulasButton:active {
+    transform: translateY(0.4vw);
+    box-shadow: 0 0.2vw 0 #6b21a8;
 }
 
 /* --- Title Header Overlay (Top of cube) ---------------------- */
@@ -59,14 +72,16 @@
 }
 
 .cubeTitle {
-    background: #ffffff;
-    border: 0.2vw solid #3498db;
+    background: #9bcbff;
+    border: 0.3vw solid #013873;
     border-radius: 1vw;
-    padding: 0.5vw 2vw;
-    font-family: "Cherry Bomb One", cursive;
+    padding: 0.8vw 2vw;
+    font-family: inherit;
     font-size: 2vw;
-    color: #2c3e50;
-    box-shadow: 0 0.4vw 1vw rgba(0, 0, 0, 0.1);
+    color: #ebebeb;
+    box-shadow: 0 0.6vw 0 #013873;
+    -webkit-text-stroke: 0.15vw #013873;
+    text-shadow: 0 0.3vw 0 #013873;
 }
 
 /* --- Left Panel: Cube area ----------------------------------- */
@@ -77,8 +92,9 @@
     align-items: center;
     justify-content: center;
     position: relative;
-    background: #e8eaed;
-    border-right: 2px dashed #bdc3c7;
+    background: #e0f2fe;
+    /* Base light blue */
+    border-right: 0.3vw solid #013873;
     gap: 2vw;
 }
 
@@ -89,42 +105,59 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: #ffffff;
-    padding: 2vw 4vw;
-    gap: 3vw;
+    background: #d5ebfa;
+    /* Slightly darker soft blue */
+    padding: 4dvh 4vw;
+    gap: 12dvh;
     position: relative;
     overflow-y: auto;
 }
 
 /* --- Title --------------------------------------------------- */
 .title {
-    font-family: "Cherry Bomb One", cursive;
-    font-size: 2.5vw;
-    color: #2c3e50;
+    font-family: inherit;
+    font-size: 3.5vw;
+    color: #ffffff;
     text-align: center;
     margin: 0;
+    -webkit-text-stroke: 0.2vw #013873;
+    text-shadow: 0 0.4vw 0 #013873;
+    line-height: 1.2;
 }
 
 /* --- Hint card (inside overlay) ------------------------------ */
-.hintCard {
-    background: #fff3cd;
-    border: 2px solid #ffc107;
+.hintCard,
+.successCard {
     border-radius: 1vw;
-    padding: 1vw 2vw;
+    padding: 0.8vw 1.8vw;
     text-align: center;
-    font-family: "Cherry Bomb One", cursive;
-    font-size: 1.4vw;
-    color: #664d03;
-    box-shadow: 0 0.4vw 1.2vw rgba(0, 0, 0, 0.15);
+    font-family: inherit;
+    font-size: 1.8vw;
+    color: #ffffff;
     animation: fadeSlideIn 0.4s ease-out;
     pointer-events: auto;
-    /* Buttons/card itself should be interactive if needed */
-    max-width: 40vw;
+    max-width: 60vw;
+}
+
+.hintCard {
+    background: #ffe874;
+    /* Soft yellow bg */
+    border: 0.4vw solid #ca8a04;
+    box-shadow: 0 0.6vw 0 #a16207;
+    -webkit-text-stroke: 0.15vw #ca8a04;
+}
+
+.successCard {
+    background: #5ee991;
+    /* Soft green */
+    border: 0.4vw solid #16a34a;
+    box-shadow: 0 0.6vw 0 #15803d;
+    -webkit-text-stroke: 0.15vw #16a34a;
 }
 
 .hintIcon {
     margin-right: 0.5vw;
-    font-size: 1.6vw;
+    font-size: 2vw;
 }
 
 /* --- Options grid -------------------------------------------- */
@@ -132,54 +165,46 @@
     display: grid;
     /* 3 columns, 2 rows for the 6 options */
     grid-template-columns: repeat(3, 1fr);
-    gap: 1.2vw;
+    gap: 1.5vw;
     width: 90%;
     max-width: 40vw;
+    /* Make options grid matching similar scale to Class 1 */
 }
 
 /* --- Option buttons ------------------------------------------ */
 .optionButton {
-    font-family: "Cherry Bomb One", cursive;
+    font-family: inherit;
     font-size: 2vw;
-    padding: 1vw 0;
-    border: none;
+    /* smaller text */
+    padding: 0.8vw 0;
+    border: 0.4vw solid #013873;
     border-radius: 1vw;
-    background: #9b59b6;
+    background: #98defc;
     color: #ffffff;
     cursor: pointer;
-    box-shadow: 0 0.4vw 0.8vw rgba(155, 89, 182, 0.3);
-    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    box-shadow: 0 0.6vw 0 #013873;
+    transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+    -webkit-text-stroke: 0.15vw #013873;
+    text-shadow: 0 0.2vw 0 #013873;
 }
 
-.optionButton:hover {
-    transform: translateY(-0.15vw);
-    box-shadow: 0 0.5vw 1.2vw rgba(155, 89, 182, 0.45);
-    background: #8e44ad;
+.optionButton:hover:not(:disabled) {
+    transform: translateY(-0.2vw);
+    box-shadow: 0 0.8vw 0 #013873;
+    background: #7dd3fc;
 }
 
-.optionButton:active {
-    transform: translateY(0.1vw);
-    box-shadow: 0 0.2vw 0.4vw rgba(155, 89, 182, 0.3);
+.optionButton:active:not(:disabled) {
+    transform: translateY(0.4vw);
+    box-shadow: 0 0.2vw 0 #013873;
 }
 
 .optionButton:disabled {
-    opacity: 0.5;
+    opacity: 0.8;
     cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-
-/* --- Summary placeholder ------------------------------------- */
-.summaryPlaceholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100dvh;
-    width: 100%;
-    font-family: "Cherry Bomb One", cursive;
-    font-size: 3vw;
-    color: #2c3e50;
-    background: linear-gradient(135deg, #f0f2f5 0%, #e8eaed 100%);
+    background: #e0f2fe;
+    box-shadow: 0 0.2vw 0 #013873;
+    transform: translateY(0.4vw);
 }
 
 /* --- Animations ---------------------------------------------- */

@@ -336,8 +336,8 @@ function GameBoard({ randomNumber, difficulty, levelConfig, onReset }: GameBoard
             </div>
 
             <div className={styles.resultStats}>
-              <p>Tempo: {formatTime(count)}</p>
-              <p>Acertos: {acertos}/{maxAcertos}</p>
+              <div>Tempo: {formatTime(count)}</div>
+              <div>Acertos: {acertos}/{maxAcertos}</div>
             </div>
 
             <div className={styles.resultActions}>

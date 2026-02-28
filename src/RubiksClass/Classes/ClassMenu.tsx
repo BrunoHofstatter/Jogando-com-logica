@@ -7,7 +7,7 @@ const ClassMenu: React.FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1>Aulas do Cubo Mágico</h1>
+        <div className={styles.title}>Aulas do Cubo Mágico</div>
       </div>
 
       <div className={styles.classGrid}>

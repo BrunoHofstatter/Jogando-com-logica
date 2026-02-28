@@ -24,10 +24,11 @@ export default function SPTTTPage() {
         <div
           style={{
             fontSize: "2vw",
-            color: "#a1e1ffff",
-            marginBottom: "24px",
+            color: "#bae6fd", // light blue base text
+            marginBottom: "1.5vw",
             lineHeight: 1.5,
-            WebkitTextStroke: "0.15vw #26095eff",
+            WebkitTextStroke: "0.15vw #0c4a6e", // dark blue stroke
+            textShadow: "0 0.2vw 0 #075985",
             display: "flex",
             flexDirection: "column",
             gap: "1vw",
@@ -35,11 +36,11 @@ export default function SPTTTPage() {
         >
           <span>
             - Aqui mostra o jogador da{" "}
-            <span style={{ color: "#fa1172ff", fontSize: "2.3vw" }}>vez</span>
+            <span style={{ color: "#ffffff", fontSize: "2.3vw" }}>vez</span>
           </span>
           <span>
             - Quem aparece aqui deve{" "}
-            <span style={{ color: "#fa1172ff", fontSize: "2.3vw" }}>jogar</span>
+            <span style={{ color: "#ffffff", fontSize: "2.3vw" }}>jogar</span>
           </span>
         </div>
       ),
@@ -55,10 +56,11 @@ export default function SPTTTPage() {
         <div
           style={{
             fontSize: "2vw",
-            color: "#a1e1ffff",
-            marginBottom: "24px",
+            color: "#bae6fd",
+            marginBottom: "1.5vw",
             lineHeight: 1.5,
-            WebkitTextStroke: "0.15vw #241555ff",
+            WebkitTextStroke: "0.15vw #0c4a6e",
+            textShadow: "0 0.2vw 0 #075985",
             display: "flex",
             flexDirection: "column",
             gap: "1vw",
@@ -66,13 +68,13 @@ export default function SPTTTPage() {
         >
           <span>
             - Este é o tabuleiro{" "}
-            <span style={{ color: "#fa1172ff", fontSize: "2.3vw" }}>
+            <span style={{ color: "#ffffff", fontSize: "2.3vw" }}>
               gigante
             </span>
           </span>
           <span>
             - Ele tem 9 tabuleiros{" "}
-            <span style={{ color: "#fa1172ff", fontSize: "2.3vw" }}>
+            <span style={{ color: "#ffffff", fontSize: "2.3vw" }}>
               pequenos
             </span>
           </span>
@@ -90,10 +92,11 @@ export default function SPTTTPage() {
         <div
           style={{
             fontSize: "2vw",
-            color: "#a1e1ffff",
-            marginBottom: "24px",
+            color: "#bae6fd",
+            marginBottom: "1.5vw",
             lineHeight: 1.5,
-            WebkitTextStroke: "0.15vw #241555ff",
+            WebkitTextStroke: "0.15vw #0c4a6e",
+            textShadow: "0 0.2vw 0 #075985",
             display: "flex",
             flexDirection: "column",
             gap: "1vw",
@@ -101,13 +104,13 @@ export default function SPTTTPage() {
         >
           <span>
             - Cada quadrado grande é um tabuleiro{" "}
-            <span style={{ color: "#fa1172ff", fontSize: "2.3vw" }}>
+            <span style={{ color: "#ffffff", fontSize: "2.3vw" }}>
               pequeno
             </span>
           </span>
           <span>
             - Vença ele para ganhar este{" "}
-            <span style={{ color: "#fa1172ff", fontSize: "2.3vw" }}>
+            <span style={{ color: "#ffffff", fontSize: "2.3vw" }}>
               quadrado
             </span>
           </span>
@@ -125,10 +128,11 @@ export default function SPTTTPage() {
         <div
           style={{
             fontSize: "2vw",
-            color: "#a1e1ffff",
-            marginBottom: "24px",
+            color: "#bae6fd",
+            marginBottom: "1.5vw",
             lineHeight: 1.5,
-            WebkitTextStroke: "0.15vw #241555ff",
+            WebkitTextStroke: "0.15vw #0c4a6e",
+            textShadow: "0 0.2vw 0 #075985",
             display: "flex",
             flexDirection: "column",
             gap: "1vw",
@@ -136,12 +140,12 @@ export default function SPTTTPage() {
         >
           <span>
             - Aqui você coloca seu{" "}
-            <span style={{ color: "#fa1172ff", fontSize: "2.3vw" }}>X</span> ou{" "}
-            <span style={{ color: "#fa1172ff", fontSize: "2.3vw" }}>O</span>
+            <span style={{ color: "#ffffff", fontSize: "2.3vw" }}>X</span> ou{" "}
+            <span style={{ color: "#ffffff", fontSize: "2.3vw" }}>O</span>
           </span>
           <span>
             - Cada jogada ocupa uma{" "}
-            <span style={{ color: "#fa1172ff", fontSize: "2.3vw" }}>casa</span>
+            <span style={{ color: "#ffffff", fontSize: "2.3vw" }}>casa</span>
           </span>
         </div>
       ),
@@ -159,10 +163,11 @@ export default function SPTTTPage() {
         <div
           style={{
             fontSize: "2vw",
-            color: "#a1e1ffff",
-            marginBottom: "24px",
+            color: "#bae6fd",
+            marginBottom: "1.5vw",
             lineHeight: 1.5,
-            WebkitTextStroke: "0.15vw #241555ff",
+            WebkitTextStroke: "0.15vw #0c4a6e",
+            textShadow: "0 0.2vw 0 #075985",
             display: "flex",
             flexDirection: "column",
             gap: "1vw",
@@ -170,11 +175,11 @@ export default function SPTTTPage() {
         >
           <span>
             - Onde você joga aqui manda o outro jogador para o mesmo{" "}
-            <span style={{ color: "#fa1172ff", fontSize: "2.3vw" }}>lugar</span>
+            <span style={{ color: "#ffffff", fontSize: "2.3vw" }}>lugar</span>
           </span>
           <span>
             - A jogada escolhe o próximo tabuleiro{" "}
-            <span style={{ color: "#fa1172ff", fontSize: "2.3vw" }}>
+            <span style={{ color: "#ffffff", fontSize: "2.3vw" }}>
               pequeno
             </span>
           </span>
@@ -196,10 +201,11 @@ export default function SPTTTPage() {
         <div
           style={{
             fontSize: "2vw",
-            color: "#a1e1ffff",
-            marginBottom: "24px",
+            color: "#bae6fd",
+            marginBottom: "1.5vw",
             lineHeight: 1.5,
-            WebkitTextStroke: "0.15vw #241555ff",
+            WebkitTextStroke: "0.15vw #0c4a6e",
+            textShadow: "0 0.2vw 0 #075985",
             display: "flex",
             flexDirection: "column",
             gap: "1vw",
@@ -207,11 +213,11 @@ export default function SPTTTPage() {
         >
           <span>
             - Ganhe 3 tabuleiros pequenos em{" "}
-            <span style={{ color: "#fa1172ff", fontSize: "2.3vw" }}>linha</span>
+            <span style={{ color: "#ffffff", fontSize: "2.3vw" }}>linha</span>
           </span>
           <span>
             - Igual ao jogo da velha{" "}
-            <span style={{ color: "#fa1172ff", fontSize: "2.3vw" }}>
+            <span style={{ color: "#ffffff", fontSize: "2.3vw" }}>
               normal
             </span>
           </span>

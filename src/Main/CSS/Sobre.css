@@ -1,20 +1,36 @@
-section {
+section.sobre {
   font-family: "Cherry Bomb One", system-ui;
   font-weight: 200;
   font-style: normal;
-  color: #eee;
+  color: #ffffff;
   margin: 0 auto;
-  -webkit-text-stroke: clamp(1px, 0.1vw, 10px) #000000;
-  width: 100%;
+  min-height: 100dvh;
+  width: 100vw;
   box-sizing: border-box;
-  padding: 1rem;
+  padding: 5dvh 1rem;
+  background-color: #68c2e0;
+  /* Unified flat blue background */
+}
+
+h2 {
+  color: #ffcf40;
+  /* Solid flat yellow */
+  font-size: clamp(45px, 10vw, 200px);
+  text-align: center;
+  margin-bottom: 5rem;
+  -webkit-text-stroke: 0.4vw #060e13;
+  text-shadow: 0 0.6vw 0 #000000;
+  /* Hard 3D shadow */
+  line-height: 1;
 }
 
 .boxBoxes {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 12vw;
+  gap: 8vw;
   padding: 2vw;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 @media (min-width: 800px) {
@@ -29,6 +45,11 @@ section {
   font-size: clamp(30px, 3.5vw, 999px);
   text-align: center;
   margin-bottom: clamp(14px, 2vw, 50px);
+  text-shadow: 0 0.4vw 0 #000000;
+  /* Blocky title shadow */
+  -webkit-text-stroke: 0.3vw #060e13 !important;
+  /* Force uniform thick stroke */
+  color: #ffcf40;
 }
 
 .digBox,
@@ -37,73 +58,57 @@ section {
 .oqeBox,
 .presBox,
 .surgBox {
-  border-radius: 3vw;
-  padding: 1.2vw 1.8vw 0.4vw 1.8vw;
+  border-radius: 2vw;
+  /* Tighter blocky radius */
+  padding: 2.5vw 2.5vw 1.5vw 2.5vw;
   box-sizing: border-box;
-  font-size: clamp(18px, 2vw, 90px);
-  text-align: justify;
+  font-size: min(3vw, 3dvh);
+  text-align: left;
+  /* Better readability than justify */
   width: 100%;
-  -webkit-text-stroke: clamp(1px, 0.1vw, 10px) #000000;
+  -webkit-text-stroke: 0.2vw #060e13;
+  color: #ffffff;
+  border: 0.4vw solid #060e13 !important;
+  /* Uniform thick black border */
+  box-shadow: 0 1vw 0 #060e13;
+  /* Signature hard drop shadow */
+  line-height: 1.4;
 }
 
+/* Make strong tags pop in red inside the boxes */
+.boxBoxes strong {
+  color: #ffcf40;
+  -webkit-text-stroke: 0.25vw #da9500;
+  font-weight: normal;
+}
+
+/* Solid Flat Colors for Box Backgrounds */
 .digBox {
-  border: clamp(6px, 0.75vw, 40px) solid #159230;
-  background-color: #15923050;
-}
-
-.digSection {
-  -webkit-text-stroke: clamp(1.5px, 0.2vw, 10px) #147228;
+  background-color: #28a745;
+  /* Flat Green */
 }
 
 .equBox {
-  border: clamp(6px, 0.75vw, 40px) solid #a24503;
-  background-color: #a2450350;
-}
-
-.equSection {
-  -webkit-text-stroke: clamp(1.5px, 0.2vw, 10px) #a24503;
+  background-color: #e31f2f;
+  /* Flat Red */
 }
 
 .objBox {
-  border: clamp(6px, 0.75vw, 40px) solid #9b0b16;
-  background-color: #9b0b1650;
-}
-
-.objSection {
-  -webkit-text-stroke: clamp(1.5px, 0.2vw, 10px) #9b0b16;
+  background-color: #286a83;
+  /* Flat Dark Blue */
 }
 
 .oqeBox {
-  border: clamp(6px, 0.75vw, 40px) solid #159230;
-  background-color: #15923050;
-}
-
-.oqeSection {
-  -webkit-text-stroke: clamp(1.5px, 0.2vw, 10px) #147228;
+  background-color: #8c2a96;
+  /* Flat Purple */
 }
 
 .presBox {
-  border: clamp(6px, 0.75vw, 40px) solid #a24503;
-  background-color: #a2450350;
-}
-
-.presSection {
-  -webkit-text-stroke: clamp(1.5px, 0.2vw, 10px) #a24503;
+  background-color: #fca000;
+  /* Flat Orange */
 }
 
 .surgBox {
-  border: clamp(6px, 0.75vw, 40px) solid #14474c;
-  background-color: #14474c50;
-}
-
-.surgSection {
-  -webkit-text-stroke: clamp(1.5px, 0.2vw, 10px) #14474c;
-}
-
-h2 {
-  color: #eee;
-  font-size: clamp(45px, 6vw, 200px);
-  text-align: center;
-  margin-bottom: 3rem;
-  -webkit-text-stroke: clamp(3px, 0.35vw, 14px) #000000;
+  background-color: #17a2b8;
+  /* Flat Cyan */
 }

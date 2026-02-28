@@ -1,22 +1,29 @@
 .form-wrapper {
   margin: auto;
   padding: clamp(1rem, 3vw, 3rem);
-  border: clamp(6px, 0.75vw, 40px) solid #051314;
-  border-radius: clamp( 15px, 2vw, 1000px);
-  background: radial-gradient(circle, #1f7077, #2a6a70);
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
-  margin: 3vw 10vw;
+  border: 0.4vw solid #051314;
+  border-radius: 2vw;
+  background-color: #286a83;
+  /* Solid blue */
+  box-shadow: 0 1vw 0 #051314;
+  /* Hard drop shadow */
+  margin: 3vw 0;
+  width: 100%;
 }
-@media (max-width: 600px){
-  .form-wrapper{
-    margin: 3vw 3vw
+
+@media (max-width: 600px) {
+  .form-wrapper {
+    margin: 3vw 0;
+    padding: 2rem 1rem;
   }
 }
-.topRow{
+
+.topRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
 }
+
 @media (max-width: 600px) {
   .topRow {
     grid-template-columns: 1fr;
@@ -24,68 +31,88 @@
 }
 
 .form-title {
-  font-size: clamp(1.7rem, 4vw, 6.5rem);
+  font-size: clamp(2rem, 5vw, 6.5rem);
   text-align: center;
   margin-bottom: 1.5rem;
-  -webkit-text-stroke: clamp(1.7px, 0.3vw, 10px) #051314;
+  color: #ffcf40;
+  /* Yellow title */
+  -webkit-text-stroke: 0.3vw #051314;
+  text-shadow: 0 0.4vw 0 #000;
+  line-height: 1;
 }
 
 .feedback-form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  font-size: clamp(18px, 2vw, 5.5rem);
-  -webkit-text-stroke: clamp(1.5px, 0.15vw, 10px) #000000;
+  gap: 1.5rem;
+  font-size: clamp(18px, 2.5vw, 5.5rem);
+  -webkit-text-stroke: 0.15vw #000000;
   color: #fff;
 }
+
 input[type='number']::-webkit-outer-spin-button,
 input[type='number']::-webkit-inner-spin-button {
   -webkit-appearance: none;
-  
+
 }
 
 .feedback-form input {
   outline: none;
   color: #ffffff;
   width: 100%;
-  padding: 1vw;
-  font-size: clamp(18px, 1.7vw, 5.5rem);
-  border: 0px solid #ccc;
-  border-radius: clamp( 7px, 0.8vw, 1000px);
+  padding: 1vw 1.5vw;
+  font-size: clamp(18px, 2vw, 5.5rem);
+  border: 0.3vw solid #051314;
+  /* Thick black border */
+  border-radius: 1vw;
   resize: vertical;
-  height: clamp(36px,4vw,10rem);
-  background: radial-gradient(circle, #abd4d8, #89babe);
-  -webkit-text-stroke: clamp(1.5px, 0.13vw, 10px) #000000;
-  text-shadow:
-  -0.09vw 0 0 #000,
-   0.09vw 0 0 #000,
-   0 -0.09vw 0 #000,
-   0 0.09vw 0 #000,
-  -0.09vw -0.09vw 0 #000,
-   0.09vw -0.09vw 0 #000,
-  -0.09vw  0.09vw 0 #000,
-   0.09vw  0.09vw 0 #000;
+  height: clamp(40px, 4vw, 10rem);
+  background-color: #bcd0d8;
+  /* Light flat blue for input */
+  -webkit-text-stroke: 0.1vw #000000;
+  box-shadow: inset 0 0.3vw 0 rgba(0, 0, 0, 0.2);
+  /* Inset shadow to look carved out */
+  margin-top: 0.5rem;
+  font-family: "Cherry Bomb One", system-ui;
 }
-.feedback-form input:focus{
-  border: clamp(3px, 0.3vw, 2000px) solid #051314;
-  box-shadow: 0 0 40px #051314;
-  background: radial-gradient(circle, #84acaf, #75a4a8);
+
+.feedback-form input:focus {
+  background-color: #ffffff;
+  box-shadow: inset 0 0.3vw 0 rgba(0, 0, 0, 0.1);
 }
 
 .feedback-form button {
-  background: radial-gradient(circle, #1b6066, #1a5053);
-  color: white;
-  font-size: clamp(1rem, 2vw, 1000px);
-  padding: 0.5vw 1vw;
-  border: clamp(4px, 0.5vw, 2000px) solid #051314;
-  border-radius: clamp( 10px, 1vw, 1000px);
+  all: unset;
+  background-color: #28a745;
+  /* Solid flat green */
+  color: #ffefc2;
+  /* Pale yellow text */
+  font-size: clamp(1.5rem, 3vw, 1000px);
+  padding: 1.5dvh 3vw 2.5dvh 3vw;
+  border: 0.4vw solid #0f4a1f;
+  /* Thick dark green border */
+  border-radius: 2vw;
+  /* Blocky radius */
   cursor: pointer;
-  transition: background 0.3s;
-  margin: 2vw 20vw 0 20vw;
-  outline: none;
+  -webkit-text-stroke: 0.2vw #0f4a1f;
+  transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 0.8vw 0 #0f4a1f;
+  /* Hard 3D button shadow */
+  transform: translateY(0);
+  margin: 2vw auto 0 auto;
+  min-width: 30%;
+  text-align: center;
+  line-height: 1;
 }
 
 .feedback-form button:hover {
-  background: radial-gradient(circle, #18545e, #13383a);
-  transform: scale(1.04);
+  background-color: #34ce57;
+  /* Bright hover state */
+  transform: translateY(-0.2vw);
+  box-shadow: 0 1vw 0 #0f4a1f;
+}
+
+.feedback-form button:active {
+  transform: translateY(0.6vw);
+  box-shadow: 0 0.2vw 0 #0f4a1f;
 }
