@@ -10,6 +10,8 @@ import { useNavigate } from "react-router-dom";
 import styles from "../styles/StopGame.module.css";
 import VirtualKeyboard from "./VirtualKeyboard";
 import { isTouchDevice } from "../Logic/domUtils";
+import { ROUTES } from "../../routes";
+
 
 interface GameBoardProps {
   randomNumber: number;
@@ -298,7 +300,7 @@ function GameBoard({ randomNumber, difficulty, levelConfig, onReset }: GameBoard
 
   const handleNextLevel = () => {
     if (!levelConfig) return;
-    navigate("/stopPage", { state: { mode: "level", level: levelConfig.id + 1 } });
+    navigate(ROUTES.STOP_GAME, { state: { mode: "level", level: levelConfig.id + 1 } });
     window.location.reload(); // Quick fix to ensure full reload of state
   };
 
@@ -312,7 +314,7 @@ function GameBoard({ randomNumber, difficulty, levelConfig, onReset }: GameBoard
   };
 
   const handleMenu = () => {
-    navigate("/stop-levels");
+    navigate(ROUTES.STOP_LEVELS);
   };
   const maxAcertos = (levelConfig?.columns ?? 5) * 2;
 
@@ -357,6 +359,13 @@ function GameBoard({ randomNumber, difficulty, levelConfig, onReset }: GameBoard
         {/* Timer display */}
         {!pararJogo && <h2>{count}</h2>}
 
+        {/* Level Display */}
+        {levelConfig && (
+          <div className={styles.levelDisplay}>
+            Nível: {levelConfig.id}
+          </div>
+        )}
+
         {/* Magic number display and STOP button */}
         <div className={styles.numMagico}>
           <div className={styles.numeroCaixa}>
@@ -387,6 +396,7 @@ function GameBoard({ randomNumber, difficulty, levelConfig, onReset }: GameBoard
           <div
             data-target="board"
             className={styles.tabela}
+            data-rows={Math.ceil(caixasData.length / 2)}
             style={
               {
                 "--columns": levelConfig?.columns || ((difficulty === "d1" && !levelConfig) ? 4 : 5),
@@ -423,6 +433,8 @@ function GameBoard({ randomNumber, difficulty, levelConfig, onReset }: GameBoard
             )}
           </div>
         </div>
+
+
       </div>
 
       {/* Virtual Keyboard */}

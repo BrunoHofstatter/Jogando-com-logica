@@ -223,3 +223,95 @@
     padding: 1rem;
   }
 }
+
+/* Mobile Portrait Layout Strategy */
+@media (orientation: portrait) and (max-width: 650px) {
+  .gamePage {
+    width: 100vw;
+  }
+  .victorySidebar {
+    width: 90vw;
+    padding: 0;
+  }
+  .victoryContent {
+    border-width: min(1vw, 0.8dvh);
+    border-radius: min(5vw, 4dvh);
+    padding: min(5vw, 4dvh);
+    box-shadow: 0 min(2vw, 1.5dvh) 0 #4c1d95;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .victoryTitle {
+    font-size: min(11vw, 7dvh);
+    text-shadow: 0 min(1.2vw, 1dvh) 0 #581c87;
+    -webkit-text-stroke: min(0.5vw, 0.4dvh) #4c1d95;
+  }
+  .victoryReason {
+    font-size: min(4vw, 3dvh);
+    text-shadow: 0 min(0.6vw, 0.5dvh) 0 #581c87;
+    -webkit-text-stroke: min(0.2vw, 0.2dvh) #4c1d95;
+  }
+  .victoryWinner {
+    font-size: min(5vw, 4dvh);
+    text-shadow: 0 min(0.6vw, 0.5dvh) 0 #581c87;
+    -webkit-text-stroke: min(0.2vw, 0.2dvh) #4c1d95;
+  }
+  .victoryButtonsRow {
+    flex-direction: column;
+    width: 100%;
+    gap: min(3vw, 2.5dvh);
+  }
+  .victoryButton, .victoryButtonMenu, .victoryButtonNext {
+    width: 100%;
+    margin: 0;
+    padding: min(2.5vw, 2dvh) min(4vw, 4dvh);
+    font-size: min(5vw, 4dvh);
+    border-width: min(0.8vw, 0.6dvh);
+    border-radius: min(4vw, 3dvh);
+  }
+  .victoryButton {
+    box-shadow: 0 min(1.2vw, 1dvh) 0 #78350f;
+  }
+  .victoryButton:hover {
+    transform: translateY(min(-0.4vw, -0.3dvh));
+    box-shadow: 0 min(1.6vw, 1.3dvh) 0 #78350f;
+  }
+  .victoryButtonMenu {
+    box-shadow: 0 min(1.2vw, 1dvh) 0 #581c87;
+  }
+  .victoryButtonMenu:hover {
+    transform: translateY(min(-0.4vw, -0.3dvh));
+    box-shadow: 0 min(1.6vw, 1.3dvh) 0 #581c87;
+  }
+  .victoryButtonNext {
+    box-shadow: 0 min(1.2vw, 1dvh) 0 #831843;
+  }
+  .victoryButtonNext:hover {
+    transform: translateY(min(-0.4vw, -0.3dvh));
+    box-shadow: 0 min(1.6vw, 1.3dvh) 0 #831843;
+  }
+  .playerRed {
+    font-size: min(7vw, 6dvh);
+    -webkit-text-stroke: min(0.3vw, 0.2dvh) #7f1d1d;
+    text-shadow: 0 min(0.5vw, 0.4dvh) 0 #7f1d1d;
+    top: min(0.8vw, 0.6dvh);
+  }
+  .playerBlue {
+    font-size: min(7vw, 6dvh);
+    -webkit-text-stroke: min(0.3vw, 0.2dvh) #1e3a8a;
+    text-shadow: 0 min(0.5vw, 0.4dvh) 0 #1e3a8a;
+    top: min(0.8vw, 0.6dvh);
+  }
+  .playerRedOp {
+    font-size: min(5vw, 4dvh);
+    -webkit-text-stroke: min(0.2vw, 0.2dvh) #7f1d1d;
+    text-shadow: 0 min(0.4vw, 0.3dvh) 0 #7f1d1d;
+    top: min(0.5vw, 0.4dvh);
+  }
+  .playerBlueOp {
+    font-size: min(5vw, 4dvh);
+    -webkit-text-stroke: min(0.2vw, 0.2dvh) #1e3a8a;
+    text-shadow: 0 min(0.4vw, 0.3dvh) 0 #1e3a8a;
+    top: min(0.5vw, 0.4dvh);
+  }
+}

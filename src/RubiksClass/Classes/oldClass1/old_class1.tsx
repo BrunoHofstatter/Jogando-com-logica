@@ -4,6 +4,8 @@ import hintStyles from "./old_class1hitns.module.css";
 import Hint from "../../Components/hintButton";
 import { CheckCircle, XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../../../routes";
+
 
 type CubeSize = "2x2" | "3x3" | "4x4" | "5x5" | "6x6";
 
@@ -26,7 +28,7 @@ const Dimensions: React.FC = () => {
   const [showCorrections, setShowCorrections] = useState(false);
 
   const goToNextClass = () => {
-    navigate("/class2"); // Adjust the path based on your routing
+    navigate(ROUTES.CLASS_2); // Adjust the path based on your routing
   };
 
   // Function to get image path based on cube size
@@ -207,7 +209,7 @@ const Dimensions: React.FC = () => {
       <div className={styles.container}>
         <div className={styles.menuButtonContainer}>
           <button
-            onClick={() => navigate("/classMenu")}
+            onClick={() => navigate(ROUTES.CLASS_MENU)}
             className={styles.menuButton}
           >
             Aulas

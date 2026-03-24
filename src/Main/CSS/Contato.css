@@ -129,3 +129,45 @@ strong {
 .formBox>* {
   width: 100%;
 }
+
+@media (orientation: portrait) and (max-width: 650px) {
+  h2 {
+    font-size: min(18vw, 15dvh);
+    -webkit-text-stroke: min(0.8vw, 0.6dvh) #060e13;
+    text-shadow: 0 min(0.6vw, 0.6dvh) 0 #000000;
+  }
+
+  .contText {
+    font-size: min(6vw, 6dvh);
+    -webkit-text-stroke: min(0.25vw, 0.25dvh) #060e13;
+    text-shadow: 0 min(0.3vw, 0.3dvh) 0 #000000;
+  }
+
+  p {
+    font-size: min(5vw, 5dvh);
+    -webkit-text-stroke: min(0.2vw, 0.2dvh) #060e13;
+  }
+
+  strong {
+    -webkit-text-stroke: min(0.25vw, 0.25dvh) #630000;
+  }
+
+  .feedbackButton {
+    font-size: min(5vw, 5dvh);
+    border: min(0.4vw, 0.4dvh) solid #0f4a1f;
+    border-radius: min(4vw, 4dvh);
+    padding: min(3vw, 3dvh) min(6vw, 6dvh) min(5vw, 5dvh) min(6vw, 6dvh);
+    -webkit-text-stroke: min(0.2vw, 0.2dvh) #0f4a1f;
+    box-shadow: 0 min(0.8vw, 0.8dvh) 0 #0f4a1f;
+  }
+
+  .feedbackButton:hover {
+    transform: translateY(calc(min(0.2vw, 0.2dvh) * -1));
+    box-shadow: 0 min(1vw, 1dvh) 0 #0f4a1f;
+  }
+
+  .feedbackButton:active {
+    transform: translateY(min(0.6vw, 0.6dvh));
+    box-shadow: 0 min(0.2vw, 0.2dvh) 0 #0f4a1f;
+  }
+}

@@ -3,9 +3,22 @@ import SPTTT from "../Components/SPTTT";
 import { useState, useEffect } from "react";
 import DynamicTutorial, { TutorialStep } from "../Components/DynamicTutorial";
 import { useDifficultyLock } from "../../Shared/Hooks/useDifficultyLock";
+import { ROUTES } from "../../routes";
+
 
 export default function SPTTTAIPage() {
   const [showTutorial, setShowTutorial] = useState(false);
+
+  useEffect(() => {
+    document.body.style.backgroundColor = "#c2e4fa";
+    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (!metaThemeColor) {
+      metaThemeColor = document.createElement("meta");
+      metaThemeColor.setAttribute("name", "theme-color");
+      document.head.appendChild(metaThemeColor);
+    }
+    metaThemeColor.setAttribute("content", "#c2e4fa");
+  }, []);
 
   // Auto-show on first visit
   useEffect(() => {
@@ -240,11 +253,11 @@ export default function SPTTTAIPage() {
   };
 
   const handleMenu = () => {
-    navigate("/spttt");
+    navigate(ROUTES.SPTTT_RULES);
   };
 
   const handleNextLevel = () => {
-    navigate("/spttt-ai", { state: { winCondition: "line", difficulty: difficulty + 1 }, replace: true });
+    navigate(ROUTES.SPTTT_AI, { state: { winCondition: "line", difficulty: difficulty + 1 }, replace: true });
   };
 
   const showNextLevel = difficulty < 4;

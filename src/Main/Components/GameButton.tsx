@@ -14,7 +14,7 @@ function GameButton({ pagina, label, imageSrc, onClick }: GameButtonProps) {
     if (onClick) {
       onClick();
     } else {
-      navigate(`/${pagina}`);
+      navigate(pagina);
     }
   };
 

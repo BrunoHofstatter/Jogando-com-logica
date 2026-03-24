@@ -12,6 +12,17 @@ export default function MathWarPage() {
   const [showDiceAnim, setShowDiceAnim] = useState(false);
   const [diceTarget, setDiceTarget] = useState<number[]>([]);
 
+  useEffect(() => {
+    document.body.style.backgroundColor = "#adfad2";
+    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (!metaThemeColor) {
+      metaThemeColor = document.createElement("meta");
+      metaThemeColor.setAttribute("name", "theme-color");
+      document.head.appendChild(metaThemeColor);
+    }
+    metaThemeColor.setAttribute("content", "#adfad2");
+  }, []);
+
   const engine = new GameEngine();
   const [gameState, setGameState] = useState<GameState>(() => {
     return engine.initializeGame(gameConfig, gameRules);

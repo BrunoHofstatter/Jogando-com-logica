@@ -260,9 +260,9 @@ const Board: React.FC<BoardProps> = ({
           <div
             className={styles.board}
             style={{
-              gridTemplateColumns: `repeat(${gameState.config.boardWidth}, clamp(2.6vw,12.35dvh,6.5vw))`,
-              gridTemplateRows: `repeat(${gameState.config.boardHeight}, clamp(2.6vw,12.35dvh,6.5vw))`,
-            }}
+              "--board-cols": gameState.config.boardWidth,
+              "--board-rows": gameState.config.boardHeight,
+            } as React.CSSProperties}
           >
             {gameState.board.map((row, rowIndex) =>
               row.map((piece, colIndex) => {

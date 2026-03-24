@@ -1,14 +1,9 @@
 body {
-  background: radial-gradient(circle, #55b5df, #0e668b);
+
   min-height: 100dvh;
   box-sizing: border-box;
 }
-@media (orientation: portrait) {
-  body {
-      background: radial-gradient(circle, #47a5ce, #2080a8);
 
-}
-}
 
 .back-button {
   position: fixed;
@@ -16,12 +11,24 @@ body {
   border: none;
   z-index: 9999;
   top: 2.5vh;
-  right:2dvh;
+  right: 2dvh;
 }
 
 .homeButton {
   height: 5vw;
 }
+
 .homeButton:hover {
   transform: scale(1.05);
+}
+
+@media (orientation: portrait) and (max-width: 650px) {
+  .back-button {
+    top: 2dvh;
+    right: 2vw;
+  }
+
+  .homeButton {
+    height: min(12vw, 10dvh);
+  }
 }

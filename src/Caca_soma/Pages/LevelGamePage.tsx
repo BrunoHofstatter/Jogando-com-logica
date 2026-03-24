@@ -10,8 +10,21 @@ import GameButton from '../componentes/GameButton';
 import RoundTracker from '../componentes/RoundTracker';
 import styles from '../styles/levelGame.module.css';
 import DynamicTutorial, { TutorialStep } from '../componentes/DynamicTutorial';
+import { ROUTES } from "../../routes";
+
 
 function LevelGamePage() {
+  useEffect(() => {
+    document.body.style.backgroundColor = "#efc9c9";
+    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (!metaThemeColor) {
+      metaThemeColor = document.createElement("meta");
+      metaThemeColor.setAttribute("name", "theme-color");
+      document.head.appendChild(metaThemeColor);
+    }
+    metaThemeColor.setAttribute("content", "#efc9c9");
+  }, []);
+
   const { levelId } = useParams<{ levelId: string }>();
   const navigate = useNavigate();
 
@@ -163,7 +176,7 @@ function LevelGamePage() {
         setLevelConfig(level);
       } else {
         // Level not found, redirect back
-        navigate('/cacaSomaNiveis');
+        navigate(ROUTES.CACA_SOMA_LEVELS);
       }
     }
   }, [levelId, navigate]);
@@ -296,7 +309,7 @@ function LevelGamePage() {
   const handleNextLevel = () => {
     if (levelConfig && levelConfig.levelId < getTotalLevels()) {
       const nextId = levelConfig.levelId + 1;
-      navigate(`/cacaSomaNivel/${nextId}`);
+      navigate(`${ROUTES.CACA_SOMA_LEVEL_BASE}/${nextId}`);
       setShowResultModal(false);
       setRoundResults([]);
       setCurrentRound(1);
@@ -315,7 +328,7 @@ function LevelGamePage() {
   };
 
   const handleMenu = () => {
-    navigate('/cacaSomaNiveis');
+    navigate(ROUTES.CACA_SOMA_LEVELS);
   };
 
   // Get current round's magic number range

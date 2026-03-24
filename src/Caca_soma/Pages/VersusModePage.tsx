@@ -8,6 +8,17 @@ import styles from "../styles/design.module.css";
 function Caca_soma() {
   const [showTutorial, setShowTutorial] = useState(false);
   useEffect(() => {
+    document.body.style.backgroundColor = "#efc9c9";
+    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (!metaThemeColor) {
+      metaThemeColor = document.createElement("meta");
+      metaThemeColor.setAttribute("name", "theme-color");
+      document.head.appendChild(metaThemeColor);
+    }
+    metaThemeColor.setAttribute("content", "#efc9c9");
+  }, []);
+
+  useEffect(() => {
     const completed = localStorage.getItem('tutorial_cacasoma_v1_completed');
     if (completed !== 'true') {
       setTimeout(() => setShowTutorial(true), 500); // Delay for DOM

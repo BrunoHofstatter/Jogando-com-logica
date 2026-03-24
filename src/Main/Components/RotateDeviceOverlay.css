@@ -1,0 +1,98 @@
+/* Only show the overlay on screens in portrait mode that are WIDER than a standard phone (e.g. iPads/Tablets) */
+.rotate-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    background-color: #5495aa;
+    /* Very dark blue matching our stroke color */
+    z-index: 99999;
+    /* Highest possible layer */
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-family: "Cherry Bomb One", system-ui;
+}
+
+@media (orientation: portrait) and (min-width: 651px) {
+    .rotate-overlay {
+        display: flex;
+    }
+}
+
+.rotate-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 4vw;
+}
+
+.rotate-content h2 {
+    color: #ffcf40;
+    font-size: min(10vw, 8dvh);
+    -webkit-text-stroke: min(0.4vw, 0.3dvh) #000000;
+    margin: 4dvh 0 2dvh 0;
+    text-shadow: 0 min(0.6vw, 0.4dvh) 0 #000000;
+}
+
+.rotate-content p {
+    color: #ffffff;
+    font-size: 4vw;
+    max-width: 80%;
+    -webkit-text-stroke: 0.2vw #000;
+}
+
+/* Pure CSS Device Icon and Animation */
+.rotate-icon-container {
+    position: relative;
+    width: min(25vw, 20dvh);
+    height: min(25vw, 20dvh);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rotate-device {
+    width: min(12vw, 10dvh);
+    height: min(18vw, 15dvh);
+    border: min(1vw, 0.8dvh) solid #000000;
+    border-radius: min(1.5vw, 1dvh);
+    position: relative;
+    animation: rotateWarning 2s infinite ease-in-out;
+}
+
+.rotate-device::after {
+    content: '';
+    position: absolute;
+    bottom: min(1vw, 0.8dvh);
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(2vw, 1.5dvh);
+    height: min(2vw, 1.5dvh);
+    background-color: #000000;
+    border-radius: 50%;
+}
+
+@keyframes rotateWarning {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    40% {
+        transform: rotate(-90deg);
+        /* Rotate to landscape */
+    }
+
+    60% {
+        transform: rotate(-90deg);
+        /* Hold landscape */
+    }
+
+    100% {
+        transform: rotate(0deg);
+        /* Return to portrait */
+    }
+}

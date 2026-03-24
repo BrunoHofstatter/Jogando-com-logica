@@ -774,3 +774,267 @@
 .gameSection:nth-child(6) {
   animation-delay: 0.6s;
 }
+
+/* ============================================
+   MOBILE PORTRAIT LAYOUT
+   ============================================ */
+@media (orientation: portrait) and (max-width: 650px) {
+
+  /* 1. Global Reset */
+  .manualPage {
+    width: 100vw;
+    min-height: 100dvh;
+    box-sizing: border-box;
+    padding: min(5vw, 4dvh) min(4vw, 3dvh) min(10vw, 8dvh) min(4vw, 3dvh);
+    overflow-x: hidden;
+  }
+
+  /* Safe Sizing for Typography */
+  .manualPage h1 {
+    font-size: min(12vw, 8dvh);
+    margin-top: min(8vw, 5dvh);
+    -webkit-text-stroke: min(0.6vw, 0.4dvh) #060e13;
+    text-shadow: 0 min(1.2vw, 0.8dvh) 0 #060e13;
+  }
+
+  .manualPage h2 {
+    font-size: min(8vw, 6dvh);
+    margin-top: min(6vw, 4dvh);
+    padding-bottom: min(4vw, 3dvh);
+    border-bottom: min(0.8vw, 0.6dvh) solid #060e13;
+    -webkit-text-stroke: min(0.4vw, 0.3dvh) #060e13;
+    text-shadow: 0 min(0.8vw, 0.6dvh) 0 #060e13;
+  }
+
+  .manualPage h3 {
+    font-size: min(6vw, 4.5dvh);
+    margin: min(4vw, 3dvh) 0 min(3vw, 2dvh);
+    -webkit-text-stroke: min(0.3vw, 0.2dvh) #060e13;
+  }
+
+  .manualPage p {
+    font-size: min(4.5vw, 3dvh);
+    margin-bottom: min(3vw, 2dvh);
+    -webkit-text-stroke: min(0.3vw, 0.2dvh) #060e13;
+  }
+
+  .manualPage strong {
+    font-size: min(5vw, 3.5dvh);
+    -webkit-text-stroke: min(0.3vw, 0.2dvh) #060e13;
+  }
+
+  .manualPage em {
+    -webkit-text-stroke: min(0.2vw, 0.15dvh) #060e13;
+  }
+
+  .manualPage ul {
+    padding-left: min(6vw, 4dvh);
+    margin: min(3vw, 2dvh) 0;
+    font-size: min(4.5vw, 3dvh);
+    -webkit-text-stroke: min(0.3vw, 0.2dvh) #060e13;
+  }
+
+  .manualPage li {
+    margin-bottom: min(2vw, 1.5dvh);
+    padding-left: min(1vw, 0.8dvh);
+  }
+
+  .manualPage li:before {
+    left: min(-5vw, -3.5dvh);
+    font-size: min(5.5vw, 4dvh);
+    -webkit-text-stroke: min(0.3vw, 0.2dvh) #060e13;
+  }
+
+  .gameDetails {
+    padding: min(3vw, 2dvh) min(4vw, 3dvh);
+    border-radius: min(3vw, 2dvh);
+    margin: min(3vw, 2dvh) 0;
+    border: min(0.6vw, 0.4dvh) solid #060e13;
+  }
+
+  .gameDetails li {
+    margin-bottom: min(1.5vw, 1dvh);
+  }
+
+  .note {
+    border-left: min(0.8vw, 0.6dvh) solid #ffcf40;
+    padding: min(2vw, 1.5dvh) min(3vw, 2dvh);
+    margin: min(3vw, 2dvh) 0;
+    border-radius: 0 min(2vw, 1.5dvh) min(2vw, 1.5dvh) 0;
+  }
+
+  /* 2. The Game Navigation Grid */
+  .gamesList {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto;
+    gap: min(3vw, 2dvh);
+    margin: min(4vw, 3dvh) 0 min(8vw, 6dvh) 0;
+  }
+
+  .gameCard {
+    padding: min(3vw, 2dvh);
+    padding-bottom: min(12vw, 8dvh);
+    border-radius: min(4vw, 3dvh);
+    border-width: min(0.6vw, 0.5dvh);
+  }
+
+  .gameCard h3 {
+    font-size: min(5.5vw, 4.5dvh);
+    /* Increased from 4.5vw/3.5dvh */
+    margin-bottom: min(2vw, 1.5dvh);
+    text-align: center;
+  }
+
+  .gameCard p {
+    font-size: min(4.2vw, 3.2dvh);
+    /* Increased from 3.5vw/2.5dvh */
+    margin-bottom: min(3vw, 2dvh);
+    text-align: center;
+  }
+
+  .viewButton {
+    border: min(0.6vw, 0.5dvh) solid #060e13;
+    padding: min(1.5vw, 1dvh) min(2vw, 1.5dvh) min(2vw, 1.5dvh);
+    border-radius: min(4vw, 3dvh);
+    font-size: min(4.5vw, 3.5dvh);
+    /* Increased from 3.5vw/2.5dvh */
+    bottom: min(2vw, 1.5dvh);
+    left: min(2vw, 1.5dvh);
+    right: min(2vw, 1.5dvh);
+  }
+
+  .viewButton:active {
+    transform: translateY(min(0.8vw, 0.6dvh));
+  }
+
+  /* Game Sections */
+  .gameSection {
+    border-radius: min(4vw, 3dvh);
+    padding: min(4vw, 3dvh);
+    margin-bottom: min(8vw, 6dvh);
+    box-shadow: 0 min(2vw, 1.5dvh) 0 #060e13;
+    border: min(0.8vw, 0.6dvh) solid #060e13;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .gameSection h2 {
+    order: -1;
+    margin-top: 0;
+    margin-bottom: min(4vw, 3dvh);
+  }
+
+  /* 4. Fixing Absolute Positioning & 5. Massive Touch Targets */
+  .rulesButton {
+    position: relative;
+    top: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
+    border: min(0.8vw, 0.6dvh) solid #060e13;
+    padding: min(3vw, 2dvh) 0 min(3.5vw, 2.5dvh);
+    border-radius: min(4vw, 3dvh);
+    font-size: min(4.5vw, 3.5dvh);
+    box-shadow: 0 min(1.2vw, 0.8dvh) 0 #060e13;
+    -webkit-text-stroke: min(0.3vw, 0.2dvh) #060e13;
+    margin-bottom: min(4vw, 3dvh);
+  }
+
+  .rulesButton:hover {
+    transform: translateY(min(-0.4vw, -0.3dvh));
+    box-shadow: 0 min(1.6vw, 1.2dvh) 0 #060e13;
+  }
+
+  .rulesButton:active {
+    transform: translateY(min(0.8vw, 0.6dvh));
+    box-shadow: 0 min(0.4vw, 0.3dvh) 0 #060e13;
+  }
+
+  /* Stacking Visuals */
+  .descriptionWithImage {
+    flex-direction: column;
+    gap: min(4vw, 3dvh);
+  }
+
+  .preview {
+    width: min(80vw, 40dvh);
+    max-width: none;
+    border-radius: min(2vw, 1.5dvh);
+    border: min(0.8vw, 0.6dvh) solid #060e13;
+    box-shadow: 0 min(1.6vw, 1.2dvh) 0 #060e13;
+    align-self: center;
+    margin-top: min(4vw, 3dvh);
+  }
+
+  /* Feedback Section */
+  .feedbackButtonContainer {
+    margin-top: min(10vw, 8dvh);
+    gap: min(4vw, 3dvh);
+  }
+
+  .feedbackHighlight {
+    font-size: min(5vw, 3.5dvh);
+    max-width: 95%;
+    -webkit-text-stroke: min(0.4vw, 0.3dvh) #060e13;
+    text-shadow: 0 min(0.8vw, 0.6dvh) 0 #060e13;
+  }
+
+  .feedbackButton {
+    border-radius: min(4vw, 3dvh);
+    border: min(0.8vw, 0.6dvh) solid #060e13;
+    padding: min(3vw, 2dvh) min(6vw, 4dvh) min(4vw, 3dvh);
+    font-size: min(5vw, 3.5dvh);
+    -webkit-text-stroke: min(0.3vw, 0.2dvh) #060e13;
+    box-shadow: 0 min(1.6vw, 1.2dvh) 0 #060e13;
+    width: 90%;
+    margin: 0 auto;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .feedbackButton:hover {
+    transform: translateY(min(-0.4vw, -0.3dvh));
+    box-shadow: 0 min(2vw, 1.4dvh) 0 #060e13;
+  }
+
+  .feedbackButton:active {
+    transform: translateY(min(0.8vw, 0.6dvh));
+    box-shadow: 0 min(0.4vw, 0.3dvh) 0 #060e13;
+  }
+
+  .feedbackBox {
+    border: min(0.8vw, 0.6dvh) solid #060e13;
+    border-radius: min(2vw, 1.5dvh);
+    padding: min(3vw, 2dvh);
+    max-width: 90%;
+    box-shadow: 0 min(1.2vw, 0.8dvh) 0 #060e13;
+  }
+
+  .feedbackBox p {
+    font-size: min(4vw, 2.8dvh);
+    -webkit-text-stroke: min(0.3vw, 0.2dvh) #060e13;
+  }
+
+  /* Scroll to top button */
+  .scrollTopButton {
+    top: min(2vw, 1.5dvh);
+    border: min(0.8vw, 0.6dvh) solid #060e13;
+    width: min(15vw, 8dvh);
+    height: min(15vw, 8dvh);
+    font-size: min(8vw, 4.5dvh);
+    box-shadow: 0 min(1.2vw, 0.8dvh) 0 #060e13;
+    -webkit-text-stroke: min(0.3vw, 0.2dvh) #060e13;
+    padding-bottom: min(1vw, 0.8dvh);
+  }
+
+  .scrollTopButton:hover {
+    transform: translateX(-50%) translateY(min(-0.4vw, -0.3dvh));
+    box-shadow: 0 min(1.6vw, 1.2dvh) 0 #060e13;
+  }
+
+  .scrollTopButton:active {
+    transform: translateX(-50%) translateY(min(0.8vw, 0.6dvh));
+    box-shadow: 0 min(0.4vw, 0.3dvh) 0 #060e13;
+  }
+}

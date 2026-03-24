@@ -1,6 +1,19 @@
 import "../CSS/Contato.css";
+import { useEffect } from "react";
 import Form from "../Components/form";
+
 function Contato() {
+  useEffect(() => {
+    document.body.style.backgroundColor = "#68c2e0";
+    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (!metaThemeColor) {
+      metaThemeColor = document.createElement("meta");
+      metaThemeColor.setAttribute("name", "theme-color");
+      document.head.appendChild(metaThemeColor);
+    }
+    metaThemeColor.setAttribute("content", "#68c2e0");
+  }, []);
+
   return <section className="contato">
     <h2>Contato</h2>
     <h3 className="contText">

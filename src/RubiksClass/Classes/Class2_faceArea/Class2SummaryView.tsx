@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import RubiksCube from "../../Components/RubiksCube";
 import styles from "./Class2SummaryView.module.css";
+import { ROUTES } from "../../../routes";
+
 
 interface Class2SummaryViewProps {
     totalFlags: number;
@@ -221,7 +223,7 @@ const Class2SummaryView: React.FC<Class2SummaryViewProps> = ({ totalFlags }) => 
     return (
         <div className={styles.container}>
             {/* --- Back to Menu Button --- */}
-            <button className={styles.aulasButton} onClick={() => navigate("/classMenu")}>
+            <button className={styles.aulasButton} onClick={() => navigate(ROUTES.CLASS_MENU)}>
                 Aulas
             </button>
 
@@ -291,7 +293,7 @@ const Class2SummaryView: React.FC<Class2SummaryViewProps> = ({ totalFlags }) => 
                         </p>
                         <button
                             className={styles.modalButton}
-                            onClick={() => navigate("/classMenu")}
+                            onClick={() => navigate(ROUTES.CLASS_MENU)}
                         >
                             Voltar ao Menu
                         </button>

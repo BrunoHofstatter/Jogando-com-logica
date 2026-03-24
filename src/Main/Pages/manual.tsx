@@ -1,10 +1,23 @@
 import { useRef, useState, useEffect } from 'react';
 import styles from '../CSS/manual.module.css';
+import { ROUTES } from "../../routes";
+
 
 function Manual() {
   const gameSections = useRef<(HTMLElement | null)[]>([]);
   const jogosSection = useRef<HTMLElement | null>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    document.body.style.backgroundColor = "#68c2e0";
+    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (!metaThemeColor) {
+      metaThemeColor = document.createElement("meta");
+      metaThemeColor.setAttribute("name", "theme-color");
+      document.head.appendChild(metaThemeColor);
+    }
+    metaThemeColor.setAttribute("content", "#68c2e0");
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -31,12 +44,12 @@ function Manual() {
 
   // Game routes - you can update these later
   const gameRoutes = {
-    'stop-matematico': '/jogoStop',
-    'caca-soma': '/cacasomaRg',
-    'cubo-magico': '/dimensions',
-    'super-velha': '/spttt',
-    'caca-coroa': '/crownchaseRg',
-    'guerra-matematica': '/mathwarRg'
+    'stop-matematico': ROUTES.STOP_RULES,
+    'caca-soma': ROUTES.CACA_SOMA_RULES,
+    'cubo-magico': ROUTES.CLASS_1_OLD,
+    'super-velha': ROUTES.SPTTT_RULES,
+    'caca-coroa': ROUTES.CROWN_CHASE_RULES,
+    'guerra-matematica': ROUTES.MATH_WAR_RULES
   };
 
   const navigateToRules = (gameId: keyof typeof gameRoutes) => {

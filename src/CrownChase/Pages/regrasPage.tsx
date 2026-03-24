@@ -1,12 +1,25 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "../styles/regras.module.css";
 import { useNavigate } from "react-router-dom";
 import { useTutorialCompleted } from "../Components/DynamicTutorial";
 import { useDifficultyLock } from "../../Shared/Hooks/useDifficultyLock";
+import { ROUTES } from "../../routes";
+
 
 type GameMode = "pvp" | "ai";
 
 function CrownChaseRegras() {
+  useEffect(() => {
+    document.body.style.backgroundColor = "#d9b6fe";
+    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (!metaThemeColor) {
+      metaThemeColor = document.createElement("meta");
+      metaThemeColor.setAttribute("name", "theme-color");
+      document.head.appendChild(metaThemeColor);
+    }
+    metaThemeColor.setAttribute("content", "#d9b6fe");
+  }, []);
+
   const navigate = useNavigate();
   const [gameMode, setGameMode] = useState<GameMode>("ai");
   const [aiDifficulty, setAiDifficulty] = useState<1 | 2 | 3 | 4>(1);
@@ -26,9 +39,9 @@ function CrownChaseRegras() {
     }
 
     if (gameMode === "ai") {
-      navigate("/crownchase-ai", { state: { difficulty: aiDifficulty } });
+      navigate(ROUTES.CROWN_CHASE_AI, { state: { difficulty: aiDifficulty } });
     } else {
-      navigate("/crownchasePg");
+      navigate(ROUTES.CROWN_CHASE_GAME);
     }
   }
 
@@ -37,9 +50,9 @@ function CrownChaseRegras() {
     if (gameMode === "ai") {
       // If selected difficulty is locked, default to 1 for tutorial or check logic
       // But typically tutorial forces its own flow. We'll just pass current.
-      navigate("/crownchase-ai", { state: { difficulty: aiDifficulty } });
+      navigate(ROUTES.CROWN_CHASE_AI, { state: { difficulty: aiDifficulty } });
     } else {
-      navigate("/crownchasePg");
+      navigate(ROUTES.CROWN_CHASE_GAME);
     }
   };
 
@@ -145,15 +158,18 @@ function CrownChaseRegras() {
           </label>
         </div>
 
-        <button className={styles.tutorialButton} onClick={startTutorial}>
-          <span>Tutorial</span>
-        </button>
-        <button
-          className={styles.detailedRulesButton}
-          onClick={() => setShowDetailedRules(true)}
-        >
-          Regras
-        </button>
+        <div className={styles.bottomAuxButtons}>
+          <button className={styles.tutorialButton} onClick={startTutorial}>
+            <span>Tutorial</span>
+          </button>
+          <button
+            className={styles.detailedRulesButton}
+            onClick={() => setShowDetailedRules(true)}
+          >
+            Regras
+          </button>
+        </div>
+
         {showDetailedRules && (
           <div
             className={styles.modalOverlay}

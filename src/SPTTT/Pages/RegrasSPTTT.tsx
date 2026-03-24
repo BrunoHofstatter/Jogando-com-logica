@@ -1,12 +1,25 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "../Style/RegrasSPTTT.module.css";
 import { useNavigate } from "react-router-dom";
 import { useTutorialCompleted } from "../Components/DynamicTutorial";
 import { useDifficultyLock } from "../../Shared/Hooks/useDifficultyLock";
+import { ROUTES } from "../../routes";
+
 
 type GameMode = "pvp" | "ai";
 
 function JogoStop() {
+  useEffect(() => {
+    document.body.style.backgroundColor = "#c2e4fa";
+    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (!metaThemeColor) {
+      metaThemeColor = document.createElement("meta");
+      metaThemeColor.setAttribute("name", "theme-color");
+      document.head.appendChild(metaThemeColor);
+    }
+    metaThemeColor.setAttribute("content", "#c2e4fa");
+  }, []);
+
   const navigate = useNavigate();
   const [gameMode, setGameMode] = useState<GameMode>("ai");
   const [aiDifficulty, setAiDifficulty] = useState<1 | 2 | 3 | 4>(1);
@@ -20,18 +33,18 @@ function JogoStop() {
   function startGame() {
     if (gameMode === "ai") {
       if (!isUnlocked(aiDifficulty)) return;
-      navigate("/spttt-ai", { state: { winCondition: "line", difficulty: aiDifficulty } });
+      navigate(ROUTES.SPTTT_AI, { state: { winCondition: "line", difficulty: aiDifficulty } });
     } else {
-      navigate("/jogospttt", { state: { winCondition: "line" } });
+      navigate(ROUTES.SPTTT_GAME, { state: { winCondition: "line" } });
     }
   }
 
   const startTutorial = () => {
     resetTutorial(); // Clear the "completed" flag
     if (gameMode === "ai") {
-      navigate("/spttt-ai", { state: { winCondition: "line", difficulty: aiDifficulty } });
+      navigate(ROUTES.SPTTT_AI, { state: { winCondition: "line", difficulty: aiDifficulty } });
     } else {
-      navigate("/jogospttt", { state: { winCondition: "line" } });
+      navigate(ROUTES.SPTTT_GAME, { state: { winCondition: "line" } });
     }
   };
 
@@ -131,15 +144,17 @@ function JogoStop() {
           </label>
         </div>
 
-        <button className={styles.tutorialButton} onClick={startTutorial}>
-          <span>Tutorial</span>
-        </button>
-        <button
-          className={styles.detailedRulesButton}
-          onClick={() => setShowDetailedRules(true)}
-        >
-          Regras
-        </button>
+        <div className={styles.bottomAuxButtons}>
+          <button className={styles.tutorialButton} onClick={startTutorial}>
+            <span>Tutorial</span>
+          </button>
+          <button
+            className={styles.detailedRulesButton}
+            onClick={() => setShowDetailedRules(true)}
+          >
+            Regras
+          </button>
+        </div>
       </div>
 
       {showDetailedRules && (

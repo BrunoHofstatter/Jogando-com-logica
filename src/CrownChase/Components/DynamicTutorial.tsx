@@ -317,6 +317,7 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
 
       {/* Fixed Skip button (top-right of the viewport) */}
       <button
+        className="tutorialSkipBtn"
         onClick={handleSkip}
         style={{
           position: "fixed",
@@ -376,6 +377,7 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
 
       {/* Tooltip */}
       <div
+        className="tutorialTooltip"
         ref={tooltipRef}
         style={{
           position: "fixed",
@@ -469,6 +471,7 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
           {/* Back button container */}
           {currentStepIndex > 0 && (
             <button
+              className="tutorialNavBtn"
               onClick={handleBack}
               style={{
                 cursor: "pointer",
@@ -514,6 +517,7 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
             }}
           >
             <button
+              className="tutorialNavBtn"
               onClick={handleNext}
               style={{
                 cursor: "pointer",
@@ -552,7 +556,7 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
         </div>
       </div>
 
-      {/* Animations */}
+      {/* Animations process */}
       <style>{`
           @keyframes tutorialBounce {
             0%, 100% {
@@ -562,6 +566,35 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
             50% {
               transform: translateY(-0.4vw);
               box-shadow: 0 0 0 99999px rgba(0, 0, 0, 0.4), 0 1vw 0 rgba(0,0,0,0.4);
+            }
+          }
+
+          @media (orientation: portrait) and (max-width: 650px) {
+            .tutorialTooltip {
+              max-width: 85vw !important;
+              min-width: 80vw !important;
+              border-width: min(1.5vw, 1.2dvh) !important;
+              border-radius: min(5vw, 4dvh) !important;
+              padding: min(5vw, 4dvh) !important;
+              box-shadow: 0 min(2vw, 1.5dvh) 0 #86198f !important;
+            }
+            .tutorialSkipBtn {
+              font-size: min(5vw, 4dvh) !important;
+              padding: min(1.5vw, 1.5dvh) min(3vw, 3dvh) min(2vw, 2dvh) min(3vw, 3dvh) !important;
+              border-radius: min(3.5vw, 3dvh) !important;
+              border-width: min(0.8vw, 0.6dvh) !important;
+              box-shadow: 0 min(1.2vw, 1dvh) 0 #b45309 !important;
+            }
+            .tutorialNavBtn {
+              font-size: min(5vw, 4dvh) !important;
+              padding: min(1.5vw, 1.5dvh) min(3vw, 3dvh) min(2vw, 2dvh) min(3vw, 3dvh) !important;
+              border-radius: min(3.5vw, 3dvh) !important;
+              border-width: min(0.8vw, 0.6dvh) !important;
+              box-shadow: 0 min(1.2vw, 1dvh) 0 #b45309 !important;
+            }
+            .tutorialNavBtn svg {
+              width: min(6vw, 4.5dvh) !important;
+              height: min(6vw, 4.5dvh) !important;
             }
           }
         `}</style>

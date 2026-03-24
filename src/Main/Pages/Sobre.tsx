@@ -1,11 +1,23 @@
 import "../CSS/Sobre.css";
 //import "../CSS/SobreSections.css";
+import { useEffect } from "react";
 import SectionBox from "../Components/sectionBox";
 
 function Sobre() {
+  useEffect(() => {
+    document.body.style.backgroundColor = "#68c2e0";
+    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (!metaThemeColor) {
+      metaThemeColor = document.createElement("meta");
+      metaThemeColor.setAttribute("name", "theme-color");
+      document.head.appendChild(metaThemeColor);
+    }
+    metaThemeColor.setAttribute("content", "#68c2e0");
+  }, []);
+
   return (
     <section className="sobre">
-      
+
       <h2>Sobre Nós</h2>
       <div className="boxBoxes">
         <SectionBox

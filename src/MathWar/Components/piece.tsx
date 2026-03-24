@@ -223,7 +223,7 @@ const PieceComponent: React.FC<PieceProps> = ({
     >
       {/* Main piece symbol */}
       <div className={styles.pieceContent}>
-        <div style={hasValue ? { fontSize: "1.7vw", WebkitTextStroke: "0.1vw #031d16ff" } : undefined}>
+        <div className={hasValue ? styles.pieceValueText : undefined}>
           {display.symbol}
         </div>
 

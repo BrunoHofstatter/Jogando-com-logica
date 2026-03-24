@@ -1,9 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../styles/levelsMenu.module.css";
 import { levels, getLevelStars, isLevelUnlocked, resetAllProgress } from "../Logic/levelsConfig";
+import { ROUTES } from "../../routes";
 
 function LevelsMenuPage() {
+    useEffect(() => {
+        document.body.style.backgroundColor = "#ffbaba";
+        let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+        if (!metaThemeColor) {
+            metaThemeColor = document.createElement("meta");
+            metaThemeColor.setAttribute("name", "theme-color");
+            document.head.appendChild(metaThemeColor);
+        }
+        metaThemeColor.setAttribute("content", "#ffbaba");
+    }, []);
     const navigate = useNavigate();
 
     const [selectedLevelId, setSelectedLevelId] = useState<number | null>(null);
@@ -20,14 +31,14 @@ function LevelsMenuPage() {
 
     const playSelectedLevel = () => {
         if (selectedLevelId !== null) {
-            navigate("/stoppage", { state: { mode: "level", level: selectedLevelId } });
+            navigate(ROUTES.STOP_GAME, { state: { mode: "level", level: selectedLevelId } });
         }
     };
 
     const selectedLevelConfig = selectedLevelId ? levels.find(l => l.id === selectedLevelId) : null;
 
     return (
-        <div className={styles.regrasPage} style={{ flexDirection: 'column', gap: '2vw' }}>
+        <div className={styles.gamePageContainer}>
             <div className={styles.gameTitle}>Níveis</div>
 
             {/* Reset Confirmation Modal */}
@@ -94,22 +105,8 @@ function LevelsMenuPage() {
             )}
 
             {/* Scrollable Container for Levels Grid */}
-            <div style={{
-                flex: 1,
-                width: '100%',
-                overflowY: 'auto',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'flex-start',
-                paddingBottom: '2vw' // Space for scroll
-            }}>
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(5, 1fr)',
-                    gap: '2vw',
-                    padding: '1vw',
-                    maxWidth: '90vw'
-                }}>
+            <div className={styles.levelsScrollWrapper}>
+                <div className={styles.levelsGrid}>
                     {levels.map((level) => {
                         const stars = getLevelStars(level.id);
                         const unlocked = isLevelUnlocked(level.id);
@@ -118,54 +115,24 @@ function LevelsMenuPage() {
                             <div
                                 key={level.id}
                                 onClick={() => handleLevelClick(level.id)}
-                                className={styles.levelButton}
-                                style={{
-                                    background: unlocked
-                                        ? '#e63946'
-                                        : '#a11425',
-                                    border: '0.4vw solid #a11425',
-                                    borderRadius: '2vw',
-                                    aspectRatio: '1',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    cursor: unlocked ? 'pointer' : 'default',
-                                    position: 'relative',
-                                    boxShadow: unlocked ? '0 0.8vw 0 #a11425' : 'none',
-                                    transition: 'all 0.1s ease',
-                                    transform: unlocked ? 'translateY(0)' : 'translateY(0.4vw)'
-                                }}
+                                className={`${styles.levelButton} ${unlocked ? styles.unlocked : styles.locked}`}
                             >
-                                <div style={{
-                                    fontSize: '4vw',
-                                    color: unlocked ? '#ffcf40' : '#fff9f9',
-                                    WebkitTextStroke: unlocked ? '0.15vw #a11425' : '0.1vw #860e1d',
-                                    fontFamily: 'inherit',
-                                    textShadow: unlocked ? '0 0.2vw 0 #da9500' : 'none'
-                                }}>
+                                <div className={styles.levelNumber}>
                                     {level.id}
                                 </div>
 
                                 {unlocked && (
-                                    <div style={{ display: 'flex', gap: '0.2vw' }}>
+                                    <div className={styles.levelStars}>
                                         {[1, 2, 3].map(s => (
-                                            <span key={s} style={{
-                                                fontSize: '1.5vw',
-                                                color: s <= stars ? '#ffcf40' : '#ffbaba',
-                                                WebkitTextStroke: '0.1vw #a11425',
-                                                textShadow: s <= stars ? '0 0.2vw 0 #da9500' : 'none'
-                                            }}>★</span>
+                                            <span key={s} className={`${styles.star} ${s <= stars ? styles.starEarned : styles.starEmpty}`}>
+                                                ★
+                                            </span>
                                         ))}
                                     </div>
                                 )}
 
                                 {!unlocked && (
-                                    <div style={{
-                                        position: 'absolute',
-                                        fontSize: '3vw',
-                                        opacity: 0.7
-                                    }}>🔒</div>
+                                    <div className={styles.lockIcon}>🔒</div>
                                 )}
                             </div>
                         );
@@ -173,20 +140,20 @@ function LevelsMenuPage() {
                 </div>
             </div>
 
-            <button
-                className={styles.button}
-                style={{ fontSize: '3vw', padding: '1vw 3vw', boxShadow: '0 0.5vw 0 #a11425' }}
-                onClick={() => navigate("/jogoStop")}
-            >
-                Voltar
-            </button>
-
-            <button
-                className={styles.resetProgressButton}
-                onClick={() => setShowResetConfirm(true)}
-            >
-                Deletar progresso
-            </button>
+            <div className={styles.bottomFooter}>
+                <button
+                    className={styles.resetProgressButton}
+                    onClick={() => setShowResetConfirm(true)}
+                >
+                    Deletar progresso
+                </button>
+                <button
+                    className={styles.voltarBtn}
+                    onClick={() => navigate(ROUTES.STOP_RULES)}
+                >
+                    Voltar
+                </button>
+            </div>
         </div>
     );
 }

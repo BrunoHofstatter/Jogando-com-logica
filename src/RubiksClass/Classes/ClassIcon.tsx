@@ -15,13 +15,13 @@ function ClassIcon({ pagina, label, imageSrc }: ClassIconProps) {
   const handleLearnClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (isDisabled) return;
-    navigate(`/${pagina}`);
+    navigate(pagina);
   }
 
   const handleGameClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (isDisabled) return;
-    navigate(`/${pagina}?mode=game`);
+    navigate(pagina, { state: { mode: "game" } });
   }
 
   return (

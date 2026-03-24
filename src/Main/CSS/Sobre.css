@@ -112,3 +112,42 @@ h2 {
   background-color: #17a2b8;
   /* Flat Cyan */
 }
+
+@media (orientation: portrait) and (max-width: 650px) {
+  h2 {
+    font-size: min(15vw, 15dvh);
+    margin-bottom: min(10vw, 10dvh);
+    -webkit-text-stroke: min(0.8vw, 0.6dvh) #060e13;
+    text-shadow: 0 min(0.6vw, 0.6dvh) 0 #000000;
+  }
+
+  .boxBoxes {
+    gap: min(8vw, 8dvh);
+    padding: min(2vw, 2dvh);
+  }
+
+  .section-title {
+    font-size: min(8vw, 8dvh);
+    margin-bottom: min(4vw, 4dvh);
+    text-shadow: 0 min(0.4vw, 0.4dvh) 0 #000000;
+    -webkit-text-stroke: min(0.3vw, 0.3dvh) #060e13 !important;
+  }
+
+  .digBox,
+  .equBox,
+  .objBox,
+  .oqeBox,
+  .presBox,
+  .surgBox {
+    border-radius: min(4vw, 4dvh);
+    padding: min(5vw, 5dvh) min(5vw, 5dvh) min(3vw, 3dvh) min(5vw, 5dvh);
+    font-size: min(5.5vw, 5.5dvh);
+    -webkit-text-stroke: min(0.2vw, 0.2dvh) #060e13;
+    border: min(0.4vw, 0.4dvh) solid #060e13 !important;
+    box-shadow: 0 min(1vw, 1dvh) 0 #060e13;
+  }
+
+  .boxBoxes strong {
+    -webkit-text-stroke: min(0.25vw, 0.25dvh) #da9500;
+  }
+}

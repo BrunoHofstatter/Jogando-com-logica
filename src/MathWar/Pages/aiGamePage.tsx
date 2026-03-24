@@ -10,6 +10,8 @@ import { getAIMove } from "../Logic/aiPlayer";
 
 import { DiceAnimation } from "../Components/DiceAnimation";
 import { useDifficultyLock } from "../../Shared/Hooks/useDifficultyLock";
+import { ROUTES } from "../../routes";
+
 
 
 export default function MathWarAIPage() {
@@ -19,6 +21,17 @@ export default function MathWarAIPage() {
   const [showTutorial, setShowTutorial] = useState(false);
   const [showDiceAnim, setShowDiceAnim] = useState(false);
   const [diceTarget, setDiceTarget] = useState<number[]>([]);
+
+  useEffect(() => {
+    document.body.style.backgroundColor = "#adfad2";
+    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (!metaThemeColor) {
+      metaThemeColor = document.createElement("meta");
+      metaThemeColor.setAttribute("name", "theme-color");
+      document.head.appendChild(metaThemeColor);
+    }
+    metaThemeColor.setAttribute("content", "#adfad2");
+  }, []);
 
   const engine = new GameEngine();
   const [gameState, setGameState] = useState<GameState>(() => {
@@ -109,13 +122,13 @@ export default function MathWarAIPage() {
   };
 
   const handleMenu = () => {
-    navigate("/mathwarRg");
+    navigate(ROUTES.MATH_WAR_RULES);
   };
 
   const handleNextLevel = () => {
     // Navigate to the same page but with next difficulty
     // Force replace so history doesn't get cluttered if they spam next
-    navigate("/mathwar-ai", { state: { difficulty: difficulty + 1 }, replace: true });
+    navigate(ROUTES.MATH_WAR_AI, { state: { difficulty: difficulty + 1 }, replace: true });
   };
 
   const showNextLevel = difficulty < 4;

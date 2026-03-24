@@ -1,13 +1,26 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import RubiksCube from "../../Components/RubiksCube";
 import { useClass2 } from "./useClass2";
 import Class2SummaryView from "./Class2SummaryView";
 import styles from "./Class2FaceArea.module.css";
+import { ROUTES } from "../../../routes";
+
 
 const Class2FaceArea: React.FC = () => {
     const { cubeProps, uiProps } = useClass2();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        document.body.style.backgroundColor = "#e0f2fe";
+        let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+        if (!metaThemeColor) {
+            metaThemeColor = document.createElement("meta");
+            metaThemeColor.setAttribute("name", "theme-color");
+            document.head.appendChild(metaThemeColor);
+        }
+        metaThemeColor.setAttribute("content", "#e0f2fe");
+    }, []);
 
     // --- Summary phase ---
     if (uiProps.currentPhase === "summary") {
@@ -23,7 +36,7 @@ const Class2FaceArea: React.FC = () => {
     return (
         <div className={styles.container}>
             {/* --- Back to Menu Button --- */}
-            <button className={styles.aulasButton} onClick={() => navigate("/classMenu")}>
+            <button className={styles.aulasButton} onClick={() => navigate(ROUTES.CLASS_MENU)}>
                 Aulas
             </button>
 

@@ -256,106 +256,185 @@
   transform: scale(1.05) translateY(-1vw);
 }
 
-@media (orientation: portrait) {
+@media (orientation: portrait) and (max-width: 650px) {
   .homePage {
-    gap: 12dvh;
+    /* DIVIDE THE SCREEN INTO 3 ROWS */
+    /* 1. Top row (Logo): 35dvh */
+    /* 2. Middle row (Cube): 30dvh */
+    /* 3. Bottom row (Buttons): 35dvh */
+    display: grid;
+    grid-template-rows: 35dvh 30dvh 35dvh;
+    height: 100dvh;
+    width: 100vw;
+    padding: 0;
+    gap: 0;
+    box-sizing: border-box;
+    overflow: hidden;
   }
 
-  .buttonsHome {
-    gap: 10dvh;
-  }
-
-  .buttonJogar {
-    font-size: min(18vw, 10dvh);
-    border: 1dvw solid #000;
-    border-radius: 12.5dvw;
-    -webkit-text-stroke: 1dvw #000000;
-    padding: 0 5dvw 3.75dvw 5dvw;
-  }
-
-  .buttonSobre {
-    font-size: 10.5dvw;
-    border: 1dvw solid #000;
-    border-radius: 12.5dvw;
-
-    -webkit-text-stroke: 0.77dvw #000000;
-    padding: 0 5dvw 2.5dvw 5dvw;
-  }
-
-  .buttonContato {
-    font-size: 10.5dvw;
-    border: 1dvw solid #000;
-    border-radius: 12.5dvw;
-
-    -webkit-text-stroke: 0.77dvw #000000;
-    padding: 0 5dvw 2.5dvw 5dvw;
-  }
-
-  .buttonManual {
-    font-size: 3.5dvw;
-    border: 0.5dvw solid #000;
-    border-radius: 2dvw;
-    -webkit-text-stroke: 0.4dvw #000000;
-    padding: 1.5dvw 2.5dvw;
-    bottom: 2dvh;
-    right: 2dvh;
-  }
-
-  .buttonRow {
-    flex-direction: column;
-    gap: 7dvw;
-  }
-
-  .logoTexto {
-    width: min(38dvh, 80vw);
-    transform: scale(1);
+  /* =========== ROW 1: THE LOGO =========== */
+  .logo {
+    grid-row: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Center the logo inside the 35dvh row */
+    margin: 0;
+    width: 100%;
   }
 
   .logoTitle {
+    display: flex;
     flex-direction: column;
+    /* This gap controls the space BETWEEN the words "Jogando", "com", "Lógica" */
     gap: 1dvh;
     text-align: center;
+    margin: 0;
   }
 
   .jogando {
-    font-size: clamp(46px, 12.5dvw, 185px);
-    -webkit-text-stroke: clamp(2.5px, 0.8dvw, 18px) #000000;
+    /* Use min() so it scales with dvh, but never gets wider than the screen (vw) */
+    font-size: min(12dvh, 18vw);
+    -webkit-text-stroke: min(0.6dvh, 0.8vw) #380000;
+    padding: 0;
   }
 
   .com {
-    font-size: clamp(38px, 10.5dvw, 155px);
-    -webkit-text-stroke: clamp(2px, 0.6dvw, 15px) #000000;
+    font-size: min(7dvh, 12vw);
+    -webkit-text-stroke: min(0.4dvh, 0.6vw) #060e13;
+    padding: 0;
   }
 
   .logica {
-    font-size: clamp(54px, 15.5dvw, 215px);
-    -webkit-text-stroke: clamp(2.5px, 0.8dvw, 18px) #000000;
+    font-size: min(13dvh, 19vw);
+    -webkit-text-stroke: min(0.6dvh, 0.8vw) #380000;
+    padding: 0;
   }
 
-  .logo {
-    margin-top: 7dvh;
-    margin-right: 0;
+  .logoTexto {
+    display: none;
+    /* Make sure image fallback doesn't mess up our flex words */
   }
 
+
+  /* =========== ROW 2: THE CUBE =========== */
   .imagens {
-    min-height: 99dvh;
-    gap: 20vw;
-    padding-top: 0dvh;
-    padding-right: 0dvh;
-  }
-
-  .imagemCubo {
+    grid-row: 2;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* This perfectly centers the cube in the 30dvh middle row */
+    min-height: auto;
+    width: 100%;
     margin: 0;
-    width: 27vw;
+    padding: 0;
   }
 
   .imagemXadrez {
-    width: 30vw;
-    margin: 0;
+    display: none;
   }
 
-  .imagemXadrez:hover,
-  .imagemCubo:hover {
-    transform: scale(1.02);
+  .imagemCuboWrapper {
+    position: relative;
+    right: auto;
+    top: auto;
+    bottom: auto;
+  }
+
+  .imagemCuboWrapper>div {
+    /* This sets the explicit size of the cube based on height */
+    --cube-size: min(50vw, 22dvh) !important;
+  }
+
+
+  /* =========== ROW 3: THE BUTTONS =========== */
+  .buttonsHome {
+    grid-row: 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* This centers the buttons block in the bottom 35dvh row */
+    align-items: center;
+
+    /* This gap controls the space BETWEEN the huge Jogar button and the Sobre/Contato row */
+    gap: 3.5dvh;
+    margin: 0;
+    width: 100%;
+    position: relative;
+    bottom: auto;
+    margin-bottom: clamp(12vw, 12vw, 40dvh);
+  }
+
+  .buttonJogar {
+    font-size: min(10dvh, 16vw);
+    border: min(1dvh, 1.5vw) solid #630000;
+    border-radius: min(8dvh, 12vw);
+    -webkit-text-stroke: min(0.5dvh, 0.8vw) #380000;
+    padding: min(1.5dvh, 2vw) min(6dvh, 10vw) min(3dvh, 4vw) min(6dvh, 10vw);
+    box-shadow: 0 min(1.5dvh, 2vw) 0 #630000;
+    text-shadow: 0 min(0.6dvh, 1vw) 0 #630000;
+  }
+
+  .buttonJogar:hover {
+    box-shadow: 0 min(1.8dvh, 2.5vw) 0 #630000;
+    transform: translateY(min(-0.3dvh, -0.5vw));
+  }
+
+  .buttonJogar:active {
+    box-shadow: 0 min(0.4dvh, 0.5vw) 0 #630000;
+    transform: translateY(min(1dvh, 1.5vw));
+  }
+
+  .buttonRow {
+    flex-direction: row;
+    /* This gap controls the space BETWEEN the Sobre and Contato buttons */
+    gap: 3dvh;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .buttonSobre,
+  .buttonContato {
+    font-size: min(5dvh, 8vw);
+    border: min(0.6dvh, 0.8vw) solid #060e13;
+    border-radius: min(4dvh, 6vw);
+    -webkit-text-stroke: min(0.3dvh, 0.4vw) #060e13;
+    padding: min(1.5dvh, 2.5vw) min(3dvh, 5vw) min(2dvh, 3.5vw) min(3dvh, 5vw);
+    box-shadow: 0 min(1dvh, 1.5vw) 0 #060e13;
+    text-shadow: 0 min(0.3dvh, 0.5vw) 0 #060e13;
+  }
+
+  .buttonSobre:hover,
+  .buttonContato:hover {
+    box-shadow: 0 min(1.5dvh, 2vw) 0 #060e13;
+    transform: translateY(min(-0.3dvh, -0.5vw));
+  }
+
+  .buttonSobre:active,
+  .buttonContato:active {
+    box-shadow: 0 min(0.3dvh, 0.5vw) 0 #060e13;
+    transform: translateY(min(0.6dvh, 1vw));
+  }
+
+  .buttonManual {
+    font-size: min(2.5dvh, 4vw);
+    border: min(0.3dvh, 0.5vw) solid #0f4a1f;
+    border-radius: min(2dvh, 3vw);
+    -webkit-text-stroke: min(0.5dvh, 0.25vw) #0b3817;
+    padding: min(1.0dvh, 1.0vw) min(2.5dvh, 3vw) min(2dvh, 1.5vw) min(2.5dvh, 3vw);
+    bottom: min(2dvh, 3vw);
+    right: min(2.5dvh, 4vw);
+    box-shadow: 0 min(0.6dvh, 1vw) 0 #0f4a1f;
+  }
+
+  .buttonManual:hover {
+    box-shadow: 0 min(0.8dvh, 1.2vw) 0 #0f4a1f;
+    transform: translateY(min(-0.1dvh, -0.2vw));
+  }
+
+  .buttonManual:active {
+    box-shadow: 0 min(0.2dvh, 0.3vw) 0 #0f4a1f;
+    transform: translateY(min(0.4dvh, 0.7vw));
   }
 }

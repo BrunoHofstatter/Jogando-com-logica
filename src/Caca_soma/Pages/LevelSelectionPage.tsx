@@ -4,8 +4,21 @@ import styles from "../styles/levelsMenu.module.css";
 import { levels, getLevelById } from "../Logic/levelConfigs";
 import { getAllProgress, isLevelUnlocked, resetAllProgress, getLevelProgress } from "../Logic/levelProgress";
 import { LevelConfig } from "../Logic/gameTypes";
+import { ROUTES } from "../../routes";
+
 
 function LevelSelectionPage() {
+  useEffect(() => {
+    document.body.style.backgroundColor = "#efc9c9";
+    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (!metaThemeColor) {
+      metaThemeColor = document.createElement("meta");
+      metaThemeColor.setAttribute("name", "theme-color");
+      document.head.appendChild(metaThemeColor);
+    }
+    metaThemeColor.setAttribute("content", "#efc9c9");
+  }, []);
+
   const navigate = useNavigate();
 
   const [selectedLevelId, setSelectedLevelId] = useState<number | null>(null);
@@ -24,7 +37,7 @@ function LevelSelectionPage() {
 
   const playSelectedLevel = () => {
     if (selectedLevelId !== null) {
-      navigate(`/cacaSomaNivel/${selectedLevelId}`);
+      navigate(`${ROUTES.CACA_SOMA_LEVEL_BASE}/${selectedLevelId}`);
     }
   };
 
@@ -186,7 +199,7 @@ function LevelSelectionPage() {
       <button
         className={styles.button}
         style={{ fontSize: '3vw', padding: '1vw 3vw' }}
-        onClick={() => navigate("/cacasomaRg")}
+        onClick={() => navigate(ROUTES.CACA_SOMA_RULES)}
       >
         Voltar
       </button>

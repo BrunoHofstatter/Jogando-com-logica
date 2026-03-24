@@ -98,6 +98,11 @@
   transform: translateY(-0.2vw) scale(1.05);
 }
 
+.pieceValueText {
+  font-size: 1.7vw;
+  -webkit-text-stroke: 0.1vw #031d16ff;
+}
+
 .pieceCaptainIndicator {
   position: absolute;
   top: -0.5vw;
@@ -114,4 +119,45 @@
   justify-content: center;
   -webkit-text-stroke: 0vw #4c1d95;
   line-height: 1;
+}
+
+/* -------------------------------------------
+   MOBILE PORTRAIT (Phones <= 650px)
+   ------------------------------------------- */
+@media (orientation: portrait) and (max-width: 650px) {
+  .piece {
+    font-size: min(6.5vw, 4dvh) !important;
+    box-shadow: 0 min(1vw, 0.6dvh) 0 rgba(0, 0, 0, 0.4);
+    margin-bottom: min(1vw, 0.6dvh);
+  }
+
+  .piece:hover:not(.pieceSelected) {
+    transform: translateY(min(-0.4vw, -0.3dvh));
+    box-shadow: 0 min(1.4vw, 0.8dvh) 0 rgba(0, 0, 0, 0.5);
+  }
+
+  .pieceSelected {
+    transform: translateY(min(-1.5vw, -1dvh)) scale(1.05);
+    border-width: min(0.6vw, 0.4dvh);
+    box-shadow: 0 min(2.5vw, 1.5dvh) 0 rgba(0, 0, 0, 0.4);
+  }
+
+  .pieceRed,
+  .pieceBlue {
+    border-width: min(0.6vw, 0.4dvh) !important;
+  }
+
+  .pieceCaptainIndicator {
+    top: min(-1.5vw, -1dvh);
+    right: min(-1.5vw, -1dvh);
+    width: min(4vw, 3dvh);
+    height: min(4vw, 3dvh);
+    font-size: min(3vw, 2dvh);
+    border-width: min(0.3vw, 0.2dvh);
+  }
+
+  .pieceValueText {
+    font-size: min(4vw, 4.5dvh);
+    -webkit-text-stroke-width: min(0.2vw, 0.15dvh);
+  }
 }

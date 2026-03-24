@@ -15,7 +15,10 @@ import LevelGamePage from "./Caca_soma/Pages/LevelGamePage";
 // import ResultsPage from "./Caca_soma/Pages/ResultsPage";
 import "./App.css";
 import BaseGame from "./AA_baseGame/Pages/baseGamePage"
+import RotateDeviceOverlay from "./Main/Components/RotateDeviceOverlay";
 import { Routes, Route, useLocation, Link } from "react-router-dom";
+import ReactGA from "react-ga4";
+import { useEffect } from "react";
 import JogoDamas from "./Damas/Pages/JogoDamas"
 import DamasRegras from "./AA_baseGame/Pages/regrasPage";
 import CrownChasePage from "./CrownChase/Pages/baseGamePage";
@@ -32,7 +35,29 @@ import MathWarPage from "./MathWar/Pages/baseGamePage"
 import MathWarAIPage from "./MathWar/Pages/aiGamePage"
 import Manual from "./Main/Pages/manual"
 import LevelsMenuPage from "./Stop/Pages/LevelsMenuPage";
+import { ROUTES } from "./routes";
 
+
+
+function trackGameTime() {
+  const sessionData = localStorage.getItem('activeGameSession');
+  if (sessionData) {
+    try {
+      const { game, startTime } = JSON.parse(sessionData);
+      const timeSpentSeconds = Math.floor((Date.now() - startTime) / 1000);
+
+      ReactGA.event({
+        category: "Game_Engagement",
+        action: "Time_Spent_In_Game",
+        label: game,
+        value: timeSpentSeconds
+      });
+    } catch (e) {
+      console.error("Error tracking game time:", e);
+    }
+    localStorage.removeItem('activeGameSession');
+  }
+}
 
 function BackButton() {
   const location = useLocation();
@@ -41,7 +66,7 @@ function BackButton() {
   if (location.pathname === "/") return null;
 
   return (
-    <Link to="/">
+    <Link to="/" onClick={trackGameTime}>
       <button className="back-button">
         <img
           src={`${import.meta.env.BASE_URL}homeButton.png`}
@@ -53,42 +78,63 @@ function BackButton() {
 }
 
 function App() {
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        trackGameTime();
+      }
+    };
+
+    const handleBeforeUnload = () => {
+      trackGameTime();
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+
   return (
     <main>
+      <RotateDeviceOverlay />
       <BackButton />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/jogodamas" element={<JogoDamas />} />
-        <Route path="/jogos" element={<Jogos />} />
-        <Route path="/sobre" element={<Sobre />} />
-        <Route path="/contato" element={<Contato />} />
-        <Route path="/jogoStop" element={<JogoStop />} />
-        <Route path="/stoppage" element={<StopPage />} />
-        <Route path="/stop-levels" element={<LevelsMenuPage />} />
-        <Route path="/damas" element={<PaginaDamas />} />
-        <Route path="/teste" element={<Teste />} />
-        <Route path="/spttt" element={<SPTTT />} />
-        <Route path="/jogospttt" element={<JogoSPTTT />} />
-        <Route path="/spttt-ai" element={<SPTTTAIPage />} />
-        <Route path="/cacaSoma" element={<VersusModePage />} />
-        <Route path="/cacaSomaNiveis" element={<LevelSelectionPage />} />
-        <Route path="/cacaSomaNivel/:levelId" element={<LevelGamePage />} />
+        <Route path={ROUTES.DAMAS_GAME} element={<JogoDamas />} />
+        <Route path={ROUTES.GAMES} element={<Jogos />} />
+        <Route path={ROUTES.ABOUT} element={<Sobre />} />
+        <Route path={ROUTES.CONTACT} element={<Contato />} />
+        <Route path={ROUTES.STOP_RULES} element={<JogoStop />} />
+        <Route path={ROUTES.STOP_GAME} element={<StopPage />} />
+        <Route path={ROUTES.STOP_LEVELS} element={<LevelsMenuPage />} />
+        <Route path={ROUTES.DAMAS_RULES} element={<PaginaDamas />} />
+        <Route path={ROUTES.TEST} element={<Teste />} />
+        <Route path={ROUTES.SPTTT_RULES} element={<SPTTT />} />
+        <Route path={ROUTES.SPTTT_GAME} element={<JogoSPTTT />} />
+        <Route path={ROUTES.SPTTT_AI} element={<SPTTTAIPage />} />
+        <Route path={ROUTES.CACA_SOMA_GAME} element={<VersusModePage />} />
+        <Route path={ROUTES.CACA_SOMA_LEVELS} element={<LevelSelectionPage />} />
+        <Route path={ROUTES.CACA_SOMA_LEVEL_DYNAMIC} element={<LevelGamePage />} />
         {/* <Route path="/cacaSomaResultado" element={<ResultsPage />} /> */}
-        <Route path="/baseGame" element={<BaseGame />} />
-        <Route path="/damasregras" element={<DamasRegras />} />
-        <Route path="/crownchasePg" element={<CrownChasePage />} />
-        <Route path="/crownchaseRg" element={<CrownChaseRegras />} />
-        <Route path="/crownchase-ai" element={<CrownChaseAIPage />} />
-        <Route path="/cacasomaRg" element={<CacaSomaRegras />} />
-        <Route path="/dimensions" element={<Dimensions />} />
-        <Route path="/classMenu" element={<ClassMenu />} />
-        <Route path="/mathwarRg" element={<MathWarRegras />} />
-        <Route path="/mathwarPg" element={<MathWarPage />} />
-        <Route path="/mathwar-ai" element={<MathWarAIPage />} />
-        <Route path="/manual" element={<Manual />} />
-        <Route path="/cube-test" element={<CubeTestPage />} />
-        <Route path="/class1" element={<Class1Dimensions />} />
-        <Route path="/class2" element={<Class2FaceArea />} />
+        <Route path={ROUTES.BASE_GAME} element={<BaseGame />} />
+        <Route path={ROUTES.DAMAS_RULES_BASE} element={<DamasRegras />} />
+        <Route path={ROUTES.CROWN_CHASE_GAME} element={<CrownChasePage />} />
+        <Route path={ROUTES.CROWN_CHASE_RULES} element={<CrownChaseRegras />} />
+        <Route path={ROUTES.CROWN_CHASE_AI} element={<CrownChaseAIPage />} />
+        <Route path={ROUTES.CACA_SOMA_RULES} element={<CacaSomaRegras />} />
+        <Route path={ROUTES.CLASS_1_OLD} element={<Dimensions />} />
+        <Route path={ROUTES.CLASS_MENU} element={<ClassMenu />} />
+        <Route path={ROUTES.MATH_WAR_RULES} element={<MathWarRegras />} />
+        <Route path={ROUTES.MATH_WAR_GAME} element={<MathWarPage />} />
+        <Route path={ROUTES.MATH_WAR_AI} element={<MathWarAIPage />} />
+        <Route path={ROUTES.MANUAL} element={<Manual />} />
+        <Route path={ROUTES.CUBE_TEST} element={<CubeTestPage />} />
+        <Route path={ROUTES.CLASS_1} element={<Class1Dimensions />} />
+        <Route path={ROUTES.CLASS_2} element={<Class2FaceArea />} />
 
       </Routes>
     </main>

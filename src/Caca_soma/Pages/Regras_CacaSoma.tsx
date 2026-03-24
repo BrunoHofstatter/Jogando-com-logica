@@ -1,14 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "../styles/regras.module.css";
 import { useNavigate } from "react-router-dom";
 import { useTutorialCompleted } from "../componentes/DynamicTutorial";
 
 import { levels } from "../Logic/levelConfigs";
 import { isLevelUnlocked, updateLevelProgress } from "../Logic/levelProgress";
+import { ROUTES } from "../../routes";
+
 
 type GameMode = "versus" | "levels";
 
 function CacaSomaRegras() {
+  useEffect(() => {
+    document.body.style.backgroundColor = "#efc9c9";
+    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (!metaThemeColor) {
+      metaThemeColor = document.createElement("meta");
+      metaThemeColor.setAttribute("name", "theme-color");
+      document.head.appendChild(metaThemeColor);
+    }
+    metaThemeColor.setAttribute("content", "#efc9c9");
+  }, []);
+
   const navigate = useNavigate();
 
   const [showDetailedRules, setShowDetailedRules] = useState(false);
@@ -35,15 +48,15 @@ function CacaSomaRegras() {
         }
       }
 
-      navigate(`/cacaSomaNivel/${maxUnlockedLevel}`);
+      navigate(`${ROUTES.CACA_SOMA_LEVEL_BASE}/${maxUnlockedLevel}`);
     } else {
-      navigate("/cacaSoma"); // Versus/Random mode
+      navigate(ROUTES.CACA_SOMA_GAME); // Versus/Random mode
     }
   }
 
   const goToLevelsMenu = (e: React.MouseEvent) => {
     e.stopPropagation();
-    navigate("/cacaSomaNiveis");
+    navigate(ROUTES.CACA_SOMA_LEVELS);
   };
 
   const unlockAllLevels = () => {
@@ -57,17 +70,16 @@ function CacaSomaRegras() {
         passed: true,
       });
     });
-    alert("Todas as fases foram desbloqueadas!");
   };
 
   const startTutorial = () => {
     if (gameMode === "levels") {
       // Manually reset levels specific key
       localStorage.removeItem("tutorial_cacasoma_levels_v1_completed");
-      navigate("/cacaSomaNivel/1");
+      navigate(`${ROUTES.CACA_SOMA_LEVEL_BASE}/1`);
     } else {
       resetTutorial(); // Clears "tutorial_cacasoma_v1_completed"
-      navigate("/cacaSoma");
+      navigate(ROUTES.CACA_SOMA_GAME);
     }
   };
 
@@ -122,16 +134,18 @@ function CacaSomaRegras() {
         </div>
 
 
-        <button className={styles.tutorialButton} onClick={startTutorial}>
-          <span>Tutorial</span>
-        </button>
-        <button
-          className={styles.detailedRulesButton}
-          onClick={() => setShowDetailedRules(true)}
-        >
-          Regras
-        </button>
-      </div>
+        <div className={styles.bottomAuxButtons}>
+          <button className={styles.tutorialButton} onClick={startTutorial}>
+            <span>Tutorial</span>
+          </button>
+          <button
+            className={styles.detailedRulesButton}
+            onClick={() => setShowDetailedRules(true)}
+          >
+            Regras
+          </button>
+        </div>
+      </div >
 
       {showDetailedRules && (
         <div

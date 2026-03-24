@@ -1,16 +1,17 @@
-.regrasPage {
+.gamePageContainer {
     font-family: "Cherry Bomb One", system-ui;
     font-weight: 200;
     font-style: normal;
     display: flex;
+    flex-direction: column;
     max-height: 100dvh;
     overflow: hidden;
-    padding: 0vw;
+    padding: 0;
     min-height: 100dvh;
     width: 100vw;
-    justify-content: center;
     align-items: center;
     background-color: #ffbaba;
+    gap: 2vw;
 }
 
 .gameTitle {
@@ -21,47 +22,145 @@
     text-shadow: 0 0.4vw 0 #da9500;
 }
 
-.button {
+/* --- Extracted Inline Styles for Levels Menu --- */
+
+.levelsScrollWrapper {
+    flex: 1;
+    width: 100%;
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-bottom: 2vw;
+}
+
+.levelsGrid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2vw;
+    padding: 1vw;
+    max-width: 90vw;
+}
+
+.levelButton {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 2vw;
+    position: relative;
+    transition: all 0.1s ease;
+}
+
+.unlocked {
+    background: #e63946;
+    border: 0.4vw solid #a11425;
+    cursor: pointer;
+    box-shadow: 0 0.8vw 0 #a11425;
+    transform: translateY(0);
+}
+
+.unlocked:hover {
+    transform: translateY(-0.2vw);
+    box-shadow: 0 1vw 0 #a11425;
+}
+
+.unlocked:active {
+    transform: translateY(0.4vw);
+    box-shadow: 0 0.4vw 0 #a11425;
+}
+
+.locked {
+    background: #a11425;
+    border: 0.4vw solid #a11425;
+    cursor: default;
+    box-shadow: none;
+    transform: translateY(0.4vw);
+}
+
+.levelNumber {
+    font-size: 4vw;
+    font-family: inherit;
+}
+
+.unlocked .levelNumber {
+    color: #ffcf40;
+    -webkit-text-stroke: 0.15vw #a11425;
+    text-shadow: 0 0.2vw 0 #da9500;
+}
+
+.locked .levelNumber {
+    color: #fff9f9;
+    -webkit-text-stroke: 0.1vw #860e1d;
+    text-shadow: none;
+}
+
+.levelStars {
+    display: flex;
+    gap: 0.2vw;
+}
+
+.star {
+    font-size: 1.5vw;
+    -webkit-text-stroke: 0.1vw #a11425;
+}
+
+.starEarned {
+    color: #ffcf40;
+    text-shadow: 0 0.2vw 0 #da9500;
+}
+
+.starEmpty {
+    color: #ffbaba;
+    text-shadow: none;
+}
+
+.lockIcon {
+    position: absolute;
+    font-size: 3vw;
+    opacity: 0.7;
+}
+
+.voltarBtn {
     border: 0.4vw solid #a11425;
     background-color: #e31f2f;
     border-radius: 4vw;
     box-sizing: border-box;
     color: #ffcf40;
     -webkit-text-stroke: 0.2vw #a11425;
-    font-size: clamp(8.5vw, 20dvh, 11vw);
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 0.3vw 2.5vw 2vw 2.5vw;
     line-height: 1;
-    box-shadow: 0 1vw 0 #a11425;
     cursor: pointer;
-    margin-bottom: 3.5vw;
     transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    font-family: inherit;
+    font-size: 3vw;
+    padding: 1vw 3vw;
+    box-shadow: 0 0.5vw 0 #a11425;
 }
 
-.button:hover {
+.voltarBtn:hover {
     background-color: #f5293a;
     transform: translateY(-0.2vw);
-    box-shadow: 0 1.2vw 0 #a11425;
+    box-shadow: 0 0.7vw 0 #a11425;
 }
 
-.button:active {
-    transform: translateY(0.8vw);
-    box-shadow: 0 0.2vw 0 #a11425;
+.voltarBtn:active {
+    transform: translateY(0.4vw);
+    box-shadow: 0 0.1vw 0 #a11425;
 }
 
-.levelButton {
-    transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.levelButton:hover {
-    transform: translateY(-0.2vw);
-}
-
-.levelButton:active {
-    transform: translateY(0.3vw);
+/* Base bottom footer styles outside mobile */
+.bottomFooter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 2vw;
+    position: relative;
 }
 
 .modalOverlay {
@@ -82,7 +181,7 @@
 
 .resetProgressButton {
     position: absolute;
-    bottom: 2dvh;
+    bottom: 0;
     left: 3vw;
     font-family: inherit;
     font-size: 1.5vw;
@@ -325,4 +424,195 @@
 .closeModalX:active {
     transform: translateY(0.3vw);
     box-shadow: 0 0.1vw 0 #a11425;
+}
+
+
+/* --- PORTRAIT MOBILE LAYOUT STRATEGY --- */
+@media (orientation: portrait) and (max-width: 650px) {
+    .gamePageContainer {
+        height: 100dvh;
+        width: 100vw;
+        box-sizing: border-box;
+        overflow: hidden;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        grid-template-rows: 15dvh 70dvh 15dvh;
+        gap: 0;
+    }
+
+    .gameTitle {
+        font-size: min(15vw, 12dvh);
+        -webkit-text-stroke: min(0.6vw, 0.5dvh) #e31f2f;
+        text-shadow: 0 min(0.8vw, 0.6dvh) 0 #da9500;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* Middle Row */
+    .levelsScrollWrapper {
+        padding-bottom: min(4vw, 3dvh);
+    }
+
+    .levelsGrid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: min(4vw, 3dvh);
+        padding: min(2vw, 1.5dvh);
+        max-width: 95vw;
+        width: 100%;
+    }
+
+    .levelButton {
+        border-radius: min(4vw, 3dvh);
+        border: min(0.8vw, 0.6dvh) solid #a11425;
+    }
+
+    .unlocked {
+        box-shadow: 0 min(1.6vw, 1.2dvh) 0 #a11425;
+    }
+
+    .locked {
+        transform: translateY(min(0.8vw, 0.6dvh));
+    }
+
+    .levelNumber {
+        font-size: min(8vw, 6dvh);
+    }
+
+    .unlocked .levelNumber {
+        -webkit-text-stroke: min(0.3vw, 0.2dvh) #a11425;
+        text-shadow: 0 min(0.4vw, 0.3dvh) 0 #da9500;
+    }
+
+    .locked .levelNumber {
+        -webkit-text-stroke: min(0.2vw, 0.15dvh) #860e1d;
+    }
+
+    .levelStars {
+        gap: min(0.4vw, 0.3dvh);
+    }
+
+    .star {
+        font-size: min(3vw, 2.5dvh);
+        -webkit-text-stroke: min(0.2vw, 0.15dvh) #a11425;
+    }
+
+    .starEarned {
+        text-shadow: 0 min(0.4vw, 0.3dvh) 0 #da9500;
+    }
+
+    .lockIcon {
+        font-size: min(6vw, 5dvh);
+    }
+
+    /* Bottom Row (Footer) */
+    .bottomFooter {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        margin: 0;
+        padding: 0 min(2vw, 2dvh);
+    }
+
+    .voltarBtn {
+        font-size: min(8vw, 6dvh);
+        padding: min(2vw, 1.5dvh) min(6vw, 4.5dvh);
+        box-shadow: 0 min(1vw, 0.8dvh) 0 #a11425;
+        border-radius: min(8vw, 6dvh);
+        border: min(0.8vw, 0.6dvh) solid #a11425;
+        -webkit-text-stroke: min(0.4vw, 0.3dvh) #a11425;
+    }
+
+    .resetProgressButton {
+        /* Override absolute positioning for mobile footer */
+        position: static;
+        font-size: min(4vw, 3dvh);
+        padding: min(2vw, 1.5dvh) min(4vw, 3dvh);
+        border: min(0.4vw, 0.3dvh) solid #630000;
+        border-radius: min(2vw, 1.5dvh);
+        -webkit-text-stroke: min(0.2vw, 0.15dvh) #630000;
+        box-shadow: 0 min(0.6vw, 0.45dvh) 0 #630000;
+        /* Make it look like a secondary, blockier button */
+        max-width: 40%;
+        text-align: center;
+        white-space: normal;
+        line-height: 1.2;
+    }
+
+    /* Modals */
+    .levelInfoModal,
+    .confirmModal {
+        width: min(90vw, 85dvh);
+        border: min(0.8vw, 0.6dvh) solid #a11425;
+        border-radius: min(6vw, 4.5dvh);
+        padding: min(6vw, 4.5dvh);
+        gap: min(2vw, 1.5dvh);
+        box-shadow: 0 min(2vw, 1.5dvh) 0 #a11425;
+    }
+
+    .levelInfoTitle {
+        font-size: min(8vw, 6dvh);
+        -webkit-text-stroke: min(0.4vw, 0.3dvh) #a11425;
+        text-shadow: 0 min(0.6vw, 0.4dvh) 0 #da9500;
+        margin-bottom: min(2vw, 1.5dvh);
+    }
+
+    .closeModalX {
+        width: min(10vw, 8dvh);
+        height: min(10vw, 8dvh);
+        font-size: min(5vw, 4dvh);
+        border: min(0.6vw, 0.4dvh) solid #a11425;
+        box-shadow: 0 min(0.8vw, 0.6dvh) 0 #a11425;
+        top: calc(-1 * min(3vw, 2.5dvh));
+        right: calc(-1 * min(3vw, 2.5dvh));
+    }
+
+    .starCriteriaContainer {
+        border-radius: min(3vw, 2.5dvh);
+        border: min(0.8vw, 0.6dvh) solid #a11425;
+        box-shadow: 0 min(1vw, 0.8dvh) 0 #a11425;
+    }
+
+    .starCriteriaRow {
+        padding: min(2vw, 1.5dvh);
+        gap: min(3vw, 2dvh);
+        border-bottom: min(0.4vw, 0.3dvh) solid #a11425;
+    }
+
+    .starIcon {
+        font-size: min(5vw, 4dvh);
+        -webkit-text-stroke: min(0.3vw, 0.2dvh) #a11425;
+        text-shadow: 0 min(0.4vw, 0.3dvh) 0 #da9500;
+    }
+
+    .starText {
+        font-size: min(4vw, 3dvh);
+        -webkit-text-stroke: min(0.15vw, 0.1dvh) #a11425;
+    }
+
+    .playLevelButton {
+        font-size: min(7vw, 5.5dvh);
+        padding: min(1vw, 0.8dvh) min(8vw, 6dvh) min(2vw, 1.5dvh) min(8vw, 6dvh);
+        border: min(0.6vw, 0.4dvh) solid #a11425;
+        box-shadow: 0 min(1.6vw, 1.2dvh) 0 #a11425;
+        border-radius: min(20vw, 15dvh);
+        margin-top: min(3vw, 2dvh);
+        -webkit-text-stroke: min(0.3vw, 0.2dvh) #a11425;
+    }
+
+    .confirmText {
+        font-size: min(6vw, 4.5dvh);
+        -webkit-text-stroke: min(0.2vw, 0.15dvh) #a11425;
+    }
+
+    .confirmBtn {
+        font-size: min(6vw, 4.5dvh);
+        padding: min(1.5vw, 1dvh) min(6vw, 4.5dvh);
+        border-radius: min(2vw, 1.5dvh);
+        border: min(0.6vw, 0.4dvh) solid #a11425;
+        -webkit-text-stroke: min(0.2vw, 0.15dvh) #a11425;
+        box-shadow: 0 min(0.8vw, 0.6dvh) 0 #a11425;
+    }
 }

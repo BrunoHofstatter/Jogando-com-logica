@@ -79,7 +79,8 @@ function getFeedbackText(phase: Class2Phase, size: number): string {
 
 export function useClass2(): UseClass2Return {
     const location = useLocation();
-    const initialPhase: Class2Phase = new URLSearchParams(location.search).get("mode") === "game" ? "summary" : "question";
+    const isGameMode = location.state?.mode === "game" || new URLSearchParams(location.search).get("mode") === "game";
+    const initialPhase: Class2Phase = isGameMode ? "summary" : "question";
 
     const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
     const [phase, setPhase] = useState<Class2Phase>(initialPhase);

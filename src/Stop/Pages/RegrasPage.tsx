@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTutorialCompleted } from "../Components/DynamicTutorial";
 import styles from "../styles/Regras.module.css";
 import { levels, saveLevelStars } from "../Logic/levelsConfig";
+import { ROUTES } from "../../routes";
+
 
 type GameMode = "random" | "levels";
 
@@ -10,6 +12,17 @@ type GameMode = "random" | "levels";
  * Rules and mode selection page for Stop Matemático
  */
 function RegrasPage() {
+  useEffect(() => {
+    document.body.style.backgroundColor = "#ffbaba";
+    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (!metaThemeColor) {
+      metaThemeColor = document.createElement("meta");
+      metaThemeColor.setAttribute("name", "theme-color");
+      document.head.appendChild(metaThemeColor);
+    }
+    metaThemeColor.setAttribute("content", "#ffbaba");
+  }, []);
+
   const navigate = useNavigate();
   const [showDetailedRules, setShowDetailedRules] = useState(false);
   const [gameMode, setGameMode] = useState<GameMode>("levels");
@@ -20,24 +33,21 @@ function RegrasPage() {
 
   function jogarStop() {
     if (gameMode === "random") {
-      navigate("/stopPage", { state: { mode: "random" } });
+      navigate(ROUTES.STOP_GAME, { state: { mode: "random" } });
     } else {
-      // For now, levels mode just plays the current level (which will need implementation in game page)
-      // or we can pass a specific level difficulty if we had it. 
-      // Plan says: navigate with state { mode: 'level', level: currentLevel }
-      navigate("/stopPage", { state: { mode: "level", level: currentLevel } });
+      navigate(ROUTES.STOP_GAME, { state: { mode: "level", level: currentLevel } });
     }
   }
 
   const startTutorial = () => {
     resetTutorial(); // Clear the "completed" flag
     // Tutorial always uses fixed difficulty (usually d1)
-    navigate("/stopPage", { state: { mode: "tutorial_fixed", difficulty: "d1" } });
+    navigate(ROUTES.STOP_GAME, { state: { mode: "tutorial_fixed", difficulty: "d1" } });
   };
 
   const goToLevelsMenu = (e: React.MouseEvent) => {
     e.stopPropagation();
-    navigate("/stop-levels");
+    navigate(ROUTES.STOP_LEVELS);
   };
 
   const unlockAllLevels = () => {
@@ -97,15 +107,17 @@ function RegrasPage() {
           </label>
         </div>
 
-        <button className={styles.tutorialButton} onClick={startTutorial}>
-          <span>Tutorial</span>
-        </button>
-        <button
-          className={styles.detailedRulesButton}
-          onClick={() => setShowDetailedRules(true)}
-        >
-          Regras
-        </button>
+        <div className={styles.bottomAuxButtons}>
+          <button className={styles.tutorialButton} onClick={startTutorial}>
+            <span>Tutorial</span>
+          </button>
+          <button
+            className={styles.detailedRulesButton}
+            onClick={() => setShowDetailedRules(true)}
+          >
+            Regras
+          </button>
+        </div>
 
         {showDetailedRules && (
           <div

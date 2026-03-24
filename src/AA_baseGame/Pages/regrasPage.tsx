@@ -1,6 +1,8 @@
 import { useState } from "react";
 import styles from "../styles/regras.module.css";
 import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../../routes";
+
 
 type MandatoryCapture = true | false;
 
@@ -9,7 +11,7 @@ function DamasRegras() {
   const [MandatoryCapture, setMandatoryCapture] = useState<MandatoryCapture>(false);
   
   function jogarStop() {
-    navigate("/baseGame", { state: { MandatoryCapture } });
+    navigate(ROUTES.BASE_GAME, { state: { MandatoryCapture } });
   }
   
   return (

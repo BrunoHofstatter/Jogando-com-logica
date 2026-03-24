@@ -14,6 +14,17 @@ import styles from "../styles/StopGame.module.css";
  * Orchestrates the number reveal animation, tutorial, and game board
  */
 function StopGamePage() {
+  useEffect(() => {
+    document.body.style.backgroundColor = "#ffbaba";
+    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (!metaThemeColor) {
+      metaThemeColor = document.createElement("meta");
+      metaThemeColor.setAttribute("name", "theme-color");
+      document.head.appendChild(metaThemeColor);
+    }
+    metaThemeColor.setAttribute("content", "#ffbaba");
+  }, []);
+
   const location = useLocation();
   const mode = location.state?.mode || "random";
   const levelId = location.state?.level || 1;
@@ -256,25 +267,13 @@ function StopGamePage() {
 
       {/* Game board */}
       {showGame && randomNumber !== null && (
-        <>
-          <GameBoard
-            randomNumber={randomNumber}
-            difficulty={difficulty}
-            levelConfig={levelConfig}
-            onReset={handleReset}
-          />
-          <button onClick={handleReset} className={styles.resetButton}>
-            Reiniciar
-          </button>
-
-          {mode === "level" && (
-            <div className={styles.levelDisplay}>
-              Nível: {levelId}
-            </div>
-          )}
-        </>
+        <GameBoard
+          randomNumber={randomNumber}
+          difficulty={difficulty}
+          levelConfig={levelConfig}
+          onReset={handleReset}
+        />
       )}
-
       {/* Tutorial overlay */}
       {showTutorial && (
         <DynamicTutorial

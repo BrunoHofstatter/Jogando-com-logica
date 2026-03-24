@@ -24,25 +24,36 @@ const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
     useEffect(() => {
         if (isVisible && targetRect) {
             const viewportWidth = window.innerWidth;
-            const inputRight = targetRect.right;
-            const spaceOnRight = viewportWidth - inputRight;
-
-            // 30vw is width, give 1vw buffer -> 31vw needed to fit on right
-            const spaceNeededPx = (31 * viewportWidth) / 100;
+            const isMobilePortrait = window.matchMedia("(orientation: portrait) and (max-width: 650px)").matches;
 
             const newStyle: React.CSSProperties = {
-                top: "10dvh", // Vertically centered (80dvh height)
                 visibility: "visible",
             };
 
-            if (spaceOnRight > spaceNeededPx) {
-                // Place on Right
-                newStyle.right = "2vw";
-                newStyle.left = "auto";
+            if (isMobilePortrait) {
+                // Mobile Portrait: Center vertically, place on opposite column
+                newStyle.top = "25dvh";
+                if (targetRect.left < viewportWidth / 2) {
+                    // Input is on Left -> Keyboard goes Right
+                    newStyle.right = "3vw";
+                    newStyle.left = "auto";
+                } else {
+                    // Input is on Right -> Keyboard goes Left
+                    newStyle.left = "3vw";
+                    newStyle.right = "auto";
+                }
             } else {
-                // Place on Left (Just to the right of the Stop/Magic Panel which is ~35vw)
-                newStyle.left = "37vw";
-                newStyle.right = "auto";
+                // Desktop / Landscape
+                const spaceNeededPx = (31 * viewportWidth) / 100;
+                newStyle.top = "10dvh";
+
+                if (viewportWidth - targetRect.right > spaceNeededPx) {
+                    newStyle.right = "2vw";
+                    newStyle.left = "auto";
+                } else {
+                    newStyle.left = "37vw";
+                    newStyle.right = "auto";
+                }
             }
 
             setPositionStyle(newStyle);
@@ -84,7 +95,7 @@ const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
                         onClick={onDelete}
                         aria-label="Apagar"
                     >
-                        <Delete size={'3vw'} />
+                        <Delete className={styles.keyButtonIcon} />
                     </button>
 
                     <button
@@ -99,7 +110,7 @@ const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
                         onClick={onNext}
                         aria-label="Próximo"
                     >
-                        <Check size={'3vw'} />
+                        <Check className={styles.keyButtonIcon} size={'3vw'} />
                     </button>
                 </div>
             </div>
