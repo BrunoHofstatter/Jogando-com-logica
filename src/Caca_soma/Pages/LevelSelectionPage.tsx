@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../styles/levelsMenu.module.css";
 import { levels, getLevelById } from "../Logic/levelConfigs";
-import { getAllProgress, isLevelUnlocked, resetAllProgress, getLevelProgress } from "../Logic/levelProgress";
-import { LevelConfig } from "../Logic/gameTypes";
+import { isLevelUnlocked, resetAllProgress, getLevelProgress } from "../Logic/levelProgress";
 import { ROUTES } from "../../routes";
 
 
@@ -23,10 +22,8 @@ function LevelSelectionPage() {
 
   const [selectedLevelId, setSelectedLevelId] = useState<number | null>(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
-  // Force re-render after reset
-  const [progressTick, setProgressTick] = useState(0);
+  const [, setProgressTick] = useState(0);
 
-  // When a level is clicked, instead of navigating, we just select it to show the modal
   const handleLevelClick = (levelId: number) => {
     if (isLevelUnlocked(levelId)) {
       setSelectedLevelId(levelId);
@@ -45,14 +42,14 @@ function LevelSelectionPage() {
     resetAllProgress();
     setProgressTick(prev => prev + 1);
     setShowResetConfirm(false);
-    // Optional: reload page to ensure clean state if needed, but state update should suffice
     window.location.reload();
   };
 
   const selectedLevelConfig = selectedLevelId ? getLevelById(selectedLevelId) : null;
+  const gridCols = levels[0].columns || 5;
 
   return (
-    <div className={styles.regrasPage} style={{ flexDirection: 'column', gap: '2vw' }}>
+    <div className={styles.gamePageContainer}>
       <div className={styles.gameTitle}>Níveis</div>
 
       {/* Reset Confirmation Modal */}
@@ -92,14 +89,12 @@ function LevelSelectionPage() {
                 <div className={styles.starIcon}>★</div>
                 <div className={styles.starText}>{selectedLevelConfig.starThresholds.oneStarCorrect} acertos</div>
               </div>
-
               <div className={styles.starCriteriaRow}>
                 <div className={styles.starIcon}>★★</div>
                 <div className={styles.starText}>
                   {selectedLevelConfig.starThresholds.twoStarCorrect} acertos em {selectedLevelConfig.starThresholds.twoStarTime}s
                 </div>
               </div>
-
               <div className={styles.starCriteriaRow}>
                 <div className={styles.starIcon}>★★★</div>
                 <div className={styles.starText}>
@@ -115,23 +110,12 @@ function LevelSelectionPage() {
         </div>
       )}
 
-      {/* Scrollable Container for Levels Grid */}
-      <div style={{
-        flex: 1,
-        width: '100%',
-        overflowY: 'auto',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'flex-start',
-        paddingBottom: '2vw' // Space for scroll
-      }}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: `repeat(${levels[0].columns || 5}, 1fr)`,
-          gap: '2vw',
-          padding: '1vw',
-          maxWidth: '90vw'
-        }}>
+      {/* Scrollable levels grid */}
+      <div className={styles.levelsScrollWrapper}>
+        <div
+          className={styles.levelsGrid}
+          style={{ '--grid-cols': gridCols } as React.CSSProperties}
+        >
           {levels.map((level) => {
             const progress = getLevelProgress(level.levelId);
             const stars = progress ? progress.bestStars : 0;
@@ -141,54 +125,23 @@ function LevelSelectionPage() {
               <div
                 key={level.levelId}
                 onClick={() => handleLevelClick(level.levelId)}
-                className={styles.levelButton}
-                style={{
-                  backgroundColor: unlocked
-                    ? '#da3e3e' /* main flat red */
-                    : '#9c8080', /* board gray for locked */
-                  border: '0.4vw solid #7f0000',
-                  boxShadow: unlocked ? '0 0.6vw 0 #5c0000' : '0 0.6vw 0 #5c4a4a',
-                  transform: 'translateY(0)',
-                  transition: 'all 0.1s ease',
-                  borderRadius: '2vw',
-                  aspectRatio: '1',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  cursor: unlocked ? 'pointer' : 'default',
-                  filter: unlocked ? 'none' : 'grayscale(0.8)',
-                  position: 'relative'
-                }}
+                className={`${styles.levelButton} ${unlocked ? styles.unlocked : styles.locked}`}
               >
-                <div style={{
-                  fontSize: '4vw',
-                  color: unlocked ? '#ffffff' : '#e0e0e0',
-                  WebkitTextStroke: unlocked ? '0.15vw #7f0000' : '0.15vw #4a3c3c',
-                  textShadow: unlocked ? '0 0.3vw 0 #5c0000' : 'none',
-                  fontFamily: 'inherit'
-                }}>
-                  {level.levelId}
-                </div>
+                <div className={styles.levelNumber}>{level.levelId}</div>
 
                 {unlocked && (
-                  <div style={{ display: 'flex', gap: '0.2vw' }}>
+                  <div className={styles.levelStars}>
                     {[1, 2, 3].map(s => (
-                      <span key={s} style={{
-                        fontSize: '1.5vw',
-                        color: s <= stars ? '#ffcf40' : '#d18d8d',
-                        WebkitTextStroke: '0.15vw #7f0000'
-                      }}>★</span>
+                      <span
+                        key={s}
+                        className={`${styles.star} ${s <= stars ? styles.starEarned : styles.starEmpty}`}
+                      >★</span>
                     ))}
                   </div>
                 )}
 
                 {!unlocked && (
-                  <div style={{
-                    position: 'absolute',
-                    fontSize: '3vw',
-                    opacity: 0.7
-                  }}>🔒</div>
+                  <div className={styles.lockIcon}>🔒</div>
                 )}
               </div>
             );
@@ -196,20 +149,19 @@ function LevelSelectionPage() {
         </div>
       </div>
 
-      <button
-        className={styles.button}
-        style={{ fontSize: '3vw', padding: '1vw 3vw' }}
-        onClick={() => navigate(ROUTES.CACA_SOMA_RULES)}
-      >
-        Voltar
-      </button>
-
-      <button
-        className={styles.resetProgressButton}
-        onClick={() => setShowResetConfirm(true)}
-      >
-        Deletar progresso
-      </button>
+      {/* Footer: back + reset */}
+      <div className={styles.bottomFooter}>
+        <button
+          className={styles.resetProgressButton}
+          onClick={() => setShowResetConfirm(true)}
+        >
+          Deletar progresso
+        </button>
+        <button className={styles.voltarBtn} onClick={() => navigate(ROUTES.CACA_SOMA_RULES)}>
+          Voltar
+        </button>
+        
+      </div>
     </div>
   );
 }
