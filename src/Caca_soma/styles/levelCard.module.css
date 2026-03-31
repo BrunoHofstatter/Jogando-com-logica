@@ -131,25 +131,3 @@
   text-shadow: 0 0.2vw 0 #332929;
 }
 
-@media (max-width: 600px) {
-  .card {
-    border-radius: 4vw;
-    padding: 3vw;
-  }
-
-  .levelNumber {
-    font-size: 6.5vw;
-  }
-
-  .description {
-    font-size: 3.5vw;
-  }
-
-  .bestTime {
-    font-size: 2.8vw;
-  }
-
-  .completed {
-    font-size: 2.8vw;
-  }
-}

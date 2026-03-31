@@ -301,16 +301,146 @@
     font-weight: bold;
 }
 
+/* Details button wrapper — extracted from inline style */
+.detailsButtonWrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
         transform: scale(0.9);
-        /* Start slightly smaller */
     }
 
     to {
         opacity: 1;
         transform: scale(1);
-        /* Reach full 1:1 scale */
+    }
+}
+
+/* ── Mobile ──────────────────────────────────────────────────── */
+@media (orientation: portrait) and (max-width: 650px) {
+    .levelResultModal {
+        width: min(92vw, 51dvh);
+        padding: min(5vw, 2.75dvh);
+        border-width: min(1vw, 0.55dvh);
+        border-radius: min(4vw, 2.2dvh);
+        box-shadow: 0 min(2vw, 1.1dvh) 0 #7f0000;
+    }
+
+    .levelTitle {
+        font-size: min(7.5vw, 4.125dvh);
+        -webkit-text-stroke: min(0.35vw, 0.1925dvh) #7f0000;
+        text-shadow: 0 min(0.55vw, 0.3025dvh) 0 #5c0000;
+    }
+
+    .starsContainer {
+        gap: min(2vw, 1.1dvh);
+        margin: min(2vw, 1.1dvh) 0;
+    }
+
+    .starFilled {
+        font-size: min(11vw, 6.05dvh);
+        -webkit-text-stroke: min(0.3vw, 0.165dvh) #b28900;
+        text-shadow: 0 min(0.55vw, 0.3025dvh) 0 #da9500;
+    }
+
+    .starEmpty {
+        font-size: min(11vw, 6.05dvh);
+        -webkit-text-stroke: min(0.3vw, 0.165dvh) #5c4a4a;
+    }
+
+    .resultStats {
+        font-size: min(4.5vw, 2.475dvh);
+        gap: min(1vw, 0.55dvh);
+    }
+
+    .resultActions {
+        gap: min(3vw, 1.65dvh);
+        margin-top: min(3vw, 1.65dvh);
+    }
+
+    .actionBtn {
+        font-size: min(4vw, 2.2dvh);
+        padding: min(1vw, 0.55dvh) min(3.5vw, 1.925dvh) min(1.5vw, 0.825dvh) min(3.5vw, 1.925dvh);
+        border-radius: min(4vw, 2.2dvh);
+        border-width: min(0.6vw, 0.33dvh);
+        -webkit-text-stroke: min(0.2vw, 0.11dvh) #7f0000;
+        box-shadow: 0 min(1.2vw, 0.66dvh) 0 #5c0000;
+    }
+
+    .actionBtn:hover {
+        box-shadow: 0 min(1.5vw, 0.825dvh) 0 #5c0000;
+    }
+
+    .actionBtn:active {
+        box-shadow: 0 min(0.4vw, 0.22dvh) 0 #5c0000;
+    }
+
+    .actionBtn:nth-child(1) {
+        box-shadow: 0 min(1.2vw, 0.66dvh) 0 #7f0000;
+    }
+
+    .actionBtn:nth-child(1):hover {
+        box-shadow: 0 min(1.5vw, 0.825dvh) 0 #7f0000;
+    }
+
+    .actionBtn:nth-child(1):active {
+        box-shadow: 0 min(0.4vw, 0.22dvh) 0 #7f0000;
+    }
+
+    .primaryBtn {
+        font-size: min(4.5vw, 2.475dvh);
+        -webkit-text-stroke: min(0.2vw, 0.11dvh) #1b5e20;
+        box-shadow: 0 min(1.2vw, 0.66dvh) 0 #1b5e20;
+    }
+
+    .primaryBtn:hover {
+        box-shadow: 0 min(1.5vw, 0.825dvh) 0 #1b5e20;
+    }
+
+    .primaryBtn:active {
+        box-shadow: 0 min(0.4vw, 0.22dvh) 0 #1b5e20;
+    }
+
+    .detailsToggle {
+        font-size: min(3.5vw, 1.925dvh);
+        margin-top: min(2vw, 1.1dvh);
+    }
+
+    .detailsModalOverlay {
+        padding: min(3vw, 1.65dvh);
+        border-width: min(0.7vw, 0.385dvh);
+        border-radius: min(4vw, 2.2dvh);
+        box-shadow: 0 min(1.5vw, 0.825dvh) 0 #7f0000;
+        max-height: min(55vw, 40dvh);
+    }
+
+    .detailsList {
+        gap: min(1.5vw, 0.825dvh);
+    }
+
+    .detailsList::-webkit-scrollbar {
+        width: min(1vw, 0.55dvh);
+    }
+
+    .detailsList::-webkit-scrollbar-track,
+    .detailsList::-webkit-scrollbar-thumb {
+        border-radius: min(0.5vw, 0.275dvh);
+    }
+
+    .detailItem {
+        padding: min(1vw, 0.55dvh) min(2vw, 1.1dvh);
+        border-radius: min(1.5vw, 0.825dvh);
+        font-size: min(3vw, 1.65dvh);
+        border-width: min(0.4vw, 0.22dvh);
+    }
+
+    .detailInfo {
+        font-size: min(2.5vw, 1.375dvh);
     }
 }

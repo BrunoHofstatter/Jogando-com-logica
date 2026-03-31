@@ -48,17 +48,23 @@ const Class2SummaryView: React.FC<Class2SummaryViewProps> = ({ totalFlags }) => 
             const deltaTime = time - lastTimeRef.current;
             // Time scale: ~60fps means deltaTime is ~16ms
             const timeScale = deltaTime / 16;
+            const isMobile = window.matchMedia("(max-width: 600px) and (orientation: portrait)").matches;
 
             setBoxes((prevBoxes) => {
                 let changed = false;
                 const nextBoxes = prevBoxes.map((box) => {
                     if (box.isPaused) return box;
                     changed = true;
+                    if (isMobile) {
+                        return { ...box, left: box.left + box.speed * timeScale };
+                    }
                     return { ...box, top: box.top + box.speed * timeScale };
                 });
 
-                // Remove boxes that fell below screen (110vh)
-                const filtered = nextBoxes.filter((b) => b.top < 110);
+                // Remove boxes that exited the screen
+                const filtered = isMobile
+                    ? nextBoxes.filter((b) => b.left < 115)
+                    : nextBoxes.filter((b) => b.top < 110);
                 if (filtered.length !== nextBoxes.length) changed = true;
 
                 return changed ? filtered : prevBoxes;
@@ -105,12 +111,13 @@ const Class2SummaryView: React.FC<Class2SummaryViewProps> = ({ totalFlags }) => 
                         DISTRACTORS[Math.floor(Math.random() * DISTRACTORS.length)];
                 }
 
+                const isMobile = window.matchMedia("(max-width: 600px) and (orientation: portrait)").matches;
                 const newBox: FallingBox = {
                     id: Math.random().toString(36).substr(2, 9),
                     value: nextValue,
-                    top: -15, // start above screen
-                    left: 30 + Math.random() * 40, // spawn between 30% and 70% width
-                    speed: 0.15 + Math.random() * 0.1, // Random fall speed (vh per frame)
+                    top: isMobile ? 15 + Math.random() * 37 : -15,
+                    left: isMobile ? -15 : 30 + Math.random() * 40,
+                    speed: 0.15 + Math.random() * 0.1,
                     isPaused: false,
                 };
 
@@ -202,7 +209,7 @@ const Class2SummaryView: React.FC<Class2SummaryViewProps> = ({ totalFlags }) => 
                 <div style={{ pointerEvents: "none" }}>
                     <RubiksCube
                         size={size}
-                        cubeSize={10} // small preview size
+                        cubeSize={window.matchMedia("(max-width: 600px) and (orientation: portrait)").matches ? 15 : 10}
                         resetToFront={true}
                         highlightRegion={null}
                         dimInactive={false}

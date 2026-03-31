@@ -375,7 +375,7 @@ function LevelGamePage() {
             <RoundTracker levelId={levelConfig.levelId} currentRound={currentRound} totalRounds={levelConfig.rounds} />
           </div>
 
-          <div data-target="step1" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+          <div data-target="step1" className={styles.magicAndButton}>
             <div className={styles.magicNumberContainer}>
               <div className={styles.magicNumberTextColumn}>
                 <span className={styles.magicNumberTitle}>Número</span>

@@ -103,7 +103,7 @@ const SummaryView: React.FC<SummaryViewProps> = ({ totalFlags }) => {
                 */}
                                 <RubiksCube
                                     size={id}
-                                    cubeSize={10} // small size in vw
+                                    cubeSize={window.matchMedia("(max-width: 600px) and (orientation: portrait)").matches ? 22 : 10} // small size in vw
                                     resetToFront={false}
                                     highlightRegion={null}
                                     dimInactive={false}

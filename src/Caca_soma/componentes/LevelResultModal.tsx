@@ -50,7 +50,7 @@ const LevelResultModal: React.FC<LevelResultModalProps> = ({
                     <p>Acertos: {totalCorrect}/{maxCorrect}</p>
                 </div>
 
-                <div style={{ position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div className={styles.detailsButtonWrapper}>
                     <button
                         className={styles.detailsToggle}
                         onClick={() => setShowDetails(!showDetails)}
