@@ -312,6 +312,185 @@
     box-shadow: 0 0.2vw 0 #6b21a8;
 }
 
+/* --- Mobile Layout --- */
+@media (max-width: 650px) and (orientation: portrait) {
+
+    .aulasButton {
+        font-size: 4vw;
+        top: 3vw;
+        left: 3vw;
+        padding: 1.5vw 3vw;
+        border-radius: 2vw;
+        border-width: 0.6vw;
+        box-shadow: 0 1.2vw 0 #6b21a8;
+        -webkit-text-stroke: 0.25vw #6b21a8;
+    }
+
+    /* Title sits just at the top edge of the falling lane */
+    .titleOverlay {
+        top: min(48vw,26dvh);
+        z-index: 6;
+    }
+
+    .titleText {
+        font-size: min(4.5vw,5dvh);
+    }
+
+    /* Feedback centered vertically in the falling lane */
+    .feedbackOverlay {
+        top: 34dvh;
+        transform: translateX(-50%) translateY(-50%);
+    }
+
+    .feedbackBubble {
+        font-size: 3.5vw;
+        padding: 1.5vw 3vw;
+        border-radius: 2vw;
+        border-width: 0.6vw;
+        box-shadow: 0 1vw 0 #a16207;
+    }
+
+    /* Side panels become horizontal bands at top and bottom */
+    .sidePanel {
+        width: 100%;
+        height: min(40vw,30dvh);
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+        top: auto;
+        bottom: auto;
+        background: rgba(224, 242, 254, 0.85);
+    }
+
+    .leftPanel {
+        top: 0;
+        left: 0;
+        right: 0;
+        border-bottom: 0.5vw dashed #0284c7;
+        padding-top: 12vw;
+
+    }
+
+    .rightPanel {
+        bottom: 0;
+        left: 0;
+        right: 0;
+        border-top: 0.5vw dashed #0284c7;
+        padding-bottom: 5vw;
+    }
+
+    /* Falling area: the lane between the two bands */
+    .fallingArea {
+        top: 20dvh;
+        bottom: 20dvh;
+        left: 0;
+        right: 0;
+        height: auto;
+    }
+
+    .cubeWrapper {
+        padding: 0 1vw;
+    }
+
+    /* Boxes now fly left→right: center vertically on top anchor */
+    .fallingBox {
+        font-size: 6vw;
+        padding: 2vw 2.5vw;
+        border-width: 0.6vw;
+        border-radius: 2vw;
+        box-shadow: 0 1.2vw 0 #013873;
+        transform: translateY(-50%);
+        -webkit-text-stroke: 0.25vw #013873;
+    }
+
+    .fallingBox:hover:not(.paused) {
+        transform: translateY(-50%) scale(1.05);
+        box-shadow: 0 1.4vw 0 #013873;
+    }
+
+    .fallingBox.paused {
+        transform: translateY(-50%) scale(1.15);
+        box-shadow: 0 1.5vw 0 #013873;
+    }
+
+    .fallingBox.shake {
+        animation: boxShakeMobile 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+        background: #ef4444;
+        border-color: #991b1b;
+    }
+
+    /* Docked numbers: below for top band, above for bottom band */
+    .dockedNumber {
+        font-size: 7vw;
+        padding: 1.5vw 2.5vw;
+        border-radius: 2.5vw;
+        border-width: 0.5vw;
+        box-shadow: 0 1vw 0 #15803d;
+    }
+
+    .dockedRight {
+        left: 50%;
+        top: 80%;
+        transform: translateX(-50%) translateY(2vw) scale(0);
+        animation: popInDockBelow 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    .dockedLeft {
+        right: auto;
+        left: 50%;
+        top: auto;
+        bottom: 80%;
+        transform: translateX(-50%) translateY(-2vw) scale(0);
+        animation: popInDockAbove 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    /* Modal */
+    .modalContent {
+        padding: 6vw;
+        border-radius: 4vw;
+        gap: 3vw;
+        border-width: 0.8vw;
+        box-shadow: 0 2vw 0 #0284c7;
+        max-width: 85vw;
+    }
+
+    .modalTitle {
+        font-size: 8vw;
+        -webkit-text-stroke: 0.4vw #ca8a04;
+    }
+
+    .modalStats {
+        font-size: 4.5vw;
+        -webkit-text-stroke: 0.2vw #0284c7;
+    }
+
+    .modalButton {
+        font-size: 5vw;
+        padding: 2vw 5vw 2.5vw;
+        border-width: 0.6vw;
+        border-radius: 2vw;
+        box-shadow: 0 1.5vw 0 #6b21a8;
+        -webkit-text-stroke: 0.25vw #6b21a8;
+    }
+
+    @keyframes boxShakeMobile {
+        10%, 90% { transform: translateY(-50%) translate3d(0, -0.3vw, 0); }
+        20%, 80% { transform: translateY(-50%) translate3d(0, 0.6vw, 0); }
+        30%, 50%, 70% { transform: translateY(-50%) translate3d(0, -1.2vw, 0); }
+        40%, 60% { transform: translateY(-50%) translate3d(0, 1.2vw, 0); }
+    }
+
+    @keyframes popInDockBelow {
+        from { transform: translateX(-50%) translateY(2vw) scale(0); }
+        to   { transform: translateX(-50%) translateY(0) scale(1); }
+    }
+
+    @keyframes popInDockAbove {
+        from { transform: translateX(-50%) translateY(-2vw) scale(0); }
+        to   { transform: translateX(-50%) translateY(0) scale(1); }
+    }
+}
+
 /* --- Animations --- */
 
 @keyframes fadeSlideIn {

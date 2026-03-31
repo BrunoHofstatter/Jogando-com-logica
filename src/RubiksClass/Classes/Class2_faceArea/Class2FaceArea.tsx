@@ -66,7 +66,7 @@ const Class2FaceArea: React.FC = () => {
                         Cubo {cubeProps.size}×{cubeProps.size}
                     </div>
                 </div>
-                <RubiksCube {...cubeProps} cubeSize={22} />
+                <RubiksCube {...cubeProps} cubeSize={window.matchMedia("(max-width: 600px) and (orientation: portrait)").matches ? 33 : 22} />
             </div>
 
             {/* --- Right panel: Interaction --- */}
