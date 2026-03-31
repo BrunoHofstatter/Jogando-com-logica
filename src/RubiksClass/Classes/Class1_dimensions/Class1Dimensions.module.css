@@ -180,6 +180,75 @@
     transform: translateY(0.4vw);
 }
 
+/* --- Mobile Layout ------------------------------------------- */
+@media (max-width: 650px) and (orientation: portrait) {
+    .container {
+        flex-direction: column;
+    }
+
+    .aulasButton {
+        font-size: 4vw;
+        top: 3vw;
+        left: 3vw;
+        padding: 1.5vw 3vw;
+        border-radius: 2vw;
+        border-width: 0.6vw;
+        box-shadow: 0 1.2vw 0 #6b21a8;
+        -webkit-text-stroke: 0.25vw #6b21a8;
+    }
+
+    .leftPanel {
+        flex: 0 0 45dvh;
+        border-right: none;
+        border-bottom: 0.3vw solid #013873;
+    }
+
+    .feedbackOverlay {
+        top: 43dvh;
+    }
+
+    .rightPanel {
+        flex: 1;
+        padding: 4vw;
+        gap: 3vw;
+        overflow-y: auto;
+    }
+
+    .title {
+        font-size: 6vw;
+        -webkit-text-stroke: 0.35vw #013873;
+    }
+
+    .optionsGrid {
+        width: 80%;
+        max-width: 80vw;
+        gap: 3vw;
+    }
+
+    .optionButton {
+        font-size: 5vw;
+        padding: 2vw 0;
+        border-width: 0.6vw;
+        border-radius: 2vw;
+        box-shadow: 0 1.2vw 0 #013873;
+        -webkit-text-stroke: 0.25vw #013873;
+    }
+
+    .hintCard,
+    .successCard {
+        font-size: 3.5vw;
+        padding: 1.5vw 3vw;
+        border-radius: 2vw;
+        max-width: 85vw;
+        border-width: 0.6vw;
+    }
+
+    .hintIcon {
+        font-size: 4vw;
+    }
+
+}
+
 /* --- Animations ---------------------------------------------- */
 @keyframes fadeSlideIn {
     0% {

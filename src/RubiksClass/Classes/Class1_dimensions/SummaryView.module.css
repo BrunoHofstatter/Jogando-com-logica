@@ -278,6 +278,112 @@
     box-shadow: 0 0.2vw 0 #6b21a8;
 }
 
+/* --- Mobile Layout --- */
+@media (max-width: 650px) and (orientation: portrait) {
+    .container {
+        flex-direction: column;
+    }
+
+    .aulasButton {
+        font-size: 4vw;
+        top: 3vw;
+        left: 3vw;
+        padding: 1.5vw 3vw;
+        border-radius: 2vw;
+        border-width: 0.6vw;
+        box-shadow: 0 1.2vw 0 #6b21a8;
+        -webkit-text-stroke: 0.25vw #6b21a8;
+    }
+
+    .leftPanel {
+        flex: 0 0 52dvh;
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        align-items: center;
+        justify-items: center;
+        border-right: none;
+        border-bottom: 0.4vw dashed #0284c7;
+        padding: 12dvh 2vw 2vw 2vw;
+        gap: 2vw;
+        overflow: auto;
+    }
+
+    .cubeWrapper {
+        padding: 0;
+    }
+
+    .cubeWrapper:nth-child(-n+2) {
+        grid-column: span 3;
+    }
+
+    .cubeWrapper:nth-child(n+3) {
+        grid-column: span 2;
+    }
+
+    .rightPanel {
+        flex: 1;
+        padding: 3vw;
+        gap: 2vw;
+        overflow-y: auto;
+    }
+
+    .title {
+        font-size: 6vw;
+        margin-bottom: 2vw;
+        -webkit-text-stroke: 0.35vw #013873;
+    }
+
+    .labelsList {
+        width: 80%;
+        max-width: 80vw;
+        gap: 2vw;
+    }
+
+    .labelButton {
+        font-size: 5vw;
+        padding: 2vw 0;
+        border-width: 0.6vw;
+        border-radius: 2vw;
+        box-shadow: 0 1.2vw 0 #013873;
+        -webkit-text-stroke: 0.25vw #013873;
+    }
+
+    .feedbackBubble {
+        font-size: 3.5vw;
+        padding: 1.5vw 3vw;
+        border-radius: 2vw;
+        border-width: 0.6vw;
+    }
+
+    .modalContent {
+        padding: 6vw;
+        border-radius: 4vw;
+        gap: 3vw;
+        border-width: 0.8vw;
+        box-shadow: 0 2vw 0 #0284c7;
+        max-width: 85vw;
+    }
+
+    .modalTitle {
+        font-size: 8vw;
+        -webkit-text-stroke: 0.4vw #ca8a04;
+    }
+
+    .modalStats {
+        font-size: 4.5vw;
+        -webkit-text-stroke: 0.2vw #0284c7;
+    }
+
+    .modalButton {
+        font-size: 5vw;
+        padding: 2vw 5vw 2.5vw;
+        border-width: 0.6vw;
+        border-radius: 2vw;
+        box-shadow: 0 1.5vw 0 #6b21a8;
+        -webkit-text-stroke: 0.25vw #6b21a8;
+    }
+}
+
 /* --- Animations --- */
 
 @keyframes fadeSlideIn {

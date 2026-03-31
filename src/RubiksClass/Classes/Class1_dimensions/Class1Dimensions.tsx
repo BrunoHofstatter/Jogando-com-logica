@@ -33,6 +33,8 @@ const Class1Dimensions: React.FC = () => {
     const showHint =
         uiProps.currentPhase === "hint1" || uiProps.currentPhase === "hint2";
 
+    const isMobilePortrait = window.matchMedia("(max-width: 600px) and (orientation: portrait)").matches;
+
     return (
         <div className={styles.container}>
             {/* --- Back to Menu Button --- */}
@@ -61,7 +63,7 @@ const Class1Dimensions: React.FC = () => {
             <div className={styles.leftPanel}>
                 <RubiksCube
                     {...cubeProps}
-                    cubeSize={22}
+                    cubeSize={isMobilePortrait ? 33 : 22}
                 />
             </div>
 
