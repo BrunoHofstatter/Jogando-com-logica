@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import styles from "../styles/regras.module.css";
 import { useNavigate } from "react-router-dom";
-import { useTutorialCompleted } from "../Components/DynamicTutorial";
+import { useTutorialCompleted } from "../../Shared/Components/DynamicTutorial";
 import { useDifficultyLock } from "../../Shared/Hooks/useDifficultyLock";
 import { ROUTES } from "../../routes";
 

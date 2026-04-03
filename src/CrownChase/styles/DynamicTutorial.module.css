@@ -1,0 +1,212 @@
+/* ============================================================
+   Skip button (fixed, top-right)
+   ============================================================ */
+.skipBtn {
+  position: fixed;
+  top: 2vw;
+  right: 2vw;
+  z-index: 100001;
+  padding: 0.7vw 1.3vw 1.2vw 1.3vw;
+  font-size: 2.5vw;
+  border-radius: 1.5vw;
+  border: 0.3vw solid #b45309;
+  background-color: #fbbf24;
+  box-shadow: 0 0.5vw 0 #b45309;
+  color: #b45309;
+  line-height: 1;
+  cursor: pointer;
+  font-family: "Cherry Bomb One", system-ui;
+  font-weight: 200;
+  transition: all 0.1s ease;
+}
+.skipBtn:hover {
+  transform: translateY(-0.2vw);
+  box-shadow: 0 0.7vw 0 #b45309;
+}
+.skipBtn:active {
+  transform: translateY(0.4vw);
+  box-shadow: 0 0.1vw 0 #b45309;
+}
+
+/* ============================================================
+   Spotlight highlight border
+   ============================================================ */
+.spotlight {
+  position: fixed;
+  border: 6px solid #dd01ff;
+  border-radius: 16px;
+  z-index: 99999;
+  pointer-events: none;
+  animation: tutorialBounce 1.5s infinite;
+}
+
+/* ============================================================
+   Tooltip container
+   ============================================================ */
+.tooltip {
+  position: fixed;
+  z-index: 100000;
+  background-color: #d946ef;
+  border: 0.5vw solid #86198f;
+  border-radius: 2vw;
+  padding: 2vw;
+  min-width: 20vw;
+  max-width: 35vw;
+  box-shadow: 0 1vw 0 #86198f;
+  font-family: "Cherry Bomb One", system-ui;
+  font-weight: 200;
+}
+
+/* ============================================================
+   Arrow triangle
+   ============================================================ */
+.arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-top: 14px solid #d946ef;
+  filter: drop-shadow(0 0.4vw 0 #86198f);
+  z-index: 1;
+}
+
+/* ============================================================
+   Step title
+   ============================================================ */
+.title {
+  margin: 0 0 1vw 0;
+  font-size: 3vw;
+  color: #fde047;
+  -webkit-text-stroke: 0.15vw #6b21a8;
+  line-height: 1.2;
+  text-shadow: 0 0.3vw 0 #86198f;
+}
+
+/* ============================================================
+   Optional step image
+   ============================================================ */
+.stepImage {
+  width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+  border-radius: 12px;
+  margin-bottom: 1vw;
+  border: 0.3vw solid #86198f;
+}
+
+/* ============================================================
+   Body wrapper (spacing only)
+   ============================================================ */
+.body {
+  margin-bottom: 1.5vw;
+}
+
+/* ============================================================
+   Step body content — used in page tutorialSteps JSX
+   ============================================================ */
+.stepBody {
+  font-size: clamp(2vw, min(5.5vw, 3dvh), 6vw);
+  color: #fbbf24;
+  line-height: 1.5;
+  -webkit-text-stroke: clamp(0.15vw, min(0.3vw, 0.2dvh), 0.4vw) #6b21a8;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1vw, min(3vw, 2dvh), 3vw);
+}
+
+/* Highlighted/emphasized words within stepBody */
+.highlight {
+  color: #fde047;
+  font-size: clamp(2.3vw, min(6vw, 3.5dvh), 6.5vw);
+}
+
+/* ============================================================
+   Nav controls row
+   ============================================================ */
+.controls {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 2vw;
+}
+
+/* ============================================================
+   Back button
+   ============================================================ */
+.backBtn {
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 200;
+  transition: all 0.1s ease;
+  margin-left: 0.5vw;
+  padding: 0.5vw 1.5vw 0.8vw 1.5vw;
+  font-size: 2.5vw;
+  border-radius: 1.5vw;
+  border: 0.3vw solid #b45309;
+  background-color: #fbbf24;
+  box-shadow: 0 0.5vw 0 #b45309;
+  color: #b45309;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.backBtn:hover {
+  transform: translateY(-0.2vw);
+  box-shadow: 0 0.7vw 0 #b45309;
+}
+.backBtn:active {
+  transform: translateY(0.4vw);
+  box-shadow: 0 0.1vw 0 #b45309;
+}
+
+/* ============================================================
+   Next button container + button
+   ============================================================ */
+.nextBtnContainer {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.nextBtn {
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 200;
+  transition: all 0.1s ease;
+  margin-right: 0.5vw;
+  padding: 0.5vw 1.5vw 0.8vw 1.5vw;
+  font-size: 2.5vw;
+  border-radius: 1.5vw;
+  border: 0.3vw solid #b45309;
+  background-color: #fbbf24;
+  box-shadow: 0 0.5vw 0 #b45309;
+  color: #b45309;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.nextBtn:hover {
+  transform: translateY(-0.2vw);
+  box-shadow: 0 0.7vw 0 #b45309;
+}
+.nextBtn:active {
+  transform: translateY(0.4vw);
+  box-shadow: 0 0.1vw 0 #b45309;
+}
+
+/* ============================================================
+   Spotlight bounce animation
+   ============================================================ */
+@keyframes tutorialBounce {
+  0%, 100% {
+    transform: translateY(-0.2vw);
+    box-shadow: 0 0 2vw #dd01ff;
+  }
+  50% {
+    transform: translateY(-0.4vw);
+    box-shadow: 0 0 3vw #dd01ff, 0 0 5vw rgba(221, 1, 255, 0.4);
+  }
+}

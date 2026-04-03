@@ -2,7 +2,8 @@ import Board from "../Components/board-component";
 import { gameConfig } from "../Logic/gameConfig";
 import { gameRules } from "../Logic/gameRules";
 import { useState, useEffect } from 'react';
-import DynamicTutorial, { TutorialStep } from "../Components/DynamicTutorial";
+import DynamicTutorial, { TutorialStep } from "../../Shared/Components/DynamicTutorial";
+import tutorialStyles from "../styles/DynamicTutorial.module.css";
 
 export default function CrownChasePage() {
   const [showTutorial, setShowTutorial] = useState(false);
@@ -25,6 +26,7 @@ export default function CrownChasePage() {
       setShowTutorial(true);
     }
   }, []);
+
   const tutorialSteps: TutorialStep[] = [
     {
       id: 'king',
@@ -32,24 +34,9 @@ export default function CrownChasePage() {
       highlight: true,
       placement: 'auto',
       title: 'O Rei',
-      body: <div style={{
-        fontSize: 'clamp(2vw, min(5.5vw, 3dvh), 6vw)',
-        color: '#fbbf24',
-        marginBottom: '24px',
-        lineHeight: 1.5,
-        WebkitTextStroke: 'clamp(0.15vw, min(0.3vw, 0.2dvh), 0.4vw) #6b21a8',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 'clamp(1vw, min(3vw, 2dvh), 3vw)'
-      }}>
-        <span>- O rei <span style={{
-          color: '#fde047',
-          fontSize: 'clamp(2.3vw, min(6vw, 3.5dvh), 6.5vw)',
-        }}>não</span> se move</span>
-        <span>- Capture o rei inimigo para <span style={{
-          color: '#fde047',
-          fontSize: 'clamp(2.3vw, min(6vw, 3.5dvh), 6.5vw)',
-        }}>ganhar</span></span>
+      body: <div className={tutorialStyles.stepBody}>
+        <span>- O rei <span className={tutorialStyles.highlight}>não</span> se move</span>
+        <span>- Capture o rei inimigo para <span className={tutorialStyles.highlight}>ganhar</span></span>
       </div>
     },
     {
@@ -58,24 +45,9 @@ export default function CrownChasePage() {
       highlight: true,
       placement: 'auto',
       title: 'O Assassino',
-      body: <div style={{
-        fontSize: 'clamp(2vw, min(5.5vw, 3dvh), 6vw)',
-        color: '#fbbf24',
-        marginBottom: '24px',
-        lineHeight: 1.5,
-        WebkitTextStroke: 'clamp(0.15vw, min(0.3vw, 0.2dvh), 0.4vw) #6b21a8',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 'clamp(1vw, min(3vw, 2dvh), 3vw)'
-      }}>
-        <span>- Se move 1 casa para <span style={{
-          color: '#fde047',
-          fontSize: 'clamp(2.3vw, min(6vw, 3.5dvh), 6.5vw)',
-        }}>todos </span>lados</span>
-        <span>- Pode capturar <span style={{
-          color: '#fde047',
-          fontSize: 'clamp(2.3vw, min(6vw, 3.5dvh), 6.5vw)',
-        }}>qualquer </span>peça</span>
+      body: <div className={tutorialStyles.stepBody}>
+        <span>- Se move 1 casa para <span className={tutorialStyles.highlight}>todos </span>lados</span>
+        <span>- Pode capturar <span className={tutorialStyles.highlight}>qualquer </span>peça</span>
       </div>
     },
     {
@@ -84,63 +56,21 @@ export default function CrownChasePage() {
       highlight: true,
       placement: 'auto',
       title: 'O Saltador',
-      body: <div style={{
-        fontSize: 'clamp(2vw, min(5.5vw, 3dvh), 6vw)',
-        color: '#fbbf24',
-        marginBottom: '24px',
-        lineHeight: 1.5,
-        WebkitTextStroke: 'clamp(0.15vw, min(0.3vw, 0.2dvh), 0.4vw) #6b21a8',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 'clamp(1vw, min(3vw, 2dvh), 3vw)'
-      }}>
-        <span>- Move 1 casa para <span style={{
-          color: '#fde047',
-          fontSize: 'clamp(2.3vw, min(6vw, 3.5dvh), 6.5vw)',
-        }}>baixo</span>, <span style={{
-          color: '#fde047',
-          fontSize: 'clamp(2.3vw, min(6vw, 3.5dvh), 6.5vw)',
-        }}>cima</span> e <span style={{
-          color: '#fde047',
-          fontSize: 'clamp(2.3vw, min(6vw, 3.5dvh), 6.5vw)',
-        }}>lados</span></span>
-        <span>- Pode <span style={{
-          color: '#fde047',
-          fontSize: 'clamp(2.3vw, min(6vw, 3.5dvh), 6.5vw)',
-        }}>pular</span> por cima de qualquer peça <span style={{
-          color: '#fde047',
-          fontSize: 'clamp(2.3vw, min(6vw, 3.5dvh), 6.5vw)',
-        }}>sem </span>capturar</span>
-        <span>- Pode capturar <span style={{
-          color: '#fde047',
-          fontSize: 'clamp(2.3vw, min(6vw, 3.5dvh), 6.5vw)',
-        }}>somente </span>o rei</span>
+      body: <div className={tutorialStyles.stepBody}>
+        <span>- Move 1 casa para <span className={tutorialStyles.highlight}>baixo</span>, <span className={tutorialStyles.highlight}>cima</span> e <span className={tutorialStyles.highlight}>lados</span></span>
+        <span>- Pode <span className={tutorialStyles.highlight}>pular</span> por cima de qualquer peça <span className={tutorialStyles.highlight}>sem </span>capturar</span>
+        <span>- Pode capturar <span className={tutorialStyles.highlight}>somente </span>o rei</span>
       </div>
     },
     {
       id: 'board',
-      target: '[data-target="gameInfo"]', // Point to game info panel
+      target: '[data-target="gameInfo"]',
       highlight: true,
       placement: 'auto',
       title: 'Informações do Jogo',
-      body: <div style={{
-        fontSize: 'clamp(2vw, min(5.5vw, 3dvh), 6vw)',
-        color: '#fbbf24',
-        marginBottom: '24px',
-        lineHeight: 1.5,
-        WebkitTextStroke: 'clamp(0.15vw, min(0.3vw, 0.2dvh), 0.4vw) #6b21a8',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 'clamp(1vw, min(3vw, 2dvh), 3vw)'
-      }}>
-        <span>- Veja de quem é a <span style={{
-          color: '#fde047',
-          fontSize: 'clamp(2.3vw, min(6vw, 3.5dvh), 6.5vw)',
-        }}>vez</span> </span>
-        <span>- Veja quantas peças foram <span style={{
-          color: '#fde047',
-          fontSize: 'clamp(2.3vw, min(6vw, 3.5dvh), 6.5vw)',
-        }}>capturadas</span></span>
+      body: <div className={tutorialStyles.stepBody}>
+        <span>- Veja de quem é a <span className={tutorialStyles.highlight}>vez</span> </span>
+        <span>- Veja quantas peças foram <span className={tutorialStyles.highlight}>capturadas</span></span>
       </div>
     }
   ];
@@ -154,6 +84,7 @@ export default function CrownChasePage() {
         onFinish={() => setShowTutorial(false)}
         storageKey="crownchase_v1"
         locale="pt"
+        styles={tutorialStyles}
       />
     )}
   </>;
