@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import styles from "./ClassIcon.module.css";
+import styles from "./ClassMenu.module.css";
 
 interface ClassIconProps {
   pagina: string;

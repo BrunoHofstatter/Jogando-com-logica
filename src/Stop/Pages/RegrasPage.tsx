@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTutorialCompleted } from "../Components/DynamicTutorial";
+import { useTutorialCompleted } from "../../Shared/Components/DynamicTutorial";
 import styles from "../styles/Regras.module.css";
 import { levels, saveLevelStars } from "../Logic/levelsConfig";
 import { ROUTES } from "../../routes";
