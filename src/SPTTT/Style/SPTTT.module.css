@@ -558,7 +558,7 @@
    MOBILE — max-width: 650px
    All measurements redefined for portrait phones
    ============================================= */
-@media (max-width: 650px) {
+@media (orientation: portrait) and (max-width: 650px) {
   /* Main container: vertical stack */
   .jogo-SPTTT {
     flex-direction: column;
@@ -582,9 +582,12 @@
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 2vw;
+    gap: 0vw;
     width: 100%;
     margin-bottom: 2vw;
+    padding-bottom: min(15vw,7dvh);
+    padding-top:min(15vw,7dvh);
+    height: min(90vw, 35dvh);
   }
 
   /* Turn indicator */
