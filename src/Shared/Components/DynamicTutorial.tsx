@@ -68,6 +68,10 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
     left: number;
     rotation: number;
   } | null>(null);
+  const [layoutMetrics, setLayoutMetrics] = useState({
+    spotlightInset: 10,
+    spotlightRadius: 16,
+  });
   const [spotlightRect, setSpotlightRect] = useState<DOMRect | null>(null);
   const [secondaryRects, setSecondaryRects] = useState<DOMRect[]>([]);
 
@@ -96,6 +100,19 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
     const tooltipRect = tooltip.getBoundingClientRect();
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
+    const isMobilePortrait =
+      viewportWidth <= 650 &&
+      window.matchMedia("(orientation: portrait)").matches;
+    const viewportScaledSize = (vw: number, dvh = vw * 0.55) =>
+      isMobilePortrait
+        ? Math.min((viewportWidth * vw) / 100, (viewportHeight * dvh) / 100)
+        : (viewportWidth * vw) / 100;
+    const gap = viewportScaledSize(3.5, 1.95);
+    const arrowSize = viewportScaledSize(1.8, 1);
+    const padding = viewportScaledSize(3, 1.65);
+    const spotlightInset = viewportScaledSize(1.2, 0.66);
+    const spotlightRadius = viewportScaledSize(3, 1.65);
+    setLayoutMetrics({ spotlightInset, spotlightRadius });
 
     let targetElement: HTMLElement | null = null;
 
@@ -137,9 +154,6 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
     }
     setSecondaryRects(secondaryElements);
 
-    const gap = 30;
-    const arrowSize = 12;
-
     let placement = step.placement || "auto";
 
     // Auto-detect best placement based on available space
@@ -149,24 +163,48 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
       const spaceLeft = targetRect.left;
       const spaceRight = viewportWidth - targetRect.right;
 
-      const maxSpace = Math.max(spaceTop, spaceBottom, spaceLeft, spaceRight);
+      if (isMobilePortrait) {
+        const prefersBottom = spaceBottom >= tooltipRect.height + gap;
+        const prefersTop = spaceTop >= tooltipRect.height + gap;
+        const prefersRight = spaceRight >= tooltipRect.width + gap;
+        const prefersLeft = spaceLeft >= tooltipRect.width + gap;
 
-      if (maxSpace === spaceBottom && spaceBottom > tooltipRect.height + gap) {
-        placement = "bottom";
-      } else if (maxSpace === spaceTop && spaceTop > tooltipRect.height + gap) {
-        placement = "top";
-      } else if (
-        maxSpace === spaceRight &&
-        spaceRight > tooltipRect.width + gap
-      ) {
-        placement = "right";
-      } else if (
-        maxSpace === spaceLeft &&
-        spaceLeft > tooltipRect.width + gap
-      ) {
-        placement = "left";
+        if (prefersBottom && spaceBottom >= spaceTop) {
+          placement = "bottom";
+        } else if (prefersTop) {
+          placement = "top";
+        } else if (prefersBottom) {
+          placement = "bottom";
+        } else if (prefersRight && spaceRight >= spaceLeft) {
+          placement = "right";
+        } else if (prefersLeft) {
+          placement = "left";
+        } else {
+          placement =
+            targetRect.top + targetRect.height / 2 > viewportHeight / 2
+              ? "top"
+              : "bottom";
+        }
       } else {
-        placement = "bottom";
+        const maxSpace = Math.max(spaceTop, spaceBottom, spaceLeft, spaceRight);
+
+        if (maxSpace === spaceBottom && spaceBottom > tooltipRect.height + gap) {
+          placement = "bottom";
+        } else if (maxSpace === spaceTop && spaceTop > tooltipRect.height + gap) {
+          placement = "top";
+        } else if (
+          maxSpace === spaceRight &&
+          spaceRight > tooltipRect.width + gap
+        ) {
+          placement = "right";
+        } else if (
+          maxSpace === spaceLeft &&
+          spaceLeft > tooltipRect.width + gap
+        ) {
+          placement = "left";
+        } else {
+          placement = "bottom";
+        }
       }
     }
 
@@ -185,7 +223,7 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
     } else if (placement === "bottom") {
       top = targetRect.bottom + gap;
       left = targetRect.left + (targetRect.width - tooltipRect.width) / 2;
-      arrowTop = -arrowSize - 2;
+      arrowTop = -arrowSize;
       arrowLeft = tooltipRect.width / 2;
       arrowRotation = 0;
     } else if (placement === "left") {
@@ -198,7 +236,7 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
       top = targetRect.top + (targetRect.height - tooltipRect.height) / 2;
       left = targetRect.right + gap;
       arrowTop = tooltipRect.height / 2;
-      arrowLeft = -arrowSize - 2;
+      arrowLeft = -arrowSize;
       arrowRotation = -90;
     } else if (placement === "center") {
       top = targetRect.top + (targetRect.height - tooltipRect.height) / 2;
@@ -207,7 +245,6 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
     }
 
     // Keep tooltip within viewport bounds
-    const padding = 20;
     if (top < padding) top = padding;
     if (top + tooltipRect.height > viewportHeight - padding) {
       top = viewportHeight - tooltipRect.height - padding;
@@ -326,22 +363,22 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
               <rect x="0" y="0" width="100%" height="100%" fill="white" />
               {spotlightRect && (
                 <rect
-                  x={spotlightRect.left - 10}
-                  y={spotlightRect.top - 10}
-                  width={spotlightRect.width + 20}
-                  height={spotlightRect.height + 20}
-                  rx="16"
+                  x={spotlightRect.left - layoutMetrics.spotlightInset}
+                  y={spotlightRect.top - layoutMetrics.spotlightInset}
+                  width={spotlightRect.width + layoutMetrics.spotlightInset * 2}
+                  height={spotlightRect.height + layoutMetrics.spotlightInset * 2}
+                  rx={layoutMetrics.spotlightRadius}
                   fill="black"
                 />
               )}
               {secondaryRects.map((rect, index) => (
                 <rect
                   key={index}
-                  x={rect.left - 10}
-                  y={rect.top - 10}
-                  width={rect.width + 20}
-                  height={rect.height + 20}
-                  rx="16"
+                  x={rect.left - layoutMetrics.spotlightInset}
+                  y={rect.top - layoutMetrics.spotlightInset}
+                  width={rect.width + layoutMetrics.spotlightInset * 2}
+                  height={rect.height + layoutMetrics.spotlightInset * 2}
+                  rx={layoutMetrics.spotlightRadius}
                   fill="black"
                 />
               ))}
@@ -397,10 +434,11 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
         <div
           className={styles.spotlight}
           style={{
-            top: spotlightRect.top - 10,
-            left: spotlightRect.left - 10,
-            width: spotlightRect.width + 20,
-            height: spotlightRect.height + 20,
+            top: spotlightRect.top - layoutMetrics.spotlightInset,
+            left: spotlightRect.left - layoutMetrics.spotlightInset,
+            width: spotlightRect.width + layoutMetrics.spotlightInset * 2,
+            height: spotlightRect.height + layoutMetrics.spotlightInset * 2,
+            borderRadius: layoutMetrics.spotlightRadius,
           }}
         />
       )}
@@ -412,10 +450,11 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
             key={index}
             className={styles.spotlight}
             style={{
-              top: rect.top - 10,
-              left: rect.left - 10,
-              width: rect.width + 20,
-              height: rect.height + 20,
+              top: rect.top - layoutMetrics.spotlightInset,
+              left: rect.left - layoutMetrics.spotlightInset,
+              width: rect.width + layoutMetrics.spotlightInset * 2,
+              height: rect.height + layoutMetrics.spotlightInset * 2,
+              borderRadius: layoutMetrics.spotlightRadius,
             }}
           />
         ))}
@@ -458,12 +497,12 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
         <div className={styles.controls}>
           {currentStepIndex > 0 && (
             <button onClick={handleBack} className={styles.backBtn}>
-              <ArrowBigLeftDash size="3.3vw" />
+              <ArrowBigLeftDash size="1em" />
             </button>
           )}
           <div className={styles.nextBtnContainer}>
             <button onClick={handleNext} className={styles.nextBtn}>
-              <ArrowBigRightDash size="3.3vw" />
+              <ArrowBigRightDash size="1em" />
             </button>
           </div>
         </div>

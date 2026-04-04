@@ -28,3 +28,6 @@ dist-ssr
 .agents/
 .claude/
 .gemini/
+
+CLAUDE.md
+AGENTS.md

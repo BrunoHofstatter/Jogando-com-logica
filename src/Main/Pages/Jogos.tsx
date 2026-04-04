@@ -75,24 +75,6 @@ function Jogos() {
       label: "Guerra Matemática",
       imageSrc: `${import.meta.env.BASE_URL}mathwarLogo.png`,
       onClick: () => handleGameClick("Guerra Matemática", ROUTES.MATH_WAR_RULES)
-    },
-    {
-      pagina: "bombgameRg",
-      label: "Bomb Game",
-      imageSrc: `${import.meta.env.BASE_URL}iconStop.png`,
-      onClick: () => handleGameClick("Bomb Game", ROUTES.BOMB_GAME_RULES)
-    },
-    {
-      pagina: "puzzlewireRg",
-      label: "Puzzle Wire",
-      imageSrc: `${import.meta.env.BASE_URL}iconStop.png`,
-      onClick: () => handleGameClick("Puzzle Wire", ROUTES.PUZZLE_WIRE_RULES)
-    },
-    {
-      pagina: "housesRg",
-      label: "Houses",
-      imageSrc: `${import.meta.env.BASE_URL}iconStop.png`,
-      onClick: () => handleGameClick("Houses", ROUTES.HOUSES_RULES)
     }
   ];
 

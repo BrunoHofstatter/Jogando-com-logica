@@ -4,7 +4,7 @@
 .skipBtn {
   position: fixed;
   top: 2vw;
-  right: 2vw;
+  left: 2vw;
   z-index: 100001;
   padding: 0.7vw 1.3vw 1.2vw 1.3vw;
   font-size: 2.5vw;
@@ -36,7 +36,7 @@
 .spotlight {
   position: fixed;
   border: 0.4vw solid #38bdf8;
-  border-radius: 16px;
+  border-radius: 1vw;
   box-shadow: 0 0 2vw #38bdf8;
   z-index: 99999;
   pointer-events: none;
@@ -67,6 +67,7 @@
   box-shadow: 0 1vw 0 #0c4a6e;
   font-family: "Cherry Bomb One", system-ui;
   font-weight: 200;
+  line-height: 1.15;
 }
 
 /* ============================================================
@@ -100,9 +101,9 @@
    ============================================================ */
 .stepImage {
   width: 100%;
-  max-height: 200px;
+  max-height: 12vw;
   object-fit: contain;
-  border-radius: 12px;
+  border-radius: 1vw;
   margin-bottom: 1vw;
 }
 
@@ -138,6 +139,7 @@
    ============================================================ */
 .controls {
   display: flex;
+  align-items: flex-end;
   justify-content: space-between;
   width: 100%;
   margin-top: 2vw;
@@ -163,6 +165,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.backBtn svg {
+  width: 1em;
+  height: 1em;
 }
 .backBtn:hover {
   transform: translateY(-0.2vw);
@@ -201,6 +207,10 @@
   align-items: center;
   justify-content: center;
 }
+.nextBtn svg {
+  width: 1em;
+  height: 1em;
+}
 .nextBtn:hover {
   transform: translateY(-0.2vw);
   box-shadow: 0 0.7vw 0 #0c4a6e;
@@ -209,4 +219,140 @@
 .nextBtn:active {
   transform: translateY(0.5vw);
   box-shadow: 0 0vw 0 #0c4a6e;
+}
+
+@media (orientation: portrait) and (max-width: 650px) {
+  .skipBtn {
+    top: auto;
+    right: auto;
+    left: min(4vw, 2.2dvh);
+    bottom: min(4vw, 2.2dvh);
+    padding: min(1.8vw, 1dvh) min(3.8vw, 2.1dvh) min(2.6vw, 1.45dvh);
+    font-size: min(5.5vw, 3dvh);
+    border-radius: min(3.5vw, 1.95dvh);
+    border-width: min(0.8vw, 0.44dvh);
+    box-shadow: 0 min(1.2vw, 0.66dvh) 0 #0c4a6e;
+    -webkit-text-stroke: min(0.3vw, 0.165dvh) #0c4a6e;
+  }
+
+  .skipBtn:hover {
+    transform: translateY(calc(-1 * min(0.35vw, 0.2dvh)));
+    box-shadow: 0 min(1.45vw, 0.8dvh) 0 #0c4a6e;
+  }
+
+  .skipBtn:active {
+    transform: translateY(min(0.8vw, 0.44dvh));
+    box-shadow: 0 min(0.15vw, 0.08dvh) 0 #0c4a6e;
+  }
+
+  .spotlight {
+    border-width: min(0.9vw, 0.5dvh);
+    border-radius: min(4vw, 2.2dvh);
+    box-shadow: 0 0 min(3vw, 1.65dvh) #38bdf8;
+  }
+
+  .tooltip {
+    border-width: min(0.9vw, 0.5dvh);
+    border-radius: min(4.5vw, 2.5dvh);
+    padding: min(4vw, 2.2dvh) min(4vw, 2.2dvh) min(4.8vw, 2.65dvh);
+    min-width: min(68vw, 37.4dvh);
+    max-width: min(88vw, 48.4dvh);
+    box-shadow: 0 min(1.8vw, 1dvh) 0 #0c4a6e;
+  }
+
+  .arrow {
+    border-left-width: min(2vw, 1.1dvh);
+    border-right-width: min(2vw, 1.1dvh);
+    border-top-width: min(2vw, 1.1dvh);
+    filter: drop-shadow(0 min(0.4vw, 0.22dvh) 0 #0c4a6e);
+  }
+
+  .title {
+    margin: 0 0 min(2.6vw, 1.45dvh) 0;
+    font-size: min(6.5vw, 3.6dvh);
+    -webkit-text-stroke: min(0.35vw, 0.2dvh) #0c4a6e;
+    text-shadow: 0 min(0.45vw, 0.25dvh) 0 #075985;
+    line-height: 1.15;
+  }
+
+  .stepImage {
+    max-height: min(24vw, 13.2dvh);
+    border-radius: min(2.6vw, 1.45dvh);
+    margin-bottom: min(2.6vw, 1.45dvh);
+  }
+
+  .body {
+    margin-bottom: min(3vw, 1.65dvh);
+  }
+
+  .stepBody {
+    font-size: min(4.6vw, 2.55dvh);
+    -webkit-text-stroke: min(0.24vw, 0.135dvh) #0c4a6e;
+    text-shadow: 0 min(0.28vw, 0.15dvh) 0 #075985;
+    gap: min(2.6vw, 1.45dvh);
+    line-height: 1.35;
+  }
+
+  .highlight {
+    font-size: min(5vw, 2.75dvh);
+  }
+
+  .controls {
+    margin-top: min(3.2vw, 1.75dvh);
+    gap: min(2.6vw, 1.45dvh);
+  }
+
+  .backBtn {
+    margin-left: 0;
+    padding: min(1.7vw, 0.95dvh) min(4vw, 2.2dvh) min(2.4vw, 1.3dvh);
+    font-size: min(6vw, 3.3dvh);
+    border-radius: min(3.6vw, 2dvh);
+    border-width: min(0.8vw, 0.44dvh);
+    box-shadow: 0 min(1.2vw, 0.66dvh) 0 #0c4a6e;
+  }
+
+  .backBtn:hover {
+    transform: translateY(calc(-1 * min(0.35vw, 0.2dvh)));
+    box-shadow: 0 min(1.45vw, 0.8dvh) 0 #0c4a6e;
+  }
+
+  .backBtn:active {
+    transform: translateY(min(0.8vw, 0.44dvh));
+    box-shadow: 0 min(0.15vw, 0.08dvh) 0 #0c4a6e;
+  }
+
+  .nextBtnContainer {
+    flex: 1;
+  }
+
+  .nextBtn {
+    margin-right: 0;
+    padding: min(1.7vw, 0.95dvh) min(4vw, 2.2dvh) min(2.4vw, 1.3dvh);
+    font-size: min(6vw, 3.3dvh);
+    border-radius: min(3.6vw, 2dvh);
+    border-width: min(0.8vw, 0.44dvh);
+    box-shadow: 0 min(1.2vw, 0.66dvh) 0 #0c4a6e;
+  }
+
+  .nextBtn:hover {
+    transform: translateY(calc(-1 * min(0.35vw, 0.2dvh)));
+    box-shadow: 0 min(1.45vw, 0.8dvh) 0 #0c4a6e;
+  }
+
+  .nextBtn:active {
+    transform: translateY(min(0.8vw, 0.44dvh));
+    box-shadow: 0 min(0.15vw, 0.08dvh) 0 #0c4a6e;
+  }
+
+  @keyframes tutorialPulse {
+    0%,
+    100% {
+      box-shadow: 0 0 min(3vw, 1.65dvh) #38bdf8;
+    }
+    50% {
+      box-shadow:
+        0 0 min(4vw, 2.2dvh) #38bdf8,
+        0 0 min(5vw, 2.75dvh) #7dd3fc;
+    }
+  }
 }
