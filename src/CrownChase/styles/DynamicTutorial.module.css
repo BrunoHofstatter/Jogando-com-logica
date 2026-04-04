@@ -4,7 +4,7 @@
 .skipBtn {
   position: fixed;
   top: 2vw;
-  right: 2vw;
+  left: 2vw;
   z-index: 100001;
   padding: 0.7vw 1.3vw 1.2vw 1.3vw;
   font-size: 2.5vw;
@@ -33,8 +33,8 @@
    ============================================================ */
 .spotlight {
   position: fixed;
-  border: 6px solid #dd01ff;
-  border-radius: 16px;
+  border: 0.4vw solid #dd01ff;
+  border-radius: 1vw;
   z-index: 99999;
   pointer-events: none;
   animation: tutorialBounce 1.5s infinite;
@@ -55,6 +55,7 @@
   box-shadow: 0 1vw 0 #86198f;
   font-family: "Cherry Bomb One", system-ui;
   font-weight: 200;
+  line-height: 1.15;
 }
 
 /* ============================================================
@@ -64,9 +65,9 @@
   position: absolute;
   width: 0;
   height: 0;
-  border-left: 14px solid transparent;
-  border-right: 14px solid transparent;
-  border-top: 14px solid #d946ef;
+  border-left: 1vw solid transparent;
+  border-right: 1vw solid transparent;
+  border-top: 1vw solid #d946ef;
   filter: drop-shadow(0 0.4vw 0 #86198f);
   z-index: 1;
 }
@@ -88,9 +89,9 @@
    ============================================================ */
 .stepImage {
   width: 100%;
-  max-height: 200px;
+  max-height: 12vw;
   object-fit: contain;
-  border-radius: 12px;
+  border-radius: 1vw;
   margin-bottom: 1vw;
   border: 0.3vw solid #86198f;
 }
@@ -126,6 +127,7 @@
    ============================================================ */
 .controls {
   display: flex;
+  align-items: flex-end;
   justify-content: space-between;
   width: 100%;
   margin-top: 2vw;
@@ -151,6 +153,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.backBtn svg {
+  width: 1em;
+  height: 1em;
 }
 .backBtn:hover {
   transform: translateY(-0.2vw);
@@ -188,6 +194,10 @@
   align-items: center;
   justify-content: center;
 }
+.nextBtn svg {
+  width: 1em;
+  height: 1em;
+}
 .nextBtn:hover {
   transform: translateY(-0.2vw);
   box-shadow: 0 0.7vw 0 #b45309;
@@ -208,5 +218,141 @@
   50% {
     transform: translateY(-0.4vw);
     box-shadow: 0 0 3vw #dd01ff, 0 0 5vw rgba(221, 1, 255, 0.4);
+  }
+}
+
+@media (orientation: portrait) and (max-width: 650px) {
+  .skipBtn {
+    top: auto;
+    right: auto;
+    left: min(4vw, 2.2dvh);
+    bottom: min(4vw, 2.2dvh);
+    padding: min(1.8vw, 1dvh) min(3.8vw, 2.1dvh) min(2.6vw, 1.45dvh);
+    font-size: min(5.5vw, 3dvh);
+    border-radius: min(3.5vw, 1.95dvh);
+    border-width: min(0.8vw, 0.44dvh);
+    box-shadow: 0 min(1.2vw, 0.66dvh) 0 #b45309;
+  }
+
+  .skipBtn:hover {
+    transform: translateY(calc(-1 * min(0.35vw, 0.2dvh)));
+    box-shadow: 0 min(1.45vw, 0.8dvh) 0 #b45309;
+  }
+
+  .skipBtn:active {
+    transform: translateY(min(0.8vw, 0.44dvh));
+    box-shadow: 0 min(0.15vw, 0.08dvh) 0 #b45309;
+  }
+
+  .spotlight {
+    border-width: min(0.9vw, 0.5dvh);
+    border-radius: min(4vw, 2.2dvh);
+  }
+
+  .tooltip {
+    border-width: min(0.9vw, 0.5dvh);
+    border-radius: min(4.5vw, 2.5dvh);
+    padding: min(4vw, 2.2dvh) min(4vw, 2.2dvh) min(4.8vw, 2.65dvh);
+    min-width: min(68vw, 37.4dvh);
+    max-width: min(88vw, 48.4dvh);
+    box-shadow: 0 min(1.8vw, 1dvh) 0 #86198f;
+  }
+
+  .arrow {
+    border-left-width: min(2vw, 1.1dvh);
+    border-right-width: min(2vw, 1.1dvh);
+    border-top-width: min(2vw, 1.1dvh);
+    filter: drop-shadow(0 min(0.4vw, 0.22dvh) 0 #86198f);
+  }
+
+  .title {
+    margin: 0 0 min(2.6vw, 1.45dvh) 0;
+    font-size: min(6.5vw, 3.6dvh);
+    -webkit-text-stroke: min(0.35vw, 0.2dvh) #6b21a8;
+    text-shadow: 0 min(0.45vw, 0.25dvh) 0 #86198f;
+    line-height: 1.15;
+  }
+
+  .stepImage {
+    max-height: min(24vw, 13.2dvh);
+    border-radius: min(2.6vw, 1.45dvh);
+    margin-bottom: min(2.6vw, 1.45dvh);
+    border-width: min(0.8vw, 0.44dvh);
+  }
+
+  .body {
+    margin-bottom: min(3vw, 1.65dvh);
+  }
+
+  .stepBody {
+    font-size: min(4.6vw, 2.55dvh);
+    -webkit-text-stroke: min(0.24vw, 0.135dvh) #6b21a8;
+    gap: min(2.6vw, 1.45dvh);
+    line-height: 1.35;
+  }
+
+  .highlight {
+    font-size: min(5vw, 2.75dvh);
+  }
+
+  .controls {
+    margin-top: min(3.2vw, 1.75dvh);
+    gap: min(2.6vw, 1.45dvh);
+  }
+
+  .backBtn {
+    margin-left: 0;
+    padding: min(1.7vw, 0.95dvh) min(4vw, 2.2dvh) min(2.4vw, 1.3dvh);
+    font-size: min(6vw, 3.3dvh);
+    border-radius: min(3.6vw, 2dvh);
+    border-width: min(0.8vw, 0.44dvh);
+    box-shadow: 0 min(1.2vw, 0.66dvh) 0 #b45309;
+  }
+
+  .backBtn:hover {
+    transform: translateY(calc(-1 * min(0.35vw, 0.2dvh)));
+    box-shadow: 0 min(1.45vw, 0.8dvh) 0 #b45309;
+  }
+
+  .backBtn:active {
+    transform: translateY(min(0.8vw, 0.44dvh));
+    box-shadow: 0 min(0.15vw, 0.08dvh) 0 #b45309;
+  }
+
+  .nextBtnContainer {
+    flex: 1;
+  }
+
+  .nextBtn {
+    margin-right: 0;
+    padding: min(1.7vw, 0.95dvh) min(4vw, 2.2dvh) min(2.4vw, 1.3dvh);
+    font-size: min(6vw, 3.3dvh);
+    border-radius: min(3.6vw, 2dvh);
+    border-width: min(0.8vw, 0.44dvh);
+    box-shadow: 0 min(1.2vw, 0.66dvh) 0 #b45309;
+  }
+
+  .nextBtn:hover {
+    transform: translateY(calc(-1 * min(0.35vw, 0.2dvh)));
+    box-shadow: 0 min(1.45vw, 0.8dvh) 0 #b45309;
+  }
+
+  .nextBtn:active {
+    transform: translateY(min(0.8vw, 0.44dvh));
+    box-shadow: 0 min(0.15vw, 0.08dvh) 0 #b45309;
+  }
+
+  @keyframes tutorialBounce {
+    0%,
+    100% {
+      transform: translateY(calc(-1 * min(0.35vw, 0.2dvh)));
+      box-shadow: 0 0 min(3vw, 1.65dvh) #dd01ff;
+    }
+    50% {
+      transform: translateY(calc(-1 * min(0.7vw, 0.38dvh)));
+      box-shadow:
+        0 0 min(4vw, 2.2dvh) #dd01ff,
+        0 0 min(5vw, 2.75dvh) rgba(221, 1, 255, 0.4);
+    }
   }
 }

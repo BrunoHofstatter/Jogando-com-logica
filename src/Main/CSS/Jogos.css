@@ -6,12 +6,13 @@
   flex-direction: column;
   align-items: center;
   min-height: 100dvh;
-  width: 100vw;
+  width: 100%;
   height: 100dvh;
   padding: 1dvh 0;
   box-sizing: border-box;
   background-color: #68c2e0;
   justify-content: center;
+  overflow-x: hidden;
   /* Flat light blue background for the page */
 }
 
@@ -39,9 +40,9 @@
 }
 
 .jogos-carousel-container {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 4.5vw) minmax(0, 1fr) minmax(0, 4.5vw);
   align-items: center;
-  justify-content: space-between;
   width: 90%;
   max-width: 1200px;
   gap: 2vw;
@@ -102,20 +103,30 @@
 .nav-arrow.disabled {
   opacity: 0;
   pointer-events: none;
-  visibility: hidden;
 }
 
 .grade_jogos {
   margin-top: 15dvh;
   row-gap: 4dvh;
-  column-gap: 5vw;
-  /* Widened horizontal gap */
+  column-gap: 2.5vw;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  flex-grow: 1;
   justify-items: center;
+  width: 100%;
   /* Removed: border, border-radius, background-color, box-shadow */
   box-sizing: border-box;
+}
+
+.prev-arrow {
+  grid-column: 1;
+}
+
+.grade_jogos {
+  grid-column: 2;
+}
+
+.next-arrow {
+  grid-column: 3;
 }
 
 
@@ -128,7 +139,8 @@
   align-items: center;
   justify-content: center;
   height: 100%;
-  width: 22vw;
+  width: 100%;
+  max-width: 22vw;
   box-sizing: border-box;
   background-color: #286a83;
   /* Solid slightly lighter blue for cards */
@@ -247,7 +259,7 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(3, 1fr);
-    gap: min(5vw, 3dvh);
+    gap: min(3vw, 3dvh);
     width: 90vw;
     height: 60dvh;
     margin: 0;
@@ -299,7 +311,8 @@
   }
 
   .game-button {
-    width: 100%;
+    width: 30vw;
+    max-width:none;
     height: 100%;
     border-width: min(0.8vw, 0.4dvh);
     border-radius: min(4vw, 2dvh);
