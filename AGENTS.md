@@ -1,5 +1,7 @@
 # AGENTS.md
 
+##### ALWAYS ANSWER IN ENGLISH
+
 **Jogando com Lógica** is a free educational game platform teaching logic and math to Brazilian public school students (ages 8-13). No login required, instant play. All user-facing text must be in Brazilian Portuguese.
 
 ## Commands
@@ -77,3 +79,5 @@ Current skill:
 | File | When to read |
 |------|--------------|
 | `jogando-design/SKILL.md` | User asks to use the design skill, follow the design system, apply the Jogando design, or use the design guide |
+
+##### ALWAYS ANSWER IN ENGLISH
