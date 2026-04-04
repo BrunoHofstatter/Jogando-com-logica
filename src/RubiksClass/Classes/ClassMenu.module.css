@@ -1,6 +1,7 @@
 /* ============================================================
    ClassMenu.module.css
    Soft Purple Neo-Brutalist Theme
+   (includes ClassIcon styles — both components live here)
    ============================================================ */
 
 .container {
@@ -11,7 +12,6 @@
   min-height: 100dvh;
   width: 100%;
   background-color: #d8b4ff;
-  /* Soft Light Purple */
   font-family: "Cherry Bomb One", system-ui;
   text-align: center;
   padding: 0vw 0;
@@ -30,7 +30,6 @@
   margin: 0;
   color: #ffffff;
   -webkit-text-stroke: 0.25vw #541686;
-  /* Dark Purple */
   text-shadow: 0 0.6vw 0 #541686;
   line-height: 1.0;
 }
@@ -43,4 +42,240 @@
   width: 100%;
   max-width: 96vw;
   padding: 0 2vw;
+}
+
+/* ============================================================
+   ClassIcon styles
+   ============================================================ */
+
+.classIcon {
+  border-radius: 1.5vw;
+  padding: 2vw;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+  font-family: "Cherry Bomb One", system-ui;
+  color: #6b21a8;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 20vw;
+  box-sizing: border-box;
+}
+
+.classIcon.disabled {
+  cursor: not-allowed;
+  transform: translateY(0.4vw);
+}
+
+.classIcon:hover:not(.disabled) {
+  transform: translateY(-0.4vw);
+}
+
+.classIcon:active:not(.disabled) {
+  transform: translateY(0.4vw);
+}
+
+.classIconInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5vw;
+  width: 100%;
+}
+
+.classLabel {
+  font-size: 2.2vw;
+  font-family: inherit;
+  color: #ffffff;
+  -webkit-text-stroke: 0.15vw #541686;
+  text-shadow: 0 0.2vw 0 #541686;
+  line-height: 1.2;
+  margin-bottom: 0.5vw;
+}
+
+.classIconContainer {
+  width: 10vw;
+  height: 10vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.classIconImg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0.4vw 0 rgba(107, 33, 168, 0.3));
+}
+
+.buttonGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 1vw;
+  width: 100%;
+  margin-top: 0.5vw;
+  align-items: center;
+}
+
+.actionButton {
+  font-family: inherit;
+  font-size: 1.7vw;
+  padding: 0.4vw 0 0.8vw 0;
+  border: 0.3vw solid #6b21a8;
+  border-radius: 1vw;
+  width: 70%;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  color: #ffffff;
+  -webkit-text-stroke: 0.1vw #6b21a8;
+  text-shadow: 0 0.2vw 0 #6b21a8;
+}
+
+.btnLearn {
+  background: #38bdf8;
+  border: 0.3vw solid #0d6990;
+  -webkit-text-stroke: 0.1vw #0d6990;
+  box-shadow: 0 0.35vw 0 #0d6990;
+  text-shadow: 0 0.2vw 0 #0d6990;
+}
+
+.btnLearn:hover {
+  background: #7dd3fc;
+  transform: translateY(-0.2vw);
+  box-shadow: 0 0.7vw 0 #0d6990;
+}
+
+.btnLearn:active {
+  transform: translateY(0.3vw);
+  box-shadow: 0 0.2vw 0 #0d6990;
+}
+
+.btnGame {
+  background: #fde047;
+  border: 0.3vw solid #907b11;
+  -webkit-text-stroke: 0.1vw #907b11;
+  box-shadow: 0 0.35vw 0 #907b11;
+  text-shadow: 0 0.2vw 0 #907b11;
+}
+
+.btnGame:hover {
+  background: #fef08a;
+  transform: translateY(-0.2vw);
+  box-shadow: 0 0.7vw 0 #907b11;
+}
+
+.btnGame:active {
+  transform: translateY(0.3vw);
+  box-shadow: 0 0.2vw 0 #907b11;
+}
+
+/* ============================================================
+   Mobile — portrait phones (≤ 650px wide)
+   All sizes use min(Xvw, Ydvh) at ~55% ratio.
+   No colors redeclared here — inherited from desktop rules.
+   ============================================================ */
+
+@media (orientation: portrait) and (max-width: 650px) {
+  .header {
+    margin-top: min(4vw, 2.2dvh);
+    margin-bottom: min(4vw, 2.2dvh);
+  }
+
+  .title {
+    font-size: min(8vw, 4.4dvh);
+    -webkit-text-stroke: min(0.6vw, 0.33dvh) #541686;
+    text-shadow: 0 min(1.2vw, 0.66dvh) 0 #541686;
+  }
+
+  .classGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: min(3vw, 1.65dvh);
+    max-width: 96vw;
+    padding: 0 min(2vw, 1.1dvh);
+  }
+
+  .classIcon {
+    width: 100%;
+    border-radius: min(4vw, 2.2dvh);
+    padding: min(3vw, 1.65dvh);
+  }
+
+  .classIcon.disabled {
+    transform: translateY(min(0.8vw, 0.44dvh));
+  }
+
+  .classIcon:hover:not(.disabled) {
+    transform: translateY(calc(-1 * min(0.8vw, 0.44dvh)));
+  }
+
+  .classIcon:active:not(.disabled) {
+    transform: translateY(min(0.8vw, 0.44dvh));
+  }
+
+  .classIconInner {
+    gap: min(2vw, 1.1dvh);
+  }
+
+  .classLabel {
+    font-size: min(4.5vw, 2.5dvh);
+    -webkit-text-stroke: min(0.4vw, 0.22dvh) #541686;
+    text-shadow: 0 min(0.5vw, 0.28dvh) 0 #541686;
+    margin-bottom: min(1vw, 0.55dvh);
+  }
+
+  .classIconContainer {
+    width: min(18vw, 9.9dvh);
+    height: min(18vw, 9.9dvh);
+  }
+
+  .classIconImg {
+    filter: drop-shadow(0 min(0.8vw, 0.44dvh) 0 rgba(107, 33, 168, 0.3));
+  }
+
+  .buttonGroup {
+    gap: min(2vw, 1.1dvh);
+    margin-top: min(1vw, 0.55dvh);
+  }
+
+  .actionButton {
+    font-size: min(4vw, 2.2dvh);
+    padding: min(1vw, 0.55dvh) 0 min(2vw, 1.1dvh) 0;
+    border-width: min(0.7vw, 0.39dvh);
+    border-radius: min(2.5vw, 1.4dvh);
+    -webkit-text-stroke: min(0.25vw, 0.14dvh) #6b21a8;
+    text-shadow: 0 min(0.5vw, 0.28dvh) 0 #6b21a8;
+  }
+
+  .btnLearn {
+    border-width: min(0.7vw, 0.39dvh);
+    box-shadow: 0 min(0.8vw, 0.44dvh) 0 #0d6990;
+    text-shadow: 0 min(0.5vw, 0.28dvh) 0 #0d6990;
+    -webkit-text-stroke: min(0.25vw, 0.14dvh) #0d6990;
+  }
+
+  .btnLearn:hover {
+    box-shadow: 0 min(1.4vw, 0.77dvh) 0 #0d6990;
+  }
+
+  .btnLearn:active {
+    box-shadow: 0 min(0.2vw, 0.11dvh) 0 #0d6990;
+  }
+
+  .btnGame {
+    border-width: min(0.7vw, 0.39dvh);
+    box-shadow: 0 min(0.8vw, 0.44dvh) 0 #907b11;
+    text-shadow: 0 min(0.5vw, 0.28dvh) 0 #907b11;
+    -webkit-text-stroke: min(0.25vw, 0.14dvh) #907b11;
+  }
+
+  .btnGame:hover {
+    box-shadow: 0 min(1.4vw, 0.77dvh) 0 #907b11;
+  }
+
+  .btnGame:active {
+    box-shadow: 0 min(0.2vw, 0.11dvh) 0 #907b11;
+  }
 }

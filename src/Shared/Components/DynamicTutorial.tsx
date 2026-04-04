@@ -17,18 +17,35 @@ export interface TutorialStep {
   id: string;
   target?: string; // CSS selector or 'none' for centered
   highlight?: boolean; // Show spotlight around target
+  secondaryTargets?: string[]; // Additional CSS selectors to highlight
   placement?: TutorialPlacement; // 'auto' will choose best position
   title?: string;
   body: React.ReactNode;
   image?: string; // Optional image URL
 }
 
+export interface TutorialStyles {
+  skipBtn?: string;
+  spotlight?: string;
+  tooltip?: string;
+  arrow?: string;
+  title?: string;
+  stepImage?: string;
+  body?: string;
+  controls?: string;
+  backBtn?: string;
+  nextBtnContainer?: string;
+  nextBtn?: string;
+}
+
 export interface DynamicTutorialProps {
   steps: TutorialStep[];
   onFinish?: (skipped: boolean) => void;
   onStart?: () => void;
+  onStepChange?: (index: number) => void;
   storageKey: string; // Required for localStorage
   locale?: "pt" | "en";
+  styles: TutorialStyles;
 }
 
 // ============================================================================
@@ -39,8 +56,10 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
   steps,
   onFinish,
   onStart,
+  onStepChange,
   storageKey,
   locale = "pt",
+  styles,
 }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
@@ -50,28 +69,11 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
     rotation: number;
   } | null>(null);
   const [spotlightRect, setSpotlightRect] = useState<DOMRect | null>(null);
+  const [secondaryRects, setSecondaryRects] = useState<DOMRect[]>([]);
 
   const tooltipRef = useRef<HTMLDivElement>(null);
 
-  // Localization
-  const labels = {
-    pt: {
-      next: "Próximo",
-      back: "Voltar",
-      skip: "Pular",
-      finish: "Concluir",
-      stepCounter: (current: number, total: number) => `${current} de ${total}`,
-    },
-    en: {
-      next: "Next",
-      back: "Back",
-      skip: "Skip",
-      finish: "Finish",
-      stepCounter: (current: number, total: number) => `${current} of ${total}`,
-    },
-  };
-
-  const t = labels[locale];
+  const skipLabel = locale === "pt" ? "Pular" : "Skip";
 
   // ============================================================================
   // CALL onStart
@@ -79,7 +81,8 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
 
   useEffect(() => {
     onStart?.();
-  }, [onStart]);
+    onStepChange?.(0);
+  }, [onStart, onStepChange]);
 
   // ============================================================================
   // POSITIONING LOGIC
@@ -112,6 +115,7 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
       const left = (viewportWidth - tooltipRect.width) / 2;
       setTooltipPosition({ top, left });
       setSpotlightRect(null);
+      setSecondaryRects([]);
       setArrowPosition(null);
       return;
     }
@@ -119,7 +123,21 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
     const targetRect = targetElement.getBoundingClientRect();
     setSpotlightRect(targetRect);
 
-    const gap = 30; // Space between target and tooltip
+    // Handle secondary targets
+    const secondaryElements: DOMRect[] = [];
+    if (step.secondaryTargets && step.secondaryTargets.length > 0) {
+      step.secondaryTargets.forEach((selector) => {
+        const element = document.querySelector(selector);
+        if (element) {
+          secondaryElements.push(element.getBoundingClientRect());
+        } else {
+          console.warn(`Tutorial: Secondary target "${selector}" not found`);
+        }
+      });
+    }
+    setSecondaryRects(secondaryElements);
+
+    const gap = 30;
     const arrowSize = 12;
 
     let placement = step.placement || "auto";
@@ -148,7 +166,6 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
       ) {
         placement = "left";
       } else {
-        // Not enough space, default to bottom
         placement = "bottom";
       }
     }
@@ -159,36 +176,27 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
     let arrowLeft = 0;
     let arrowRotation = 0;
 
-    // Calculate tooltip and arrow positions based on placement
     if (placement === "top") {
       top = targetRect.top - tooltipRect.height - gap;
       left = targetRect.left + (targetRect.width - tooltipRect.width) / 2;
-
-      // Arrow points down from bottom of tooltip
       arrowTop = tooltipRect.height;
       arrowLeft = tooltipRect.width / 2;
       arrowRotation = 180;
     } else if (placement === "bottom") {
       top = targetRect.bottom + gap;
       left = targetRect.left + (targetRect.width - tooltipRect.width) / 2;
-
-      // Arrow points up from top of tooltip
       arrowTop = -arrowSize - 2;
       arrowLeft = tooltipRect.width / 2;
       arrowRotation = 0;
     } else if (placement === "left") {
       top = targetRect.top + (targetRect.height - tooltipRect.height) / 2;
       left = targetRect.left - tooltipRect.width - gap;
-
-      // Arrow points right from right side of tooltip
       arrowTop = tooltipRect.height / 2;
       arrowLeft = tooltipRect.width;
       arrowRotation = 90;
     } else if (placement === "right") {
       top = targetRect.top + (targetRect.height - tooltipRect.height) / 2;
       left = targetRect.right + gap;
-
-      // Arrow points left from left side of tooltip
       arrowTop = tooltipRect.height / 2;
       arrowLeft = -arrowSize - 2;
       arrowRotation = -90;
@@ -212,11 +220,7 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
     setTooltipPosition({ top, left });
 
     if (placement !== "center") {
-      setArrowPosition({
-        top: arrowTop,
-        left: arrowLeft,
-        rotation: arrowRotation,
-      });
+      setArrowPosition({ top: arrowTop, left: arrowLeft, rotation: arrowRotation });
     }
   }, [currentStepIndex, steps]);
 
@@ -225,14 +229,13 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
   // ============================================================================
 
   useEffect(() => {
-    // Small delay to ensure DOM elements are rendered
     const timeoutId = setTimeout(() => {
       calculatePosition();
     }, 100);
 
     const handleUpdate = () => calculatePosition();
     window.addEventListener("resize", handleUpdate);
-    window.addEventListener("scroll", handleUpdate, true); // Use capture phase
+    window.addEventListener("scroll", handleUpdate, true);
 
     return () => {
       clearTimeout(timeoutId);
@@ -247,7 +250,11 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
 
   const handleNext = () => {
     if (currentStepIndex < steps.length - 1) {
-      setCurrentStepIndex((prev) => prev + 1);
+      setCurrentStepIndex((prev) => {
+        const next = prev + 1;
+        onStepChange?.(next);
+        return next;
+      });
     } else {
       handleFinish(false);
     }
@@ -255,16 +262,17 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
 
   const handleBack = () => {
     if (currentStepIndex > 0) {
-      setCurrentStepIndex((prev) => prev - 1);
+      setCurrentStepIndex((prev) => {
+        const next = prev - 1;
+        onStepChange?.(next);
+        return next;
+      });
     }
   };
 
-  const handleSkip = () => {
-    handleFinish(true);
-  };
+  const handleSkip = () => handleFinish(true);
 
   const handleFinish = (skipped: boolean) => {
-    // Mark as completed in localStorage
     localStorage.setItem(`tutorial_${storageKey}_completed`, "true");
     onFinish?.(skipped);
   };
@@ -295,10 +303,75 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
   // ============================================================================
 
   const currentStep = steps[currentStepIndex];
+  const shouldShowMask =
+    currentStep.highlight && (spotlightRect || secondaryRects.length > 0);
 
   return (
     <>
-      {/* Full-screen overlay - blocks ALL clicks */}
+      {/* SVG Mask Overlay - creates cutouts for highlights */}
+      {shouldShowMask ? (
+        <svg
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            zIndex: 99998,
+            pointerEvents: "none",
+          }}
+        >
+          <defs>
+            <mask id="tutorial-mask">
+              <rect x="0" y="0" width="100%" height="100%" fill="white" />
+              {spotlightRect && (
+                <rect
+                  x={spotlightRect.left - 10}
+                  y={spotlightRect.top - 10}
+                  width={spotlightRect.width + 20}
+                  height={spotlightRect.height + 20}
+                  rx="16"
+                  fill="black"
+                />
+              )}
+              {secondaryRects.map((rect, index) => (
+                <rect
+                  key={index}
+                  x={rect.left - 10}
+                  y={rect.top - 10}
+                  width={rect.width + 20}
+                  height={rect.height + 20}
+                  rx="16"
+                  fill="black"
+                />
+              ))}
+            </mask>
+          </defs>
+          <rect
+            x="0"
+            y="0"
+            width="100%"
+            height="100%"
+            fill="rgba(0, 0, 0, 0.5)"
+            mask="url(#tutorial-mask)"
+          />
+        </svg>
+      ) : (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.1)",
+            zIndex: 99998,
+            pointerEvents: "none",
+          }}
+        />
+      )}
+
+      {/* Blocking layer for clicks */}
       <div
         style={{
           position: "fixed",
@@ -306,7 +379,6 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: "rgba(0, 0, 0, 0.1)",
           zIndex: 99998,
           cursor: "default",
         }}
@@ -315,255 +387,87 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
         onTouchStart={(e) => e.stopPropagation()}
       />
 
-      {/* Fixed Skip button (top-right of the viewport) */}
-      <button
-        onClick={handleSkip}
-        style={{
-          position: "fixed",
-          top: "2vw",
-          right: "2vw",
-          padding: "0.7vw 1.3vw 1.2vw 1.3vw",
-          fontSize: "2.5vw",
-          borderRadius: "1.5vw",
-          border: "0.4vw solid #064e3b",
-          background: "#10b981",
-          boxShadow: "0 0.8vw 0 #064e3b",
-          color: "#f3f4f6",
-          WebkitTextStroke: "0.15vw #064e3b",
-          lineHeight: "1",
-          cursor: "pointer",
-          fontFamily: "Cherry Bomb One",
-          transition: "all 0.1s ease",
-          zIndex: 100001,
-          transform: "translateY(0)",
-          textShadow: "0 0.3vw 0 #064e3b",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = "translateY(-0.2vw)";
-          e.currentTarget.style.boxShadow = "0 1vw 0 #064e3b";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = "translateY(0)";
-          e.currentTarget.style.boxShadow = "0 0.8vw 0 #064e3b";
-        }}
-        onMouseDown={(e) => {
-          e.currentTarget.style.transform = "translateY(0.4vw)";
-          e.currentTarget.style.boxShadow = "0 0.2vw 0 #064e3b";
-        }}
-        onMouseUp={(e) => {
-          e.currentTarget.style.transform = "translateY(-0.2vw)";
-          e.currentTarget.style.boxShadow = "0 1vw 0 #064e3b";
-        }}
-      >
-        {t.skip}
+      {/* Skip button */}
+      <button onClick={handleSkip} className={styles.skipBtn}>
+        {skipLabel}
       </button>
 
-      {/* Spotlight highlight */}
+      {/* Primary spotlight */}
       {currentStep.highlight && spotlightRect && (
         <div
+          className={styles.spotlight}
           style={{
-            position: "fixed",
             top: spotlightRect.top - 10,
             left: spotlightRect.left - 10,
             width: spotlightRect.width + 20,
             height: spotlightRect.height + 20,
-            border: "0.4vw solid #064e3b",
-            borderRadius: "16px",
-            boxShadow: "0 0 0 99999px rgba(0, 0, 0, 0.4), 0 1vw 0 #064e3b",
-            zIndex: 99999,
-            pointerEvents: "none",
           }}
         />
       )}
 
+      {/* Secondary spotlights */}
+      {currentStep.highlight &&
+        secondaryRects.map((rect, index) => (
+          <div
+            key={index}
+            className={styles.spotlight}
+            style={{
+              top: rect.top - 10,
+              left: rect.left - 10,
+              width: rect.width + 20,
+              height: rect.height + 20,
+            }}
+          />
+        ))}
+
       {/* Tooltip */}
       <div
         ref={tooltipRef}
+        className={styles.tooltip}
         style={{
-          position: "fixed",
           top: tooltipPosition.top,
           left: tooltipPosition.left,
-          zIndex: 100000,
-          backgroundColor: "#059669",
-          borderRadius: "20px",
-          padding: "24px",
-          minWidth: "20vw",
-          maxWidth: "35vw",
-          boxShadow: "0 1.5vw 0 #064e3b",
-          border: "0.4vw solid #064e3b",
-          fontFamily: '"Cherry Bomb One", system-ui',
         }}
       >
         {/* Arrow pointing to target */}
         {arrowPosition && (
           <div
+            className={styles.arrow}
             style={{
-              position: "absolute",
               top: arrowPosition.top,
               left: arrowPosition.left,
-              width: 0,
-              height: 0,
-              borderLeft: "14px solid transparent",
-              borderRight: "14px solid transparent",
-              borderTop: "14px solid #059669",
               transform: `translate(-50%, -50%) rotate(${arrowPosition.rotation}deg)`,
-              zIndex: 1,
             }}
           />
         )}
 
         {/* Title */}
         {currentStep.title && (
-          <h3
-            style={{
-              margin: "0 0 16px 0",
-              fontSize: "3vw",
-              color: "#f3f4f6",
-              WebkitTextStroke: "0.24vw #064e3b",
-              textShadow: "0 0.4vw 0 #064e3b",
-              lineHeight: 1.2,
-            }}
-          >
-            {currentStep.title}
-          </h3>
+          <h3 className={styles.title}>{currentStep.title}</h3>
         )}
 
         {/* Image */}
         {currentStep.image && (
-          <img
-            src={currentStep.image}
-            alt=""
-            style={{
-              width: "100%",
-              maxHeight: "200px",
-              objectFit: "contain",
-              borderRadius: "12px",
-              marginBottom: "16px",
-            }}
-          />
+          <img src={currentStep.image} alt="" className={styles.stepImage} />
         )}
 
         {/* Body */}
-        <div
-          style={{
-            fontSize: "20px",
-            color: "#f3f4f6",
-            marginBottom: "24px",
-            lineHeight: 1.5,
-            WebkitTextStroke: "0.15vw #064e3b",
-          }}
-        >
-          {currentStep.body}
-        </div>
+        <div className={styles.body}>{currentStep.body}</div>
 
         {/* Controls */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            width: "100%",
-            marginTop: "24px",
-          }}
-        >
-          {/* Back button container */}
+        <div className={styles.controls}>
           {currentStepIndex > 0 && (
-            <button
-              onClick={handleBack}
-              style={{
-                cursor: "pointer",
-                fontFamily: "inherit",
-                transition: "all 0.1s ease",
-                marginLeft: "1vw",
-                padding: "0.5vw 1.5vw 0.8vw 1.5vw",
-                fontSize: "2.5vw",
-                borderRadius: "1.5vw",
-                border: "0.4vw solid #064e3b",
-                background: "#10b981",
-                boxShadow: "0 0.8vw 0 #064e3b",
-                color: "#f3f4f6",
-                WebkitTextStroke: "0.15vw #064e3b",
-                lineHeight: "1",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                transform: "translateY(0)",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-0.2vw)";
-                e.currentTarget.style.boxShadow = "0 1vw 0 #064e3b";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = "0 0.8vw 0 #064e3b";
-              }}
-              onMouseDown={(e) => {
-                e.currentTarget.style.transform = "translateY(0.4vw)";
-                e.currentTarget.style.boxShadow = "0 0.2vw 0 #064e3b";
-              }}
-              onMouseUp={(e) => {
-                e.currentTarget.style.transform = "translateY(-0.2vw)";
-                e.currentTarget.style.boxShadow = "0 1vw 0 #064e3b";
-              }}
-            >
-              <ArrowBigLeftDash size='3.3vw' />
+            <button onClick={handleBack} className={styles.backBtn}>
+              <ArrowBigLeftDash size="3.3vw" />
             </button>
           )}
-
-          {/* Next button container - takes remaining space and pushes button to right */}
-          <div
-            style={{
-              flex: 1,
-              display: "flex",
-              justifyContent: "flex-end",
-            }}
-          >
-            <button
-              onClick={handleNext}
-              style={{
-                cursor: "pointer",
-                fontFamily: "inherit",
-                transition: "all 0.1s ease",
-                marginRight: "1vw",
-                padding: "0.5vw 1.5vw 0.8vw 1.5vw",
-                fontSize: "2.5vw",
-                borderRadius: "1.5vw",
-                border: "0.4vw solid #064e3b",
-                background: "#10b981",
-                boxShadow: "0 0.8vw 0 #064e3b",
-                color: "#f3f4f6",
-                WebkitTextStroke: "0.15vw #064e3b",
-                lineHeight: "1",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                transform: "translateY(0)",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-0.2vw)";
-                e.currentTarget.style.boxShadow = "0 1vw 0 #064e3b";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = "0 0.8vw 0 #064e3b";
-              }}
-              onMouseDown={(e) => {
-                e.currentTarget.style.transform = "translateY(0.4vw)";
-                e.currentTarget.style.boxShadow = "0 0.2vw 0 #064e3b";
-              }}
-              onMouseUp={(e) => {
-                e.currentTarget.style.transform = "translateY(-0.2vw)";
-                e.currentTarget.style.boxShadow = "0 1vw 0 #064e3b";
-              }}
-            >
-              <ArrowBigRightDash size='3.3vw' />
+          <div className={styles.nextBtnContainer}>
+            <button onClick={handleNext} className={styles.nextBtn}>
+              <ArrowBigRightDash size="3.3vw" />
             </button>
           </div>
         </div>
       </div>
-
-      {/* Animations */}
-      <style>{`
-      `}</style>
     </>
   );
 };

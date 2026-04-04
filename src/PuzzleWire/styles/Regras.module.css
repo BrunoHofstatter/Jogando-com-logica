@@ -1,0 +1,524 @@
+.regrasPage {
+  font-family: "Cherry Bomb One", system-ui;
+  font-weight: 200;
+  font-style: normal;
+  display: flex;
+  max-height: 100dvh;
+  overflow: hidden;
+  padding: 0vw;
+  min-height: 100dvh;
+  width: 100vw;
+  justify-content: center;
+  align-items: center;
+  background-color: #ffbaba;
+}
+
+.boxRegras {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0vw;
+  width: 47%;
+  border-radius: 3.3vw;
+}
+
+.gameTitle {
+  font-size: clamp(3vw, 9dvh, 4.8vw);
+  color: #ffcf40;
+  -webkit-text-stroke: 0.3vw #b4111e;
+  margin-bottom: 4dvh;
+  text-shadow: 0 0.4vw 0 #da9500;
+}
+
+.preview {
+  height: clamp(20vw, 50dvh, 28vw);
+  transition: all 0.5s ease;
+  animation: pulsePreview 5s infinite;
+  border-radius: 2vw;
+  padding: 0.5vw 1vw 0.5vw 0.5vw;
+  border: 0.4vw solid #e31f2f;
+  box-shadow: 0 0.6vw 0 #a11425;
+}
+
+@keyframes pulsePreview {
+  0% {
+    transform: scale(0.96);
+  }
+
+  50% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(0.96);
+  }
+}
+
+.botoes {
+  gap: 0vw;
+  width: 47%;
+  padding: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  position: relative;
+}
+
+.button {
+  border: 0.4vw solid #630000;
+  background-color: #e31f2f;
+  border-radius: 4vw;
+  box-sizing: border-box;
+  color: #ffcf40;
+  -webkit-text-stroke: 0.3vw #630000;
+  font-size: clamp(8.5vw, 20dvh, 11vw);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0.3vw 2.5vw 2vw 2.5vw;
+  line-height: 1;
+  box-shadow: 0 1vw 0 #a11425;
+  cursor: pointer;
+  margin-bottom: 3.5vw;
+  transition: all 0.1s ease;
+}
+
+.button:hover {
+  background-color: #f5293a;
+  transform: translateY(-0.2vw);
+  box-shadow: 0 1.2vw 0 #a11425;
+}
+
+.button:active {
+  transform: translateY(0.8vw);
+  box-shadow: 0 0.2vw 0 #a11425;
+}
+
+.tutorialButton {
+  position: absolute;
+  bottom: 4.2dvh;
+  left: 3vw;
+  border: 0.3vw solid #a11425;
+  background-color: #e31f2f;
+  border-radius: 1.7vw;
+  padding: 0.1vw 1vw 0.5vw 1vw;
+  color: #ffcf40;
+  -webkit-text-stroke: 0.15vw #a11425;
+  font-size: clamp(1.5vw, 5dvh, 2.7vw);
+  font-family: "Cherry Bomb One", system-ui;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  z-index: 10;
+  box-shadow: 0 0.4vw 0 #a11425;
+}
+
+.tutorialButton:hover {
+  background-color: #f5293a;
+  transform: translateY(-0.1vw);
+  box-shadow: 0 0.5vw 0 #a11425;
+}
+
+.tutorialButton:active {
+  transform: translateY(0.3vw);
+  box-shadow: 0 0.1vw 0 #a11425;
+}
+
+.detailedRulesButton {
+  position: absolute;
+  bottom: 4.2dvh;
+  right: 3vw;
+  border: 0.3vw solid #a11425;
+  background-color: #e31f2f;
+  border-radius: 1.7vw;
+  padding: 0.1vw 1vw 0.5vw 1vw;
+  color: #ffcf40;
+  -webkit-text-stroke: 0.15vw #a11425;
+  font-size: clamp(1.5vw, 5dvh, 2.7vw);
+  font-family: "Cherry Bomb One", system-ui;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  z-index: 10;
+  box-shadow: 0 0.4vw 0 #a11425;
+}
+
+.detailedRulesButton:hover {
+  background-color: #f5293a;
+  transform: translateY(-0.2vw);
+  box-shadow: 0 0.8vw 0 #a11425;
+}
+
+.detailedRulesButton:active {
+  transform: translateY(0.4vw);
+  box-shadow: 0 0.2vw 0 #a11425;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(69, 10, 10, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background-color: #ffbaba;
+  border: 0.4vw solid #a11425;
+  border-radius: 3vw;
+  padding: 2.5vw 3.5vw;
+  margin: 5dvh auto 0;
+  max-width: 80%;
+  max-height: 85dvh;
+  overflow-y: auto;
+  color: #630000;
+  font-size: 1.8vw;
+  position: relative;
+  box-shadow: 0 1.2vw 0 #630000;
+}
+
+.modalContent::-webkit-scrollbar {
+  width: 0.8vw;
+}
+
+.modalContent::-webkit-scrollbar-track {
+  background: #ffbaba;
+  border-radius: 1vw;
+}
+
+.modalContent::-webkit-scrollbar-thumb {
+  background: #e31f2f;
+  border-radius: 1vw;
+  border: 0.2vw solid #630000;
+}
+
+.closeButton {
+  border-radius: 50%;
+  padding: 0 0 0.2vw 0;
+  background-color: #e31f2f;
+  border: 0.3vw solid #630000;
+  width: 4vw;
+  height: 4vw;
+  color: #ffcf40;
+  -webkit-text-stroke: 0.15vw #630000;
+  font-size: 2.2vw;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  box-shadow: 0 0.4vw 0 #a11425;
+  position: sticky;
+  float: right;
+  margin-top: -1vw;
+  margin-right: -1.5vw;
+  top: -1vw;
+  right: -1.5vw;
+  transition: all 0.1s ease;
+}
+
+.closeButton:hover {
+  background-color: #f5293a;
+  transform: translateY(-0.1vw);
+  box-shadow: 0 0.5vw 0 #a11425;
+}
+
+.closeButton:active {
+  transform: translateY(0.3vw);
+  box-shadow: 0 0.1vw 0 #a11425;
+}
+
+.detailedRules {
+  max-height: 100%;
+  overflow-y: visible;
+}
+
+.detailedRules h3 {
+  color: #ffcf40;
+  -webkit-text-stroke: 0.15vw #a11425;
+  font-size: 2.8vw;
+  margin-bottom: 1.5vw;
+  margin-top: 2vw;
+  text-shadow: 0 0.2vw 0 #da9500;
+}
+
+.detailedRules p {
+  font-size: 2vw;
+  margin-bottom: 1.5vw;
+  color: #ffffff;
+  -webkit-text-stroke: 0.12vw #a11425;
+  font-family: "Cherry Bomb One", system-ui;
+  font-weight: 200;
+  line-height: 1.5;
+}
+
+.detailedRules h2 {
+  font-size: 4vw;
+  color: #ffcf40;
+  -webkit-text-stroke: 0.2vw #a11425;
+  text-shadow: 0 0.3vw 0 #da9500;
+  text-align: center;
+  margin-bottom: 2.5vw;
+}
+
+.mode-select-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2vw;
+  font-size: 2.2vw;
+  -webkit-text-stroke: 0.15vw #a11425;
+  color: #ffcf40;
+  margin-bottom: 5vw;
+  width: 100%;
+  align-items: center;
+}
+
+.mode-select-rules label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5vw;
+  background-color: #e31f2f;
+  border: 0.3vw solid #a11425;
+  border-radius: 2vw;
+  padding: 0.8vw 2vw;
+  cursor: pointer;
+  transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  color: #ffcf40;
+  box-shadow: 0 0.5vw 0 #a11425;
+  width: 60%;
+}
+
+.mode-select-rules label:hover {
+  background-color: #f5293a;
+  transform: translateY(-0.2vw);
+  box-shadow: 0 0.7vw 0 #a11425;
+}
+
+.mode-select-rules label:active {
+  transform: translateY(0.3vw);
+  box-shadow: 0 0.2vw 0 #a11425;
+}
+
+.mode-select-rules input[type="radio"] {
+  width: 1.5vw;
+  height: 1.5vw;
+  accent-color: #ffcf40;
+}
+
+.levelsRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+}
+
+.levelsButton {
+  margin-left: 0vw;
+  font-family: "Cherry Bomb One", system-ui;
+  font-size: 1.5vw;
+  padding: 0.5vw 1vw;
+  border-radius: 1vw;
+  border: 0.25vw solid #a11425;
+  background-color: #ffcf40;
+  color: #fd6a76;
+  -webkit-text-stroke: 0.15vw #930d1c;
+  cursor: pointer;
+  transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  height: fit-content;
+  position: absolute;
+  left: 85%;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0.4vw 0 #da9500;
+}
+
+.levelsButton:hover {
+  background-color: #ffd859;
+  transform: translateY(-0.1vw);
+  box-shadow: 0 0.5vw 0 #da9500;
+}
+
+.levelsButton:active {
+  transform: translateY(0.3vw);
+  box-shadow: 0 0.1vw 0 #da9500;
+}
+
+@media (orientation: portrait) and (max-width: 650px) {
+  .regrasPage {
+    height: 100dvh;
+    width: 100vw;
+    box-sizing: border-box;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .boxRegras {
+    height: 45dvh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 0;
+  }
+
+  .gameTitle {
+    font-size: min(15vw, 7.5dvh);
+    margin-bottom: min(3vw, 2dvh);
+    padding-top: 4vw;
+    -webkit-text-stroke-width: min(0.8vw, 0.4dvh);
+    padding-left: 2vw;
+    padding-right: 2vw;
+    width: min-content;
+    line-height: 7dvh;
+  }
+
+  .preview {
+    height: min(60vw, 28dvh);
+    width: auto;
+    object-fit: contain;
+  }
+
+  .botoes {
+    height: 55dvh;
+    min-height: auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    padding: 0;
+  }
+
+  .mode-select-rules {
+    width: 90%;
+    margin-bottom: 0;
+    gap: min(3vw, 1dvh);
+  }
+
+  .mode-select-rules label {
+    width: 73%;
+    padding: min(2vw, 1.5dvh);
+    height: min(15vw, 7dvh);
+    border-radius: min(5vw, 2dvh);
+    border-width: min(0.8vw, 1.5dvh);
+    font-size: min(7vw, 3.5dvh);
+    box-shadow: 0 1vw 0 #a11425;
+    margin-bottom: 0;
+    -webkit-text-stroke-width: min(0.5vw, 0.25dvh);
+    padding-bottom: min(2.5vw, 10dvh);
+  }
+
+  .mode-select-rules input[type="radio"] {
+    width: min(4.5vw, 2.5dvh);
+    height: min(4.5vw, 2.5dvh);
+    margin-right: 1vw;
+  }
+
+  .levelsButton {
+    left: 80%;
+    bottom: 50%;
+    width: min(22vw, 12dvh);
+    height: min(10vw, 5.2dvh);
+    border-width: min(0.4vw, 1.5dvh);
+    border-radius: min(3vw, 1.5dvh);
+    padding: min(2vw, 1.5dvh);
+    font-size: min(4.5vw, 2.3dvh);
+    -webkit-text-stroke-width: min(0.3vw, 0.17dvh);
+  }
+
+  .button {
+    width: 80%;
+    height: min(22vw, 12dvh);
+    border-radius: min(8vw, 5dvh);
+    border-width: min(1vw, 1.5dvh);
+    font-size: min(15vw, 10dvh);
+    box-shadow: 0 1.5vw 0 #a11425;
+    margin-bottom: 0;
+    -webkit-text-stroke-width: min(0.7vw, 0.5dvh);
+    padding-bottom: min(2.5vw, 10dvh);
+  }
+
+  .bottomAuxButtons {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: min(4vw, 2dvh);
+    box-sizing: border-box;
+  }
+
+  .tutorialButton,
+  .detailedRulesButton {
+    width: 30%;
+    bottom: min(6vw, 2dvh);
+    height: min(10vw, 5dvh);
+    border-radius: min(3vw, 2dvh);
+    border-width: min(0.6vw, 1.5dvh);
+    font-size: min(6vw, 2.7dvh);
+    box-shadow: 0 1vw 0 #a11425;
+    margin-bottom: 0;
+    -webkit-text-stroke-width: min(0.4vw, 0.2dvh);
+  }
+
+  .modalContent {
+    width: 95vw;
+    max-width: 95vw;
+    height: 90dvh;
+    max-height: 95dvh;
+    padding: min(4vw, 2dvh);
+    padding-bottom: 10vw;
+    margin: 7dvh auto 0;
+    border-radius: min(5vw, 3dvh);
+    border-width: min(0.6vw, 0.3dvh);
+  }
+
+  .closeButton {
+    width: min(8vw, 5dvh);
+    height: min(8vw, 5dvh);
+    font-size: min(5vw, 3dvh);
+    border-width: min(0.4vw, 0.2dvh);
+    margin-top: min(-2vw, -1dvh);
+    margin-right: min(-2vw, -1dvh);
+  }
+
+  .detailedRules {
+    max-height: 80dvh;
+  }
+
+  .detailedRules h2 {
+    font-size: min(8vw, 5dvh);
+    margin-bottom: min(4vw, 2dvh);
+    -webkit-text-stroke-width: min(0.4vw, 0.2dvh);
+  }
+
+  .detailedRules h3 {
+    font-size: min(6vw, 3.3dvh);
+    margin-top: min(4vw, 2dvh);
+    margin-bottom: min(3vw, 1.5dvh);
+    -webkit-text-stroke-width: min(0.3vw, 0.15dvh);
+  }
+
+  .detailedRules p {
+    font-size: min(5vw, 2.7dvh);
+    margin-bottom: min(3vw, 1.5dvh);
+    -webkit-text-stroke-width: min(0.37vw, 0.19dvh);
+    line-height: 1.4;
+  }
+}

@@ -316,31 +316,7 @@
   font-size: 1em;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .big-board {
-    width: 90vw;
-    height: 90vw;
-  }
-
-  .symbol {
-    font-size: 6vw;
-  }
-
-  .board-winner .symbol {
-    font-size: 15vw;
-  }
-
-  .jogo-SPTTT h1 {
-    font-size: 6vw;
-  }
-
-  .mode-select {
-    flex-direction: column;
-    align-items: center;
-    font-size: 2.5vw;
-  }
-}
+/* Responsive adjustments — see mobile block at end of file */
 
 .Xstack {
   position: relative;
@@ -474,13 +450,6 @@
   box-shadow: 0 0.1vw 0 #0284c7 !important;
 }
 
-/* Mobile responsive adjustments */
-@media (max-width: 768px) {
-  .scoreDisplay {
-    font-size: 4vw;
-    padding: 1.5vw 2.5vw;
-  }
-}
 
 .previewPiece {
   opacity: 0.4;
@@ -551,14 +520,6 @@
   z-index: 10;
 }
 
-/* Mobile responsive adjustments */
-@media (max-width: 768px) {
-  .small-board.previewNext::after {
-    top: -4vw;
-    font-size: 2vw;
-    padding: 0.5vw 1.5vw;
-  }
-}
 
 .casa.playableCell:hover:not(:disabled)::after {
   position: absolute;
@@ -571,14 +532,6 @@
   font-weight: bold;
 }
 
-/* For mobile */
-@media (max-width: 768px) {
-  .casa.playableCell:hover:not(:disabled)::after {
-    font-size: 2.5vw;
-    bottom: 1vw;
-    right: 1vw;
-  }
-}
 
 .winningBoard {
   animation: winBoardPulse 0.8s ease-in-out;
@@ -598,5 +551,241 @@
 
   100% {
     transform: scale(1.1);
+  }
+}
+
+/* =============================================
+   MOBILE — max-width: 650px
+   All measurements redefined for portrait phones
+   ============================================= */
+@media (max-width: 650px) {
+  /* Main container: vertical stack */
+  .jogo-SPTTT {
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 3vw 2vw 2vw 2vw;
+    min-height: 100dvh;
+    -webkit-text-stroke: 0.3vw #000000;
+  }
+
+  .jogo-SPTTT h1 {
+    font-size: 7vw;
+    -webkit-text-stroke: 0.5vw #0c4a6e;
+    text-shadow: 0 0.8vw 0 #075985;
+    margin: 1.5vw 0;
+  }
+
+  /* Stats panel: horizontal wrap to save vertical space */
+  .statWrap {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 2vw;
+    width: 100%;
+    margin-bottom: 2vw;
+  }
+
+  /* Turn indicator */
+  .turn-indicator {
+    font-size: 4.5vw;
+    gap: 2vw;
+    margin: 0;
+    padding: 2vw 3vw;
+    border: 0.5vw solid #0c4a6e;
+    border-radius: 2.5vw;
+    box-shadow: 0 1.2vw 0 #075985;
+    -webkit-text-stroke: 0.3vw #0c4a6e;
+  }
+
+  .current-player-symbol {
+    font-size: 4vw;
+    width: 9vw;
+    transform: scale(1.5);
+  }
+
+  /* Difficulty indicator */
+  .difficulty-indicator {
+    font-size: 3.5vw;
+    gap: 1.5vw;
+    margin: 0;
+    padding: 2vw 3vw;
+    border: 0.4vw solid #0c4a6e;
+    border-radius: 2vw;
+    box-shadow: 0 0.8vw 0 #075985;
+    -webkit-text-stroke: 0.25vw #0c4a6e;
+  }
+
+  /* Score display */
+  .scoreDisplayWrap {
+    margin: 0;
+    padding: 0.5vw 0;
+    gap: 0;
+  }
+
+  .scoreDisplay {
+    font-size: 4vw;
+    gap: 2vw;
+    padding: 2vw 3vw;
+    border: 0.5vw solid #0c4a6e;
+    border-radius: 2.5vw;
+    box-shadow: 0 1.2vw 0 #075985;
+    margin: 0;
+    -webkit-text-stroke: 0.3vw #0c4a6e;
+  }
+
+  .score {
+    margin: 0 1.5vw;
+    transform: scale(1.2);
+    gap: 1vw;
+  }
+
+  .scoreSeparator {
+    transform: scale(1.2);
+    margin: 0 0.5vw;
+  }
+
+  /* Board wrapper */
+  .board-wrap {
+    flex-grow: 0;
+    width: 100%;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+  }
+
+  /* Big board: square, capped at 55dvh to leave room for stats above */
+  .big-board {
+    width: min(95vw, 55dvh);
+    height: min(95vw, 55dvh);
+    gap: 1.5vw;
+    padding: 1.5vw;
+    border: 0.8vw solid #0c4a6e;
+    border-radius: 3vw;
+    box-shadow: 0 1.5vw 0 #082f49;
+  }
+
+  /* Small boards */
+  .small-board {
+    gap: 0.6vw;
+    padding: 0.8vw;
+    border: 0.5vw solid #0c4a6e;
+    border-radius: 1.5vw;
+  }
+
+  .small-board.playable:hover {
+    transform: translateY(-1.5vw) scale(1.03);
+    box-shadow: 0 2vw 0 #0c4a6e, 0 0 5vw #38bdf8;
+  }
+
+  .small-board.playableStatic {
+    transform: translateY(-1vw) scale(1.02);
+    box-shadow: 0 1.5vw 0 #0c4a6e, 0 0 3vw #38bdf8;
+  }
+
+  .small-board.playableStatic:hover {
+    transform: translateY(-1.5vw) scale(1.03);
+    box-shadow: 0 2vw 0 #0c4a6e, 0 0 5vw #38bdf8;
+  }
+
+  .small-board.won .casa {
+    transform: translateY(0.5vw);
+  }
+
+  .small-board.tied .casa {
+    transform: translateY(0.5vw);
+  }
+
+  /* Individual cells */
+  .casa {
+    border: 0.4vw solid #0c4a6e;
+    border-radius: 1vw;
+    box-shadow: 0 0.5vw 0 #0284c7;
+  }
+
+  .casa.playableCell:hover:not(:disabled) {
+    transform: translateY(-0.4vw);
+    box-shadow: 0 0.8vw 0 #0284c7;
+    border-color: #0ea5e9;
+  }
+
+  .casa.playableCell:active:not(:disabled) {
+    transform: translateY(0.3vw);
+    box-shadow: 0 0.15vw 0 #0284c7;
+  }
+
+  .casa:disabled {
+    box-shadow: 0 0.15vw 0 #0284c7;
+    transform: translateY(0.3vw);
+  }
+
+  .tappedCell {
+    background-color: #bae6fd !important;
+    transform: translateY(0.3vw) !important;
+    box-shadow: 0 0.15vw 0 #0284c7 !important;
+  }
+
+  /* Board winner overlay */
+  .board-winner {
+    border-radius: 1.5vw;
+  }
+
+  .board-winner .symbol {
+    font-size: 15vw;
+    transform: scale(2);
+    filter: drop-shadow(0 0.4vw 0 #082f49);
+  }
+
+  /* Piece symbols */
+  .symbol {
+    font-size: 6vw;
+  }
+
+  /* Preview next board tooltip */
+  .small-board.previewNext::after {
+    top: -5vw;
+    font-size: 2.5vw;
+    padding: 0.5vw 1.5vw;
+    border: 0.3vw solid #ca8a04;
+    box-shadow: 0 0.5vw 0 #854d0e;
+    border-radius: 0.8vw;
+  }
+
+  /* Cell hover indicator */
+  .casa.playableCell:hover:not(:disabled)::after {
+    font-size: 2.5vw;
+    bottom: 1vw;
+    right: 1vw;
+  }
+
+  /* Winning board */
+  .winningBoard {
+    transform: scale(1.08);
+  }
+
+  /* Mode select */
+  .mode-select {
+    flex-direction: column;
+    align-items: center;
+    font-size: 3vw;
+    gap: 1.5vw;
+    margin: 1vw 0;
+  }
+
+  .mode-select label {
+    font-size: 3vw;
+    padding: 1vw 2vw;
+    border: 0.5vw solid #0c4a6e;
+    border-radius: 1.5vw;
+    box-shadow: 0 0.8vw 0 #075985;
+    gap: 1.5vw;
+  }
+
+  .mode-select input[type="radio"] {
+    width: 3vw;
+    height: 3vw;
   }
 }

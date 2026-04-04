@@ -1,6 +1,7 @@
 import Tabuleiro from "../componentes/tabuleiro";
 import Girar from "../componentes/sorteio";
-import DynamicTutorial, { TutorialStep } from '../componentes/DynamicTutorial';
+import DynamicTutorial, { TutorialStep } from '../../Shared/Components/DynamicTutorial';
+import tutorialStyles from '../styles/DynamicTutorial.module.css';
 import GameButton from "../componentes/GameButton";
 import { useEffect, useState, useCallback } from "react";
 import styles from "../styles/design.module.css";
@@ -31,27 +32,9 @@ function Caca_soma() {
       highlight: true,
       placement: 'auto',
       title: 'Número Mágico',
-      body: <div style={{
-        fontSize: '2vw',
-        color: '#ffffff',
-        marginBottom: '24px',
-        lineHeight: 1.5,
-        WebkitTextStroke: '0.15vw #7f0000',
-        textShadow: '0 0.2vw 0 #5c0000',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '1vw'
-      }}>
-        <span>- O <span style={{
-          color: '#ffcf40',
-          WebkitTextStroke: '0.15vw #b28900',
-          fontSize: '2.3vw',
-        }}>Número Mágico</span> vai ser sorteado</span>
-        <span>- Clique em <span style={{
-          color: '#ffcf40',
-          WebkitTextStroke: '0.15vw #b28900',
-          fontSize: '2.3vw',
-        }}>Começar</span> para iniciar o jogo </span>
+      body: <div className={tutorialStyles.stepBody}>
+        <span>- O <span className={tutorialStyles.highlight}>Número Mágico</span> vai ser sorteado</span>
+        <span>- Clique em <span className={tutorialStyles.highlight}>Começar</span> para iniciar o jogo</span>
       </div>
     },
     {
@@ -60,40 +43,10 @@ function Caca_soma() {
       highlight: true,
       placement: 'auto',
       title: 'Tabuleiro',
-      body: <div style={{
-        fontSize: '2vw',
-        color: '#ffffff',
-        marginBottom: '24px',
-        lineHeight: 1.5,
-        WebkitTextStroke: '0.15vw #7f0000',
-        textShadow: '0 0.2vw 0 #5c0000',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '1vw'
-      }}>
-        <span>- <span style={{
-          color: '#ffcf40',
-          WebkitTextStroke: '0.15vw #b28900',
-          fontSize: '2.3vw',
-        }}>Monte</span> o Número Mágico com <span style={{
-          color: '#ffcf40',
-          WebkitTextStroke: '0.15vw #b28900',
-          fontSize: '2.3vw',
-        }}>2 ou 3</span> números. </span>
-        <span>- A <span style={{
-          color: '#ffcf40',
-          WebkitTextStroke: '0.15vw #b28900',
-          fontSize: '2.3vw',
-        }}>soma</span> desses números tem que ser <span style={{
-          color: '#ffcf40',
-          WebkitTextStroke: '0.15vw #b28900',
-          fontSize: '2.3vw',
-        }}>igual</span> ao Número Mágico</span>
-        <span>- Clique <span style={{
-          color: '#ffcf40',
-          WebkitTextStroke: '0.15vw #b28900',
-          fontSize: '2.3vw',
-        }}>Fora do Tabuleiro</span> quando terminar</span>
+      body: <div className={tutorialStyles.stepBody}>
+        <span>- <span className={tutorialStyles.highlight}>Monte</span> o Número Mágico com <span className={tutorialStyles.highlight}>2 ou 3</span> números.</span>
+        <span>- A <span className={tutorialStyles.highlight}>soma</span> desses números tem que ser <span className={tutorialStyles.highlight}>igual</span> ao Número Mágico</span>
+        <span>- Clique <span className={tutorialStyles.highlight}>Fora do Tabuleiro</span> quando terminar</span>
       </div>
     },
     {
@@ -102,36 +55,10 @@ function Caca_soma() {
       highlight: true,
       placement: 'auto',
       title: 'Placar',
-      body: <div style={{
-        fontSize: '2vw',
-        color: '#ffffff',
-        marginBottom: '24px',
-        lineHeight: 1.5,
-        WebkitTextStroke: '0.15vw #7f0000',
-        textShadow: '0 0.2vw 0 #5c0000',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '1vw'
-      }}>
-        <span>- Veja quanto <span style={{
-          color: '#ffcf40',
-          WebkitTextStroke: '0.15vw #b28900',
-          fontSize: '2.3vw',
-        }}>tempo</span> o jogador levou </span>
-        <span>- Depois que os dois jogadores jogarem, quem acertar com menos tempo ganha <span style={{
-          color: '#ffcf40',
-          WebkitTextStroke: '0.15vw #b28900',
-          fontSize: '2.3vw',
-        }}>1 ponto</span> </span>
-        <span>- Quem fizer <span style={{
-          color: '#ffcf40',
-          WebkitTextStroke: '0.15vw #b28900',
-          fontSize: '2.3vw',
-        }}>5 pontos</span> primeiro <span style={{
-          color: '#ffcf40',
-          WebkitTextStroke: '0.15vw #b28900',
-          fontSize: '2.3vw',
-        }}>ganha</span> o jogo </span>
+      body: <div className={tutorialStyles.stepBody}>
+        <span>- Veja quanto <span className={tutorialStyles.highlight}>tempo</span> o jogador levou</span>
+        <span>- Depois que os dois jogadores jogarem, quem acertar com menos tempo ganha <span className={tutorialStyles.highlight}>1 ponto</span></span>
+        <span>- Quem fizer <span className={tutorialStyles.highlight}>5 pontos</span> primeiro <span className={tutorialStyles.highlight}>ganha</span> o jogo</span>
       </div>
     }
   ];
@@ -368,6 +295,7 @@ function Caca_soma() {
           onFinish={() => setShowTutorial(false)}
           storageKey="cacasoma_v1"
           locale="pt"
+          styles={tutorialStyles}
         />
       )}
     </div>

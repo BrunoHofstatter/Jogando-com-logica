@@ -4,7 +4,8 @@ import NumberReveal from "../Components/NumberReveal";
 import GameBoard from "../Components/GameBoard";
 import DynamicTutorial, {
   TutorialStep,
-} from "../Components/DynamicTutorial";
+} from "../../Shared/Components/DynamicTutorial";
+import tutorialStyles from "../styles/DynamicTutorial.module.css";
 import { getRandomDifficultyKey, type DifficultyKey } from "../Logic/gameConfig";
 import { getLevelById, type LevelConfig } from "../Logic/levelsConfig";
 import styles from "../styles/StopGame.module.css";
@@ -84,42 +85,9 @@ function StopGamePage() {
       placement: "auto",
       title: "Número Mágico",
       body: (
-        <div
-          style={{
-            fontSize: "2vw",
-            color: "#ffcf40",
-            WebkitTextStroke: "0.15vw #a11425",
-            marginBottom: "24px",
-            lineHeight: 1.5,
-            display: "flex",
-            flexDirection: "column",
-            gap: "1vw",
-          }}
-        >
-          <span>
-            - O{" "}
-            <span
-              style={{
-                color: "#e31f2f",
-                fontSize: "2.2vw",
-              }}
-            >
-              Número Mágico{" "}
-            </span>
-            é sorteado
-          </span>
-          <span>
-            - Preste{" "}
-            <span
-              style={{
-                color: "#e31f2f",
-                fontSize: "2.2vw",
-              }}
-            >
-              atenção{" "}
-            </span>
-            nesse número{" "}
-          </span>
+        <div className={tutorialStyles.stepBody}>
+          <span>- O <span className={tutorialStyles.highlight}>Número Mágico </span>é sorteado</span>
+          <span>- Preste <span className={tutorialStyles.highlight}>atenção </span>nesse número</span>
         </div>
       ),
     },
@@ -130,41 +98,9 @@ function StopGamePage() {
       placement: "auto",
       title: "Cáculos",
       body: (
-        <div
-          style={{
-            fontSize: "2vw",
-            color: "#ffcf40",
-            WebkitTextStroke: "0.15vw #a11425",
-            marginBottom: "24px",
-            lineHeight: 1.5,
-            display: "flex",
-            flexDirection: "column",
-            gap: "1vw",
-          }}
-        >
-          <span>
-            - Use o Número mágico para fazer os{" "}
-            <span
-              style={{
-                color: "#e31f2f",
-                fontSize: "2.2vw",
-              }}
-            >
-              cálculos{" "}
-            </span>
-          </span>
-          <span>
-            - Cada cálculo usa o{" "}
-            <span
-              style={{
-                color: "#e31f2f",
-                fontSize: "2.2vw",
-              }}
-            >
-              mesmo{" "}
-            </span>
-            Número Mágico{" "}
-          </span>
+        <div className={tutorialStyles.stepBody}>
+          <span>- Use o Número mágico para fazer os <span className={tutorialStyles.highlight}>cálculos </span></span>
+          <span>- Cada cálculo usa o <span className={tutorialStyles.highlight}>mesmo </span>Número Mágico</span>
         </div>
       ),
     },
@@ -175,59 +111,9 @@ function StopGamePage() {
       placement: "auto",
       title: "O Botão STOP",
       body: (
-        <div
-          style={{
-            fontSize: "2vw",
-            color: "#ffcf40",
-            WebkitTextStroke: "0.15vw #a11425",
-            marginBottom: "24px",
-            lineHeight: 1.5,
-            display: "flex",
-            flexDirection: "column",
-            gap: "1vw",
-          }}
-        >
-          <span>
-            - Quando{" "}
-            <span
-              style={{
-                color: "#e31f2f",
-                fontSize: "2.2vw",
-              }}
-            >
-              terminar{" "}
-            </span>
-            os cálculos, clique em{" "}
-            <span
-              style={{
-                color: "#e31f2f",
-                fontSize: "2.2vw",
-              }}
-            >
-              STOP{" "}
-            </span>
-          </span>
-          <span>
-            - E veja sua{" "}
-            <span
-              style={{
-                color: "#e31f2f",
-                fontSize: "2.2vw",
-              }}
-            >
-              pontuação{" "}
-            </span>
-            e{" "}
-            <span
-              style={{
-                color: "#e31f2f",
-                fontSize: "2.2vw",
-              }}
-            >
-              tempo{" "}
-            </span>
-            de jogo
-          </span>
+        <div className={tutorialStyles.stepBody}>
+          <span>- Quando <span className={tutorialStyles.highlight}>terminar </span>os cálculos, clique em <span className={tutorialStyles.highlight}>STOP </span></span>
+          <span>- E veja sua <span className={tutorialStyles.highlight}>pontuação </span>e <span className={tutorialStyles.highlight}>tempo </span>de jogo</span>
         </div>
       ),
     },
@@ -295,6 +181,7 @@ function StopGamePage() {
           }}
           storageKey="stop_v1"
           locale="pt"
+          styles={tutorialStyles}
         />
       )}
     </div>
