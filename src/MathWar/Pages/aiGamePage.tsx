@@ -3,7 +3,8 @@ import { gameConfig } from "../Logic/gameConfig";
 import { gameRules } from "../Logic/gameRules";
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from "react-router-dom";
-import DynamicTutorial, { TutorialStep } from "../Components/DynamicTutorial";
+import DynamicTutorial, { TutorialStep } from "../../Shared/Components/DynamicTutorial";
+import tutorialStyles from "../styles/DynamicTutorial.module.css";
 import { GameEngine } from "../Logic/gameEngine";
 import { GameState } from "../Logic/types";
 import { getAIMove } from "../Logic/aiPlayer";
@@ -140,24 +141,9 @@ export default function MathWarAIPage() {
       highlight: true,
       placement: 'auto',
       title: 'O Capitão',
-      body: <div style={{
-        fontSize: '2vw',
-        color: '#f3f4f6',
-        marginBottom: '24px',
-        lineHeight: 1.5,
-        WebkitTextStroke: '0.15vw #414549ff',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '1vw'
-      }}>
-        <span>- Pode ser <span style={{
-          color: '#3da2e6ff',
-          fontSize: '2.3vw',
-        }}>qualquer </span> peça </span>
-        <span>- Se ele for capturado, o jogo <span style={{
-          color: '#3da2e6ff',
-          fontSize: '2.3vw',
-        }}>acaba </span> </span>
+      body: <div className={tutorialStyles.stepBody}>
+        <span>- Pode ser <span className={tutorialStyles.highlight}>qualquer </span> peça </span>
+        <span>- Se ele for capturado, o jogo <span className={tutorialStyles.highlight}>acaba </span> </span>
       </div>
     },
     {
@@ -166,24 +152,9 @@ export default function MathWarAIPage() {
       highlight: true,
       placement: 'auto',
       title: 'A Soma Redonda',
-      body: <div style={{
-        fontSize: '2vw',
-        color: '#f3f4f6',
-        marginBottom: '24px',
-        lineHeight: 1.5,
-        WebkitTextStroke: '0.15vw #414549ff',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '1vw'
-      }}>
-        <span>- Se move somente em <span style={{
-          color: '#3da2e6ff',
-          fontSize: '2.3vw',
-        }}>linha reta </span> </span>
-        <span>- O número na peça é seu <span style={{
-          color: '#3da2e6ff',
-          fontSize: '2.3vw',
-        }}>valor </span> </span>
+      body: <div className={tutorialStyles.stepBody}>
+        <span>- Se move somente em <span className={tutorialStyles.highlight}>linha reta </span> </span>
+        <span>- O número na peça é seu <span className={tutorialStyles.highlight}>valor </span> </span>
       </div>
     },
     {
@@ -192,24 +163,9 @@ export default function MathWarAIPage() {
       highlight: true,
       placement: 'auto',
       title: 'A Soma Quadrada ',
-      body: <div style={{
-        fontSize: '2vw',
-        color: '#f3f4f6',
-        marginBottom: '24px',
-        lineHeight: 1.5,
-        WebkitTextStroke: '0.15vw #414549ff',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '1vw'
-      }}>
-        <span>- Se move somente em <span style={{
-          color: '#3da2e6ff',
-          fontSize: '2.3vw',
-        }}>diagonal </span> </span>
-        <span>- O número na peça é seu <span style={{
-          color: '#3da2e6ff',
-          fontSize: '2.3vw',
-        }}>valor </span> </span>
+      body: <div className={tutorialStyles.stepBody}>
+        <span>- Se move somente em <span className={tutorialStyles.highlight}>diagonal </span> </span>
+        <span>- O número na peça é seu <span className={tutorialStyles.highlight}>valor </span> </span>
       </div>
     },
     {
@@ -218,27 +174,9 @@ export default function MathWarAIPage() {
       highlight: true,
       placement: 'auto',
       title: 'Informações do Jogo',
-      body: <div style={{
-        fontSize: '2vw',
-        color: '#f3f4f6',
-        marginBottom: '24px',
-        lineHeight: 1.5,
-        WebkitTextStroke: '0.15vw #414549ff',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '1vw'
-      }}>
-        <span>- Toda rodada o <span style={{
-          color: '#3da2e6ff',
-          fontSize: '2.3vw',
-        }}>dado </span> gera um número de <span style={{
-          color: '#3da2e6ff',
-          fontSize: '2.3vw',
-        }}>2 a 10 </span>  </span>
-        <span>- O valor de cada peça + o dado = <span style={{
-          color: '#3da2e6ff',
-          fontSize: '2.3vw',
-        }}>energia </span> da peça </span>
+      body: <div className={tutorialStyles.stepBody}>
+        <span>- Toda rodada o <span className={tutorialStyles.highlight}>dado </span> gera um número de <span className={tutorialStyles.highlight}>2 a 10 </span>  </span>
+        <span>- O valor de cada peça + o dado = <span className={tutorialStyles.highlight}>energia </span> da peça </span>
       </div>
     },
     {
@@ -247,27 +185,9 @@ export default function MathWarAIPage() {
       highlight: true,
       placement: 'auto',
       title: 'Informações do Jogo',
-      body: <div style={{
-        fontSize: '2vw',
-        color: '#f3f4f6',
-        marginBottom: '24px',
-        lineHeight: 1.5,
-        WebkitTextStroke: '0.15vw #414549ff',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '1vw'
-      }}>
-        <span>- Para andar <span style={{
-          color: '#3da2e6ff',
-          fontSize: '2.3vw',
-        }}>1 </span> espaço gasta <span style={{
-          color: '#3da2e6ff',
-          fontSize: '2.3vw',
-        }}>2 </span> de energia  </span>
-        <span>- Para capturar uma peça gasta <span style={{
-          color: '#3da2e6ff',
-          fontSize: '2.3vw',
-        }}>mais 2 </span> de energia </span>
+      body: <div className={tutorialStyles.stepBody}>
+        <span>- Para andar <span className={tutorialStyles.highlight}>1 </span> espaço gasta <span className={tutorialStyles.highlight}>2 </span> de energia  </span>
+        <span>- Para capturar uma peça gasta <span className={tutorialStyles.highlight}>mais 2 </span> de energia </span>
       </div>
     },
   ];
@@ -291,6 +211,7 @@ export default function MathWarAIPage() {
         onFinish={() => setShowTutorial(false)}
         storageKey="mathwar_v1"
         locale="pt"
+        styles={tutorialStyles}
       />
     )}
 

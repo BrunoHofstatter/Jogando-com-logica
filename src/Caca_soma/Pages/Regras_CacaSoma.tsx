@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import styles from "../styles/regras.module.css";
 import { useNavigate } from "react-router-dom";
-import { useTutorialCompleted } from "../componentes/DynamicTutorial";
+import { useTutorialCompleted } from "../../Shared/Components/DynamicTutorial";
 
 import { levels } from "../Logic/levelConfigs";
 import { isLevelUnlocked, updateLevelProgress } from "../Logic/levelProgress";

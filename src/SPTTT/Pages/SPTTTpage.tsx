@@ -1,7 +1,8 @@
 import { useLocation } from "react-router-dom";
 import SPTTT from "../Components/SPTTT";
 import { useState, useEffect } from "react";
-import DynamicTutorial, { TutorialStep } from "../Components/DynamicTutorial";
+import DynamicTutorial, { TutorialStep } from "../../Shared/Components/DynamicTutorial";
+import tutorialStyles from "../Style/DynamicTutorial.module.css";
 
 export default function SPTTTPage() {
   const [showTutorial, setShowTutorial] = useState(false);
@@ -32,26 +33,14 @@ export default function SPTTTPage() {
       placement: "auto",
       title: "Jogador da Vez",
       body: (
-        <div
-          style={{
-            fontSize: "2vw",
-            color: "#bae6fd", // light blue base text
-            marginBottom: "1.5vw",
-            lineHeight: 1.5,
-            WebkitTextStroke: "0.15vw #0c4a6e", // dark blue stroke
-            textShadow: "0 0.2vw 0 #075985",
-            display: "flex",
-            flexDirection: "column",
-            gap: "1vw",
-          }}
-        >
+        <div className={tutorialStyles.stepBody}>
           <span>
             - Aqui mostra o jogador da{" "}
-            <span style={{ color: "#ffffff", fontSize: "2.3vw" }}>vez</span>
+            <span className={tutorialStyles.highlight}>vez</span>
           </span>
           <span>
             - Quem aparece aqui deve{" "}
-            <span style={{ color: "#ffffff", fontSize: "2.3vw" }}>jogar</span>
+            <span className={tutorialStyles.highlight}>jogar</span>
           </span>
         </div>
       ),
@@ -64,30 +53,14 @@ export default function SPTTTPage() {
       placement: "auto",
       title: "Tabuleiro Gigante",
       body: (
-        <div
-          style={{
-            fontSize: "2vw",
-            color: "#bae6fd",
-            marginBottom: "1.5vw",
-            lineHeight: 1.5,
-            WebkitTextStroke: "0.15vw #0c4a6e",
-            textShadow: "0 0.2vw 0 #075985",
-            display: "flex",
-            flexDirection: "column",
-            gap: "1vw",
-          }}
-        >
+        <div className={tutorialStyles.stepBody}>
           <span>
             - Este é o tabuleiro{" "}
-            <span style={{ color: "#ffffff", fontSize: "2.3vw" }}>
-              gigante
-            </span>
+            <span className={tutorialStyles.highlight}>gigante</span>
           </span>
           <span>
             - Ele tem 9 tabuleiros{" "}
-            <span style={{ color: "#ffffff", fontSize: "2.3vw" }}>
-              pequenos
-            </span>
+            <span className={tutorialStyles.highlight}>pequenos</span>
           </span>
         </div>
       ),
@@ -100,30 +73,14 @@ export default function SPTTTPage() {
       placement: "auto",
       title: "Tabuleiro Pequeno",
       body: (
-        <div
-          style={{
-            fontSize: "2vw",
-            color: "#bae6fd",
-            marginBottom: "1.5vw",
-            lineHeight: 1.5,
-            WebkitTextStroke: "0.15vw #0c4a6e",
-            textShadow: "0 0.2vw 0 #075985",
-            display: "flex",
-            flexDirection: "column",
-            gap: "1vw",
-          }}
-        >
+        <div className={tutorialStyles.stepBody}>
           <span>
             - Cada quadrado grande é um tabuleiro{" "}
-            <span style={{ color: "#ffffff", fontSize: "2.3vw" }}>
-              pequeno
-            </span>
+            <span className={tutorialStyles.highlight}>pequeno</span>
           </span>
           <span>
             - Vença ele para ganhar este{" "}
-            <span style={{ color: "#ffffff", fontSize: "2.3vw" }}>
-              quadrado
-            </span>
+            <span className={tutorialStyles.highlight}>quadrado</span>
           </span>
         </div>
       ),
@@ -136,27 +93,15 @@ export default function SPTTTPage() {
       placement: "auto",
       title: "Casa do Jogo",
       body: (
-        <div
-          style={{
-            fontSize: "2vw",
-            color: "#bae6fd",
-            marginBottom: "1.5vw",
-            lineHeight: 1.5,
-            WebkitTextStroke: "0.15vw #0c4a6e",
-            textShadow: "0 0.2vw 0 #075985",
-            display: "flex",
-            flexDirection: "column",
-            gap: "1vw",
-          }}
-        >
+        <div className={tutorialStyles.stepBody}>
           <span>
             - Aqui você coloca seu{" "}
-            <span style={{ color: "#ffffff", fontSize: "2.3vw" }}>X</span> ou{" "}
-            <span style={{ color: "#ffffff", fontSize: "2.3vw" }}>O</span>
+            <span className={tutorialStyles.highlight}>X</span> ou{" "}
+            <span className={tutorialStyles.highlight}>O</span>
           </span>
           <span>
             - Cada jogada ocupa uma{" "}
-            <span style={{ color: "#ffffff", fontSize: "2.3vw" }}>casa</span>
+            <span className={tutorialStyles.highlight}>casa</span>
           </span>
         </div>
       ),
@@ -171,28 +116,14 @@ export default function SPTTTPage() {
       secondaryTargets: ['[data-target="smallboard-2"]'],
 
       body: (
-        <div
-          style={{
-            fontSize: "2vw",
-            color: "#bae6fd",
-            marginBottom: "1.5vw",
-            lineHeight: 1.5,
-            WebkitTextStroke: "0.15vw #0c4a6e",
-            textShadow: "0 0.2vw 0 #075985",
-            display: "flex",
-            flexDirection: "column",
-            gap: "1vw",
-          }}
-        >
+        <div className={tutorialStyles.stepBody}>
           <span>
             - Onde você joga aqui manda o outro jogador para o mesmo{" "}
-            <span style={{ color: "#ffffff", fontSize: "2.3vw" }}>lugar</span>
+            <span className={tutorialStyles.highlight}>lugar</span>
           </span>
           <span>
             - A jogada escolhe o próximo tabuleiro{" "}
-            <span style={{ color: "#ffffff", fontSize: "2.3vw" }}>
-              pequeno
-            </span>
+            <span className={tutorialStyles.highlight}>pequeno</span>
           </span>
         </div>
       ),
@@ -209,28 +140,14 @@ export default function SPTTTPage() {
         '[data-target="smallboard-7"]',
       ],
       body: (
-        <div
-          style={{
-            fontSize: "2vw",
-            color: "#bae6fd",
-            marginBottom: "1.5vw",
-            lineHeight: 1.5,
-            WebkitTextStroke: "0.15vw #0c4a6e",
-            textShadow: "0 0.2vw 0 #075985",
-            display: "flex",
-            flexDirection: "column",
-            gap: "1vw",
-          }}
-        >
+        <div className={tutorialStyles.stepBody}>
           <span>
             - Ganhe 3 tabuleiros pequenos em{" "}
-            <span style={{ color: "#ffffff", fontSize: "2.3vw" }}>linha</span>
+            <span className={tutorialStyles.highlight}>linha</span>
           </span>
           <span>
             - Igual ao jogo da velha{" "}
-            <span style={{ color: "#ffffff", fontSize: "2.3vw" }}>
-              normal
-            </span>
+            <span className={tutorialStyles.highlight}>normal</span>
           </span>
         </div>
       ),
@@ -249,6 +166,7 @@ export default function SPTTTPage() {
           onFinish={() => setShowTutorial(false)}
           storageKey="spttt_v1"
           locale="pt"
+          styles={tutorialStyles}
         />
       )}
     </div>

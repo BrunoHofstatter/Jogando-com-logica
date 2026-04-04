@@ -33,6 +33,15 @@ import MathWarPage from "./MathWar/Pages/baseGamePage";
 import MathWarAIPage from "./MathWar/Pages/aiGamePage";
 import Manual from "./Main/Pages/manual";
 import LevelsMenuPage from "./Stop/Pages/LevelsMenuPage";
+import BombGameRulesPage from "./BombGame/Pages/RegrasPage";
+import BombGameLevelsMenuPage from "./BombGame/Pages/LevelsMenuPage";
+import BombGamePage from "./BombGame/Pages/BombGamePage";
+import PuzzleWireRulesPage from "./PuzzleWire/Pages/RegrasPage";
+import PuzzleWireLevelsMenuPage from "./PuzzleWire/Pages/LevelsMenuPage";
+import PuzzleWirePage from "./PuzzleWire/Pages/PuzzleWirePage";
+import HousesRulesPage from "./Houses/Pages/RegrasPage";
+import HousesLevelsMenuPage from "./Houses/Pages/LevelsMenuPage";
+import HousesPage from "./Houses/Pages/HousesPage";
 import { ROUTES } from "./routes";
 
 function trackGameTime() {
@@ -106,6 +115,15 @@ function App() {
         <Route path={ROUTES.STOP_RULES} element={<JogoStop />} />
         <Route path={ROUTES.STOP_GAME} element={<StopPage />} />
         <Route path={ROUTES.STOP_LEVELS} element={<LevelsMenuPage />} />
+        <Route path={ROUTES.BOMB_GAME_RULES} element={<BombGameRulesPage />} />
+        <Route path={ROUTES.BOMB_GAME_GAME} element={<BombGamePage />} />
+        <Route path={ROUTES.BOMB_GAME_LEVELS} element={<BombGameLevelsMenuPage />} />
+        <Route path={ROUTES.PUZZLE_WIRE_RULES} element={<PuzzleWireRulesPage />} />
+        <Route path={ROUTES.PUZZLE_WIRE_GAME} element={<PuzzleWirePage />} />
+        <Route path={ROUTES.PUZZLE_WIRE_LEVELS} element={<PuzzleWireLevelsMenuPage />} />
+        <Route path={ROUTES.HOUSES_RULES} element={<HousesRulesPage />} />
+        <Route path={ROUTES.HOUSES_GAME} element={<HousesPage />} />
+        <Route path={ROUTES.HOUSES_LEVELS} element={<HousesLevelsMenuPage />} />
         <Route path={ROUTES.TEST} element={<Teste />} />
         <Route path={ROUTES.SPTTT_RULES} element={<SPTTT />} />
         <Route path={ROUTES.SPTTT_GAME} element={<JogoSPTTT />} />

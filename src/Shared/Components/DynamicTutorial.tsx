@@ -42,6 +42,7 @@ export interface DynamicTutorialProps {
   steps: TutorialStep[];
   onFinish?: (skipped: boolean) => void;
   onStart?: () => void;
+  onStepChange?: (index: number) => void;
   storageKey: string; // Required for localStorage
   locale?: "pt" | "en";
   styles: TutorialStyles;
@@ -55,6 +56,7 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
   steps,
   onFinish,
   onStart,
+  onStepChange,
   storageKey,
   locale = "pt",
   styles,
@@ -79,7 +81,8 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
 
   useEffect(() => {
     onStart?.();
-  }, [onStart]);
+    onStepChange?.(0);
+  }, [onStart, onStepChange]);
 
   // ============================================================================
   // POSITIONING LOGIC
@@ -247,7 +250,11 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
 
   const handleNext = () => {
     if (currentStepIndex < steps.length - 1) {
-      setCurrentStepIndex((prev) => prev + 1);
+      setCurrentStepIndex((prev) => {
+        const next = prev + 1;
+        onStepChange?.(next);
+        return next;
+      });
     } else {
       handleFinish(false);
     }
@@ -255,7 +262,11 @@ const DynamicTutorial: React.FC<DynamicTutorialProps> = ({
 
   const handleBack = () => {
     if (currentStepIndex > 0) {
-      setCurrentStepIndex((prev) => prev - 1);
+      setCurrentStepIndex((prev) => {
+        const next = prev - 1;
+        onStepChange?.(next);
+        return next;
+      });
     }
   };
 

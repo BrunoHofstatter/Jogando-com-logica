@@ -16,6 +16,21 @@ export const ROUTES = {
   STOP_GAME: "/stop",
   STOP_LEVELS: "/stop/niveis",
 
+  // Bomb Game
+  BOMB_GAME_RULES: "/bombgame/regras",
+  BOMB_GAME_GAME: "/bombgame",
+  BOMB_GAME_LEVELS: "/bombgame/niveis",
+
+  // Puzzle Wire
+  PUZZLE_WIRE_RULES: "/puzzle-wire/regras",
+  PUZZLE_WIRE_GAME: "/puzzle-wire",
+  PUZZLE_WIRE_LEVELS: "/puzzle-wire/niveis",
+
+  // Houses
+  HOUSES_RULES: "/houses/regras",
+  HOUSES_GAME: "/houses",
+  HOUSES_LEVELS: "/houses/niveis",
+
   // Super Jogo Da Velha (SPTTT)
   SPTTT_RULES: "/super-jogo-da-velha/regras",
   SPTTT_GAME: "/super-jogo-da-velha",
