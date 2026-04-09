@@ -1,7 +1,7 @@
 import { GameConfig, InitialPieceSetup } from "./types";
 
-// Create initial checkers board setup
-const createCheckersSetup = (): InitialPieceSetup[] => {
+// Create the initial Crown Chase board setup
+const createCrownChaseSetup = (): InitialPieceSetup[] => {
   let setup: InitialPieceSetup[] = [];
 
   setup = [
@@ -30,12 +30,12 @@ export const gameConfig: GameConfig = {
 
   // Game setup
   players: 2,
-  initialSetup: createCheckersSetup(),
+  initialSetup: createCrownChaseSetup(),
 
   // Turn rules
   movesPerTurn: 1, // One move per turn
 
   // Game metadata
-  name: "Checkers",
-  description: "Classic checkers game with diagonal movement",
+  name: "Caça Coroa",
+  description: "Jogo de estratégia em que o objetivo é capturar a coroa inimiga.",
 };

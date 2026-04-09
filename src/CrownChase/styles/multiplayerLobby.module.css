@@ -1,0 +1,295 @@
+.page {
+  min-height: 100dvh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4vw;
+  padding: 3vw;
+  box-sizing: border-box;
+  background:
+    radial-gradient(circle at top left, #f5d0fe 0%, transparent 35%),
+    radial-gradient(circle at bottom right, #c084fc 0%, transparent 30%),
+    #d9b6fe;
+  font-family: "Cherry Bomb One", system-ui;
+}
+
+.previewColumn {
+  width: 42%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2vw;
+}
+
+.title {
+  font-size: clamp(3vw, 9dvh, 5.5vw);
+  color: #fbbf24;
+  -webkit-text-stroke: 0.25vw #610fa8;
+  text-shadow: 0 0.4vw 0 #581c87;
+  text-align: center;
+}
+
+.preview {
+  width: min(36vw, 68dvh);
+  height: auto;
+  animation: previewFloat 4s ease-in-out infinite;
+}
+
+@keyframes previewFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-1vw);
+  }
+}
+
+.panel {
+  width: 42%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card {
+  width: 100%;
+  background-color: #a855f7;
+  border: 0.4vw solid #4c1d95;
+  border-radius: 3vw;
+  box-shadow: 0 1vw 0 #581c87;
+  padding: 2vw;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4vw;
+  color: #fbbf24;
+  box-sizing: border-box;
+}
+
+.heading {
+  font-size: clamp(2.5vw, 5dvh, 4vw);
+  text-align: center;
+  -webkit-text-stroke: 0.16vw #4c1d95;
+  text-shadow: 0 0.3vw 0 #581c87;
+}
+
+.description {
+  margin: 0;
+  text-align: center;
+  font-size: clamp(1.3vw, 2.5dvh, 2vw);
+  -webkit-text-stroke: 0.1vw #4c1d95;
+}
+
+.fieldLabel {
+  font-size: clamp(1.2vw, 2.3dvh, 1.8vw);
+  -webkit-text-stroke: 0.1vw #4c1d95;
+}
+
+.input {
+  width: 100%;
+  border: 0.25vw solid #4c1d95;
+  border-radius: 1.4vw;
+  background-color: #f3e8ff;
+  color: #4c1d95;
+  font-family: "Cherry Bomb One", system-ui;
+  font-size: clamp(1.2vw, 2.4dvh, 1.8vw);
+  padding: 0.8vw 1vw;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.actions {
+  display: flex;
+  gap: 1vw;
+}
+
+.joinBox,
+.waitingBox {
+  display: flex;
+  flex-direction: column;
+  gap: 1vw;
+  background-color: #c084fc;
+  border: 0.3vw solid #4c1d95;
+  border-radius: 2vw;
+  box-shadow: 0 0.7vw 0 #581c87;
+  padding: 1.4vw;
+}
+
+.primaryButton,
+.secondaryButton,
+.leaveButton {
+  border: 0.3vw solid #4c1d95;
+  border-radius: 1.8vw;
+  font-family: "Cherry Bomb One", system-ui;
+  font-size: clamp(1.2vw, 2.5dvh, 1.9vw);
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.1s ease;
+  padding: 0.7vw 1vw 0.9vw 1vw;
+}
+
+.primaryButton {
+  background-color: #fbbf24;
+  color: #f3e8ff;
+  -webkit-text-stroke: 0.1vw #92400e;
+  box-shadow: 0 0.6vw 0 #b45309;
+}
+
+.secondaryButton {
+  background-color: #d8b4fe;
+  color: #fbbf24;
+  -webkit-text-stroke: 0.1vw #4c1d95;
+  box-shadow: 0 0.6vw 0 #581c87;
+}
+
+.leaveButton {
+  background-color: #ef4444;
+  color: #fff;
+  -webkit-text-stroke: 0.1vw #7f1d1d;
+  box-shadow: 0 0.6vw 0 #991b1b;
+}
+
+.primaryButton:hover,
+.secondaryButton:hover,
+.leaveButton:hover {
+  transform: translateY(-0.1vw);
+}
+
+.primaryButton:active,
+.secondaryButton:active,
+.leaveButton:active {
+  transform: translateY(0.3vw);
+}
+
+.primaryButton:disabled,
+.secondaryButton:disabled {
+  filter: grayscale(1);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.waitingTitle {
+  font-size: clamp(1.8vw, 3.5dvh, 2.6vw);
+  text-align: center;
+  -webkit-text-stroke: 0.12vw #4c1d95;
+}
+
+.codeBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2vw;
+  border: 0.3vw dashed #4c1d95;
+  background-color: #f3e8ff;
+  color: #4c1d95;
+  font-size: clamp(3vw, 6dvh, 5vw);
+  letter-spacing: 0.6vw;
+  padding: 1vw;
+}
+
+.waitingText,
+.feedback,
+.errorText {
+  margin: 0;
+  text-align: center;
+  font-size: clamp(1.1vw, 2.1dvh, 1.6vw);
+  -webkit-text-stroke: 0.08vw #4c1d95;
+}
+
+.feedback {
+  color: #14532d;
+  -webkit-text-stroke: 0.08vw #14532d;
+}
+
+.errorText {
+  color: #fee2e2;
+  -webkit-text-stroke: 0.08vw #7f1d1d;
+}
+
+@media (orientation: portrait) and (max-width: 650px) {
+  .page {
+    flex-direction: column;
+    gap: 3vw;
+    padding: 5vw 4vw;
+  }
+
+  .previewColumn,
+  .panel {
+    width: 100%;
+  }
+
+  .title {
+    font-size: min(14vw, 7dvh);
+    -webkit-text-stroke-width: min(0.7vw, 0.35dvh);
+  }
+
+  .preview {
+    width: min(78vw, 38dvh);
+  }
+
+  .card {
+    border-radius: min(6vw, 3dvh);
+    border-width: min(0.8vw, 0.4dvh);
+    box-shadow: 0 min(1.5vw, 0.8dvh) 0 #581c87;
+    padding: min(5vw, 2.8dvh);
+    gap: min(3vw, 1.6dvh);
+  }
+
+  .heading {
+    font-size: min(10vw, 5dvh);
+    -webkit-text-stroke-width: min(0.4vw, 0.2dvh);
+  }
+
+  .description,
+  .fieldLabel,
+  .input,
+  .primaryButton,
+  .secondaryButton,
+  .leaveButton,
+  .waitingText,
+  .feedback,
+  .errorText {
+    font-size: min(5vw, 2.6dvh);
+  }
+
+  .input {
+    border-width: min(0.5vw, 0.25dvh);
+    border-radius: min(4vw, 2dvh);
+    padding: min(2.6vw, 1.4dvh) min(3vw, 1.6dvh);
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .joinBox,
+  .waitingBox {
+    border-width: min(0.6vw, 0.3dvh);
+    border-radius: min(5vw, 2.5dvh);
+    box-shadow: 0 min(1vw, 0.6dvh) 0 #581c87;
+    padding: min(4vw, 2.2dvh);
+    gap: min(2vw, 1dvh);
+  }
+
+  .primaryButton,
+  .secondaryButton,
+  .leaveButton {
+    border-width: min(0.6vw, 0.3dvh);
+    border-radius: min(4vw, 2dvh);
+    padding: min(2vw, 1.1dvh) min(3vw, 1.6dvh) min(2.6vw, 1.3dvh) min(3vw, 1.6dvh);
+  }
+
+  .waitingTitle {
+    font-size: min(7vw, 3.8dvh);
+  }
+
+  .codeBox {
+    font-size: min(12vw, 6dvh);
+    letter-spacing: min(1vw, 0.5dvh);
+    border-width: min(0.6vw, 0.3dvh);
+    border-radius: min(4vw, 2dvh);
+    padding: min(3vw, 1.7dvh);
+  }
+}

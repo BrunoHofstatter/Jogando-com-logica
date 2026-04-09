@@ -1,15 +1,34 @@
-import { useState, useEffect } from 'react';
-import { GameState, Position, Piece, TurnAction, GameConfig, GameRules, WinResult } from '../Logic/types';
-import { GameEngine } from '../Logic/gameEngine';
-import PieceComponent from './piece';
-import styles from '../styles/board.module.css';
-import { VictoryScreen } from './VictoryScreen';
+import type { CSSProperties } from "react";
+import { useEffect, useState } from "react";
+
+import {
+  applyAction,
+  createInitialState,
+  getLegalActionsForPiece,
+  resolveMoveIntent,
+} from "../Logic/v2";
+import type {
+  CrownChaseAction,
+  CrownChaseState,
+  MoveIntent,
+  PlayerId,
+  Position,
+} from "../Logic/v2";
+import PieceComponent from "./piece";
+import styles from "../styles/board.module.css";
+import { VictoryScreen } from "./VictoryScreen";
 
 interface BoardProps {
-  gameConfig: GameConfig;
-  gameRules: GameRules;
-  gameState?: GameState;
-  onGameStateChange?: (newState: GameState) => void;
+  mode?: "local" | "remote";
+  gameState?: CrownChaseState;
+  onGameStateChange?: (newState: CrownChaseState) => void;
+  onMoveIntent?: (intent: MoveIntent) => void;
+  playerSeat?: PlayerId;
+  interactionLocked?: boolean;
+  onPlayAgain?: () => void;
+  onPlayAgainDisabled?: boolean;
+  playAgainLabel?: string;
+  statusMessage?: string | null;
   isAIMode?: boolean;
   difficulty?: number;
   onMenu?: () => void;
@@ -18,96 +37,91 @@ interface BoardProps {
 }
 
 const Board: React.FC<BoardProps> = ({
-  gameConfig,
-  gameRules,
+  mode = "local",
   gameState: externalGameState,
   onGameStateChange,
+  onMoveIntent,
+  playerSeat,
+  interactionLocked = false,
+  onPlayAgain,
+  onPlayAgainDisabled = false,
+  playAgainLabel,
+  statusMessage,
   isAIMode = false,
   difficulty,
   onMenu,
   onNextLevel,
-  showNextLevel
+  showNextLevel,
 }) => {
-  const engine = new GameEngine();
-  const [internalGameState, setInternalGameState] = useState<GameState>(() =>
-    engine.initializeGame(gameConfig, gameRules)
+  const [internalGameState, setInternalGameState] = useState<CrownChaseState>(() =>
+    createInitialState(),
   );
-  const [gameOver, setGameOver] = useState(false);
-  const gameState = externalGameState || internalGameState;
   const [selectedSquare, setSelectedSquare] = useState<Position | null>(null);
-  const [availableActions, setAvailableActions] = useState<TurnAction[]>([]);
-  const [highlightedSquares, setHighlightedSquares] = useState<Position[]>([]);
-  const [winResult, setWinResult] = useState<WinResult | null>(null);
-  useEffect(() => {
-    if (selectedSquare) {
-      const actions = engine.getAvailableActions(gameState, gameRules, selectedSquare);
-      setAvailableActions(actions);
-
-      const highlights: Position[] = [];
-      actions.forEach(action => {
-        if (action.to) {
-          highlights.push(action.to);
+  const gameState = externalGameState ?? internalGameState;
+  const selectedPiece = selectedSquare
+    ? gameState.board[selectedSquare.row]?.[selectedSquare.col] ?? null
+    : null;
+  const availableActions =
+    selectedSquare &&
+    selectedPiece &&
+    selectedPiece.owner === gameState.currentPlayer &&
+    gameState.status === "playing"
+      ? getLegalActionsForPiece(gameState, selectedSquare)
+      : [];
+  const highlightedSquares = availableActions.map((action) => action.to);
+  const finalWin =
+    gameState.status === "ended"
+      ? {
+          winner: gameState.winner,
+          endReason: gameState.endReason,
         }
-      });
-      setHighlightedSquares(highlights);
-    } else {
-      const allActions = engine.getAvailableActions(gameState, gameRules);
-      setAvailableActions(allActions);
-      setHighlightedSquares([]);
-    }
-  }, [selectedSquare, gameState]);
+      : null;
+  const turnLabel = statusMessage ?? (
+    mode === "remote" && playerSeat !== undefined
+      ? gameState.currentPlayer === playerSeat
+        ? "Sua vez"
+        : "Vez do oponente"
+      : isAIMode
+        ? gameState.currentPlayer === 0
+          ? "Vez do computador"
+          : "Sua vez"
+        : "Vez do Jogador"
+  );
+  const interactionBlocked =
+    gameState.status === "ended" ||
+    (mode === "remote"
+      ? interactionLocked ||
+        playerSeat === undefined ||
+        gameState.currentPlayer !== playerSeat
+      : isAIMode && gameState.currentPlayer === 0);
 
-  // Check for win conditions
   useEffect(() => {
-    const result = gameRules.checkWinCondition(gameState);
-    setWinResult(result);
-    if (result && gameState.gamePhase !== "ended") {
-      setGameOver(true);
-      const newState: GameState = {
-        ...gameState,
-        gamePhase: "ended" as const,
-        winner: result.winner
-      };
-
-      if (onGameStateChange) {
-        onGameStateChange(newState);
-      } else {
-        setInternalGameState(newState);
-      }
-    }
+    setSelectedSquare(null);
   }, [gameState]);
 
-  // Handle play again action
-  const handlePlayAgain = () => {
-    const newGameState = engine.initializeGame(gameConfig, gameRules);
-    setGameOver(false);
-    setWinResult(null);
-    setSelectedSquare(null);
-    setAvailableActions([]);
-    setHighlightedSquares([]);
-
+  const updateGameState = (newState: CrownChaseState) => {
     if (onGameStateChange) {
-      onGameStateChange(newGameState);
-    } else {
-      setInternalGameState(newGameState);
+      onGameStateChange(newState);
+      return;
     }
+
+    setInternalGameState(newState);
   };
 
+  const handlePlayAgain = () => {
+    if (mode === "remote" && onPlayAgain) {
+      onPlayAgain();
+      return;
+    }
+
+    updateGameState(createInitialState());
+  };
 
   const handleSquareClick = (row: number, col: number) => {
     const clickedPosition = { row, col };
     const clickedPiece = gameState.board[row][col];
 
-    // Block input if it's AI's turn (User Request)
-    if (isAIMode && gameState.currentPlayer === 0) {
-      return;
-    }
-
-    if (gameState.gamePhase === "ended") {
-      return;
-    }
-
-    if (clickedPiece && clickedPiece.isObstacle) {
+    if (interactionBlocked) {
       return;
     }
 
@@ -117,118 +131,75 @@ const Board: React.FC<BoardProps> = ({
         return;
       }
 
-      const validAction = availableActions.find(action =>
-        action.to?.row === row && action.to?.col === col
-      );
+      const action =
+        resolveMoveIntent(gameState, {
+          from: selectedSquare,
+          to: clickedPosition,
+        }) ??
+        availableActions.find(
+          (candidate) =>
+            candidate.to.row === row && candidate.to.col === col,
+        ) ??
+        null;
 
-      if (validAction) {
-        const success = engine.executeAction(gameState, validAction, gameRules);
+      if (action) {
+        commitAction(action);
+        return;
+      }
 
-        if (success) {
-          if (onGameStateChange) {
-            onGameStateChange(gameState);
-          } else {
-            setInternalGameState({ ...gameState });
-          }
-
-          setSelectedSquare(null);
-        }
-      } else if (clickedPiece && clickedPiece.owner === gameState.currentPlayer) {
+      if (clickedPiece?.owner === gameState.currentPlayer) {
         setSelectedSquare(clickedPosition);
-      } else {
-        const placeAction = availableActions.find(action =>
-          action.type === "place" && action.to?.row === row && action.to?.col === col
-        );
-
-        if (placeAction) {
-          const success = engine.executeAction(gameState, placeAction, gameRules);
-
-          if (success) {
-            if (onGameStateChange) {
-              onGameStateChange(gameState);
-            } else {
-              setInternalGameState({ ...gameState });
-            }
-          }
-        }
-
-        setSelectedSquare(null);
+        return;
       }
-    } else {
-      if (clickedPiece && clickedPiece.owner === gameState.currentPlayer) {
-        setSelectedSquare(clickedPosition);
-      } else if (!clickedPiece) {
-        const placeAction = availableActions.find(action =>
-          action.type === "place" && action.to?.row === row && action.to?.col === col
-        );
 
-        if (placeAction) {
-          const success = engine.executeAction(gameState, placeAction, gameRules);
+      setSelectedSquare(null);
+      return;
+    }
 
-          if (success) {
-            if (onGameStateChange) {
-              onGameStateChange(gameState);
-            } else {
-              setInternalGameState({ ...gameState });
-            }
-          }
-        }
-      }
+    if (clickedPiece?.owner === gameState.currentPlayer) {
+      setSelectedSquare(clickedPosition);
     }
   };
 
-  const handleSpecialAction = (actionType: string) => {
-    const specialAction = availableActions.find(action => action.type === actionType);
+  const commitAction = (action: CrownChaseAction) => {
+    if (mode === "remote") {
+      onMoveIntent?.({
+        from: action.from,
+        to: action.to,
+      });
+      setSelectedSquare(null);
+      return;
+    }
 
-    if (specialAction) {
-      const success = engine.executeAction(gameState, specialAction, gameRules);
+    const result = applyAction(gameState, action);
+    if (!result.ok) {
+      return;
+    }
 
-      if (success) {
-        if (onGameStateChange) {
-          onGameStateChange(gameState);
-        } else {
-          setInternalGameState({ ...gameState });
-        }
-        setSelectedSquare(null);
-      }
+    updateGameState(result.state);
+    setSelectedSquare(null);
+  };
+
+  const isSquareSelected = (row: number, col: number): boolean =>
+    selectedSquare !== null &&
+    selectedSquare.row === row &&
+    selectedSquare.col === col;
+
+  const isSquareHighlighted = (row: number, col: number): boolean =>
+    highlightedSquares.some((position) => position.row === row && position.col === col);
+
+  const getPieceLabel = (pieceType: string): string => {
+    switch (pieceType) {
+      case "king":
+        return "Rei";
+      case "killer":
+        return "Assassino";
+      case "jumper":
+        return "Saltador";
+      default:
+        return "Peça";
     }
   };
-
-  const handleDiceRoll = () => {
-    const diceAction: TurnAction = { type: 'roll_dice' };
-    const success = engine.executeAction(gameState, diceAction, gameRules);
-
-    if (success) {
-      if (onGameStateChange) {
-        onGameStateChange(gameState);
-      } else {
-        setInternalGameState({ ...gameState });
-      }
-    }
-  };
-
-  const isSquareSelected = (row: number, col: number): boolean => {
-    return selectedSquare !== null && selectedSquare.row === row && selectedSquare.col === col;
-  };
-
-  const isSquareHighlighted = (row: number, col: number): boolean => {
-    return highlightedSquares.some(pos => pos.row === row && pos.col === col);
-  };
-
-  const canPlaceHere = (row: number, col: number): boolean => {
-    return availableActions.some(action =>
-      action.type === "place" && action.to?.row === row && action.to?.col === col
-    );
-  };
-
-  const currentPlayerName = `Player ${gameState.currentPlayer + 1}`;
-  const currentPlayerData = gameState.playerData?.[gameState.currentPlayer] || {};
-  const barriersLeft = currentPlayerData.barriersLeft || 0;
-  const finalWin: WinResult | null = winResult ?? (
-    gameState.gamePhase === "ended" && gameState.winner !== null
-      ? { winner: gameState.winner, reason: "Game Over" }
-      : null
-  );
 
   return (
     <div className={styles.gamePage}>
@@ -239,130 +210,87 @@ const Board: React.FC<BoardProps> = ({
               Nível: {difficulty === 1 ? "Muito Fácil" : difficulty === 2 ? "Fácil" : difficulty === 3 ? "Médio" : "Difícil"}
             </div>
           )}
+
           <div className={styles.currentPlayer}>
-            Vez do Jogador
-            <span className={`${styles.playerIndicator} ${gameState.currentPlayer === 0 ? styles.playerRed : styles.playerBlue}`}>
-              {gameState.currentPlayer === 0 ? '●' : '●'}
+            {turnLabel}
+            <span
+              className={`${styles.playerIndicator} ${gameState.currentPlayer === 0 ? styles.playerRed : styles.playerBlue}`}
+            >
+              ●
             </span>
           </div>
 
           <div className={styles.capturesSection}>
             <div className={styles.captureInfo}>
-
-              <span className={styles.captureText}>Peças <div className={styles.redIndicator}>●</div> capturadas: {gameState.gameData?.capturedPieces?.[0] || 0} </span>
+              <span className={styles.captureText}>
+                Peças <span className={styles.redIndicator}>●</span> capturadas: {gameState.capturedByPlayer[0]}
+              </span>
             </div>
             <div className={styles.captureInfo}>
-              <span className={styles.captureText}>Peças <span className={styles.blueIndicator}>●</span> capturadas: {gameState.gameData?.capturedPieces?.[1] || 0}  </span>
+              <span className={styles.captureText}>
+                Peças <span className={styles.blueIndicator}>●</span> capturadas: {gameState.capturedByPlayer[1]}
+              </span>
             </div>
           </div>
         </div>
+
         <div className={styles.boardWrapper}>
           <div
             className={styles.board}
-            style={{
-              "--board-cols": gameState.config.boardWidth,
-              "--board-rows": gameState.config.boardHeight,
-            } as React.CSSProperties}
+            style={
+              {
+                "--board-cols": gameState.board[0]?.length ?? 0,
+                "--board-rows": gameState.board.length,
+              } as CSSProperties
+            }
           >
             {gameState.board.map((row, rowIndex) =>
               row.map((piece, colIndex) => {
                 const isSelected = isSquareSelected(rowIndex, colIndex);
                 const isHighlighted = isSquareHighlighted(rowIndex, colIndex);
-                const canPlace = !piece && canPlaceHere(rowIndex, colIndex);
-                const isObstacle = piece && piece.isObstacle;
-                const squareType = (rowIndex + colIndex) % 2 === 0 ? styles.lightSquare : styles.darkSquare;
+                const squareType =
+                  (rowIndex + colIndex) % 2 === 0 ? styles.lightSquare : styles.darkSquare;
 
                 return (
                   <div
                     key={`${rowIndex}-${colIndex}`}
                     data-square={`${String.fromCharCode(97 + colIndex)}${rowIndex + 1}`}
-                    data-piece={piece ? `${piece.owner === 0 ? 'red' : 'blue'}-${piece.type}` : undefined}
-                    className={`${styles.square} ${squareType} ${isObstacle ? styles.squareObstacle : ''
-                      } ${isHighlighted ? styles.squareHighlighted : ''} ${canPlace ? styles.squareCanPlace : ''
-                      }`}
-                    onClick={() => !isObstacle && handleSquareClick(rowIndex, colIndex)}
+                    data-piece={piece ? `${piece.owner === 0 ? "red" : "blue"}-${piece.type}` : undefined}
+                    className={`${styles.square} ${squareType} ${isHighlighted ? styles.squareHighlighted : ""}`}
+                    onClick={() => handleSquareClick(rowIndex, colIndex)}
                   >
                     {piece && (
                       <PieceComponent
                         piece={piece}
-                        gameConfig={gameState.config}
                         isSelected={isSelected}
-                        onPieceClick={() => !isObstacle && handleSquareClick(rowIndex, colIndex)}
+                        onPieceClick={() => handleSquareClick(rowIndex, colIndex)}
                       />
                     )}
 
-                    {isHighlighted && !piece && (
-                      <div className={styles.moveIndicator} />
-                    )}
-
-                    {canPlace && (
-                      <div className={styles.placeIndicator} />
-                    )}
+                    {isHighlighted && !piece && <div className={styles.moveIndicator} />}
                   </div>
                 );
-              })
+              }),
             )}
           </div>
         </div>
 
-        <div className={styles.actionButtons}>
-          {gameState.config.useDice && !gameState.lastDiceRoll && (
-            <button
-              onClick={handleDiceRoll}
-              className={`${styles.actionButton} ${styles.actionButtonDice}`}
-              disabled={!!finalWin}
-            >
-              Roll Dice
-            </button>
-          )}
-
-          {availableActions.filter(action => action.type === 'custom').map((action, index) => (
-            <button
-              key={index}
-              onClick={() => handleSpecialAction('custom')}
-              className={`${styles.actionButton} ${styles.actionButtonCustom}`}
-              disabled={!!finalWin}
-            >
-              {action.data?.buttonText || 'Custom Action'}
-            </button>
-          ))}
-
-          {/* Skip turn button hidden as requested */}
-          {/* {availableActions.length === 0 && gameState.gamePhase === "playing" && (
-            <button
-              onClick={() => {
-                const skipAction: TurnAction = { type: 'custom', data: { skip: true } };
-                engine.executeAction(gameState, skipAction, gameRules);
-                if (onGameStateChange) {
-                  onGameStateChange(gameState);
-                } else {
-                  setInternalGameState({...gameState});
-                }
-              }}
-              className={`${styles.actionButton} ${styles.actionButtonSkip}`}
-              disabled={!!finalWin}
-            >
-              Skip Turn
-            </button>
-          )} */}
-        </div>
-
-        {selectedSquare && gameState.board[selectedSquare.row][selectedSquare.col] && (
+        {selectedSquare && selectedPiece && (
           <div className={styles.pieceInfo}>
-            <h4>Selected Piece</h4>
-            <p>Type: {gameState.board[selectedSquare.row][selectedSquare.col]?.type}</p>
-            <p>Position: ({selectedSquare.row}, {selectedSquare.col})</p>
-            {gameState.board[selectedSquare.row][selectedSquare.col]?.value !== undefined && (
-              <p>Value: {gameState.board[selectedSquare.row][selectedSquare.col]?.value}</p>
-            )}
-            <p>Available Actions: {availableActions.length}</p>
+            <h4>Peça Selecionada</h4>
+            <p>Tipo: {getPieceLabel(selectedPiece.type)}</p>
+            <p>Posição: ({selectedSquare.row + 1}, {selectedSquare.col + 1})</p>
+            <p>Ações disponíveis: {availableActions.length}</p>
           </div>
         )}
+
         {finalWin && (
           <VictoryScreen
             winner={finalWin.winner}
-            reason={finalWin.reason}
+            endReason={finalWin.endReason}
             onPlayAgain={handlePlayAgain}
+            onPlayAgainDisabled={onPlayAgainDisabled}
+            playAgainLabel={playAgainLabel}
             isAIMode={isAIMode}
             onMenu={onMenu}
             onNextLevel={onNextLevel}

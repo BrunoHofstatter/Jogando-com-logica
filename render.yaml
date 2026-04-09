@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: jogando-com-logica-multiplayer
+    runtime: node
+    rootDir: multiplayer-server
+    plan: free
+    buildCommand: npm install
+    startCommand: npm run start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: HOST
+        value: 0.0.0.0
+      - key: CLIENT_ORIGINS
+        sync: false

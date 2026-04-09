@@ -1,10 +1,14 @@
-import React from 'react';
-import styles from '../styles/victoryScreen.module.css';
+import React from "react";
+
+import type { CrownChaseEndReason, PlayerId } from "../Logic/v2";
+import styles from "../styles/victoryScreen.module.css";
 
 interface VictoryScreenProps {
-  winner: number;
-  reason: string;
+  winner: PlayerId | null;
+  endReason: CrownChaseEndReason | null;
   onPlayAgain: () => void;
+  onPlayAgainDisabled?: boolean;
+  playAgainLabel?: string;
   onMenu?: () => void;
   onNextLevel?: () => void;
   showNextLevel?: boolean;
@@ -13,65 +17,69 @@ interface VictoryScreenProps {
 
 export const VictoryScreen: React.FC<VictoryScreenProps> = ({
   winner,
-  reason,
+  endReason,
   onPlayAgain,
+  onPlayAgainDisabled = false,
+  playAgainLabel = "Jogar Novamente",
   onMenu,
   onNextLevel,
   showNextLevel,
-  isAIMode = false
+  isAIMode = false,
 }) => {
-  const playerColor = winner === 0 ? 'Vermelho' : winner === 1 ? 'Azul' : '';
-  const playerClass = winner === 0 ? styles.playerRed : winner === 1 ? styles.playerBlue : '';
-  const OpplayerClass = winner === 0 ? styles.playerBlueOp : winner === 1 ? styles.playerRedOp : '';
-
-  // AI mode: player 1 (blue) is the user, player 0 (red) is the AI
+  const isDraw = winner === null;
   const userWon = isAIMode && winner === 1;
-  const userLost = isAIMode && winner === 0;
+  const playerClass = winner === 0 ? styles.playerRed : styles.playerBlue;
+  const opponentClass = winner === 0 ? styles.playerBlueOp : styles.playerRedOp;
 
   return (
     <div className={styles.gamePage}>
       <div className={styles.victorySidebar}>
         <div className={styles.victoryContent}>
           <h2 className={styles.victoryTitle}>
-            {winner === -1 ? 'Empate!' : (isAIMode ? (userWon ? 'Vitória!' : 'Derrota!') : 'Vitória!')}
+            {isDraw ? "Empate!" : isAIMode ? (userWon ? "Vitória!" : "Derrota!") : "Vitória!"}
           </h2>
+
           <div className={styles.victoryMessage}>
-            {winner !== -1 ? (
+            {isDraw ? (
+              <p className={styles.victoryReason}>
+                {endReason === "double_stuck"
+                  ? "Nenhum jogador tinha movimentos disponíveis."
+                  : "A partida terminou em empate!"}
+              </p>
+            ) : isAIMode ? (
               <>
-                {isAIMode ? (
-                  <>
-                    <p className={styles.victoryWinner}>
-                      {userWon ? 'Você ganhou do computador!' : 'Você perdeu para o computador!'}
-                    </p>
-                    <p className={styles.victoryReason}>
-                      {userWon ? 'Você capturou o Rei!' : 'Seu Rei foi capturado!'}
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <p className={styles.victoryWinner}>
-                      O Jogador <span className={playerClass}>●</span> venceu a partida!
-                    </p>
-                    <p className={styles.victoryReason}>
-                      <span className={playerClass}></span> O rei <span className={OpplayerClass}>●</span> foi capturado
-                    </p>
-                  </>
-                )}
+                <p className={styles.victoryWinner}>
+                  {userWon ? "Você ganhou do computador!" : "Você perdeu para o computador!"}
+                </p>
+                <p className={styles.victoryReason}>
+                  {userWon ? "Você capturou o Rei inimigo!" : "Seu Rei foi capturado!"}
+                </p>
               </>
             ) : (
-              <p className={styles.victoryReason}>A partida terminou em empate!</p>
+              <>
+                <p className={styles.victoryWinner}>
+                  O Jogador <span className={playerClass}>●</span> venceu a partida!
+                </p>
+                <p className={styles.victoryReason}>
+                  O Rei <span className={opponentClass}>●</span> foi capturado.
+                </p>
+              </>
             )}
           </div>
+
           <div className={styles.victoryButtonsContainer}>
             <div className={styles.victoryButtonsRow}>
-              <button onClick={onMenu} className={styles.victoryButtonMenu}>
-                Menu
-              </button>
+              {onMenu && (
+                <button onClick={onMenu} className={styles.victoryButtonMenu}>
+                  Menu
+                </button>
+              )}
               <button
                 onClick={onPlayAgain}
                 className={styles.victoryButton}
+                disabled={onPlayAgainDisabled}
               >
-                Jogar Novamente
+                {playAgainLabel}
               </button>
             </div>
 
