@@ -169,6 +169,17 @@
   width: 100%;
 }
 
+.bottomAuxButtons {
+  position: absolute;
+  bottom: 4.2dvh;
+  left: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
 .tutorialButton {
   position: absolute;
   bottom: 4.2dvh;
@@ -185,6 +196,33 @@
   transition: all 0.1s ease;
   z-index: 10;
   box-shadow: 0 0.4vw 0 #581c87;
+}
+
+.onlineButton {
+  border: 0.3vw solid #4c1d95;
+  background-color: #fbbf24;
+  border-radius: 1.7vw;
+  padding: 0.1vw 1vw 0.5vw 1vw;
+  color: #f3e8ff;
+  -webkit-text-stroke: 0.15vw #92400e;
+  font-size: clamp(1.5vw, 5dvh, 2.7vw);
+  font-family: "Cherry Bomb One", system-ui;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  z-index: 10;
+  box-shadow: 0 0.4vw 0 #b45309;
+  pointer-events: auto;
+}
+
+.onlineButton:hover {
+  background-color: #fcd34d;
+  transform: translateY(-0.1vw);
+  box-shadow: 0 0.5vw 0 #b45309;
+}
+
+.onlineButton:active {
+  transform: translateY(0.3vw);
+  box-shadow: 0 0.1vw 0 #b45309;
 }
 
 .tutorialButton:hover {
@@ -707,15 +745,19 @@
   .bottomAuxButtons {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     width: 100%;
     padding: min(4vw, 2dvh);
     box-sizing: border-box;
+    position: static;
+    pointer-events: auto;
   }
 
   .tutorialButton,
+  .onlineButton,
   .detailedRulesButton {
+    position: static;
     width: 30%;
-    bottom: min(6vw, 2dvh);
     height: min(10vw, 5dvh);
     border-radius: min(3vw, 2dvh);
     border-width: min(0.6vw, 1.5dvh);

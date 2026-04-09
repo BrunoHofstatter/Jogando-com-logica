@@ -22,6 +22,8 @@ import DamasRegras from "./AA_baseGame/Pages/regrasPage";
 import CrownChasePage from "./CrownChase/Pages/baseGamePage";
 import CrownChaseRegras from "./CrownChase/Pages/regrasPage";
 import CrownChaseAIPage from "./CrownChase/Pages/aiGamePage";
+import CrownChaseMultiplayerGamePage from "./CrownChase/Pages/multiplayerGamePage";
+import CrownChaseMultiplayerLobbyPage from "./CrownChase/Pages/multiplayerLobbyPage";
 import CacaSomaRegras from "./Caca_soma/Pages/Regras_CacaSoma";
 import ClassMenu from "./RubiksClass/Classes/ClassMenu";
 import Dimensions from "./RubiksClass/Classes/oldClass1/old_class1.tsx";
@@ -42,6 +44,10 @@ import PuzzleWirePage from "./PuzzleWire/Pages/PuzzleWirePage";
 import HousesRulesPage from "./Houses/Pages/RegrasPage";
 import HousesLevelsMenuPage from "./Houses/Pages/LevelsMenuPage";
 import HousesPage from "./Houses/Pages/HousesPage";
+import {
+  hasActiveCrownChaseMultiplayerSession,
+  leaveCrownChaseMultiplayerRoom,
+} from "./CrownChase/Hooks/useCrownChaseMultiplayer";
 import { ROUTES } from "./routes";
 
 function trackGameTime() {
@@ -83,6 +89,8 @@ function BackButton() {
 }
 
 function App() {
+  const location = useLocation();
+
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === "hidden") {
@@ -102,6 +110,14 @@ function App() {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, []);
+
+  useEffect(() => {
+    const isCrownChaseOnlineRoute = location.pathname.startsWith(ROUTES.CROWN_CHASE_MP_LOBBY);
+
+    if (!isCrownChaseOnlineRoute && hasActiveCrownChaseMultiplayerSession()) {
+      leaveCrownChaseMultiplayerRoom({ preserveName: true });
+    }
+  }, [location.pathname]);
 
   return (
     <main>
@@ -136,6 +152,8 @@ function App() {
         <Route path={ROUTES.CROWN_CHASE_GAME} element={<CrownChasePage />} />
         <Route path={ROUTES.CROWN_CHASE_RULES} element={<CrownChaseRegras />} />
         <Route path={ROUTES.CROWN_CHASE_AI} element={<CrownChaseAIPage />} />
+        <Route path={ROUTES.CROWN_CHASE_MP_LOBBY} element={<CrownChaseMultiplayerLobbyPage />} />
+        <Route path={ROUTES.CROWN_CHASE_MP_GAME} element={<CrownChaseMultiplayerGamePage />} />
         <Route path={ROUTES.CACA_SOMA_RULES} element={<CacaSomaRegras />} />
         <Route path={ROUTES.CLASS_1_OLD} element={<Dimensions />} />
         <Route path={ROUTES.CLASS_MENU} element={<ClassMenu />} />

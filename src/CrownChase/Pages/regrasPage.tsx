@@ -45,6 +45,10 @@ function CrownChaseRegras() {
     }
   }
 
+  const goToOnlineLobby = () => {
+    navigate(ROUTES.CROWN_CHASE_MP_LOBBY);
+  };
+
   const startTutorial = () => {
     resetTutorial(); // Clear the "completed" flag
     if (gameMode === "ai") {
@@ -161,6 +165,9 @@ function CrownChaseRegras() {
         <div className={styles.bottomAuxButtons}>
           <button className={styles.tutorialButton} onClick={startTutorial}>
             <span>Tutorial</span>
+          </button>
+          <button className={styles.onlineButton} onClick={goToOnlineLobby}>
+            Online
           </button>
           <button
             className={styles.detailedRulesButton}

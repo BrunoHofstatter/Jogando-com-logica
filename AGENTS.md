@@ -53,6 +53,12 @@ Routes follow the pattern `/{game}Pg` (play) and `/{game}Rg` (rules). `RubiksCla
 - Performance matters. School computers may be slow, so keep bundles lean
 - **Windows reserved filenames:** Never create files named `CON`, `PRN`, `AUX`, `NUL`, `COM1-9`, or `LPT1-9` with or without extensions
 
+## Documentation Notes
+
+- Treat project documentation as structured context, not all as equal source-of-truth
+- Keep **current reality** clearly separated from **planned ideas** or future roadmap items
+- Grade ranges and pedagogical fit are recommendations unless a doc explicitly says they were validated in practice
+
 ## Context Files
 
 Deeper project context lives in `.agents/rules/`. Read these when relevant:
@@ -61,12 +67,12 @@ Deeper project context lives in `.agents/rules/`. Read these when relevant:
 |------|--------------|
 | `game_crown_chase.md` | Working on Caça Coroa |
 | `game_math_war.md` | Working on Guerra Matemática |
-| `game_damas.md` | Working on Damas |
 | `game_spttt.md` | Working on Super Jogo da Velha |
 | `game_stop.md` | Working on Stop Matemático |
 | `game_caca_soma.md` | Working on Caça Soma |
 | `game_rubiks.md` | Working on Cubo Mágico |
 | `docs_games_overview.md` | Need the full game catalog at a glance |
+| `docs_general.md` | Need overall project context, positioning, current priorities, or future plans |
 | `docs_teacher_manual.md` | Working on the `/manual` page or teacher-facing content |
 | `googleanalytics.md` | Adding or modifying GA4 event tracking |
 

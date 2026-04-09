@@ -47,6 +47,8 @@ export const ROUTES = {
   CROWN_CHASE_RULES: "/caca-coroa/regras",
   CROWN_CHASE_GAME: "/caca-coroa",
   CROWN_CHASE_AI: "/caca-coroa/computador",
+  CROWN_CHASE_MP_LOBBY: "/caca-coroa/online",
+  CROWN_CHASE_MP_GAME: "/caca-coroa/online/partida",
 
   // Math War
   MATH_WAR_RULES: "/guerra-matematica/regras",
