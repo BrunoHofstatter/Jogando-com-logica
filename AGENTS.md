@@ -73,6 +73,7 @@ Deeper project context lives in `.agents/rules/`. Read these when relevant:
 | `game_rubiks.md` | Working on Cubo Mágico |
 | `docs_games_overview.md` | Need the full game catalog at a glance |
 | `docs_general.md` | Need overall project context, positioning, current priorities, or future plans |
+| `docs_multiplayer_backend.md` | Working on online multiplayer architecture, backend deployment, or adding multiplayer to another game |
 | `docs_teacher_manual.md` | Working on the `/manual` page or teacher-facing content |
 | `googleanalytics.md` | Adding or modifying GA4 event tracking |
 

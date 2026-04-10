@@ -1,0 +1,54 @@
+.gamePage {
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6dvh 6vw;
+  background: linear-gradient(180deg, #ffbaba 0%, #ffdede 100%);
+  box-sizing: border-box;
+}
+
+.contentCard {
+  width: min(88vw, 72dvh);
+  padding: 5dvh 6vw;
+  border-radius: 4vw;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 2dvh 4dvh rgba(116, 32, 32, 0.14);
+  text-align: center;
+}
+
+.title {
+  margin: 0 0 2dvh;
+  font-size: min(8vw, 5dvh);
+  color: #722525;
+}
+
+.description {
+  margin: 0 auto 2dvh;
+  max-width: 90%;
+  font-size: min(4.3vw, 2.7dvh);
+  line-height: 1.45;
+  color: #5c3333;
+}
+
+.description:last-child {
+  margin-bottom: 0;
+}
+
+@media (orientation: portrait) and (max-width: 650px) {
+  .contentCard {
+    width: 100%;
+    padding: 4.5dvh 7vw;
+    border-radius: 6vw;
+  }
+
+  .title {
+    font-size: min(10vw, 5dvh);
+  }
+
+  .description {
+    max-width: 100%;
+    font-size: min(4.8vw, 2.5dvh);
+  }
+}
