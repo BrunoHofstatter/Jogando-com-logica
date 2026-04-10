@@ -20,7 +20,7 @@ const PieceComponent: React.FC<PieceProps> = ({
   return (
     <div
       className={`${styles.piece} ${piece.owner === 0 ? styles.pieceRed : styles.pieceBlue} ${styles[piece.type] || ""} ${
-        display.shape === "hexagon" ? styles.pieceHexagon : styles.pieceCircle
+        display.shape === styles.pieceCircle
       } ${isSelected ? styles.pieceSelected : ""}`}
       style={{
         width: "75%",
@@ -56,7 +56,7 @@ function getPieceDisplay(piece: CrownChasePiece) {
         symbol: "⚔",
         background: getPlayerColor(piece.owner),
         textColor: "#fbbf24",
-        shape: "hexagon" as const,
+        shape: "circle" as const,
       };
     case "jumper":
       return {

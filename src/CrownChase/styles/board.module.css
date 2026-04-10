@@ -1,6 +1,6 @@
 .gameContainer {
   width: 100vw;
-  min-height: 100dvh;
+  height: 100dvh;
   display: flex;
   flex-direction: row;
   align-items: center;
