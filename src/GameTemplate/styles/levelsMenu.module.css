@@ -1,0 +1,88 @@
+.gamePageContainer {
+  min-height: 100dvh;
+  width: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 3dvh;
+  padding: 5dvh 6vw;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, #ffbaba 0%, #ffe8e8 100%);
+}
+
+.headerBlock {
+  display: grid;
+  gap: 1.2dvh;
+  justify-items: center;
+  text-align: center;
+}
+
+.gameTitle {
+  margin: 0;
+  font-size: min(8vw, 5dvh);
+  color: #722525;
+}
+
+.subtitle {
+  margin: 0;
+  max-width: min(70vw, 70dvh);
+  font-size: min(4vw, 2.5dvh);
+  line-height: 1.4;
+  color: #6a3a3a;
+}
+
+.placeholderPanel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4dvh 5vw;
+  border-radius: 4vw;
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: 0 2dvh 4dvh rgba(116, 32, 32, 0.12);
+}
+
+.placeholderText {
+  margin: 0;
+  max-width: min(74vw, 74dvh);
+  text-align: center;
+  font-size: min(4.3vw, 2.7dvh);
+  line-height: 1.5;
+  color: #5c3333;
+}
+
+.voltarBtn {
+  justify-self: center;
+  min-width: min(42vw, 32dvh);
+  border: none;
+  border-radius: 999vw;
+  padding: 1.8dvh 6vw;
+  background: #ff7f7f;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: min(4.5vw, 2.7dvh);
+  cursor: pointer;
+}
+
+@media (orientation: portrait) and (max-width: 650px) {
+  .gamePageContainer {
+    padding: 4dvh 6vw;
+  }
+
+  .gameTitle {
+    font-size: min(10vw, 5dvh);
+  }
+
+  .subtitle,
+  .placeholderText,
+  .voltarBtn {
+    font-size: min(4.8vw, 2.5dvh);
+  }
+
+  .subtitle,
+  .placeholderText {
+    max-width: 100%;
+  }
+
+  .placeholderPanel {
+    border-radius: 6vw;
+  }
+}

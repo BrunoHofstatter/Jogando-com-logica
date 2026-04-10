@@ -1,0 +1,215 @@
+.regrasPage {
+  min-height: 100dvh;
+  width: 100%;
+  padding: 5dvh 6vw;
+  box-sizing: border-box;
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: 3dvh;
+  background: linear-gradient(180deg, #ffbaba 0%, #ffe7e7 100%);
+}
+
+.boxRegras {
+  width: min(88vw, 78dvh);
+  display: grid;
+  gap: 2dvh;
+  justify-items: center;
+}
+
+.gameTitle {
+  margin: 0;
+  text-align: center;
+  font-size: min(9vw, 5.5dvh);
+  color: #722525;
+}
+
+.preview {
+  width: min(58vw, 36dvh);
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 4vw;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 2dvh 4dvh rgba(116, 32, 32, 0.12);
+}
+
+.botoes {
+  width: min(88vw, 78dvh);
+  display: grid;
+  gap: 2dvh;
+}
+
+.primaryButton,
+.secondaryButton,
+.auxButton,
+.closeButton {
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.primaryButton,
+.secondaryButton,
+.auxButton {
+  border-radius: 999vw;
+  padding: 1.8dvh 6vw;
+  font-size: min(4.5vw, 2.7dvh);
+}
+
+.primaryButton {
+  background: #ff7f7f;
+  color: #ffffff;
+}
+
+.modeSelect {
+  padding: 2.4dvh 5vw;
+  border-radius: 4vw;
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: 0 2dvh 4dvh rgba(116, 32, 32, 0.1);
+}
+
+.levelsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4vw;
+}
+
+.levelsLabel {
+  display: flex;
+  align-items: center;
+  gap: 2vw;
+  font-size: min(4.3vw, 2.6dvh);
+  color: #5c3333;
+}
+
+.secondaryButton {
+  background: #ffd4d4;
+  color: #6d2f2f;
+}
+
+.bottomAuxButtons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 3vw;
+}
+
+.auxButton {
+  min-width: min(34vw, 24dvh);
+  background: rgba(255, 255, 255, 0.88);
+  color: #6d2f2f;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5dvh 6vw;
+  background: rgba(70, 22, 22, 0.4);
+  box-sizing: border-box;
+}
+
+.modalContent {
+  position: relative;
+  width: min(88vw, 82dvh);
+  max-height: 84dvh;
+  overflow-y: auto;
+  border-radius: 4vw;
+  padding: 5dvh 6vw;
+  box-sizing: border-box;
+  background: #fff7f7;
+  box-shadow: 0 2dvh 5dvh rgba(46, 11, 11, 0.18);
+}
+
+.closeButton {
+  position: absolute;
+  top: 2dvh;
+  right: 3vw;
+  width: min(10vw, 6dvh);
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background: #ff7f7f;
+  color: #ffffff;
+  font-size: min(4.5vw, 2.7dvh);
+}
+
+.detailedRules {
+  display: grid;
+  gap: 1.6dvh;
+  color: #5c3333;
+}
+
+.detailedRules h2,
+.detailedRules h3,
+.detailedRules p {
+  margin: 0;
+}
+
+.detailedRules h2 {
+  font-size: min(6.4vw, 4dvh);
+}
+
+.detailedRules h3 {
+  margin-top: 1.2dvh;
+  font-size: min(4.8vw, 2.9dvh);
+}
+
+.detailedRules p {
+  font-size: min(4.1vw, 2.5dvh);
+  line-height: 1.5;
+}
+
+@media (orientation: portrait) and (max-width: 650px) {
+  .regrasPage {
+    padding: 4dvh 6vw;
+  }
+
+  .boxRegras,
+  .botoes,
+  .modalContent {
+    width: 100%;
+  }
+
+  .gameTitle {
+    font-size: min(10vw, 5dvh);
+  }
+
+  .preview {
+    width: min(70vw, 34dvh);
+    border-radius: 6vw;
+  }
+
+  .modeSelect,
+  .modalContent {
+    border-radius: 6vw;
+  }
+
+  .levelsRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .levelsLabel {
+    justify-content: center;
+    font-size: min(4.8vw, 2.5dvh);
+  }
+
+  .primaryButton,
+  .secondaryButton,
+  .auxButton,
+  .detailedRules p,
+  .closeButton {
+    font-size: min(4.8vw, 2.5dvh);
+  }
+
+  .detailedRules h2 {
+    font-size: min(7vw, 3.7dvh);
+  }
+
+  .detailedRules h3 {
+    font-size: min(5.2vw, 2.8dvh);
+  }
+}
