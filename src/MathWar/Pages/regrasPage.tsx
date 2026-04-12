@@ -42,6 +42,10 @@ function MathWarRegras() {
     }
   }
 
+  const goToOnlineLobby = () => {
+    navigate(ROUTES.MATH_WAR_MP_LOBBY);
+  };
+
   const startTutorial = () => {
     resetTutorial(); // Clear the "completed" flag
     if (gameMode === "ai") {
@@ -155,6 +159,9 @@ function MathWarRegras() {
         <div className={styles.bottomAuxButtons}>
           <button className={styles.tutorialButton} onClick={startTutorial}>
             <span>Tutorial</span>
+          </button>
+          <button className={styles.onlineButton} onClick={goToOnlineLobby}>
+            Online
           </button>
           <button
             className={styles.detailedRulesButton}

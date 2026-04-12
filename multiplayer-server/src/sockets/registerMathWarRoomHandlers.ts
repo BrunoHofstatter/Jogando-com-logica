@@ -1,17 +1,17 @@
 import type { Namespace, Socket } from "socket.io";
 
 import type {
-  CrownChaseClientToServerEvents,
-  CrownChaseServerToClientEvents,
+  MathWarClientToServerEvents,
+  MathWarServerToClientEvents,
   MultiplayerErrorCode,
   RoomPlayerInfo,
-} from "../../../src/CrownChase/Logic/multiplayer/protocol.ts";
-import type { CrownChaseState, PlayerId } from "../../../src/CrownChase/Logic/v2/index.ts";
+} from "../../../src/MathWar/Logic/multiplayer/protocol.ts";
+import type { MathWarState, PlayerId } from "../../../src/MathWar/Logic/v2/index.ts";
 import {
   applyMultiplayerMove,
   createMultiplayerInitialState,
   resolveMultiplayerMove,
-} from "../crownChase/crownChaseAdapter.ts";
+} from "../mathWar/mathWarAdapter.ts";
 import { generateRoomCode } from "../rooms/roomCode.ts";
 import { createRoomStore } from "../rooms/roomStore.ts";
 import {
@@ -23,21 +23,21 @@ import {
   type RoomPlayer,
 } from "../rooms/roomTypes.ts";
 
-type CrownChaseNamespace = Namespace<
-  CrownChaseClientToServerEvents,
-  CrownChaseServerToClientEvents
+type MathWarNamespace = Namespace<
+  MathWarClientToServerEvents,
+  MathWarServerToClientEvents
 >;
 
-type CrownChaseSocket = Socket<
-  CrownChaseClientToServerEvents,
-  CrownChaseServerToClientEvents
+type MathWarSocket = Socket<
+  MathWarClientToServerEvents,
+  MathWarServerToClientEvents
 >;
 
-type CrownChaseRoom = MultiplayerRoom<CrownChaseState>;
+type MathWarRoom = MultiplayerRoom<MathWarState>;
 
-const roomStore = createRoomStore<CrownChaseState>();
+const roomStore = createRoomStore<MathWarState>();
 
-export function registerRoomHandlers(io: CrownChaseNamespace): void {
+export function registerMathWarRoomHandlers(io: MathWarNamespace): void {
   io.on("connection", (socket) => {
     socket.on("create_room", ({ playerName }) => {
       leaveAnyExistingRoom(io, socket, "leave_room");
@@ -55,7 +55,7 @@ export function registerRoomHandlers(io: CrownChaseNamespace): void {
         name: normalizedName,
         connected: true,
       };
-      const room: CrownChaseRoom = {
+      const room: MathWarRoom = {
         code: roomCode,
         state: createMultiplayerInitialState(),
         status: "waiting",
@@ -248,8 +248,8 @@ export function registerRoomHandlers(io: CrownChaseNamespace): void {
 }
 
 function handlePlayerExit(
-  io: CrownChaseNamespace,
-  room: CrownChaseRoom,
+  io: MathWarNamespace,
+  room: MathWarRoom,
   socketId: string,
   reason: "disconnect" | "leave_room",
 ): void {
@@ -307,8 +307,8 @@ function handlePlayerExit(
 }
 
 function closeRoomImmediately(
-  io: CrownChaseNamespace,
-  room: CrownChaseRoom,
+  io: MathWarNamespace,
+  room: MathWarRoom,
   leavingSeat: PlayerId,
   message: string,
 ): void {
@@ -335,8 +335,8 @@ function closeRoomImmediately(
 }
 
 function scheduleWaitingRoomExpiry(
-  io: CrownChaseNamespace,
-  room: CrownChaseRoom,
+  io: MathWarNamespace,
+  room: MathWarRoom,
 ): void {
   if (room.waitingTimeout) {
     clearTimeout(room.waitingTimeout);
@@ -362,8 +362,8 @@ function scheduleWaitingRoomExpiry(
 }
 
 function leaveAnyExistingRoom(
-  io: CrownChaseNamespace,
-  socket: CrownChaseSocket,
+  io: MathWarNamespace,
+  socket: MathWarSocket,
   reason: "leave_room",
 ): void {
   const currentRoom = roomStore.findRoomBySocketId(socket.id);
@@ -375,13 +375,13 @@ function leaveAnyExistingRoom(
 }
 
 function getPlayerBySocketId(
-  room: CrownChaseRoom,
+  room: MathWarRoom,
   socketId: string,
 ): RoomPlayer | null {
   return room.players.find((player) => player?.socketId === socketId) ?? null;
 }
 
-function serializePlayers(room: CrownChaseRoom): RoomPlayerInfo[] {
+function serializePlayers(room: MathWarRoom): RoomPlayerInfo[] {
   return room.players
     .filter((player): player is RoomPlayer => player !== null)
     .map((player) => ({
@@ -397,7 +397,7 @@ function normalizePlayerName(playerName: string): string | null {
 }
 
 function emitError(
-  socket: CrownChaseSocket,
+  socket: MathWarSocket,
   code: MultiplayerErrorCode,
   message: string,
 ): void {

@@ -33,6 +33,8 @@ import Class2FaceArea from "./RubiksClass/Classes/Class2_faceArea/Class2FaceArea
 import MathWarRegras from "./MathWar/Pages/regrasPage";
 import MathWarPage from "./MathWar/Pages/baseGamePage";
 import MathWarAIPage from "./MathWar/Pages/aiGamePage";
+import MathWarMultiplayerGamePage from "./MathWar/Pages/multiplayerGamePage";
+import MathWarMultiplayerLobbyPage from "./MathWar/Pages/multiplayerLobbyPage";
 import Manual from "./Main/Pages/manual";
 import LevelsMenuPage from "./Stop/Pages/LevelsMenuPage";
 import BombGameRulesPage from "./BombGame/Pages/RegrasPage";
@@ -48,6 +50,10 @@ import {
   hasActiveCrownChaseMultiplayerSession,
   leaveCrownChaseMultiplayerRoom,
 } from "./CrownChase/Hooks/useCrownChaseMultiplayer";
+import {
+  hasActiveMathWarMultiplayerSession,
+  leaveMathWarMultiplayerRoom,
+} from "./MathWar/Hooks/useMathWarMultiplayer";
 import { ROUTES } from "./routes";
 
 function trackGameTime() {
@@ -113,9 +119,14 @@ function App() {
 
   useEffect(() => {
     const isCrownChaseOnlineRoute = location.pathname.startsWith(ROUTES.CROWN_CHASE_MP_LOBBY);
+    const isMathWarOnlineRoute = location.pathname.startsWith(ROUTES.MATH_WAR_MP_LOBBY);
 
     if (!isCrownChaseOnlineRoute && hasActiveCrownChaseMultiplayerSession()) {
       leaveCrownChaseMultiplayerRoom({ preserveName: true });
+    }
+
+    if (!isMathWarOnlineRoute && hasActiveMathWarMultiplayerSession()) {
+      leaveMathWarMultiplayerRoom({ preserveName: true });
     }
   }, [location.pathname]);
 
@@ -160,6 +171,8 @@ function App() {
         <Route path={ROUTES.MATH_WAR_RULES} element={<MathWarRegras />} />
         <Route path={ROUTES.MATH_WAR_GAME} element={<MathWarPage />} />
         <Route path={ROUTES.MATH_WAR_AI} element={<MathWarAIPage />} />
+        <Route path={ROUTES.MATH_WAR_MP_LOBBY} element={<MathWarMultiplayerLobbyPage />} />
+        <Route path={ROUTES.MATH_WAR_MP_GAME} element={<MathWarMultiplayerGamePage />} />
         <Route path={ROUTES.MANUAL} element={<Manual />} />
         <Route path={ROUTES.CUBE_TEST} element={<CubeTestPage />} />
         <Route path={ROUTES.CLASS_1} element={<Class1Dimensions />} />

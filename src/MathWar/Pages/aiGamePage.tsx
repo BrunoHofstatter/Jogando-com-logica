@@ -1,19 +1,14 @@
-import Board from "../Components/board-component";
-import { gameConfig } from "../Logic/gameConfig";
-import { gameRules } from "../Logic/gameRules";
-import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from "react-router-dom";
-import DynamicTutorial, { TutorialStep } from "../../Shared/Components/DynamicTutorial";
-import tutorialStyles from "../styles/DynamicTutorial.module.css";
-import { GameEngine } from "../Logic/gameEngine";
-import { GameState } from "../Logic/types";
-import { getAIMove } from "../Logic/aiPlayer";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
-import { DiceAnimation } from "../Components/DiceAnimation";
+import DynamicTutorial, { TutorialStep } from "../../Shared/Components/DynamicTutorial";
 import { useDifficultyLock } from "../../Shared/Hooks/useDifficultyLock";
 import { ROUTES } from "../../routes";
-
-
+import Board from "../Components/board-component";
+import { DiceAnimation } from "../Components/DiceAnimation";
+import { applyAction, createInitialState, getAIMove } from "../Logic/v2";
+import type { MathWarState } from "../Logic/v2";
+import tutorialStyles from "../styles/DynamicTutorial.module.css";
 
 export default function MathWarAIPage() {
   const location = useLocation();
@@ -22,6 +17,10 @@ export default function MathWarAIPage() {
   const [showTutorial, setShowTutorial] = useState(false);
   const [showDiceAnim, setShowDiceAnim] = useState(false);
   const [diceTarget, setDiceTarget] = useState<number[]>([]);
+  const [gameState, setGameState] = useState<MathWarState>(() =>
+    createInitialState({ startingPlayer: 1 }),
+  );
+  const { unlockNext } = useDifficultyLock("mathwar");
 
   useEffect(() => {
     document.body.style.backgroundColor = "#adfad2";
@@ -34,90 +33,64 @@ export default function MathWarAIPage() {
     metaThemeColor.setAttribute("content", "#adfad2");
   }, []);
 
-  const engine = new GameEngine();
-  const [gameState, setGameState] = useState<GameState>(() => {
-    const initialState = engine.initializeGame(gameConfig, gameRules);
-    // Force Player 1 (Blue/Human) to start first in AI mode
-    initialState.currentPlayer = 1;
-    return initialState;
-  });
-
-  const { unlockNext } = useDifficultyLock("mathwar");
-
-  // Reset game when difficulty changes (for Next Level feature)
   useEffect(() => {
-    setGameState(() => {
-      const initialState = engine.initializeGame(gameConfig, gameRules);
-      initialState.currentPlayer = 1;
-      return initialState;
-    });
+    setGameState(createInitialState({ startingPlayer: 1 }));
   }, [difficulty]);
 
-  // Check if tutorial should auto-start
   useEffect(() => {
-    const completed = localStorage.getItem('tutorial_mathwar_v1_completed');
-    if (completed !== 'true') {
+    const completed = localStorage.getItem("tutorial_mathwar_v1_completed");
+    if (completed !== "true") {
       setShowTutorial(true);
     }
   }, []);
 
-  // Handle Dice Animation on turn change
   useEffect(() => {
-    if (gameState.turnCount % 3 === 0 && gameState.lastDiceRoll) {
-      setDiceTarget(gameState.lastDiceRoll);
+    if (gameState.turnCount % 3 === 0) {
+      setDiceTarget(gameState.diceRoll);
       setShowDiceAnim(true);
     }
-  }, [gameState.turnCount]);
+  }, [gameState.diceRoll, gameState.turnCount]);
 
-  // Handle AI move when it's AI's turn (player 0 = red = AI)
   useEffect(() => {
-    // Only move if AI turn AND animation is not playing
-    if (gameState.currentPlayer === 0 && gameState.gamePhase === 'playing' && !showDiceAnim) {
-      // Add a delay so the AI doesn't move instantly
+    if (gameState.currentPlayer === 0 && gameState.status === "playing" && !showDiceAnim) {
       const timeout = setTimeout(() => {
-        makeAIMove();
+        const attemptMove = (currentDifficulty: number): boolean => {
+          try {
+            const aiMove = getAIMove(gameState, currentDifficulty as 1 | 2 | 3 | 4);
+            if (!aiMove) {
+              return false;
+            }
+
+            const result = applyAction(gameState, aiMove);
+            if (!result.ok) {
+              console.warn(`AI move failed at difficulty ${currentDifficulty}`, result.evaluation.invalidReason);
+              return false;
+            }
+
+            setGameState(result.state);
+            return true;
+          } catch (error) {
+            console.error(`AI failed at difficulty ${currentDifficulty}:`, error);
+            return false;
+          }
+        };
+
+        if (!attemptMove(difficulty)) {
+          console.warn("AI failed primary difficulty, falling back to random.");
+          if (!attemptMove(1)) {
+            console.error("AI completely failed to move!");
+          }
+        }
       }, 1500);
 
       return () => clearTimeout(timeout);
     }
-  }, [gameState.currentPlayer, gameState.gamePhase, showDiceAnim]);
+  }, [difficulty, gameState, showDiceAnim]);
 
-  const makeAIMove = () => {
-    // Try to get a move, with fallback to simpler logic if it fails
-    const attemptMove = (currentDifficulty: number): boolean => {
-      try {
-        const aiMove = getAIMove(gameState, gameRules, currentDifficulty as any);
-        const success = engine.executeAction(gameState, aiMove, gameRules);
+  const handleGameStateChange = (newState: MathWarState) => {
+    setGameState(newState);
 
-        if (success) {
-          setGameState({ ...gameState });
-          return true;
-        } else {
-          console.warn(`AI move failed executive action at difficulty ${currentDifficulty}`);
-          return false;
-        }
-      } catch (error) {
-        console.error(`AI failed at difficulty ${currentDifficulty}:`, error);
-        return false;
-      }
-    };
-
-    // First try valid difficulty
-    if (!attemptMove(difficulty)) {
-      console.warn("AI failed primary difficulty, falling back to random (Level 1)");
-      // Fallback to random move
-      if (!attemptMove(1)) {
-        console.error("AI completely failed to move!");
-      }
-    }
-  };
-
-  const handleGameStateChange = (newState: GameState) => {
-    setGameState({ ...newState });
-
-    // Check for win condition
-    // Player 1 = Human (Blue)
-    if (newState.gamePhase === 'ended' && newState.winner === 1) {
+    if (newState.status === "ended" && newState.winner === 1) {
       unlockNext(difficulty);
     }
   };
@@ -127,82 +100,76 @@ export default function MathWarAIPage() {
   };
 
   const handleNextLevel = () => {
-    // Navigate to the same page but with next difficulty
-    // Force replace so history doesn't get cluttered if they spam next
     navigate(ROUTES.MATH_WAR_AI, { state: { difficulty: difficulty + 1 }, replace: true });
   };
 
-  const showNextLevel = difficulty < 4;
-
   const tutorialSteps: TutorialStep[] = [
     {
-      id: 'captain',
+      id: "captain",
       target: '[data-captain="true"]',
       highlight: true,
-      placement: 'auto',
-      title: 'O Capitão',
+      placement: "auto",
+      title: "O Capitão",
       body: <div className={tutorialStyles.stepBody}>
         <span>- Pode ser <span className={tutorialStyles.highlight}>qualquer </span> peça </span>
         <span>- Se ele for capturado, o jogo <span className={tutorialStyles.highlight}>acaba </span> </span>
-      </div>
+      </div>,
     },
     {
-      id: 'sum',
+      id: "sum",
       target: '[data-piece*="sum"]',
       highlight: true,
-      placement: 'auto',
-      title: 'A Soma Redonda',
+      placement: "auto",
+      title: "A Soma Redonda",
       body: <div className={tutorialStyles.stepBody}>
         <span>- Se move somente em <span className={tutorialStyles.highlight}>linha reta </span> </span>
         <span>- O número na peça é seu <span className={tutorialStyles.highlight}>valor </span> </span>
-      </div>
+      </div>,
     },
     {
-      id: 'sumDiag',
+      id: "sumDiag",
       target: '[data-piece*="sumDiag"]',
       highlight: true,
-      placement: 'auto',
-      title: 'A Soma Quadrada ',
+      placement: "auto",
+      title: "A Soma Quadrada",
       body: <div className={tutorialStyles.stepBody}>
         <span>- Se move somente em <span className={tutorialStyles.highlight}>diagonal </span> </span>
         <span>- O número na peça é seu <span className={tutorialStyles.highlight}>valor </span> </span>
-      </div>
+      </div>,
     },
     {
-      id: 'info',
+      id: "info",
       target: '[data-target="info"]',
       highlight: true,
-      placement: 'auto',
-      title: 'Informações do Jogo',
+      placement: "auto",
+      title: "Informações do Jogo",
       body: <div className={tutorialStyles.stepBody}>
-        <span>- Toda rodada o <span className={tutorialStyles.highlight}>dado </span> gera um número de <span className={tutorialStyles.highlight}>2 a 10 </span>  </span>
+        <span>- Toda rodada o <span className={tutorialStyles.highlight}>dado </span> gera um número de <span className={tutorialStyles.highlight}>2 a 10 </span> </span>
         <span>- O valor de cada peça + o dado = <span className={tutorialStyles.highlight}>energia </span> da peça </span>
-      </div>
+      </div>,
     },
     {
-      id: 'board',
+      id: "board",
       target: '[data-target="board"]',
       highlight: true,
-      placement: 'auto',
-      title: 'Informações do Jogo',
+      placement: "auto",
+      title: "Informações do Jogo",
       body: <div className={tutorialStyles.stepBody}>
-        <span>- Para andar <span className={tutorialStyles.highlight}>1 </span> espaço gasta <span className={tutorialStyles.highlight}>2 </span> de energia  </span>
+        <span>- Para andar <span className={tutorialStyles.highlight}>1 </span> espaço gasta <span className={tutorialStyles.highlight}>2 </span> de energia </span>
         <span>- Para capturar uma peça gasta <span className={tutorialStyles.highlight}>mais 2 </span> de energia </span>
-      </div>
+      </div>,
     },
   ];
 
   return <>
     <Board
-      gameConfig={gameConfig}
-      gameRules={gameRules}
       gameState={gameState}
       onGameStateChange={handleGameStateChange}
       isAIMode={true}
       difficulty={difficulty}
       onMenu={handleMenu}
       onNextLevel={handleNextLevel}
-      showNextLevel={showNextLevel}
+      showNextLevel={difficulty < 4}
     />
 
     {showTutorial && (
