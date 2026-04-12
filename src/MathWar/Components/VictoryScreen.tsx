@@ -1,10 +1,14 @@
-import React from 'react';
-import styles from '../styles/victoryScreen.module.css';
+import React from "react";
+
+import type { PlayerId } from "../Logic/v2";
+import styles from "../styles/victoryScreen.module.css";
 
 interface VictoryScreenProps {
-  winner: number;
+  winner: PlayerId | null;
   reason: string;
   onPlayAgain: () => void;
+  onPlayAgainDisabled?: boolean;
+  playAgainLabel?: string;
   isAIMode?: boolean;
   onMenu?: () => void;
   onNextLevel?: () => void;
@@ -15,57 +19,53 @@ export const VictoryScreen: React.FC<VictoryScreenProps> = ({
   winner,
   reason,
   onPlayAgain,
+  onPlayAgainDisabled = false,
+  playAgainLabel = "Jogar Novamente",
   isAIMode = false,
   onMenu,
   onNextLevel,
-  showNextLevel
+  showNextLevel,
 }) => {
-  const playerColor = winner === 0 ? 'Vermelho' : winner === 1 ? 'Azul' : '';
-  const playerClass = winner === 0 ? styles.playerRed : winner === 1 ? styles.playerBlue : '';
-  const OpplayerClass = winner === 0 ? styles.playerBlueOp : winner === 1 ? styles.playerRedOp : '';
-
-  // AI mode: player 1 (blue) is the user, player 0 (red) is the AI
+  const isDraw = winner === null;
+  const playerClass = winner === 0 ? styles.playerRed : styles.playerBlue;
+  const opponentClass = winner === 0 ? styles.playerBlueOp : styles.playerRedOp;
   const userWon = isAIMode && winner === 1;
-  const userLost = isAIMode && winner === 0;
 
   return (
     <div className={styles.gamePage}>
       <div className={styles.victorySidebar}>
         <div className={styles.victoryContent}>
           <h2 className={styles.victoryTitle}>
-            {winner === -1 ? 'Empate!' : (isAIMode ? (userWon ? 'Vitória!' : 'Derrota!') : 'Vitória!')}
+            {isDraw ? "Empate!" : isAIMode ? (userWon ? "Vitória!" : "Derrota!") : "Vitória!"}
           </h2>
+
           <div className={styles.victoryMessage}>
-            {winner !== -1 ? (
+            {isDraw ? (
+              <p className={styles.victoryReason}>A partida terminou em empate!</p>
+            ) : isAIMode ? (
               <>
-                {isAIMode ? (
-                  <>
-                    <p className={styles.victoryWinner}>
-                      {userWon ? 'Você ganhou do computador!' : 'Você perdeu para o computador!'}
-                    </p>
-                    <p className={styles.victoryReason}>
-                      {userWon ? 'Você capturou o Capitão!' : 'Seu Capitão foi capturado!'}
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <p className={styles.victoryWinner}>
-                      O Jogador <span className={playerClass}>●</span> venceu a partida!
-                    </p>
-                    <p className={styles.victoryReason}>
-                      <span className={playerClass}></span> O capitão <span className={OpplayerClass}>●</span> foi capturado
-                    </p>
-                  </>
-                )}
+                <p className={styles.victoryWinner}>
+                  {userWon ? "Você ganhou do computador!" : "Você perdeu para o computador!"}
+                </p>
+                <p className={styles.victoryReason}>
+                  {reason || (userWon ? "Você capturou o Capitão!" : "Seu Capitão foi capturado!")}
+                </p>
               </>
             ) : (
-              <p className={styles.victoryReason}>A partida terminou em empate!</p>
+              <>
+                <p className={styles.victoryWinner}>
+                  O Jogador <span className={playerClass}>●</span> venceu a partida!
+                </p>
+                <p className={styles.victoryReason}>
+                  {reason || <>O capitão <span className={opponentClass}>●</span> foi capturado.</>}
+                </p>
+              </>
             )}
           </div>
 
           <div className={styles.victoryButtonsContainer}>
             <div className={styles.victoryButtonsRow}>
-              {isAIMode && onMenu && (
+              {onMenu && (
                 <button onClick={onMenu} className={styles.victoryButtonMenu}>
                   Menu
                 </button>
@@ -73,8 +73,9 @@ export const VictoryScreen: React.FC<VictoryScreenProps> = ({
               <button
                 onClick={onPlayAgain}
                 className={styles.victoryButton}
+                disabled={onPlayAgainDisabled}
               >
-                Jogar Novamente
+                {playAgainLabel}
               </button>
             </div>
 

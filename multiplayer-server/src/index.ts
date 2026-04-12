@@ -6,5 +6,5 @@ const host = process.env.HOST ?? "0.0.0.0";
 const { httpServer } = createMultiplayerServer();
 
 httpServer.listen(port, host, () => {
-  console.log(`Crown Chase multiplayer server listening on http://${host}:${port}`);
+  console.log(`Jogando com Lógica multiplayer server listening on http://${host}:${port}`);
 });

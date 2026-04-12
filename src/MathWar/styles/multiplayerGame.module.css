@@ -1,0 +1,164 @@
+.roomBanner {
+  position: fixed;
+  top: 1.5vw;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(88vw, 110dvh);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2vw;
+  padding: 1vw 1.4vw;
+  box-sizing: border-box;
+  background-color: rgba(6, 78, 59, 0.92);
+  border: 0.25vw solid #fcd34d;
+  border-radius: 2vw;
+  box-shadow: 0 0.7vw 0 #064e3b;
+  z-index: 30;
+  font-family: "Cherry Bomb One", system-ui;
+}
+
+.roomInfo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1vw;
+  color: #f3f4f6;
+  -webkit-text-stroke: 0.06vw #064e3b;
+}
+
+.roomCode,
+.roomDetail {
+  font-size: clamp(1vw, 2dvh, 1.5vw);
+}
+
+.leaveButton {
+  border: 0.25vw solid #7f1d1d;
+  border-radius: 1.6vw;
+  background-color: #ef4444;
+  color: #fff;
+  -webkit-text-stroke: 0.08vw #7f1d1d;
+  font-family: "Cherry Bomb One", system-ui;
+  font-size: clamp(1vw, 2dvh, 1.4vw);
+  padding: 0.6vw 1vw 0.8vw 1vw;
+  cursor: pointer;
+  box-shadow: 0 0.6vw 0 #991b1b;
+}
+
+.alertBox {
+  position: fixed;
+  top: 7.5vw;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(70vw, 90dvh);
+  text-align: center;
+  padding: 0.8vw 1vw;
+  box-sizing: border-box;
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 0.25vw solid #ef4444;
+  border-radius: 1.6vw;
+  box-shadow: 0 0.6vw 0 #fca5a5;
+  font-family: "Cherry Bomb One", system-ui;
+  font-size: clamp(1vw, 2dvh, 1.4vw);
+  z-index: 29;
+}
+
+.loadingPage {
+  min-height: 100dvh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at top left, #d1fae5 0%, transparent 35%),
+    radial-gradient(circle at bottom right, #34d399 0%, transparent 30%),
+    #adfad2;
+  font-family: "Cherry Bomb One", system-ui;
+}
+
+.loadingCard {
+  width: min(82vw, 70dvh);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5vw;
+  padding: 2vw;
+  box-sizing: border-box;
+  background-color: #10b981;
+  border: 0.35vw solid #064e3b;
+  border-radius: 3vw;
+  box-shadow: 0 1vw 0 #064e3b;
+}
+
+.loadingTitle {
+  margin: 0;
+  font-size: clamp(2.8vw, 5.5dvh, 4.2vw);
+  color: #f3f4f6;
+  -webkit-text-stroke: 0.16vw #064e3b;
+  text-shadow: 0 0.3vw 0 #064e3b;
+  text-align: center;
+}
+
+.loadingText {
+  margin: 0;
+  text-align: center;
+  font-size: clamp(1.2vw, 2.4dvh, 1.8vw);
+  color: #f3f4f6;
+  -webkit-text-stroke: 0.08vw #064e3b;
+}
+
+@media (orientation: portrait) and (max-width: 650px) {
+  .roomBanner {
+    top: 2vw;
+    width: 92vw;
+    flex-direction: column;
+    align-items: stretch;
+    gap: min(1.8vw, 0.9dvh);
+    padding: min(2.8vw, 1.5dvh);
+    border-width: min(0.5vw, 0.25dvh);
+    border-radius: min(4vw, 2dvh);
+    box-shadow: 0 min(1vw, 0.5dvh) 0 #064e3b;
+  }
+
+  .roomInfo {
+    gap: min(1.8vw, 0.9dvh);
+  }
+
+  .roomCode,
+  .roomDetail,
+  .leaveButton,
+  .alertBox,
+  .loadingText {
+    font-size: min(4.3vw, 2.2dvh);
+  }
+
+  .leaveButton {
+    border-width: min(0.5vw, 0.25dvh);
+    border-radius: min(4vw, 2dvh);
+    padding: min(2vw, 1dvh) min(3vw, 1.5dvh) min(2.6vw, 1.3dvh) min(3vw, 1.5dvh);
+  }
+
+  .alertBox {
+    top: 26vw;
+    width: 88vw;
+    border-width: min(0.5vw, 0.25dvh);
+    border-radius: min(3vw, 1.6dvh);
+    padding: min(2vw, 1dvh);
+    box-shadow: 0 min(0.8vw, 0.4dvh) 0 #fca5a5;
+  }
+
+  .loadingCard {
+    width: 90vw;
+    gap: min(3vw, 1.5dvh);
+    padding: min(5vw, 2.7dvh);
+    border-width: min(0.7vw, 0.35dvh);
+    border-radius: min(5vw, 2.5dvh);
+    box-shadow: 0 min(1.5vw, 0.8dvh) 0 #064e3b;
+  }
+
+  .loadingTitle {
+    font-size: min(9vw, 4.6dvh);
+    -webkit-text-stroke-width: min(0.4vw, 0.2dvh);
+  }
+}

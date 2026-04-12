@@ -13,6 +13,8 @@
   "include": [
     "src",
     "../src/CrownChase/Logic/v2/**/*.ts",
-    "../src/CrownChase/Logic/multiplayer/**/*.ts"
+    "../src/CrownChase/Logic/multiplayer/**/*.ts",
+    "../src/MathWar/Logic/v2/**/*.ts",
+    "../src/MathWar/Logic/multiplayer/**/*.ts"
   ]
 }

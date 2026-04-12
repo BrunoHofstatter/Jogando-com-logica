@@ -54,6 +54,8 @@ export const ROUTES = {
   MATH_WAR_RULES: "/guerra-matematica/regras",
   MATH_WAR_GAME: "/guerra-matematica",
   MATH_WAR_AI: "/guerra-matematica/computador",
+  MATH_WAR_MP_LOBBY: "/guerra-matematica/online",
+  MATH_WAR_MP_GAME: "/guerra-matematica/online/partida",
 
   // Classes / Rubiks
   CLASS_MENU: "/aulas",
