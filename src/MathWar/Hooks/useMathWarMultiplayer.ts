@@ -165,6 +165,17 @@ function ensureSocket(): Socket<
       });
     });
 
+    socket.on("connect_error", (error) => {
+      const message = error.message === "Invalid namespace"
+        ? "O servidor online ainda não foi atualizado para a Guerra Matemática."
+        : "Não foi possível conectar ao servidor online.";
+
+      updateSnapshot({
+        connectionStatus: "disconnected",
+        errorMessage: message,
+      });
+    });
+
     socket.on("room_created", (payload) => {
       updateSnapshot({
         roomCode: payload.code,
