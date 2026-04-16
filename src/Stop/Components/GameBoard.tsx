@@ -1,290 +1,236 @@
-import { useState, useEffect, useRef, createRef, useMemo } from "react";
-// Imports continued
+import { createRef, useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import CalculationCell from "./CalculationCell";
-import type { DifficultyKey } from "../Logic/gameConfig";
-import { difficulties } from "../Logic/gameConfig";
-import { shuffleTogether, formatTime, getValidNumber } from "../Logic/gameLogic";
-import { type LevelConfig, saveLevelStars, isLevelUnlocked, getLevelById } from "../Logic/levelsConfig";
-import { useNavigate } from "react-router-dom";
-import styles from "../styles/StopGame.module.css";
 import VirtualKeyboard from "./VirtualKeyboard";
+import { formatTime } from "../Logic/gameLogic";
+import {
+  areAllStopAnswersFilled,
+  evaluateStopRound,
+  getFirstBlankStopAnswerIndex,
+  type StopRound,
+  type StopRoundResult,
+} from "../Logic/stopRound";
+import {
+  getLevelById,
+  saveLevelStars,
+  type LevelConfig,
+} from "../Logic/levelsConfig";
 import { isTouchDevice } from "../Logic/domUtils";
 import { ROUTES } from "../../routes";
-
+import styles from "../styles/StopGame.module.css";
 
 interface GameBoardProps {
-  randomNumber: number;
-  difficulty: DifficultyKey;
+  round: StopRound;
   levelConfig?: LevelConfig | null;
   onReset?: () => void;
+  requireFilledBoardToStop?: boolean;
 }
-
-type CaixaData =
-  | {
-    numero: number;
-    conta: string;
-    checar: boolean;
-    isDual: false;
-  }
-  | {
-    numeros: [number, number];
-    contas: [string, string];
-    checar: boolean;
-    isDual: true;
-  };
 
 /**
  * Main game board component
- * Manages timer, calculation cells, and game state
+ * Renders a pre-generated round and evaluates submitted answers.
  */
-function GameBoard({ randomNumber, difficulty, levelConfig, onReset }: GameBoardProps) {
+function GameBoard({
+  round,
+  levelConfig,
+  onReset,
+  requireFilledBoardToStop = false,
+}: GameBoardProps) {
   const navigate = useNavigate();
-  const [acertos, setAcertos] = useState(0);
-  const [caixasData, setCaixasData] = useState<CaixaData[]>([]);
   const [count, setCount] = useState(0);
-  const [showGame] = useState(true);
-  const [pararJogo, setPararJogo] = useState(false);
+  const [roundResult, setRoundResult] = useState<StopRoundResult | null>(null);
 
-  // Input Handling
   const [isTouch, setIsTouch] = useState(false);
-  const inputRefs = useMemo(() => {
-    return Array(caixasData.length).fill(null).map(() => createRef<HTMLInputElement>());
-  }, [caixasData]);
+  const inputRefs = useMemo(
+    () => round.boxes.map(() => createRef<HTMLInputElement>()),
+    [round],
+  );
+  const [answers, setAnswers] = useState(() => round.boxes.map(() => ""));
 
-  // Virtual Keyboard State
   const [showKeyboard, setShowKeyboard] = useState(false);
   const [activeInputIndex, setActiveInputIndex] = useState<number | null>(null);
   const [activeInputRect, setActiveInputRect] = useState<DOMRect | null>(null);
+
+  const [showLevelResult, setShowLevelResult] = useState(false);
+  const [starsEarned, setStarsEarned] = useState(0);
+
+  const roundEnded = roundResult !== null;
+  const correctCount = roundResult?.correctCount ?? 0;
+  const maxAcertos = round.boxes.length;
+  const canStopRound =
+    !requireFilledBoardToStop || areAllStopAnswersFilled(answers);
+  const nextLevelExists = levelConfig ? Boolean(getLevelById(levelConfig.id + 1)) : false;
 
   useEffect(() => {
     setIsTouch(isTouchDevice());
   }, []);
 
-  // Initialize input refs -> Handled by useMemo now.
-
-
-
-  // Level Mode Result State
-  const [showLevelResult, setShowLevelResult] = useState(false);
-  const [starsEarned, setStarsEarned] = useState(0);
-
-  // Check if next level exists
-  const nextLevelExists = levelConfig ? !!getLevelById(levelConfig.id + 1) : false;
-
-  // Initialize calculation cells based on difficulty or level config
   useEffect(() => {
-    // Determine config to use (Level Config overrides Difficulty Key)
-    let configToUse = difficulties[difficulty];
+    setAnswers(round.boxes.map(() => ""));
+    setCount(0);
+    setRoundResult(null);
+    setShowLevelResult(false);
+    setStarsEarned(0);
+    setShowKeyboard(false);
+    setActiveInputIndex(null);
+    setActiveInputRect(null);
+  }, [round]);
 
-    if (levelConfig) {
-      // Use the difficulty part of the level config
-      // LevelConfig extends DifficultyConfig so we can just use it directly
-      configToUse = levelConfig;
+  useEffect(() => {
+    if (roundEnded) {
+      return;
     }
-
-    const {
-      possibleNumbersByBox,
-      contasPorBox,
-      dualBoxes = [],
-    } = configToUse;
-
-    // Shuffle the single-box configurations
-    const [shuffledNumbers, shuffledContas] = shuffleTogether(
-      [...possibleNumbersByBox],
-      [...contasPorBox]
-    );
-
-    // Create single calculation cells
-    const singleBoxes: CaixaData[] = shuffledNumbers.map((arr, index) => {
-      const conta = shuffledContas[index];
-      const numero = getValidNumber(randomNumber, conta, [...arr], difficulty); // Note: getValidNumber uses difficulty string for some fallback? Check logic.
-      // If we pass 'difficulty' prop but use 'levelConfig' logic, we might need to be careful if difficulty string doesn't match level nature.
-      // But getValidNumber mainly uses it for some ranges? Actually looking at Logic/gameLogic.ts would clarify.
-      // For now we pass the prop difficulty which is 'd1' placeholder in level mode.
-      // Ideally we should pass the actual difficulty key corresponding to the level if possible, or refactor getValidNumber.
-
-      return {
-        numero,
-        conta,
-        checar: false,
-        isDual: false,
-      } as const;
-    });
-
-    // Create dual calculation cells
-    const dualBoxesData: CaixaData[] = dualBoxes.map((dualBox) => {
-      const num1 = getValidNumber(
-        randomNumber,
-        dualBox.operations[0],
-        [...dualBox.numbers1],
-        difficulty
-      );
-
-      // Calculate intermediate result after first operation
-      let intermediate = randomNumber;
-      switch (dualBox.operations[0]) {
-        case "+":
-          intermediate = randomNumber + num1;
-          break;
-        case "-":
-          intermediate = randomNumber - num1;
-          break;
-        case "x":
-          intermediate = randomNumber * num1;
-          break;
-        case "÷":
-          intermediate = randomNumber / num1;
-          break;
-      }
-
-      // Validate second number against intermediate result, not original randomNumber
-      const num2 = getValidNumber(
-        intermediate,
-        dualBox.operations[1],
-        [...dualBox.numbers2],
-        difficulty
-      );
-
-      return {
-        numeros: [num1, num2] as [number, number],
-        contas: [dualBox.operations[0], dualBox.operations[1]] as [
-          string,
-          string
-        ],
-        checar: false,
-        isDual: true,
-      } as const;
-    });
-
-    setCaixasData([...singleBoxes, ...dualBoxesData]);
-  }, [randomNumber, difficulty, levelConfig]);
-
-  // Timer effect
-  useEffect(() => {
-    if (!showGame || pararJogo) return;
 
     const interval = setInterval(() => {
       setCount((prevCount) => prevCount + 1);
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [showGame, pararJogo]);
+  }, [roundEnded]);
 
-  // Calculate stats when game stops
   useEffect(() => {
-    if (pararJogo && levelConfig) {
-      // Calculate stars
-      let stars = 0;
-      // Check 3 stars
-      if (count <= levelConfig.stars[3].maxTime && acertos >= levelConfig.stars[3].minCorrect) {
-        stars = 3;
-      }
-      // Check 2 stars
-      else if (count <= levelConfig.stars[2].maxTime && acertos >= levelConfig.stars[2].minCorrect) {
-        stars = 2;
-      }
-      // Check 1 star
-      else if (count <= levelConfig.stars[1].maxTime && acertos >= levelConfig.stars[1].minCorrect) {
-        stars = 1;
-      }
-
-      setStarsEarned(stars);
-      saveLevelStars(levelConfig.id, stars);
-      setTimeout(() => setShowLevelResult(true), 500); // Slight delay for dramatic effect
-    }
-  }, [pararJogo, levelConfig, acertos, count]);
-
-  // Enter key listener (Improved: Moves to next input instead of Stop)
-  useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
-      // Only handle if game is running and not stopped
-      if (!pararJogo && showGame) {
-        if (event.key === "Enter") {
-          event.preventDefault(); // Prevent default form submission or newline
-
-          // If we have an active input (tracked via focus or click ideally, but `document.activeElement` works)
-          // We can find which index it is.
-          const currentInput = document.activeElement as HTMLInputElement;
-          const currentIndex = inputRefs.findIndex(ref => ref.current === currentInput);
-
-          if (currentIndex !== -1) {
-            handleEnter(currentIndex);
-          }
-        }
-      }
-    };
-
-    if (!pararJogo && showGame) {
-      document.addEventListener("keydown", handleKeyPress);
+    if (!roundEnded || !levelConfig) {
+      return;
     }
 
-    return () => {
-      document.removeEventListener("keydown", handleKeyPress);
-    };
-  }, [pararJogo, showGame, inputRefs]);
+    let stars = 0;
 
-  const handleEnter = (currentIndex: number) => {
-    // If it's the last input, trigger STOP? Or just stop focusing?
-    // User requested "last one stops and ends the game" or "Stop button in the last one".
-    // "auto stopping in the last one" was one idea. "Enter button goes to next and the last one stops" was preferred.
-
-    if (currentIndex < caixasData.length - 1) {
-      // Go to next
-      const nextInput = inputRefs[currentIndex + 1].current;
-      if (nextInput) {
-        nextInput.focus();
-        if (isTouch) {
-          handleInputFocus(currentIndex + 1, nextInput);
-        }
-      }
-    } else {
-      // Last one -> Stop Game
-      setPararJogo(true);
-      setShowKeyboard(false);
+    if (
+      count <= levelConfig.stars[3].maxTime &&
+      correctCount >= levelConfig.stars[3].minCorrect
+    ) {
+      stars = 3;
+    } else if (
+      count <= levelConfig.stars[2].maxTime &&
+      correctCount >= levelConfig.stars[2].minCorrect
+    ) {
+      stars = 2;
+    } else if (
+      count <= levelConfig.stars[1].maxTime &&
+      correctCount >= levelConfig.stars[1].minCorrect
+    ) {
+      stars = 1;
     }
-  };
 
-  // Virtual Keyboard Handlers
-  const handleInputFocus = (index: number, element: HTMLInputElement) => {
-    if (!isTouch) return; // Only for touch
+    setStarsEarned(stars);
+    saveLevelStars(levelConfig.id, stars);
+
+    const timeout = window.setTimeout(() => {
+      setShowLevelResult(true);
+    }, 500);
+
+    return () => window.clearTimeout(timeout);
+  }, [count, correctCount, levelConfig, roundEnded]);
+
+  const handleInputFocus = useCallback((index: number, element: HTMLInputElement) => {
+    if (!isTouch || roundEnded) {
+      return;
+    }
 
     setActiveInputIndex(index);
     setActiveInputRect(element.getBoundingClientRect());
     setShowKeyboard(true);
+  }, [isTouch, roundEnded]);
+
+  const focusInputAt = useCallback((index: number) => {
+    const input = inputRefs[index]?.current;
+    if (!input) {
+      return;
+    }
+
+    input.focus();
+    if (isTouch) {
+      handleInputFocus(index, input);
+    }
+  }, [handleInputFocus, inputRefs, isTouch]);
+
+  const handleStop = useCallback(() => {
+    if (roundEnded) {
+      return;
+    }
+
+    if (!canStopRound) {
+      const blankIndex = getFirstBlankStopAnswerIndex(answers);
+      if (blankIndex !== -1) {
+        focusInputAt(blankIndex);
+      }
+      return;
+    }
+
+    setRoundResult(evaluateStopRound(round, answers));
+    setShowKeyboard(false);
+    setActiveInputIndex(null);
+  }, [answers, canStopRound, focusInputAt, round, roundEnded]);
+
+  const handleEnter = useCallback((currentIndex: number) => {
+    if (currentIndex < round.boxes.length - 1) {
+      focusInputAt(currentIndex + 1);
+      return;
+    }
+
+    handleStop();
+  }, [focusInputAt, handleStop, round.boxes.length]);
+
+  useEffect(() => {
+    if (roundEnded) {
+      return;
+    }
+
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key !== "Enter") {
+        return;
+      }
+
+      event.preventDefault();
+      const currentInput = document.activeElement as HTMLInputElement | null;
+      const currentIndex = inputRefs.findIndex(
+        (ref) => ref.current === currentInput,
+      );
+
+      if (currentIndex !== -1) {
+        handleEnter(currentIndex);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyPress);
+    return () => document.removeEventListener("keydown", handleKeyPress);
+  }, [answers, canStopRound, handleEnter, inputRefs, isTouch, round, roundEnded]);
+
+  const handleAnswerChange = (index: number, value: string) => {
+    if (roundEnded) {
+      return;
+    }
+
+    setAnswers((currentAnswers) =>
+      currentAnswers.map((answer, currentIndex) =>
+        currentIndex === index ? value : answer,
+      ),
+    );
   };
 
   const handleVirtualInput = (value: string) => {
-    if (activeInputIndex === null) return;
-    const input = inputRefs[activeInputIndex].current;
-    if (input) {
-      // Programmatically set value and trigger React change
-      // Standard hack to trigger React's onChange from JS code
-      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value")?.set;
-      if (nativeInputValueSetter) {
-        const newValue = input.value + value;
-        nativeInputValueSetter.call(input, newValue);
-
-        const event = new Event('input', { bubbles: true });
-        input.dispatchEvent(event);
-      }
+    if (activeInputIndex === null || roundEnded) {
+      return;
     }
+
+    setAnswers((currentAnswers) =>
+      currentAnswers.map((answer, index) =>
+        index === activeInputIndex ? answer + value : answer,
+      ),
+    );
   };
 
   const handleVirtualBackspace = () => {
-    if (activeInputIndex === null) return;
-    const input = inputRefs[activeInputIndex].current;
-    if (input) {
-      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value")?.set;
-      if (nativeInputValueSetter) {
-        // Slice last char
-        const newValue = input.value.slice(0, -1);
-        nativeInputValueSetter.call(input, newValue);
-
-        const event = new Event('input', { bubbles: true });
-        input.dispatchEvent(event);
-      }
+    if (activeInputIndex === null || roundEnded) {
+      return;
     }
+
+    setAnswers((currentAnswers) =>
+      currentAnswers.map((answer, index) =>
+        index === activeInputIndex ? answer.slice(0, -1) : answer,
+      ),
+    );
   };
 
   const handleVirtualNext = () => {
@@ -299,29 +245,26 @@ function GameBoard({ randomNumber, difficulty, levelConfig, onReset }: GameBoard
   };
 
   const handleNextLevel = () => {
-    if (!levelConfig) return;
-    navigate(ROUTES.STOP_GAME, { state: { mode: "level", level: levelConfig.id + 1 } });
-    window.location.reload(); // Quick fix to ensure full reload of state
+    if (!levelConfig) {
+      return;
+    }
+
+    navigate(ROUTES.STOP_GAME, {
+      state: { mode: "level", level: levelConfig.id + 1 },
+    });
+    window.location.reload();
   };
 
   const handleRetry = () => {
-    if (onReset) onReset();
-    // Reset local state
-    setPararJogo(false);
-    setShowLevelResult(false);
-    setCount(0);
-    setAcertos(0);
+    onReset?.();
   };
 
   const handleMenu = () => {
     navigate(ROUTES.STOP_LEVELS);
   };
-  const maxAcertos = (levelConfig?.columns ?? 5) * 2;
 
   return (
     <div className={styles.jogoStop}>
-
-      {/* Level Result Modal */}
       {showLevelResult && levelConfig && (
         <div className={styles.modalOverlay}>
           <div className={styles.levelResultModal}>
@@ -330,8 +273,11 @@ function GameBoard({ randomNumber, difficulty, levelConfig, onReset }: GameBoard
             </div>
 
             <div className={styles.starsContainer}>
-              {[1, 2, 3].map(s => (
-                <span key={s} className={s <= starsEarned ? styles.starFilled : styles.starEmpty}>
+              {[1, 2, 3].map((star) => (
+                <span
+                  key={star}
+                  className={star <= starsEarned ? styles.starFilled : styles.starEmpty}
+                >
                   ★
                 </span>
               ))}
@@ -339,14 +285,17 @@ function GameBoard({ randomNumber, difficulty, levelConfig, onReset }: GameBoard
 
             <div className={styles.resultStats}>
               <div>Tempo: {formatTime(count)}</div>
-              <div>Acertos: {acertos}/{maxAcertos}</div>
+              <div>Acertos: {correctCount}/{maxAcertos}</div>
             </div>
 
             <div className={styles.resultActions}>
               <button onClick={handleMenu} className={styles.actionBtn}>Menu</button>
               <button onClick={handleRetry} className={styles.actionBtn}>Tentar Novamente</button>
               {starsEarned >= 2 && nextLevelExists && (
-                <button onClick={handleNextLevel} className={`${styles.actionBtn} ${styles.primaryBtn}`}>
+                <button
+                  onClick={handleNextLevel}
+                  className={`${styles.actionBtn} ${styles.primaryBtn}`}
+                >
                   Próximo Nível
                 </button>
               )}
@@ -356,90 +305,65 @@ function GameBoard({ randomNumber, difficulty, levelConfig, onReset }: GameBoard
       )}
 
       <div className={styles.stopBorder}>
-        {/* Timer display */}
-        {!pararJogo && <h2>{count}</h2>}
+        {!roundEnded && <h2>{count}</h2>}
 
-        {/* Level Display */}
         {levelConfig && (
           <div className={styles.levelDisplay}>
             Nível: {levelConfig.id}
           </div>
         )}
 
-        {/* Magic number display and STOP button */}
         <div className={styles.numMagico}>
           <div className={styles.numeroCaixa}>
-            <span className={styles.numeroO}>{randomNumber}</span>
+            <span className={styles.numeroO}>{round.magicNumber}</span>
           </div>
-          {!pararJogo ? (
+          {!roundEnded ? (
             <button
               data-target="stopbutton"
               className={styles.pararJogo}
-              onClick={() => setPararJogo(true)}
+              onClick={handleStop}
+              disabled={requireFilledBoardToStop && !canStopRound}
             >
               STOP
             </button>
           ) : (
-            // Only show simpler results inline if NOT in level mode (modal will show for levels)
             !levelConfig && (
               <div className={styles.finalResultado}>
                 <div>Tempo:</div>
                 <div>{formatTime(count)}</div>
-                <div>Acertos: {acertos}</div>
+                <div>Acertos: {correctCount}</div>
               </div>
             )
           )}
         </div>
 
-        {/* Calculation cells grid */}
         <div className={styles.tabelaWrap}>
           <div
             data-target="board"
             className={styles.tabela}
-            data-rows={Math.ceil(caixasData.length / 2)}
-            style={
-              {
-                "--columns": levelConfig?.columns || ((difficulty === "d1" && !levelConfig) ? 4 : 5),
-              } as React.CSSProperties
-            }
+            data-rows={Math.ceil(round.boxes.length / 2)}
+            style={{ "--columns": round.columns } as React.CSSProperties}
           >
-            {caixasData.map((data, i) =>
-              data.isDual ? (
-                <CalculationCell
-                  key={`caixa-${i}`}
-                  numero_base={randomNumber}
-                  numeros={data.numeros}
-                  contas={data.contas}
-                  checar={pararJogo}
-                  registrarAcerto={() => setAcertos((prev) => prev + 1)}
-                  isDual
-                  inputRef={inputRefs[i] as React.RefObject<HTMLInputElement>}
-                  onFocus={(e) => handleInputFocus(i, e.target)}
-                  isTouch={isTouch}
-                />
-              ) : (
-                <CalculationCell
-                  key={`caixa-${i}`}
-                  numero_base={randomNumber}
-                  numero={data.numero}
-                  conta={data.conta}
-                  checar={pararJogo}
-                  registrarAcerto={() => setAcertos((prev) => prev + 1)}
-                  inputRef={inputRefs[i] as React.RefObject<HTMLInputElement>}
-                  onFocus={(e) => handleInputFocus(i, e.target)}
-                  isTouch={isTouch}
-                />
-              )
-            )}
+            {round.boxes.map((box, index) => (
+              <CalculationCell
+                key={box.id}
+                box={box}
+                value={answers[index] ?? ""}
+                showFeedback={roundEnded}
+                result={roundResult?.boxResults[index]}
+                inputRef={inputRefs[index]}
+                onChange={(value) => handleAnswerChange(index, value)}
+                onFocus={(event) => handleInputFocus(index, event.target)}
+                isTouch={isTouch}
+                isLocked={roundEnded}
+              />
+            ))}
           </div>
         </div>
-
-
       </div>
 
-      {/* Virtual Keyboard */}
       <VirtualKeyboard
-        isVisible={showKeyboard && !pararJogo}
+        isVisible={showKeyboard && !roundEnded}
         targetRect={activeInputRect}
         onInput={handleVirtualInput}
         onDelete={handleVirtualBackspace}

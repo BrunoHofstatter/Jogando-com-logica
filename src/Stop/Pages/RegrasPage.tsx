@@ -50,6 +50,10 @@ function RegrasPage() {
     navigate(ROUTES.STOP_LEVELS);
   };
 
+  const goToOnlineLobby = () => {
+    navigate(ROUTES.STOP_MP_LOBBY);
+  };
+
   const unlockAllLevels = () => {
     levels.forEach((level) => {
       saveLevelStars(level.id, 3);
@@ -110,6 +114,9 @@ function RegrasPage() {
         <div className={styles.bottomAuxButtons}>
           <button className={styles.tutorialButton} onClick={startTutorial}>
             <span>Tutorial</span>
+          </button>
+          <button className={styles.onlineButton} onClick={goToOnlineLobby}>
+            Online
           </button>
           <button
             className={styles.detailedRulesButton}

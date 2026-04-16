@@ -11,6 +11,7 @@
   color: #1a0e47;
   box-shadow: 0 0.5vw 0 rgba(0, 0, 0, 0.4);
   margin-bottom: 0.5vw;
+  z-index: 3;
 }
 
 .piece:hover:not(.pieceSelected) {

@@ -137,6 +137,36 @@
   box-shadow: 0 0.1vw 0 #a11425;
 }
 
+.onlineButton {
+  position: absolute;
+  bottom: 4.2dvh;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 0.3vw solid #a11425;
+  background-color: #e31f2f;
+  border-radius: 1.7vw;
+  padding: 0.1vw 1vw 0.5vw 1vw;
+  color: #ffcf40;
+  -webkit-text-stroke: 0.15vw #a11425;
+  font-size: clamp(1.5vw, 5dvh, 2.7vw);
+  font-family: "Cherry Bomb One", system-ui;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  z-index: 10;
+  box-shadow: 0 0.4vw 0 #a11425;
+}
+
+.onlineButton:hover {
+  background-color: #f5293a;
+  transform: translateX(-50%) translateY(-0.1vw);
+  box-shadow: 0 0.5vw 0 #a11425;
+}
+
+.onlineButton:active {
+  transform: translateX(-50%) translateY(0.3vw);
+  box-shadow: 0 0.1vw 0 #a11425;
+}
+
 .detailedRulesButton {
   position: absolute;
   bottom: 4.2dvh;
@@ -593,6 +623,7 @@
   }
 
   .tutorialButton,
+  .onlineButton,
   .detailedRulesButton {
     width: 30%;
     bottom: min(6vw, 2dvh);

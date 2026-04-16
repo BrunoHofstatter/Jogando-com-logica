@@ -15,7 +15,7 @@
 }
 
 .previewColumn {
-  width: 42%;
+  width: 25%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -24,15 +24,15 @@
 }
 
 .title {
-  font-size: clamp(3vw, 9dvh, 5.5vw);
+  font-size: clamp(1vw, 5dvh, 5vw);
   color: #f3f4f6;
-  -webkit-text-stroke: 0.25vw #064e3b;
+  -webkit-text-stroke: 0.13vw #064e3b;
   text-shadow: 0 0.4vw 0 #064e3b;
   text-align: center;
 }
 
 .preview {
-  width: min(36vw, 68dvh);
+  width: min(27vw, 68dvh);
   height: auto;
   animation: previewFloat 4s ease-in-out infinite;
 }
@@ -49,7 +49,7 @@
 }
 
 .panel {
-  width: 42%;
+  width: 62%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -61,16 +61,16 @@
   border: 0.4vw solid #064e3b;
   border-radius: 3vw;
   box-shadow: 0 1vw 0 #064e3b;
-  padding: 2vw;
+  padding: 1vw 2vw;
   display: flex;
   flex-direction: column;
-  gap: 1.4vw;
+  gap: 1vw;
   color: #f3f4f6;
   box-sizing: border-box;
 }
 
 .heading {
-  font-size: clamp(2.5vw, 5dvh, 4vw);
+  font-size: clamp(2.5vw, 5.5dvh, 4vw);
   text-align: center;
   -webkit-text-stroke: 0.16vw #064e3b;
   text-shadow: 0 0.3vw 0 #064e3b;
@@ -79,17 +79,23 @@
 .description {
   margin: 0;
   text-align: center;
-  font-size: clamp(1.3vw, 2.5dvh, 2vw);
-  -webkit-text-stroke: 0.08vw #064e3b;
+  font-size: clamp(1.3vw, 3.3dvh, 2vw);
+  -webkit-text-stroke: 0.1vw #064e3b;
+}
+
+.nameWrap {
+  display: flex;
+  flex-direction: row;
+  gap: 0.8vw;
 }
 
 .fieldLabel {
-  font-size: clamp(1.2vw, 2.3dvh, 1.8vw);
-  -webkit-text-stroke: 0.08vw #064e3b;
+  font-size: clamp(1.2vw, 4dvh, 3vw);
+  -webkit-text-stroke: 0.13vw #064e3b;
 }
 
 .input {
-  width: 100%;
+  width: 50%;
   border: 0.25vw solid #064e3b;
   border-radius: 1.4vw;
   background-color: #ecfdf5;
@@ -99,6 +105,7 @@
   padding: 0.8vw 1vw;
   box-sizing: border-box;
   outline: none;
+  margin-left: 2vw;
 }
 
 .actions {
@@ -124,7 +131,7 @@
   border: 0.3vw solid #064e3b;
   border-radius: 1.8vw;
   font-family: "Cherry Bomb One", system-ui;
-  font-size: clamp(1.2vw, 2.5dvh, 1.9vw);
+  font-size: clamp(1.2vw, 3dvh, 1.9vw);
   cursor: pointer;
   transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.1s ease;
   padding: 0.7vw 1vw 0.9vw 1vw;
@@ -133,21 +140,21 @@
 .primaryButton {
   background-color: #fcd34d;
   color: #064e3b;
-  -webkit-text-stroke: 0.08vw #064e3b;
+  -webkit-text-stroke: 0.1vw #064e3b;
   box-shadow: 0 0.6vw 0 #b45309;
 }
 
 .secondaryButton {
   background-color: #d1fae5;
   color: #064e3b;
-  -webkit-text-stroke: 0.08vw #064e3b;
+  -webkit-text-stroke: 0.1vw #064e3b;
   box-shadow: 0 0.6vw 0 #047857;
 }
 
 .leaveButton {
   background-color: #ef4444;
   color: #fff;
-  -webkit-text-stroke: 0.08vw #7f1d1d;
+  -webkit-text-stroke: 0.1vw #7f1d1d;
   box-shadow: 0 0.6vw 0 #991b1b;
 }
 
@@ -171,9 +178,31 @@
 }
 
 .waitingTitle {
-  font-size: clamp(1.8vw, 3.5dvh, 2.6vw);
+  font-size: clamp(1.8vw, 4.5dvh, 2.6vw);
   text-align: center;
-  -webkit-text-stroke: 0.12vw #064e3b;
+  -webkit-text-stroke: 0.15vw #064e3b;
+}
+
+.waitingLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 1.2vw;
+  align-items: stretch;
+}
+
+.waitingCodeColumn,
+.waitingInfoColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1vw;
+}
+
+.waitingCodeColumn {
+  justify-content: center;
+}
+
+.waitingInfoColumn {
+  justify-content: space-between;
 }
 
 .codeBox {
@@ -194,18 +223,18 @@
 .errorText {
   margin: 0;
   text-align: center;
-  font-size: clamp(1.1vw, 2.1dvh, 1.6vw);
-  -webkit-text-stroke: 0.06vw #064e3b;
+  font-size: clamp(1.1vw, 3.5dvh, 1.6vw);
+  -webkit-text-stroke: 0.12vw #064e3b;
 }
 
 .feedback {
   color: #14532d;
-  -webkit-text-stroke: 0.06vw #14532d;
+  -webkit-text-stroke: 0.08vw #14532d;
 }
 
 .errorText {
   color: #fee2e2;
-  -webkit-text-stroke: 0.06vw #7f1d1d;
+  -webkit-text-stroke: 0.08vw #7f1d1d;
 }
 
 @media (orientation: portrait) and (max-width: 650px) {
@@ -243,6 +272,7 @@
   }
 
   .description,
+  .nameWrap,
   .fieldLabel,
   .input,
   .primaryButton,
@@ -258,6 +288,10 @@
     border-width: min(0.5vw, 0.25dvh);
     border-radius: min(4vw, 2dvh);
     padding: min(2.6vw, 1.4dvh) min(3vw, 1.6dvh);
+  }
+
+  .nameWrap {
+    gap: min(2vw, 1dvh);
   }
 
   .actions {
@@ -283,6 +317,16 @@
 
   .waitingTitle {
     font-size: min(7vw, 3.8dvh);
+  }
+
+  .waitingLayout {
+    grid-template-columns: 1fr;
+    gap: min(3vw, 1.5dvh);
+  }
+
+  .waitingCodeColumn,
+  .waitingInfoColumn {
+    gap: min(2vw, 1dvh);
   }
 
   .codeBox {

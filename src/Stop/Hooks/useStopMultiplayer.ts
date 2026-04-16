@@ -2,48 +2,42 @@ import { useEffect, useState } from "react";
 import { io, type Socket } from "socket.io-client";
 
 import type {
-  CrownChaseClientToServerEvents,
-  CrownChaseServerToClientEvents,
   MultiplayerConnectionStatus,
-  RoomPlayerInfo,
+  StopClientToServerEvents,
+  StopServerToClientEvents,
 } from "../Logic/multiplayer/protocol";
-import type { CrownChaseState, MoveIntent, PlayerId } from "../Logic/v2";
+import type {
+  StopMultiplayerSettingsPatch,
+  StopMultiplayerState,
+} from "../Logic/multiplayer/types";
 
 type MultiplayerSnapshot = {
   connectionStatus: MultiplayerConnectionStatus;
   roomCode: string | null;
   playerName: string;
-  playerSeat: PlayerId | null;
-  players: RoomPlayerInfo[];
-  gameState: CrownChaseState | null;
+  playerId: string | null;
+  state: StopMultiplayerState | null;
   errorMessage: string | null;
-  opponentDisconnected: boolean;
-  rematchRequestedBy: PlayerId | null;
-  rematchPending: boolean;
 };
 
 type LeaveRoomOptions = {
   preserveName?: boolean;
 };
 
-const SESSION_STORAGE_KEY = "crownchase_multiplayer_session_v1";
+const SESSION_STORAGE_KEY = "stop_multiplayer_session_v1";
 
 const DEFAULT_SNAPSHOT: MultiplayerSnapshot = {
   connectionStatus: "idle",
   roomCode: null,
   playerName: "",
-  playerSeat: null,
-  players: [],
-  gameState: null,
+  playerId: null,
+  state: null,
   errorMessage: null,
-  opponentDisconnected: false,
-  rematchRequestedBy: null,
-  rematchPending: false,
 };
 
 let socket: Socket<
-  CrownChaseServerToClientEvents,
-  CrownChaseClientToServerEvents
+  StopServerToClientEvents,
+  StopClientToServerEvents
 > | null = null;
 let sharedSnapshot = loadSnapshot();
 const subscribers = new Set<(snapshot: MultiplayerSnapshot) => void>();
@@ -63,13 +57,11 @@ function loadSnapshot(): MultiplayerSnapshot {
     const nextSnapshot: MultiplayerSnapshot = {
       ...DEFAULT_SNAPSHOT,
       ...parsed,
-      players: Array.isArray(parsed.players) ? normalizePlayers(parsed.players) : [],
     };
 
     if (nextSnapshot.roomCode && nextSnapshot.connectionStatus !== "waiting") {
-      nextSnapshot.connectionStatus = nextSnapshot.gameState?.status === "ended"
-        ? "ended"
-        : "disconnected";
+      nextSnapshot.connectionStatus =
+        nextSnapshot.state?.status === "ended" ? "ended" : "disconnected";
     }
 
     return nextSnapshot;
@@ -83,7 +75,10 @@ function persistSnapshot(): void {
     return;
   }
 
-  window.sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(sharedSnapshot));
+  window.sessionStorage.setItem(
+    SESSION_STORAGE_KEY,
+    JSON.stringify(sharedSnapshot),
+  );
 }
 
 function notifySubscribers(): void {
@@ -95,21 +90,13 @@ function updateSnapshot(patch: Partial<MultiplayerSnapshot>): void {
   sharedSnapshot = {
     ...sharedSnapshot,
     ...patch,
-    players: patch.players ? normalizePlayers(patch.players) : sharedSnapshot.players,
   };
   notifySubscribers();
 }
 
 function replaceSnapshot(nextSnapshot: MultiplayerSnapshot): void {
-  sharedSnapshot = {
-    ...nextSnapshot,
-    players: normalizePlayers(nextSnapshot.players),
-  };
+  sharedSnapshot = nextSnapshot;
   notifySubscribers();
-}
-
-function normalizePlayers(players: RoomPlayerInfo[]): RoomPlayerInfo[] {
-  return [...players].sort((left, right) => left.seat - right.seat);
 }
 
 function getServerUrl(): string | null {
@@ -119,9 +106,27 @@ function getServerUrl(): string | null {
     : null;
 }
 
+function getNamespaceUrl(serverUrl: string): string {
+  return `${serverUrl.replace(/\/$/, "")}/stop`;
+}
+
+function getConnectionStatusFromState(
+  state: StopMultiplayerState | null,
+): MultiplayerConnectionStatus {
+  if (!state) {
+    return sharedSnapshot.roomCode ? "disconnected" : "idle";
+  }
+
+  if (state.status === "ended") {
+    return "ended";
+  }
+
+  return state.status === "playing" ? "playing" : "waiting";
+}
+
 function ensureSocket(): Socket<
-  CrownChaseServerToClientEvents,
-  CrownChaseClientToServerEvents
+  StopServerToClientEvents,
+  StopClientToServerEvents
 > | null {
   const serverUrl = getServerUrl();
 
@@ -134,23 +139,14 @@ function ensureSocket(): Socket<
   }
 
   if (!socket) {
-    socket = io(serverUrl, {
+    socket = io(getNamespaceUrl(serverUrl), {
       autoConnect: false,
       transports: ["websocket"],
     });
 
     socket.on("connect", () => {
-      const nextStatus =
-        sharedSnapshot.roomCode === null
-          ? "idle"
-          : sharedSnapshot.gameState?.status === "ended"
-            ? "ended"
-            : sharedSnapshot.connectionStatus === "waiting"
-              ? "waiting"
-              : "playing";
-
       updateSnapshot({
-        connectionStatus: nextStatus,
+        connectionStatus: getConnectionStatusFromState(sharedSnapshot.state),
         errorMessage: null,
       });
     });
@@ -162,9 +158,10 @@ function ensureSocket(): Socket<
     });
 
     socket.on("connect_error", (error) => {
-      const message = error.message === "Invalid namespace"
-        ? "O servidor online ainda não foi atualizado para o Caça Coroa."
-        : "Não foi possível conectar ao servidor online.";
+      const message =
+        error.message === "Invalid namespace"
+          ? "O servidor online ainda não foi atualizado para o Stop Matemático."
+          : "Não foi possível conectar ao servidor online.";
 
       updateSnapshot({
         connectionStatus: "disconnected",
@@ -175,79 +172,29 @@ function ensureSocket(): Socket<
     socket.on("room_created", (payload) => {
       updateSnapshot({
         roomCode: payload.code,
-        playerSeat: payload.seat,
-        players: payload.players,
-        gameState: payload.state,
-        connectionStatus: "waiting",
-        opponentDisconnected: false,
+        playerId: payload.playerId,
+        state: payload.state,
+        connectionStatus: getConnectionStatusFromState(payload.state),
         errorMessage: null,
-        rematchPending: false,
-        rematchRequestedBy: null,
       });
     });
 
     socket.on("room_joined", (payload) => {
       updateSnapshot({
         roomCode: payload.code,
-        playerSeat: payload.seat,
-        players: payload.players,
-        gameState: payload.state,
-        connectionStatus: "waiting",
-        opponentDisconnected: false,
+        playerId: payload.playerId,
+        state: payload.state,
+        connectionStatus: getConnectionStatusFromState(payload.state),
         errorMessage: null,
-        rematchPending: false,
-        rematchRequestedBy: null,
-      });
-    });
-
-    socket.on("room_ready", (payload) => {
-      updateSnapshot({
-        roomCode: payload.code,
-        players: payload.players,
-        gameState: payload.state,
-        connectionStatus: payload.state.status === "ended" ? "ended" : "playing",
-        opponentDisconnected: false,
-        errorMessage: null,
-        rematchPending: false,
-        rematchRequestedBy: null,
       });
     });
 
     socket.on("state_updated", (payload) => {
       updateSnapshot({
         roomCode: payload.code,
-        gameState: payload.state,
-        connectionStatus: payload.state.status === "ended" ? "ended" : "playing",
+        state: payload.state,
+        connectionStatus: getConnectionStatusFromState(payload.state),
         errorMessage: null,
-        opponentDisconnected: false,
-      });
-    });
-
-    socket.on("rematch_requested", (payload) => {
-      updateSnapshot({
-        rematchRequestedBy: payload.requestedBy,
-        rematchPending: sharedSnapshot.playerSeat === payload.requestedBy,
-        errorMessage: null,
-      });
-    });
-
-    socket.on("rematch_started", (payload) => {
-      updateSnapshot({
-        roomCode: payload.code,
-        gameState: payload.state,
-        connectionStatus: "playing",
-        errorMessage: null,
-        opponentDisconnected: false,
-        rematchPending: false,
-        rematchRequestedBy: null,
-      });
-    });
-
-    socket.on("opponent_left", (payload) => {
-      updateSnapshot({
-        connectionStatus: "disconnected",
-        errorMessage: payload.message,
-        opponentDisconnected: true,
       });
     });
 
@@ -255,13 +202,14 @@ function ensureSocket(): Socket<
       updateSnapshot({
         connectionStatus: "disconnected",
         errorMessage: payload.message,
-        opponentDisconnected: true,
       });
     });
 
     socket.on("multiplayer_error", (payload) => {
       updateSnapshot({
-        connectionStatus: sharedSnapshot.roomCode ? sharedSnapshot.connectionStatus : "idle",
+        connectionStatus: sharedSnapshot.roomCode
+          ? sharedSnapshot.connectionStatus
+          : "idle",
         errorMessage: payload.message,
       });
     });
@@ -274,11 +222,11 @@ function ensureSocket(): Socket<
   return socket;
 }
 
-export function hasActiveCrownChaseMultiplayerSession(): boolean {
+export function hasActiveStopMultiplayerSession(): boolean {
   return sharedSnapshot.roomCode !== null;
 }
 
-export function leaveCrownChaseMultiplayerRoom(
+export function leaveStopMultiplayerRoom(
   options: LeaveRoomOptions = {},
 ): void {
   const { preserveName = true } = options;
@@ -298,7 +246,7 @@ export function leaveCrownChaseMultiplayerRoom(
   });
 }
 
-export function useCrownChaseMultiplayer() {
+export function useStopMultiplayer() {
   const [snapshot, setSnapshot] = useState<MultiplayerSnapshot>(sharedSnapshot);
 
   useEffect(() => {
@@ -325,18 +273,16 @@ export function useCrownChaseMultiplayer() {
     updateSnapshot({
       playerName: normalizedName,
       roomCode: null,
-      playerSeat: null,
-      players: [],
-      gameState: null,
+      playerId: null,
+      state: null,
       connectionStatus: "connecting",
       errorMessage: null,
-      opponentDisconnected: false,
-      rematchPending: false,
-      rematchRequestedBy: null,
     });
 
     const activeSocket = ensureSocket();
-    activeSocket?.emit("create_room", { playerName: normalizedName });
+    activeSocket?.emit("create_room", {
+      playerName: normalizedName,
+    });
   };
 
   const joinRoom = (code: string, playerName: string) => {
@@ -360,14 +306,10 @@ export function useCrownChaseMultiplayer() {
     updateSnapshot({
       playerName: normalizedName,
       roomCode: normalizedCode,
-      playerSeat: null,
-      players: [],
-      gameState: null,
+      playerId: null,
+      state: null,
       connectionStatus: "connecting",
       errorMessage: null,
-      opponentDisconnected: false,
-      rematchPending: false,
-      rematchRequestedBy: null,
     });
 
     const activeSocket = ensureSocket();
@@ -377,15 +319,50 @@ export function useCrownChaseMultiplayer() {
     });
   };
 
-  const submitMove = (intent: MoveIntent) => {
+  const updateRoomSettings = (settingsPatch: StopMultiplayerSettingsPatch) => {
     if (!sharedSnapshot.roomCode) {
       return;
     }
 
     const activeSocket = ensureSocket();
-    activeSocket?.emit("submit_move", {
+    activeSocket?.emit("update_room_settings", {
       code: sharedSnapshot.roomCode,
-      intent,
+      settingsPatch,
+    });
+  };
+
+  const startMatch = () => {
+    if (!sharedSnapshot.roomCode) {
+      return;
+    }
+
+    const activeSocket = ensureSocket();
+    activeSocket?.emit("start_match", {
+      code: sharedSnapshot.roomCode,
+    });
+  };
+
+  const submitAnswerSnapshot = (answers: string[]) => {
+    if (!sharedSnapshot.roomCode) {
+      return;
+    }
+
+    const activeSocket = ensureSocket();
+    activeSocket?.emit("submit_answer_snapshot", {
+      code: sharedSnapshot.roomCode,
+      answers,
+    });
+  };
+
+  const pressStop = (answers: string[]) => {
+    if (!sharedSnapshot.roomCode) {
+      return;
+    }
+
+    const activeSocket = ensureSocket();
+    activeSocket?.emit("press_stop", {
+      code: sharedSnapshot.roomCode,
+      answers,
     });
   };
 
@@ -393,12 +370,6 @@ export function useCrownChaseMultiplayer() {
     if (!sharedSnapshot.roomCode) {
       return;
     }
-
-    updateSnapshot({
-      rematchPending: true,
-      rematchRequestedBy: sharedSnapshot.playerSeat,
-      errorMessage: null,
-    });
 
     const activeSocket = ensureSocket();
     activeSocket?.emit("request_rematch", {
@@ -410,8 +381,11 @@ export function useCrownChaseMultiplayer() {
     ...snapshot,
     createRoom,
     joinRoom,
-    submitMove,
+    updateRoomSettings,
+    startMatch,
+    submitAnswerSnapshot,
+    pressStop,
     requestRematch,
-    leaveRoom: leaveCrownChaseMultiplayerRoom,
+    leaveRoom: leaveStopMultiplayerRoom,
   };
 }
