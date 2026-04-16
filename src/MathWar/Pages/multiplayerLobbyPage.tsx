@@ -28,12 +28,14 @@ export default function MathWarMultiplayerLobbyPage() {
 
   useEffect(() => {
     document.body.style.backgroundColor = "#adfad2";
+
     let metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (!metaThemeColor) {
       metaThemeColor = document.createElement("meta");
       metaThemeColor.setAttribute("name", "theme-color");
       document.head.appendChild(metaThemeColor);
     }
+
     metaThemeColor.setAttribute("content", "#adfad2");
   }, []);
 
@@ -48,6 +50,9 @@ export default function MathWarMultiplayerLobbyPage() {
   }, [connectionStatus, navigate, roomCode]);
 
   const opponent = players.find((candidate) => candidate.seat !== playerSeat) ?? null;
+  const isBusy = connectionStatus === "connecting";
+  const isWaiting = connectionStatus === "waiting" && roomCode !== null;
+  const isDisconnected = connectionStatus === "disconnected" && roomCode !== null;
 
   const handleCreateRoom = () => {
     createRoom(nameInput);
@@ -79,10 +84,6 @@ export default function MathWarMultiplayerLobbyPage() {
     setCopyFeedback("");
   };
 
-  const isBusy = connectionStatus === "connecting";
-  const isWaiting = connectionStatus === "waiting" && roomCode !== null;
-  const isDisconnected = connectionStatus === "disconnected" && roomCode !== null;
-
   return (
     <div className={styles.page}>
       <div className={styles.previewColumn}>
@@ -101,17 +102,19 @@ export default function MathWarMultiplayerLobbyPage() {
             Crie uma sala e compartilhe o código com outro jogador.
           </p>
 
-          <label className={styles.fieldLabel} htmlFor="math-war-online-name">
-            Seu nome
-          </label>
-          <input
-            id="math-war-online-name"
-            className={styles.input}
-            value={nameInput}
-            maxLength={20}
-            onChange={(event) => setNameInput(event.target.value)}
-            placeholder="Digite seu nome"
-          />
+          <div className={styles.nameWrap}>
+            <label className={styles.fieldLabel} htmlFor="math-war-online-name">
+              Seu nome
+            </label>
+            <input
+              id="math-war-online-name"
+              className={styles.input}
+              value={nameInput}
+              maxLength={20}
+              onChange={(event) => setNameInput(event.target.value)}
+              placeholder="Digite seu nome"
+            />
+          </div>
 
           {!isWaiting && !isDisconnected && (
             <div className={styles.actions}>
@@ -125,7 +128,11 @@ export default function MathWarMultiplayerLobbyPage() {
 
               <button
                 className={styles.secondaryButton}
-                onClick={() => setLobbyMode((currentMode) => currentMode === "join" ? "home" : "join")}
+                onClick={() =>
+                  setLobbyMode((currentMode) =>
+                    currentMode === "join" ? "home" : "join",
+                  )
+                }
                 disabled={isBusy}
               >
                 {lobbyMode === "join" ? "Voltar" : "Entrar em Sala"}
@@ -135,6 +142,7 @@ export default function MathWarMultiplayerLobbyPage() {
 
           {lobbyMode === "join" && !isWaiting && !isDisconnected && (
             <div className={styles.joinBox}>
+              <div className={styles.nameWrap}>
               <label className={styles.fieldLabel} htmlFor="math-war-online-code">
                 Código da sala
               </label>
@@ -146,6 +154,7 @@ export default function MathWarMultiplayerLobbyPage() {
                 onChange={(event) => setRoomInput(event.target.value.toUpperCase())}
                 placeholder="AB12"
               />
+              </div>
 
               <button
                 className={styles.primaryButton}
@@ -160,25 +169,30 @@ export default function MathWarMultiplayerLobbyPage() {
           {isWaiting && (
             <div className={styles.waitingBox}>
               <div className={styles.waitingTitle}>Aguardando oponente...</div>
-              <div className={styles.codeBox}>{roomCode}</div>
-              <button className={styles.secondaryButton} onClick={handleCopyCode}>
-                Copiar Código
-              </button>
-              {copyFeedback && <p className={styles.feedback}>{copyFeedback}</p>}
-              <p className={styles.waitingText}>
-                Compartilhe este código para outro jogador entrar na sala.
-              </p>
-              <p className={styles.waitingText}>
-                Você joga com as peças azuis e começa a partida.
-              </p>
-              {opponent && (
-                <p className={styles.waitingText}>
-                  Oponente conectado: {opponent.name}
-                </p>
-              )}
-              <button className={styles.leaveButton} onClick={handleLeaveRoom}>
-                Cancelar Sala
-              </button>
+
+              <div className={styles.waitingLayout}>
+                <div className={styles.waitingCodeColumn}>
+                  <div className={styles.codeBox}>{roomCode}</div>
+                  <button className={styles.secondaryButton} onClick={handleCopyCode}>
+                    Copiar Código
+                  </button>
+                  {copyFeedback && <p className={styles.feedback}>{copyFeedback}</p>}
+                </div>
+
+                <div className={styles.waitingInfoColumn}>
+                  <p className={styles.waitingText}>
+                    Compartilhe este código para outro jogador entrar na sala.
+                  </p>
+                  {opponent && (
+                    <p className={styles.waitingText}>
+                      Oponente conectado: {opponent.name}
+                    </p>
+                  )}
+                  <button className={styles.leaveButton} onClick={handleLeaveRoom}>
+                    Cancelar Sala
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 

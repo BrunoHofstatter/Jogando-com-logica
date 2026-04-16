@@ -4,6 +4,19 @@ This service hosts private-room online multiplayer for Crown Chase.
 
 ## Local development
 
+You can now start both the frontend and the multiplayer server from the repo root:
+
+```bash
+npm run dev
+```
+
+That command starts:
+
+- Vite on `http://localhost:5173`
+- the multiplayer server on `http://localhost:3001`
+
+If you only need the backend, keep using the commands below inside `multiplayer-server/`.
+
 1. Create a local env file from `.env.example`.
 2. Install dependencies:
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import NumberReveal from "../Components/NumberReveal";
 import GameBoard from "../Components/GameBoard";
@@ -8,7 +8,12 @@ import DynamicTutorial, {
 import tutorialStyles from "../styles/DynamicTutorial.module.css";
 import { getRandomDifficultyKey, type DifficultyKey } from "../Logic/gameConfig";
 import { getLevelById, type LevelConfig } from "../Logic/levelsConfig";
-import styles from "../styles/StopGame.module.css";
+import {
+  createStopRound,
+  createStopRoundTemplateFromDifficulty,
+  createStopRoundTemplateFromLevel,
+  type StopRound,
+} from "../Logic/stopRound";
 
 /**
  * Main Stop game page
@@ -52,7 +57,7 @@ function StopGamePage() {
   });
 
   const [showTutorial, setShowTutorial] = useState(false);
-  const [randomNumber, setRandomNumber] = useState<number | null>(null);
+  const [currentRound, setCurrentRound] = useState<StopRound | null>(null);
   const [showNumber, setShowNumber] = useState(true);
   const [showGame, setShowGame] = useState(false);
   const [resetTrigger, setResetTrigger] = useState(0);
@@ -75,6 +80,22 @@ function StopGamePage() {
       setLevelConfig(null);
     }
   }, [mode, levelId]);
+
+  const roundTemplate = useMemo(() => {
+    if (mode === "level") {
+      return levelConfig ? createStopRoundTemplateFromLevel(levelConfig) : null;
+    }
+
+    return createStopRoundTemplateFromDifficulty(difficulty);
+  }, [difficulty, levelConfig, mode]);
+
+  useEffect(() => {
+    if (!roundTemplate) {
+      return;
+    }
+
+    setCurrentRound(createStopRound(roundTemplate));
+  }, [roundTemplate, resetTrigger]);
 
   // Tutorial step definitions
   const tutorialSteps: TutorialStep[] = [
@@ -124,38 +145,32 @@ function StopGamePage() {
     setShowGame(true);
   }, []);
 
-  const handleNumberRevealed = useCallback((number: number) => {
-    setRandomNumber(number);
-  }, []);
-
   const handleReset = () => {
     if (mode === "random") {
       setDifficulty(prev => getRandomDifficultyKey(prev));
     }
+    setCurrentRound(null);
     setResetTrigger((prev) => prev + 1);
     setShowNumber(true);
     setShowGame(false);
-    setRandomNumber(null);
   };
 
   return (
     <div>
       {/* Number reveal animation */}
-      {showNumber && (
+      {showNumber && currentRound !== null && roundTemplate !== null && (
         <NumberReveal
-          difficulty={difficulty}
-          levelConfig={levelConfig}
-          onNumberRevealed={handleNumberRevealed}
+          finalNumber={currentRound.magicNumber}
+          possibleNumbers={roundTemplate.possibleRandomNumbers}
           onAnimationComplete={proceedToGame}
           tutorialActive={tutorialActiveRef.current}
         />
       )}
 
       {/* Game board */}
-      {showGame && randomNumber !== null && (
+      {showGame && currentRound !== null && (
         <GameBoard
-          randomNumber={randomNumber}
-          difficulty={difficulty}
+          round={currentRound}
           levelConfig={levelConfig}
           onReset={handleReset}
         />

@@ -1,13 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import type { DifficultyKey } from "../Logic/gameConfig";
-import { difficulties } from "../Logic/gameConfig";
-import type { LevelConfig } from "../Logic/levelsConfig";
 import styles from "../styles/StopGame.module.css";
 
 interface NumberRevealProps {
-  difficulty: DifficultyKey;
-  levelConfig?: LevelConfig | null;
-  onNumberRevealed: (number: number) => void;
+  finalNumber: number;
+  possibleNumbers: readonly number[];
   onAnimationComplete: () => void;
   tutorialActive: boolean;
 }
@@ -17,14 +13,12 @@ interface NumberRevealProps {
  * Shows a rapidly changing number that settles on a final "magic number"
  */
 function NumberReveal({
-  difficulty,
-  levelConfig,
-  onNumberRevealed,
+  finalNumber,
+  possibleNumbers,
   onAnimationComplete,
   tutorialActive,
 }: NumberRevealProps) {
   const [displayedNumber, setDisplayedNumber] = useState<number>(4);
-  const [randomNumber, setRandomNumber] = useState<number | null>(null);
 
   const animationIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
     null
@@ -36,15 +30,10 @@ function NumberReveal({
    * Generate a random number from the difficulty's possible numbers
    */
   const NumGenerator = useCallback(() => {
-    let possible: number[] = [];
-    if (levelConfig?.possibleRandomNumbers) {
-      possible = levelConfig.possibleRandomNumbers;
-    } else {
-      possible = difficulties[difficulty].possibleRandomNumbers;
-    }
+    const possible = possibleNumbers.length > 0 ? possibleNumbers : [finalNumber];
     const index = Math.floor(Math.random() * possible.length);
     return possible[index];
-  }, [difficulty, levelConfig]);
+  }, [finalNumber, possibleNumbers]);
 
   /**
    * Start the number animation sequence
@@ -59,10 +48,7 @@ function NumberReveal({
     stopTimeoutRef.current = setTimeout(() => {
       if (animationIntervalRef.current)
         clearInterval(animationIntervalRef.current);
-      const finalNum = NumGenerator();
-      setDisplayedNumber(finalNum);
-      setRandomNumber(finalNum);
-      onNumberRevealed(finalNum);
+      setDisplayedNumber(finalNumber);
     }, 2000);
 
     // Auto-advance to game after 3.5 seconds (only if tutorial is not active)
@@ -80,9 +66,8 @@ function NumberReveal({
       if (gameTimeoutRef.current) clearTimeout(gameTimeoutRef.current);
     };
   }, [
-    difficulty,
+    finalNumber,
     NumGenerator,
-    onNumberRevealed,
     onAnimationComplete,
     tutorialActive,
   ]);

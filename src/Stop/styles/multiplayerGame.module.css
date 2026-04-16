@@ -1,0 +1,473 @@
+.page {
+  min-height: 100dvh;
+  width: 100vw;
+  box-sizing: border-box;
+  padding: 2vw;
+  background:
+    radial-gradient(circle at top left, #ffd9d9 0%, transparent 34%),
+    radial-gradient(circle at bottom right, #ff8f8f 0%, transparent 28%),
+    #ffbaba;
+  font-family: "Cherry Bomb One", system-ui;
+  display: flex;
+  flex-direction: column;
+  gap: 1.6vw;
+}
+
+.banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1vw;
+  background-color: #e31f2f;
+  border: 0.35vw solid #a11425;
+  border-radius: 2vw;
+  box-shadow: 0 0.8vw 0 #a11425;
+  padding: 1vw 1.4vw;
+  color: #ffcf40;
+}
+
+.bannerInfo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1vw;
+  align-items: center;
+}
+
+.roomCode,
+.roomDetail,
+.text {
+  font-size: min(1.45vw, 2.7dvh);
+  -webkit-text-stroke: 0.07vw #630000;
+}
+
+.confirmationCard,
+.alertBox,
+.centerCard,
+.finalCard,
+.resultsCard,
+.stopOverlayCard {
+  background-color: #e31f2f;
+  border: 0.35vw solid #a11425;
+  border-radius: 2.2vw;
+  box-shadow: 0 0.8vw 0 #a11425;
+  color: #ffcf40;
+  box-sizing: border-box;
+}
+
+.alertBox,
+.centerCard,
+.finalCard,
+.resultsCard,
+.stopOverlayCard {
+  padding: 1.4vw;
+}
+
+.gameArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.title {
+  margin: 0;
+  text-align: center;
+  font-size: min(3.4vw, 5.5dvh);
+  -webkit-text-stroke: 0.14vw #630000;
+  text-shadow: 0 0.3vw 0 #da9500;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: min(2vw, 3.5dvh);
+  -webkit-text-stroke: 0.09vw #630000;
+}
+
+.playerRow,
+.finalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1vw;
+  background-color: #ffcf40;
+  color: #a11425;
+  border: 0.2vw solid #a11425;
+  border-radius: 1.4vw;
+  padding: 0.8vw 1vw;
+  box-shadow: 0 0.4vw 0 #da9500;
+}
+
+.finalWinner {
+  background-color: #fff1b3;
+}
+
+.roundStage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1vw;
+  min-height: 100%;
+}
+
+.statusRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1vw;
+  color: #a11425;
+  padding: 0 0.6vw;
+}
+
+.statusText {
+  font-size: min(1.4vw, 2.6dvh);
+  -webkit-text-stroke: 0.05vw #630000;
+}
+
+.playSurface {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(18vw, 24vw) 1fr;
+  gap: 1.4vw;
+  padding: 0.2vw 0;
+}
+
+.magicColumn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3vw;
+}
+
+.roundSummary {
+  border: 0.4vw solid #a11425;
+  background-color: #e31f2f;
+  border-radius: 4.17vw;
+  box-sizing: border-box;
+  color: #ffcf40;
+  max-width: 24.3vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25vw;
+  text-align: center;
+  margin: auto;
+  padding: 0.8vw 2vw 1vw 2vw;
+  box-shadow: 0 0.6vw 0 #a11425;
+}
+
+.roundSummaryLabel,
+.roundSummaryMeta {
+  font-size: min(2.05vw, 3.5dvh);
+  -webkit-text-stroke: 0.06vw #a11425;
+  text-shadow: 0 0.1vw 0 #da9500;
+  line-height: 1.1;
+}
+
+.roundSummaryValue {
+  font-size: min(4vw, 6.5dvh);
+  color: #fff4b8;
+  -webkit-text-stroke: 0.02vw #a11425;
+  text-shadow: 0 0.06vw 0 #da9500;
+  line-height: 1;
+}
+
+.gridColumn {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+}
+
+.phaseOverlay,
+.confirmationOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(99, 0, 0, 0.45);
+  backdrop-filter: blur(0.35vw);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.phaseOverlay {
+  position: absolute;
+  border-radius: 2vw;
+  inset: 0;
+}
+
+.stopOverlayCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8vw;
+  width: min(35vw, 52dvh);
+  text-align: center;
+  background-color: #ffcf40;
+  color: #a11425;
+  box-shadow: 0 0.9vw 0 #da9500;
+}
+
+.stopOverlayTitle {
+  font-size: min(4vw, 6dvh);
+  -webkit-text-stroke: 0.12vw #a11425;
+}
+
+.stopOverlayText,
+.confirmationText {
+  font-size: min(1.8vw, 3.3dvh);
+  -webkit-text-stroke: 0.07vw #630000;
+  margin: 0;
+}
+
+.resultsCard,
+.finalCard,
+.centerCard {
+  width: min(46vw, 70dvh);
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2vw;
+  text-align: center;
+}
+
+.resultsGrid,
+.finalRanking {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8vw;
+}
+
+.resultTile {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1vw;
+  background-color: #ffcf40;
+  color: #a11425;
+  border: 0.2vw solid #a11425;
+  border-radius: 1.4vw;
+  padding: 0.8vw 1vw;
+  box-shadow: 0 0.4vw 0 #da9500;
+  font-size: min(1.25vw, 2.5dvh);
+}
+
+.resultTile strong {
+  font-size: min(1.45vw, 2.8dvh);
+}
+
+.finalRanking {
+  text-align: left;
+}
+
+.finalRow {
+  font-size: min(1.35vw, 2.6dvh);
+}
+
+.leaveButton,
+.confirmationButton {
+  border: 0.28vw solid #a11425;
+  border-radius: 1.5vw;
+  font-family: "Cherry Bomb One", system-ui;
+  font-size: min(1.25vw, 2.5dvh);
+  padding: 0.6vw 1vw 0.8vw 1vw;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.leaveButton {
+  background-color: #ffcf40;
+  color: #a11425;
+  box-shadow: 0 0.6vw 0 #da9500;
+}
+
+.leaveButton:hover,
+.confirmationButton:hover {
+  transform: translateY(-0.1vw);
+}
+
+.leaveButton:active,
+.confirmationButton:active {
+  transform: translateY(0.2vw);
+}
+
+.leaveButton:disabled {
+  opacity: 0.7;
+  cursor: default;
+  transform: none;
+  box-shadow: 0 0.3vw 0 #da9500;
+}
+
+.alertBox {
+  width: min(48vw, 70dvh);
+  align-self: center;
+  text-align: center;
+}
+
+.confirmationCard {
+  width: min(34vw, 48dvh);
+  padding: 1.8vw;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2vw;
+}
+
+.confirmationActions {
+  display: flex;
+  justify-content: center;
+  gap: 1vw;
+}
+
+.confirmationCancel {
+  background-color: #ffcf40;
+  color: #a11425;
+  box-shadow: 0 0.6vw 0 #da9500;
+}
+
+.confirmationConfirm {
+  background-color: #ef4444;
+  color: #fff;
+  box-shadow: 0 0.6vw 0 #991b1b;
+}
+
+@media (orientation: portrait) and (max-width: 650px) {
+  .page {
+    padding: 3vw;
+    gap: 3vw;
+  }
+
+  .banner {
+    flex-direction: column;
+    align-items: stretch;
+    border-width: min(0.7vw, 0.35dvh);
+    border-radius: min(5vw, 2.6dvh);
+    box-shadow: 0 min(1.4vw, 0.7dvh) 0 #a11425;
+    padding: min(3vw, 1.7dvh);
+  }
+
+  .bannerInfo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: min(1vw, 0.5dvh);
+  }
+
+  .alertBox,
+  .centerCard,
+  .finalCard,
+  .resultsCard,
+  .stopOverlayCard,
+  .confirmationCard {
+    border-width: min(0.7vw, 0.35dvh);
+    border-radius: min(5vw, 2.6dvh);
+    box-shadow: 0 min(1.5vw, 0.8dvh) 0 #a11425;
+    padding: min(4vw, 2.2dvh);
+  }
+
+  .statusRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: min(1vw, 0.6dvh);
+    padding: 0 min(1vw, 0.5dvh);
+  }
+
+  .playSurface {
+    grid-template-columns: 1fr;
+    gap: 3vw;
+    padding: 0;
+  }
+
+  .magicColumn {
+    align-items: center;
+    gap: min(4vw, 2.2dvh);
+  }
+
+  .roundSummary {
+    width: 80vw;
+    max-width: none;
+    border: min(0.8vw, 0.6dvh) solid #a11425;
+    border-radius: min(8vw, 6dvh);
+    padding: min(3vw, 2dvh) min(6vw, 4dvh);
+    box-shadow: 0 min(1.2vw, 0.9dvh) 0 #a11425;
+    gap: min(0.8vw, 0.5dvh);
+  }
+
+  .roundSummaryLabel,
+  .roundSummaryMeta {
+    font-size: min(5vw, 4dvh);
+    -webkit-text-stroke: min(0.08vw, 0.06dvh) #a11425;
+    text-shadow: 0 min(0.16vw, 0.12dvh) 0 #da9500;
+  }
+
+  .roundSummaryValue {
+    font-size: min(9vw, 7dvh);
+    -webkit-text-stroke: min(0.03vw, 0.02dvh) #a11425;
+    text-shadow: 0 min(0.12vw, 0.08dvh) 0 #da9500;
+  }
+
+  .gridColumn {
+    overflow: visible;
+  }
+
+  .roomCode,
+  .roomDetail,
+  .text,
+  .statusText,
+  .leaveButton,
+  .confirmationButton,
+  .resultTile,
+  .finalRow,
+  .stopOverlayText,
+  .confirmationText {
+    font-size: min(4.3vw, 2.3dvh);
+  }
+
+  .title {
+    font-size: min(8.5vw, 4.6dvh);
+    -webkit-text-stroke-width: min(0.33vw, 0.17dvh);
+  }
+
+  .sectionTitle {
+    font-size: min(6vw, 3.1dvh);
+  }
+
+  .finalRow,
+  .resultTile {
+    border-width: min(0.45vw, 0.24dvh);
+    border-radius: min(3vw, 1.5dvh);
+    padding: min(2vw, 1.1dvh);
+    box-shadow: 0 min(0.8vw, 0.45dvh) 0 #da9500;
+  }
+
+  .resultsCard,
+  .finalCard,
+  .centerCard,
+  .alertBox,
+  .stopOverlayCard {
+    width: 100%;
+  }
+
+  .stopOverlayTitle {
+    font-size: min(10vw, 5.5dvh);
+  }
+
+  .phaseOverlay,
+  .confirmationOverlay {
+    backdrop-filter: blur(min(0.8vw, 0.4dvh));
+  }
+
+  .confirmationActions {
+    gap: min(2vw, 1dvh);
+  }
+
+  .leaveButton,
+  .confirmationButton {
+    border-width: min(0.6vw, 0.3dvh);
+    border-radius: min(4vw, 2dvh);
+    padding: min(2vw, 1dvh) min(3vw, 1.5dvh) min(2.3vw, 1.1dvh) min(3vw, 1.5dvh);
+  }
+}

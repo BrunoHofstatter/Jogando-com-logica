@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import {
+  ArrowBigDownDash,
+  ArrowBigLeftDash,
+  ArrowBigRightDash,
+  ArrowBigUpDash,
+} from "lucide-react";
 
 import {
   applyAction,
@@ -14,14 +20,36 @@ import {
 import type {
   MathWarAction,
   MathWarState,
-  MoveIntent,
   MoveEvaluation,
+  MoveIntent,
   PlayerId,
   Position,
 } from "../Logic/v2";
 import PieceComponent from "./piece";
 import styles from "../styles/board.module.css";
 import { VictoryScreen } from "./VictoryScreen";
+
+const HINT_SYSTEM_CONFIG = {
+  samePieceMissesToReveal: 3,
+  turnMissesToReveal: 6,
+  directionPreviewDistance: 3,
+  feedbackDurationMs: 4000,
+  feedbackFadeMs: 350,
+  showNumericFeedback: true,
+  showDirectionArrows: true,
+} as const;
+
+type DirectionKey =
+  | "up"
+  | "down"
+  | "left"
+  | "right"
+  | "upLeft"
+  | "upRight"
+  | "downLeft"
+  | "downRight";
+
+type PreviewStrength = 1 | 2 | 3;
 
 interface BoardProps {
   mode?: "local" | "remote";
@@ -62,7 +90,14 @@ const Board: React.FC<BoardProps> = ({
     createInitialState(),
   );
   const [selectedSquare, setSelectedSquare] = useState<Position | null>(null);
-  const [lastMoveEvaluation, setLastMoveEvaluation] = useState<MoveEvaluation | null>(null);
+  const [samePieceMisses, setSamePieceMisses] = useState(0);
+  const [turnMisses, setTurnMisses] = useState(0);
+  const [revealedHintsPieceId, setRevealedHintsPieceId] = useState<string | null>(null);
+  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+  const [feedbackVisible, setFeedbackVisible] = useState(false);
+  const feedbackHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const feedbackClearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const gameState = externalGameState ?? internalGameState;
   const selectedPiece = selectedSquare
     ? gameState.board[selectedSquare.row]?.[selectedSquare.col] ?? null
@@ -74,7 +109,33 @@ const Board: React.FC<BoardProps> = ({
         : [],
     [gameState, selectedPiece, selectedSquare],
   );
-  const highlightedSquares = availableActions.map((action) => action.to);
+  const turnRevealActive =
+    turnMisses >= HINT_SYSTEM_CONFIG.turnMissesToReveal;
+  const exactHintsVisible =
+    selectedPiece !== null &&
+    (turnRevealActive || revealedHintsPieceId === selectedPiece.id);
+  const highlightedSquares = exactHintsVisible
+    ? availableActions.map((action) => action.to)
+    : [];
+  const visibleDirections = useMemo(
+    () =>
+      HINT_SYSTEM_CONFIG.showDirectionArrows && selectedSquare
+        ? getAvailableDirections(selectedSquare, availableActions)
+        : [],
+    [availableActions, selectedSquare],
+  );
+  const directionalPreviewMap = useMemo(
+    () =>
+      selectedSquare && !exactHintsVisible
+        ? getDirectionalPreviewMap(
+            gameState,
+            selectedSquare,
+            visibleDirections,
+            HINT_SYSTEM_CONFIG.directionPreviewDistance,
+          )
+        : new Map<string, PreviewStrength>(),
+    [exactHintsVisible, gameState, selectedSquare, visibleDirections],
+  );
   const allCurrentPlayerActions = useMemo(
     () => getLegalActions(gameState),
     [gameState],
@@ -104,10 +165,77 @@ const Board: React.FC<BoardProps> = ({
         gameState.currentPlayer !== playerSeat
       : isAIMode && gameState.currentPlayer === 0);
 
+  const clearFeedbackTimers = () => {
+    if (feedbackHideTimerRef.current) {
+      clearTimeout(feedbackHideTimerRef.current);
+      feedbackHideTimerRef.current = null;
+    }
+
+    if (feedbackClearTimerRef.current) {
+      clearTimeout(feedbackClearTimerRef.current);
+      feedbackClearTimerRef.current = null;
+    }
+  };
+
+  const clearFeedback = () => {
+    clearFeedbackTimers();
+    setFeedbackVisible(false);
+    setFeedbackMessage(null);
+  };
+
+  const showFeedback = (message: string) => {
+    clearFeedbackTimers();
+    setFeedbackMessage(message);
+    setFeedbackVisible(true);
+
+    feedbackHideTimerRef.current = setTimeout(() => {
+      setFeedbackVisible(false);
+
+      feedbackClearTimerRef.current = setTimeout(() => {
+        setFeedbackMessage(null);
+      }, HINT_SYSTEM_CONFIG.feedbackFadeMs);
+    }, HINT_SYSTEM_CONFIG.feedbackDurationMs);
+  };
+
+  const resetAllHintState = () => {
+    setSelectedSquare(null);
+    setSamePieceMisses(0);
+    setTurnMisses(0);
+    setRevealedHintsPieceId(null);
+    clearFeedback();
+  };
+
   useEffect(() => {
     setSelectedSquare(null);
-    setLastMoveEvaluation(null);
+    setSamePieceMisses(0);
+    setTurnMisses(0);
+    setRevealedHintsPieceId(null);
+
+    if (feedbackHideTimerRef.current) {
+      clearTimeout(feedbackHideTimerRef.current);
+      feedbackHideTimerRef.current = null;
+    }
+
+    if (feedbackClearTimerRef.current) {
+      clearTimeout(feedbackClearTimerRef.current);
+      feedbackClearTimerRef.current = null;
+    }
+
+    setFeedbackVisible(false);
+    setFeedbackMessage(null);
   }, [gameState]);
+
+  useEffect(() => () => {
+    if (feedbackHideTimerRef.current) {
+      clearTimeout(feedbackHideTimerRef.current);
+      feedbackHideTimerRef.current = null;
+    }
+
+    if (feedbackClearTimerRef.current) {
+      clearTimeout(feedbackClearTimerRef.current);
+      feedbackClearTimerRef.current = null;
+    }
+  }, []);
 
   const updateGameState = (nextState: MathWarState) => {
     if (onGameStateChange) {
@@ -125,8 +253,48 @@ const Board: React.FC<BoardProps> = ({
     }
 
     updateGameState(createInitialState({ startingPlayer: isAIMode ? 1 : 0 }));
-    setSelectedSquare(null);
-    setLastMoveEvaluation(null);
+    resetAllHintState();
+  };
+
+  const handlePieceSelection = (position: Position | null) => {
+    const nextPieceId = position
+      ? gameState.board[position.row]?.[position.col]?.id ?? null
+      : null;
+    const currentPieceId = selectedPiece?.id ?? null;
+
+    if (nextPieceId !== currentPieceId) {
+      setSamePieceMisses(0);
+      if (!turnRevealActive) {
+        setRevealedHintsPieceId(null);
+      }
+      clearFeedback();
+    }
+
+    setSelectedSquare(position);
+  };
+
+  const handleInvalidMove = (evaluation: MoveEvaluation) => {
+    const nextSamePieceMisses = samePieceMisses + 1;
+    const nextTurnMisses = turnMisses + 1;
+    const shouldRevealHints = Boolean(
+      selectedPiece &&
+        (nextSamePieceMisses >= HINT_SYSTEM_CONFIG.samePieceMissesToReveal ||
+          nextTurnMisses >= HINT_SYSTEM_CONFIG.turnMissesToReveal),
+    );
+
+    setSamePieceMisses(nextSamePieceMisses);
+    setTurnMisses(nextTurnMisses);
+
+    if (shouldRevealHints && selectedPiece) {
+      setRevealedHintsPieceId(selectedPiece.id);
+    }
+
+    showFeedback(
+      formatMoveFeedback(evaluation, {
+        showNumericFeedback: HINT_SYSTEM_CONFIG.showNumericFeedback,
+        revealExactHints: shouldRevealHints,
+      }),
+    );
   };
 
   const commitAction = (action: MathWarAction) => {
@@ -135,20 +303,18 @@ const Board: React.FC<BoardProps> = ({
         from: action.from,
         to: action.to,
       });
-      setSelectedSquare(null);
-      setLastMoveEvaluation(null);
+      resetAllHintState();
       return;
     }
 
     const result = applyAction(gameState, action);
     if (!result.ok) {
-      setLastMoveEvaluation(result.evaluation);
+      handleInvalidMove(result.evaluation);
       return;
     }
 
     updateGameState(result.state);
-    setSelectedSquare(null);
-    setLastMoveEvaluation(null);
+    resetAllHintState();
   };
 
   const handleSquareClick = (row: number, col: number) => {
@@ -161,8 +327,7 @@ const Board: React.FC<BoardProps> = ({
 
     if (selectedSquare) {
       if (selectedSquare.row === row && selectedSquare.col === col) {
-        setSelectedSquare(null);
-        setLastMoveEvaluation(null);
+        handlePieceSelection(null);
         return;
       }
 
@@ -182,24 +347,22 @@ const Board: React.FC<BoardProps> = ({
         return;
       }
 
-      const evaluation = evaluateMove(gameState, {
-        from: selectedSquare,
-        to: clickedPosition,
-      });
-
       if (clickedPiece?.owner === gameState.currentPlayer) {
-        setSelectedSquare(clickedPosition);
-        setLastMoveEvaluation(null);
+        handlePieceSelection(clickedPosition);
         return;
       }
 
-      setLastMoveEvaluation(evaluation);
+      handleInvalidMove(
+        evaluateMove(gameState, {
+          from: selectedSquare,
+          to: clickedPosition,
+        }),
+      );
       return;
     }
 
     if (clickedPiece?.owner === gameState.currentPlayer) {
-      setSelectedSquare(clickedPosition);
-      setLastMoveEvaluation(null);
+      handlePieceSelection(clickedPosition);
     }
   };
 
@@ -212,11 +375,9 @@ const Board: React.FC<BoardProps> = ({
     highlightedSquares.some((position) => position.row === row && position.col === col);
 
   const selectedPieceEnergy = selectedPiece
-    ? getPieceAvailableEnergy(gameState, selectedPiece)
-    : 0;
-  const selectedPieceMoves = selectedSquare ? availableActions.length : 0;
+    ? String(getPieceAvailableEnergy(gameState, selectedPiece))
+    : "-";
   const roundsUntilNextRoll = getRoundsUntilNextRoll(gameState);
-  const lastInvalidReason = formatInvalidReason(lastMoveEvaluation?.invalidReason);
 
   return (
     <div className={styles.gamePage}>
@@ -269,20 +430,18 @@ const Board: React.FC<BoardProps> = ({
                 </div>
               </div>
             )}
-
-            {lastInvalidReason && (
-              <div className={styles.energyInfo}>
-                <div className={styles.energyDisplay}>
-                  <span>
-                    Falha: <strong>{lastInvalidReason}</strong>
-                  </span>
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
         <div className={styles.boardWrapper}>
+          {feedbackMessage && (
+            <div
+              className={`${styles.boardFeedback} ${feedbackVisible ? "" : styles.boardFeedbackHidden}`}
+            >
+              {feedbackMessage}
+            </div>
+          )}
+
           <div
             className={styles.board}
             data-target="board"
@@ -295,6 +454,8 @@ const Board: React.FC<BoardProps> = ({
               rowData.map((piece, colIndex) => {
                 const isSelected = isSquareSelected(rowIndex, colIndex);
                 const isHighlighted = isSquareHighlighted(rowIndex, colIndex);
+                const previewStrength =
+                  directionalPreviewMap.get(`${rowIndex}-${colIndex}`) ?? null;
                 const squareType =
                   (rowIndex + colIndex) % 2 === 0
                     ? styles.lightSquare
@@ -306,7 +467,7 @@ const Board: React.FC<BoardProps> = ({
                     data-square={`${String.fromCharCode(97 + colIndex)}${rowIndex + 1}`}
                     data-piece={piece ? `${piece.owner === 0 ? "red" : "blue"}-${piece.type}` : undefined}
                     data-captain={piece?.isCaptain ? "true" : undefined}
-                    className={`${styles.square} ${squareType} ${isHighlighted ? styles.squareHighlighted : ""}`}
+                    className={`${styles.square} ${squareType} ${isSelected ? styles.squareSelectedLayer : ""} ${!isHighlighted && previewStrength === 1 ? styles.squareDirectionalPreviewNear : ""} ${!isHighlighted && previewStrength === 2 ? styles.squareDirectionalPreviewMid : ""} ${!isHighlighted && previewStrength === 3 ? styles.squareDirectionalPreviewFar : ""} ${isHighlighted ? styles.squareHighlighted : ""}`}
                     onClick={() => handleSquareClick(rowIndex, colIndex)}
                   >
                     {piece && (
@@ -315,6 +476,19 @@ const Board: React.FC<BoardProps> = ({
                         isSelected={isSelected}
                         onPieceClick={() => handleSquareClick(rowIndex, colIndex)}
                       />
+                    )}
+
+                    {isSelected && visibleDirections.length > 0 && (
+                      <div className={styles.directionHintsLayer}>
+                        {visibleDirections.map((direction) => (
+                          <div
+                            key={direction}
+                            className={`${styles.directionHint} ${styles[getDirectionClassName(direction)]}`}
+                          >
+                            {renderDirectionIcon(direction)}
+                          </div>
+                        ))}
+                      </div>
                     )}
 
                     {isHighlighted && !piece && (
@@ -333,7 +507,6 @@ const Board: React.FC<BoardProps> = ({
             <p>Tipo: {selectedPiece.type === "sumDiag" ? "Soma quadrada" : "Soma redonda"}</p>
             <p>Posição: ({selectedSquare.row + 1}, {selectedSquare.col + 1})</p>
             <p>Valor: +{selectedPiece.value}</p>
-            <p>Movimentos disponíveis: {selectedPieceMoves}</p>
           </div>
         )}
 
@@ -362,31 +535,255 @@ const Board: React.FC<BoardProps> = ({
   );
 };
 
-function formatInvalidReason(
-  invalidReason: MoveEvaluation["invalidReason"] | undefined,
-): string | null {
-  switch (invalidReason) {
-    case "out_of_bounds":
-      return "Destino fora do tabuleiro";
-    case "same_square":
-      return "Escolha outra casa";
-    case "no_piece":
-      return "Não há peça nessa casa";
-    case "not_your_piece":
-      return "Essa peça não é sua";
-    case "ally_on_destination":
-      return "A casa já está ocupada por uma peça aliada";
-    case "invalid_direction":
-      return "A direção não combina com essa peça";
-    case "path_blocked":
-      return "Há peças bloqueando o caminho";
-    case "insufficient_energy":
-      return "Energia insuficiente";
-    case "game_over":
-      return "A partida já terminou";
+function getAvailableDirections(
+  from: Position,
+  actions: MathWarAction[],
+): DirectionKey[] {
+  const directions = new Set<DirectionKey>();
+
+  actions.forEach((action) => {
+    const direction = getDirectionFromPositions(from, action.to);
+    if (direction) {
+      directions.add(direction);
+    }
+  });
+
+  return Array.from(directions);
+}
+
+function getDirectionalPreviewMap(
+  state: MathWarState,
+  from: Position,
+  directions: DirectionKey[],
+  maxDistance: number,
+): Map<string, PreviewStrength> {
+  const previewMap = new Map<string, PreviewStrength>();
+
+  directions.forEach((direction) => {
+    const vector = getDirectionVector(direction);
+    if (!vector) {
+      return;
+    }
+
+    for (let distance = 1; distance <= maxDistance; distance++) {
+      const row = from.row + vector.row * distance;
+      const col = from.col + vector.col * distance;
+
+      if (!isPositionInBounds(state, { row, col })) {
+        break;
+      }
+
+      const pieceOnSquare = state.board[row][col];
+      previewMap.set(`${row}-${col}`, distance as PreviewStrength);
+
+      if (pieceOnSquare) {
+        break;
+      }
+    }
+  });
+
+  return previewMap;
+}
+
+function getDirectionFromPositions(
+  from: Position,
+  to: Position,
+): DirectionKey | null {
+  const rowDirection = Math.sign(to.row - from.row);
+  const colDirection = Math.sign(to.col - from.col);
+
+  if (rowDirection === -1 && colDirection === 0) {
+    return "up";
+  }
+
+  if (rowDirection === 1 && colDirection === 0) {
+    return "down";
+  }
+
+  if (rowDirection === 0 && colDirection === -1) {
+    return "left";
+  }
+
+  if (rowDirection === 0 && colDirection === 1) {
+    return "right";
+  }
+
+  if (rowDirection === -1 && colDirection === -1) {
+    return "upLeft";
+  }
+
+  if (rowDirection === -1 && colDirection === 1) {
+    return "upRight";
+  }
+
+  if (rowDirection === 1 && colDirection === -1) {
+    return "downLeft";
+  }
+
+  if (rowDirection === 1 && colDirection === 1) {
+    return "downRight";
+  }
+
+  return null;
+}
+
+function getDirectionVector(
+  direction: DirectionKey,
+): { row: number; col: number } | null {
+  switch (direction) {
+    case "up":
+      return { row: -1, col: 0 };
+    case "down":
+      return { row: 1, col: 0 };
+    case "left":
+      return { row: 0, col: -1 };
+    case "right":
+      return { row: 0, col: 1 };
+    case "upLeft":
+      return { row: -1, col: -1 };
+    case "upRight":
+      return { row: -1, col: 1 };
+    case "downLeft":
+      return { row: 1, col: -1 };
+    case "downRight":
+      return { row: 1, col: 1 };
     default:
       return null;
   }
+}
+
+function isPositionInBounds(
+  state: MathWarState,
+  position: Position,
+): boolean {
+  return (
+    position.row >= 0 &&
+    position.row < state.board.length &&
+    position.col >= 0 &&
+    position.col < (state.board[0]?.length ?? 0)
+  );
+}
+
+function getDirectionClassName(direction: DirectionKey): string {
+  switch (direction) {
+    case "up":
+      return "directionUp";
+    case "down":
+      return "directionDown";
+    case "left":
+      return "directionLeft";
+    case "right":
+      return "directionRight";
+    case "upLeft":
+      return "directionUpLeft";
+    case "upRight":
+      return "directionUpRight";
+    case "downLeft":
+      return "directionDownLeft";
+    case "downRight":
+      return "directionDownRight";
+    default:
+      return "directionUp";
+  }
+}
+
+function renderDirectionIcon(direction: DirectionKey): React.JSX.Element {
+  switch (direction) {
+    case "up":
+      return <ArrowBigUpDash />;
+    case "down":
+      return <ArrowBigDownDash />;
+    case "left":
+      return <ArrowBigLeftDash />;
+    case "right":
+      return <ArrowBigRightDash />;
+    case "upLeft":
+      return <ArrowBigUpDash className={styles.iconRotateLeft} />;
+    case "upRight":
+      return <ArrowBigUpDash className={styles.iconRotateRight} />;
+    case "downLeft":
+      return <ArrowBigDownDash className={styles.iconRotateRight} />;
+    case "downRight":
+      return <ArrowBigDownDash className={styles.iconRotateLeft} />;
+    default:
+      return <ArrowBigUpDash />;
+  }
+}
+
+function formatMoveFeedback(
+  evaluation: MoveEvaluation,
+  options: {
+    showNumericFeedback: boolean;
+    revealExactHints: boolean;
+  },
+): string {
+  const baseMessage = getBaseFeedbackMessage(evaluation, options.showNumericFeedback);
+
+  if (options.revealExactHints) {
+    return `${baseMessage} Veja as casas que a peça pode ir`;
+  }
+
+  return baseMessage;
+}
+
+function getBaseFeedbackMessage(
+  evaluation: MoveEvaluation,
+  showNumericFeedback: boolean,
+): string {
+  switch (evaluation.invalidReason) {
+    case "out_of_bounds":
+      return "Escolha uma casa dentro do tabuleiro.";
+    case "same_square":
+      return "Escolha outra casa para mover.";
+    case "no_piece":
+      return "Escolha uma peça para jogar.";
+    case "not_your_piece":
+      return "Escolha uma peça sua.";
+    case "ally_on_destination":
+      return "Essa casa já está ocupada por uma peça sua.";
+    case "invalid_direction":
+      return evaluation.piece?.type === "sumDiag"
+        ? "Essa peça só anda na diagonal."
+        : "Essa peça só anda em linha reta.";
+    case "path_blocked":
+      return "Há uma peça no caminho.";
+    case "insufficient_energy":
+      return getEnergyFeedbackMessage(evaluation, showNumericFeedback);
+    case "game_over":
+      return "A partida já terminou.";
+    default:
+      return "Esse movimento não é válido.";
+  }
+}
+
+function getEnergyFeedbackMessage(
+  evaluation: MoveEvaluation,
+  showNumericFeedback: boolean,
+): string {
+  const availableEnergy = evaluation.availableEnergy;
+  const requiredEnergy = evaluation.requiredEnergy;
+
+  if (evaluation.cost?.captainRuleChangedCost) {
+    if (showNumericFeedback) {
+      return `O Capitão gasta o dobro de energia. Você tem ${availableEnergy}, mas esse movimento custa ${requiredEnergy}.`;
+    }
+
+    return "O Capitão gasta o dobro de energia.";
+  }
+
+  if (evaluation.cost?.captureAddsCost) {
+    if (showNumericFeedback) {
+      return `Capturar custa energia extra. Você tem ${availableEnergy}, mas esse movimento custa ${requiredEnergy}.`;
+    }
+
+    return "Capturar custa energia extra.";
+  }
+
+  if (showNumericFeedback) {
+    return `Você tem ${availableEnergy} de energia, mas esse movimento custa ${requiredEnergy}.`;
+  }
+
+  return "Energia insuficiente.";
 }
 
 export default Board;

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { ROUTES } from "../../routes";
@@ -8,6 +8,7 @@ import styles from "../styles/multiplayerGame.module.css";
 
 export default function CrownChaseMultiplayerGamePage() {
   const navigate = useNavigate();
+  const [isLeaveConfirmationOpen, setIsLeaveConfirmationOpen] = useState(false);
   const {
     connectionStatus,
     roomCode,
@@ -60,6 +61,19 @@ export default function CrownChaseMultiplayerGamePage() {
     navigate(ROUTES.CROWN_CHASE_MP_LOBBY, { replace: true });
   };
 
+  const handleLeaveRoomRequest = () => {
+    setIsLeaveConfirmationOpen(true);
+  };
+
+  const handleCancelLeaveRoom = () => {
+    setIsLeaveConfirmationOpen(false);
+  };
+
+  const handleConfirmLeaveRoom = () => {
+    setIsLeaveConfirmationOpen(false);
+    handleLeaveRoom();
+  };
+
   if (!gameState || playerSeat === null) {
     return (
       <div className={styles.loadingPage}>
@@ -89,10 +103,34 @@ export default function CrownChaseMultiplayerGamePage() {
           </span>
         </div>
 
-        <button className={styles.leaveButton} onClick={handleLeaveRoom}>
+        <button className={styles.leaveButton} onClick={handleLeaveRoomRequest}>
           Sair da Sala
         </button>
       </div>
+
+      {isLeaveConfirmationOpen && (
+        <div className={styles.confirmationOverlay}>
+          <div className={styles.confirmationCard}>
+            <p className={styles.confirmationText}>
+              Tem certeza que deseja sair da sala?
+            </p>
+            <div className={styles.confirmationActions}>
+              <button
+                className={`${styles.confirmationButton} ${styles.confirmationCancel}`}
+                onClick={handleCancelLeaveRoom}
+              >
+                Não
+              </button>
+              <button
+                className={`${styles.confirmationButton} ${styles.confirmationConfirm}`}
+                onClick={handleConfirmLeaveRoom}
+              >
+                Sim
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {errorMessage && (
         <div className={styles.alertBox}>
@@ -110,7 +148,7 @@ export default function CrownChaseMultiplayerGamePage() {
         onPlayAgainDisabled={opponentDisconnected || rematchPending}
         playAgainLabel={playAgainLabel}
         statusMessage={statusMessage}
-        onMenu={handleLeaveRoom}
+        onMenu={handleLeaveRoomRequest}
       />
     </>
   );

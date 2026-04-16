@@ -37,6 +37,8 @@ import MathWarMultiplayerGamePage from "./MathWar/Pages/multiplayerGamePage";
 import MathWarMultiplayerLobbyPage from "./MathWar/Pages/multiplayerLobbyPage";
 import Manual from "./Main/Pages/manual";
 import LevelsMenuPage from "./Stop/Pages/LevelsMenuPage";
+import StopMultiplayerGamePage from "./Stop/Pages/multiplayerGamePage";
+import StopMultiplayerLobbyPage from "./Stop/Pages/multiplayerLobbyPage";
 import BombGameRulesPage from "./BombGame/Pages/RegrasPage";
 import BombGameLevelsMenuPage from "./BombGame/Pages/LevelsMenuPage";
 import BombGamePage from "./BombGame/Pages/BombGamePage";
@@ -54,6 +56,10 @@ import {
   hasActiveMathWarMultiplayerSession,
   leaveMathWarMultiplayerRoom,
 } from "./MathWar/Hooks/useMathWarMultiplayer";
+import {
+  hasActiveStopMultiplayerSession,
+  leaveStopMultiplayerRoom,
+} from "./Stop/Hooks/useStopMultiplayer";
 import { ROUTES } from "./routes";
 
 function trackGameTime() {
@@ -120,6 +126,7 @@ function App() {
   useEffect(() => {
     const isCrownChaseOnlineRoute = location.pathname.startsWith(ROUTES.CROWN_CHASE_MP_LOBBY);
     const isMathWarOnlineRoute = location.pathname.startsWith(ROUTES.MATH_WAR_MP_LOBBY);
+    const isStopOnlineRoute = location.pathname.startsWith(ROUTES.STOP_MP_LOBBY);
 
     if (!isCrownChaseOnlineRoute && hasActiveCrownChaseMultiplayerSession()) {
       leaveCrownChaseMultiplayerRoom({ preserveName: true });
@@ -127,6 +134,10 @@ function App() {
 
     if (!isMathWarOnlineRoute && hasActiveMathWarMultiplayerSession()) {
       leaveMathWarMultiplayerRoom({ preserveName: true });
+    }
+
+    if (!isStopOnlineRoute && hasActiveStopMultiplayerSession()) {
+      leaveStopMultiplayerRoom({ preserveName: true });
     }
   }, [location.pathname]);
 
@@ -142,6 +153,8 @@ function App() {
         <Route path={ROUTES.STOP_RULES} element={<JogoStop />} />
         <Route path={ROUTES.STOP_GAME} element={<StopPage />} />
         <Route path={ROUTES.STOP_LEVELS} element={<LevelsMenuPage />} />
+        <Route path={ROUTES.STOP_MP_LOBBY} element={<StopMultiplayerLobbyPage />} />
+        <Route path={ROUTES.STOP_MP_GAME} element={<StopMultiplayerGamePage />} />
         <Route path={ROUTES.BOMB_GAME_RULES} element={<BombGameRulesPage />} />
         <Route path={ROUTES.BOMB_GAME_GAME} element={<BombGamePage />} />
         <Route path={ROUTES.BOMB_GAME_LEVELS} element={<BombGameLevelsMenuPage />} />

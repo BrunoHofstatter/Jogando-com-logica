@@ -1,7 +1,7 @@
 .roomBanner {
   position: fixed;
   top: 1.5vw;
-  left: 50%;
+  left: 30%;
   transform: translateX(-50%);
   width: min(88vw, 110dvh);
   display: flex;
@@ -11,7 +11,7 @@
   padding: 1vw 1.4vw;
   box-sizing: border-box;
   background-color: rgba(6, 78, 59, 0.92);
-  border: 0.25vw solid #fcd34d;
+  border: 0.25vw solid #f8f8f8;
   border-radius: 2vw;
   box-shadow: 0 0.7vw 0 #064e3b;
   z-index: 30;
@@ -29,7 +29,7 @@
 
 .roomCode,
 .roomDetail {
-  font-size: clamp(1vw, 2dvh, 1.5vw);
+  font-size: clamp(1vw, 2.7dvh, 3vw);
 }
 
 .leaveButton {
@@ -39,16 +39,85 @@
   color: #fff;
   -webkit-text-stroke: 0.08vw #7f1d1d;
   font-family: "Cherry Bomb One", system-ui;
-  font-size: clamp(1vw, 2dvh, 1.4vw);
+  font-size: clamp(1vw, 2.6dvh, 1.4vw);
+  padding: 0.4vw 0.8vw 0.6vw 0.8vw;
+  cursor: pointer;
+  box-shadow: 0 0.3vw 0 #991b1b;
+}
+
+.confirmationOverlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4vw;
+  box-sizing: border-box;
+  background-color: rgba(2, 44, 34, 0.42);
+  z-index: 1200;
+}
+
+.confirmationCard {
+  width: min(40vw, 100dvh);
+  display: flex;
+  flex-direction: column;
+  gap: 1.4vw;
+  padding: 1.8vw;
+  box-sizing: border-box;
+  background-color: #69cb9d;
+  border: 0.25vw solid #10b981;
+  border-radius: 2vw;
+  box-shadow: 0 0.8vw 0 #064e3b;
+}
+
+.confirmationText {
+  margin: 0;
+  text-align: center;
+  color: #a9f9d4;
+  font-family: "Cherry Bomb One", system-ui;
+  font-size: clamp(1.1vw, 5dvh, 4vw);
+}
+
+.confirmationActions {
+  display: flex;
+  justify-content: center;
+  gap: 1vw;
+}
+
+.confirmationButton {
+  min-width: 8vw;
+  border: 0.2vw solid;
+  border-radius: 1.3vw;
+  font-family: "Cherry Bomb One", system-ui;
+  font-size: clamp(1vw, 3dvh, 1.8vw);
   padding: 0.6vw 1vw 0.8vw 1vw;
   cursor: pointer;
-  box-shadow: 0 0.6vw 0 #991b1b;
+  transition: transform 0.1s ease;
+}
+
+.confirmationButton:hover{
+  transform: scale(1.05) translateY(-1dvh);
+}
+
+.confirmationCancel {
+  background-color: #d1fae5;
+  border-color: #10b981;
+  color: #064e3b;
+  box-shadow: 0 0.5vw 0 #34d399;
+}
+
+.confirmationConfirm {
+  background-color: #ef4444;
+  border-color: #7f1d1d;
+  color: #fff;
+  -webkit-text-stroke: 0.08vw #7f1d1d;
+  box-shadow: 0 0.5vw 0 #991b1b;
 }
 
 .alertBox {
   position: fixed;
-  top: 7.5vw;
-  left: 50%;
+  top: 8vw;
+  left: 30%;
   transform: translateX(-50%);
   width: min(70vw, 90dvh);
   text-align: center;
@@ -60,7 +129,7 @@
   border-radius: 1.6vw;
   box-shadow: 0 0.6vw 0 #fca5a5;
   font-family: "Cherry Bomb One", system-ui;
-  font-size: clamp(1vw, 2dvh, 1.4vw);
+  font-size: clamp(1vw, 3dvh, 1.8vw);
   z-index: 29;
 }
 
@@ -128,6 +197,8 @@
   .roomCode,
   .roomDetail,
   .leaveButton,
+  .confirmationText,
+  .confirmationButton,
   .alertBox,
   .loadingText {
     font-size: min(4.3vw, 2.2dvh);
@@ -146,6 +217,30 @@
     border-radius: min(3vw, 1.6dvh);
     padding: min(2vw, 1dvh);
     box-shadow: 0 min(0.8vw, 0.4dvh) 0 #fca5a5;
+  }
+
+  .confirmationOverlay {
+    padding: min(5vw, 2.5dvh);
+  }
+
+  .confirmationCard {
+    width: 88vw;
+    gap: min(3vw, 1.5dvh);
+    padding: min(4vw, 2dvh);
+    border-width: min(0.5vw, 0.25dvh);
+    border-radius: min(4vw, 2dvh);
+    box-shadow: 0 min(1vw, 0.5dvh) 0 #064e3b;
+  }
+
+  .confirmationActions {
+    gap: min(2vw, 1dvh);
+  }
+
+  .confirmationButton {
+    min-width: 28vw;
+    border-width: min(0.45vw, 0.22dvh);
+    border-radius: min(3vw, 1.5dvh);
+    padding: min(2vw, 1dvh) min(3.4vw, 1.7dvh) min(2.4vw, 1.2dvh) min(3.4vw, 1.7dvh);
   }
 
   .loadingCard {

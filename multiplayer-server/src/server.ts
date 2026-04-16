@@ -11,8 +11,13 @@ import type {
   MathWarClientToServerEvents,
   MathWarServerToClientEvents,
 } from "../../src/MathWar/Logic/multiplayer/protocol.ts";
+import type {
+  StopClientToServerEvents,
+  StopServerToClientEvents,
+} from "../../src/Stop/Logic/multiplayer/protocol.ts";
 import { registerRoomHandlers } from "./sockets/registerRoomHandlers.ts";
 import { registerMathWarRoomHandlers } from "./sockets/registerMathWarRoomHandlers.ts";
+import { registerStopRoomHandlers } from "./sockets/registerStopRoomHandlers.ts";
 
 export function createMultiplayerServer() {
   const app = express();
@@ -41,9 +46,14 @@ export function createMultiplayerServer() {
     MathWarClientToServerEvents,
     MathWarServerToClientEvents
   >;
+  const stopNamespace = io.of("/stop") as Namespace<
+    StopClientToServerEvents,
+    StopServerToClientEvents
+  >;
 
   registerRoomHandlers(crownChaseNamespace);
   registerMathWarRoomHandlers(mathWarNamespace);
+  registerStopRoomHandlers(stopNamespace);
 
   return {
     app,

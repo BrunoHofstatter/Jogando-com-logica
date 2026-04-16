@@ -15,6 +15,8 @@ export const ROUTES = {
   STOP_RULES: "/stop/regras",
   STOP_GAME: "/stop",
   STOP_LEVELS: "/stop/niveis",
+  STOP_MP_LOBBY: "/stop/online",
+  STOP_MP_GAME: "/stop/online/partida",
 
   // Bomb Game
   BOMB_GAME_RULES: "/bombgame/regras",
