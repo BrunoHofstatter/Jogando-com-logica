@@ -1,4 +1,3 @@
-import { useLocation } from "react-router-dom";
 import SPTTT from "../Components/SPTTT";
 import { useState, useEffect } from "react";
 import DynamicTutorial, { TutorialStep } from "../../Shared/Components/DynamicTutorial";
@@ -154,12 +153,9 @@ export default function SPTTTPage() {
     },
   ];
 
-  const location = useLocation();
-  const winCondition = location.state?.winCondition || "line"; // default to "line" if not specified
-
   return (
     <div className="spttt-page">
-      <SPTTT winCondition={winCondition} />
+      <SPTTT />
       {showTutorial && (
         <DynamicTutorial
           steps={tutorialSteps}

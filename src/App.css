@@ -4,21 +4,47 @@ body {
   box-sizing: border-box;
 }
 
-
 .back-button {
   position: fixed;
+  top: 2.5vh;
+  right: 2dvh;
   background: none;
   border: none;
   z-index: 9999;
+  padding: 0;
+  cursor: pointer;
+}
+
+.universal-return-button {
+  position: fixed;
   top: 2.5vh;
-  right: 2dvh;
+  left: 2dvh;
+  z-index: 9999;
+  width: 5vw;
+  height: 5vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background-color: #ffffffd9;
+  color: #222;
+  font-size: 3vw;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
 }
 
 .homeButton {
   height: 5vw;
+  display: block;
 }
 
 .homeButton:hover {
+  transform: scale(1.05);
+}
+
+.universal-return-button:hover {
   transform: scale(1.05);
 }
 
@@ -30,5 +56,13 @@ body {
 
   .homeButton {
     height: min(12vw, 10dvh);
+  }
+
+  .universal-return-button {
+    top: 2dvh;
+    left: 2vw;
+    width: min(12vw, 10dvh);
+    height: min(12vw, 10dvh);
+    font-size: min(7vw, 6dvh);
   }
 }

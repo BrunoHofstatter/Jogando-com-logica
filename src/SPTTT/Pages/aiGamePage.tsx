@@ -159,7 +159,6 @@ export default function SPTTTAIPage() {
 
   const location = useLocation();
   const navigate = useNavigate();
-  const winCondition = location.state?.winCondition || "line"; // default to "line" if not specified
   const difficulty = Number(location.state?.difficulty || 1);
   const { unlockNext } = useDifficultyLock("spttt");
 
@@ -180,7 +179,7 @@ export default function SPTTTAIPage() {
   };
 
   const handleNextLevel = () => {
-    navigate(ROUTES.SPTTT_AI, { state: { winCondition: "line", difficulty: difficulty + 1 }, replace: true });
+    navigate(ROUTES.SPTTT_AI, { state: { difficulty: difficulty + 1 }, replace: true });
   };
 
   const showNextLevel = difficulty < 4;
@@ -190,7 +189,6 @@ export default function SPTTTAIPage() {
     <div className="spttt-page">
       <SPTTT
         key={gameKey}
-        winCondition={winCondition}
         isAiMode={true}
         difficulty={difficulty as 1 | 2 | 3 | 4}
         onUnlockNext={handleUnlock}

@@ -35,7 +35,7 @@ type MathWarSocket = Socket<
 
 type MathWarRoom = MultiplayerRoom<MathWarState>;
 
-const roomStore = createRoomStore<MathWarState>();
+const roomStore = createRoomStore<MathWarRoom>();
 
 export function registerMathWarRoomHandlers(io: MathWarNamespace): void {
   io.on("connection", (socket) => {

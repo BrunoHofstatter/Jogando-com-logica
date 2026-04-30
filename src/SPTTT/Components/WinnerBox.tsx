@@ -4,6 +4,8 @@ import { Piece } from "./Piece";
 export function WinnerOverlay({
   winner,
   onRestart,
+  restartLabel = "Jogar de novo",
+  isRestartDisabled = false,
   isAiMode = false,
   onMenu,
   onNextLevel,
@@ -11,6 +13,8 @@ export function WinnerOverlay({
 }: {
   winner: "X" | "O" | "tie";
   onRestart: () => void;
+  restartLabel?: string;
+  isRestartDisabled?: boolean;
   isAiMode?: boolean;
   onMenu?: () => void;
   onNextLevel?: () => void;
@@ -42,12 +46,14 @@ export function WinnerOverlay({
 
         <div className={styles.victoryButtonsContainer}>
           <div className={styles.victoryButtonsRow}>
-            {isAiMode && onMenu && (
+            {onMenu && (
               <button onClick={onMenu} className={styles.victoryButtonMenu}>
                 Menu
               </button>
             )}
-            <button onClick={onRestart}>Jogar de novo</button>
+            <button onClick={onRestart} disabled={isRestartDisabled}>
+              {restartLabel}
+            </button>
           </div>
 
           {showNextLevel && onNextLevel && (

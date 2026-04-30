@@ -59,6 +59,10 @@ function CacaSomaRegras() {
     navigate(ROUTES.CACA_SOMA_LEVELS);
   };
 
+  const goToOnlineLobby = () => {
+    navigate(ROUTES.CACA_SOMA_MP_LOBBY);
+  };
+
   const unlockAllLevels = () => {
     levels.forEach((level) => {
       updateLevelProgress({
@@ -137,6 +141,9 @@ function CacaSomaRegras() {
         <div className={styles.bottomAuxButtons}>
           <button className={styles.tutorialButton} onClick={startTutorial}>
             <span>Tutorial</span>
+          </button>
+          <button className={styles.onlineButton} onClick={goToOnlineLobby}>
+            Online
           </button>
           <button
             className={styles.detailedRulesButton}

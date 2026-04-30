@@ -1,17 +1,18 @@
 import type { Namespace, Socket } from "socket.io";
 
 import type {
-  CrownChaseClientToServerEvents,
-  CrownChaseServerToClientEvents,
   MultiplayerErrorCode,
+  PlayerSeat,
   RoomPlayerInfo,
-} from "../../../src/CrownChase/Logic/multiplayer/protocol.ts";
-import type { CrownChaseState, PlayerId } from "../../../src/CrownChase/Logic/v2/index.ts";
+  SptttClientToServerEvents,
+  SptttServerToClientEvents,
+} from "../../../src/SPTTT/Logic/multiplayer/protocol.ts";
+import type { SptttPlayer, SptttState } from "../../../src/SPTTT/Logic/v2/index.ts";
 import {
   applyMultiplayerMove,
   createMultiplayerInitialState,
   resolveMultiplayerMove,
-} from "../crownChase/crownChaseAdapter.ts";
+} from "../spttt/sptttAdapter.ts";
 import { generateRoomCode } from "../rooms/roomCode.ts";
 import { createRoomStore } from "../rooms/roomStore.ts";
 import {
@@ -23,21 +24,21 @@ import {
   type RoomPlayer,
 } from "../rooms/roomTypes.ts";
 
-type CrownChaseNamespace = Namespace<
-  CrownChaseClientToServerEvents,
-  CrownChaseServerToClientEvents
+type SptttNamespace = Namespace<
+  SptttClientToServerEvents,
+  SptttServerToClientEvents
 >;
 
-type CrownChaseSocket = Socket<
-  CrownChaseClientToServerEvents,
-  CrownChaseServerToClientEvents
+type SptttSocket = Socket<
+  SptttClientToServerEvents,
+  SptttServerToClientEvents
 >;
 
-type CrownChaseRoom = MultiplayerRoom<CrownChaseState>;
+type SptttRoom = MultiplayerRoom<SptttState>;
 
-const roomStore = createRoomStore<CrownChaseRoom>();
+const roomStore = createRoomStore<SptttRoom>();
 
-export function registerRoomHandlers(io: CrownChaseNamespace): void {
+export function registerSptttRoomHandlers(io: SptttNamespace): void {
   io.on("connection", (socket) => {
     socket.on("create_room", ({ playerName }) => {
       leaveAnyExistingRoom(io, socket, "leave_room");
@@ -55,7 +56,7 @@ export function registerRoomHandlers(io: CrownChaseNamespace): void {
         name: normalizedName,
         connected: true,
       };
-      const room: CrownChaseRoom = {
+      const room: SptttRoom = {
         code: roomCode,
         state: createMultiplayerInitialState(),
         status: "waiting",
@@ -75,6 +76,7 @@ export function registerRoomHandlers(io: CrownChaseNamespace): void {
       socket.emit("room_created", {
         code: roomCode,
         seat: CREATOR_SEAT,
+        mark: getPlayerMark(CREATOR_SEAT),
         state: room.state,
         players: serializePlayers(room),
       });
@@ -93,17 +95,17 @@ export function registerRoomHandlers(io: CrownChaseNamespace): void {
 
       const room = roomStore.getRoom(normalizedCode);
       if (!room) {
-        emitError(socket, "room_not_found", "Sala não encontrada.");
+        emitError(socket, "room_not_found", "Sala nÃ£o encontrada.");
         return;
       }
 
       if (room.status !== "waiting") {
-        emitError(socket, "room_not_joinable", "Essa sala já começou.");
+        emitError(socket, "room_not_joinable", "Essa sala jÃ¡ comeÃ§ou.");
         return;
       }
 
       if (room.players[JOINER_SEAT] !== null) {
-        emitError(socket, "room_full", "Essa sala já está cheia.");
+        emitError(socket, "room_full", "Essa sala jÃ¡ estÃ¡ cheia.");
         return;
       }
 
@@ -126,6 +128,7 @@ export function registerRoomHandlers(io: CrownChaseNamespace): void {
       socket.emit("room_joined", {
         code: room.code,
         seat: JOINER_SEAT,
+        mark: getPlayerMark(JOINER_SEAT),
         state: room.state,
         players: serializePlayers(room),
       });
@@ -139,30 +142,31 @@ export function registerRoomHandlers(io: CrownChaseNamespace): void {
     socket.on("submit_move", ({ code, intent }) => {
       const room = roomStore.getRoom(code.trim().toUpperCase());
       if (!room) {
-        emitError(socket, "room_not_found", "Sala não encontrada.");
+        emitError(socket, "room_not_found", "Sala nÃ£o encontrada.");
         return;
       }
 
       const player = getPlayerBySocketId(room, socket.id);
       if (!player) {
-        emitError(socket, "unauthorized", "Você não pertence a esta sala.");
+        emitError(socket, "unauthorized", "VocÃª nÃ£o pertence a esta sala.");
         return;
       }
 
-      if (room.state.currentPlayer !== player.seat) {
-        emitError(socket, "not_your_turn", "Ainda não é a sua vez.");
+      const playerMark = getPlayerMark(player.seat);
+      if (room.state.currentPlayer !== playerMark) {
+        emitError(socket, "not_your_turn", "Ainda nÃ£o Ã© a sua vez.");
         return;
       }
 
-      const action = resolveMultiplayerMove(room.state, intent, player.seat);
-      if (!action) {
-        emitError(socket, "illegal_move", "Movimento inválido.");
+      const resolvedIntent = resolveMultiplayerMove(room.state, intent, playerMark);
+      if (!resolvedIntent) {
+        emitError(socket, "illegal_move", "Movimento invÃ¡lido.");
         return;
       }
 
-      const result = applyMultiplayerMove(room.state, action);
+      const result = applyMultiplayerMove(room.state, resolvedIntent);
       if (!result.ok) {
-        emitError(socket, "illegal_move", "Movimento inválido.");
+        emitError(socket, "illegal_move", "Movimento invÃ¡lido.");
         return;
       }
 
@@ -174,25 +178,24 @@ export function registerRoomHandlers(io: CrownChaseNamespace): void {
       io.to(room.code).emit("state_updated", {
         code: room.code,
         state: room.state,
-        events: result.events,
       });
     });
 
     socket.on("request_rematch", ({ code }) => {
       const room = roomStore.getRoom(code.trim().toUpperCase());
       if (!room) {
-        emitError(socket, "room_not_found", "Sala não encontrada.");
+        emitError(socket, "room_not_found", "Sala nÃ£o encontrada.");
         return;
       }
 
       const player = getPlayerBySocketId(room, socket.id);
       if (!player) {
-        emitError(socket, "unauthorized", "Você não pertence a esta sala.");
+        emitError(socket, "unauthorized", "VocÃª nÃ£o pertence a esta sala.");
         return;
       }
 
       if (room.state.status !== "ended") {
-        emitError(socket, "room_not_joinable", "A revanche só pode começar ao final da partida.");
+        emitError(socket, "room_not_joinable", "A revanche sÃ³ pode comeÃ§ar ao final da partida.");
         return;
       }
 
@@ -209,7 +212,7 @@ export function registerRoomHandlers(io: CrownChaseNamespace): void {
       room.updatedAt = Date.now();
       io.to(room.code).emit("rematch_requested", {
         code: room.code,
-        requestedBy: player.seat,
+        requestedBy: player.seat as PlayerSeat,
       });
 
       if (room.rematchVotes.size < 2) {
@@ -248,8 +251,8 @@ export function registerRoomHandlers(io: CrownChaseNamespace): void {
 }
 
 function handlePlayerExit(
-  io: CrownChaseNamespace,
-  room: CrownChaseRoom,
+  io: SptttNamespace,
+  room: SptttRoom,
   socketId: string,
   reason: "disconnect" | "leave_room",
 ): void {
@@ -264,7 +267,7 @@ function handlePlayerExit(
   }
 
   if (reason === "leave_room") {
-    closeRoomImmediately(io, room, player.seat, "O outro jogador saiu da sala.");
+    closeRoomImmediately(io, room, player.seat as PlayerSeat, "O outro jogador saiu da sala.");
     return;
   }
 
@@ -282,9 +285,9 @@ function handlePlayerExit(
 
   io.to(remainingPlayer.socketId).emit("opponent_left", {
     code: room.code,
-    seat: player.seat,
+    seat: player.seat as PlayerSeat,
     reason: "disconnect",
-    message: "O outro jogador desconectou. A sala será encerrada em instantes.",
+    message: "O outro jogador desconectou. A sala serÃ¡ encerrada em instantes.",
   });
 
   if (room.closeTimeout) {
@@ -300,16 +303,16 @@ function handlePlayerExit(
     io.to(remainingPlayer.socketId).emit("room_closed", {
       code: latestRoom.code,
       reason: "opponent_left",
-      message: "A sala foi encerrada porque o outro jogador não voltou.",
+      message: "A sala foi encerrada porque o outro jogador nÃ£o voltou.",
     });
     roomStore.deleteRoom(latestRoom.code);
   }, DISCONNECT_GRACE_MS);
 }
 
 function closeRoomImmediately(
-  io: CrownChaseNamespace,
-  room: CrownChaseRoom,
-  leavingSeat: PlayerId,
+  io: SptttNamespace,
+  room: SptttRoom,
+  leavingSeat: PlayerSeat,
   message: string,
 ): void {
   const remainingPlayer = room.players.find(
@@ -335,8 +338,8 @@ function closeRoomImmediately(
 }
 
 function scheduleWaitingRoomExpiry(
-  io: CrownChaseNamespace,
-  room: CrownChaseRoom,
+  io: SptttNamespace,
+  room: SptttRoom,
 ): void {
   if (room.waitingTimeout) {
     clearTimeout(room.waitingTimeout);
@@ -353,7 +356,7 @@ function scheduleWaitingRoomExpiry(
       io.to(host.socketId).emit("room_closed", {
         code: latestRoom.code,
         reason: "room_expired",
-        message: "A sala expirou porque ninguém entrou a tempo.",
+        message: "A sala expirou porque ninguÃ©m entrou a tempo.",
       });
     }
 
@@ -362,8 +365,8 @@ function scheduleWaitingRoomExpiry(
 }
 
 function leaveAnyExistingRoom(
-  io: CrownChaseNamespace,
-  socket: CrownChaseSocket,
+  io: SptttNamespace,
+  socket: SptttSocket,
   reason: "leave_room",
 ): void {
   const currentRoom = roomStore.findRoomBySocketId(socket.id);
@@ -375,20 +378,25 @@ function leaveAnyExistingRoom(
 }
 
 function getPlayerBySocketId(
-  room: CrownChaseRoom,
+  room: SptttRoom,
   socketId: string,
 ): RoomPlayer | null {
   return room.players.find((player) => player?.socketId === socketId) ?? null;
 }
 
-function serializePlayers(room: CrownChaseRoom): RoomPlayerInfo[] {
+function serializePlayers(room: SptttRoom): RoomPlayerInfo[] {
   return room.players
     .filter((player): player is RoomPlayer => player !== null)
     .map((player) => ({
-      seat: player.seat,
+      seat: player.seat as PlayerSeat,
+      mark: getPlayerMark(player.seat as PlayerSeat),
       name: player.name,
       connected: player.connected,
     }));
+}
+
+function getPlayerMark(seat: PlayerSeat): SptttPlayer {
+  return seat === CREATOR_SEAT ? "X" : "O";
 }
 
 function normalizePlayerName(playerName: string): string | null {
@@ -397,7 +405,7 @@ function normalizePlayerName(playerName: string): string | null {
 }
 
 function emitError(
-  socket: CrownChaseSocket,
+  socket: SptttSocket,
   code: MultiplayerErrorCode,
   message: string,
 ): void {
