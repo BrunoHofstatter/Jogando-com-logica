@@ -8,9 +8,9 @@
   padding: 3vw;
   box-sizing: border-box;
   background:
-    radial-gradient(circle at top left, #ffd6d6 0%, transparent 35%),
-    radial-gradient(circle at bottom right, #ff8d8d 0%, transparent 30%),
-    #ffbaba;
+    radial-gradient(circle at top left, #ffe1e1 0%, transparent 35%),
+    radial-gradient(circle at bottom right, #ff9ba4 0%, transparent 30%),
+    #efc9c9;
   font-family: "Cherry Bomb One", system-ui;
 }
 
@@ -25,7 +25,7 @@
 
 .title {
   font-size: clamp(3vw, 7dvh, 5vw);
-  color: #ffcf40;
+  color: #ffffff;
   -webkit-text-stroke: 0.17vw #630000;
   text-shadow: 0 0.4vw 0 #a11425;
   text-align: center;
@@ -115,15 +115,10 @@
   margin-left: 2vw;
 }
 
-.actions {
-  display: flex;
-  gap: 1vw;
-}
-
+.settingsPanel,
 .joinBox,
 .waitingBox,
-.playersSection,
-.settingsModal {
+.playersSection {
   display: flex;
   flex-direction: column;
   gap: 1vw;
@@ -135,11 +130,51 @@
   color: #ffcf40;
 }
 
+.settingsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9vw;
+}
+
+.settingCard,
+.playerTile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4vw;
+  background-color: #fff1f1;
+  border: 0.18vw solid #a11425;
+  border-radius: 1.2vw;
+  padding: 0.7vw 0.9vw;
+  color: #a11425;
+  box-shadow: 0 0.3vw 0 #ff6b6b;
+}
+
+.settingTitle,
+.eyebrow {
+  font-size: clamp(1.2vw, 3dvh, 1.6vw);
+  -webkit-text-stroke: 0.1vw #630000;
+  color: #ffcf40;
+}
+
+.settingControl {
+  width: 100%;
+  border: 0.18vw solid #a11425;
+  border-radius: 1vw;
+  background-color: #fff1f1;
+  color: #a11425;
+  font-family: "Cherry Bomb One", system-ui;
+  font-size: clamp(1vw, 2.5dvh, 1.4vw);
+  padding: 0.45vw 0.7vw;
+}
+
+.actions {
+  display: flex;
+  gap: 1vw;
+}
+
 .primaryButton,
 .secondaryButton,
-.leaveButton,
-.optionButton,
-.closeButton {
+.leaveButton {
   border: 0.3vw solid #630000;
   border-radius: 1.8vw;
   font-family: "Cherry Bomb One", system-ui;
@@ -156,9 +191,7 @@
   box-shadow: 0 0.6vw 0 #da9500;
 }
 
-.secondaryButton,
-.optionButton,
-.closeButton {
+.secondaryButton {
   background-color: #ffdede;
   color: #a11425;
   -webkit-text-stroke: 0.08vw #630000;
@@ -174,25 +207,19 @@
 
 .primaryButton:hover,
 .secondaryButton:hover,
-.leaveButton:hover,
-.optionButton:hover,
-.closeButton:hover {
+.leaveButton:hover {
   transform: translateY(-0.1vw);
 }
 
 .primaryButton:active,
 .secondaryButton:active,
-.leaveButton:active,
-.optionButton:active,
-.closeButton:active {
+.leaveButton:active {
   transform: translateY(0.3vw);
 }
 
 .primaryButton:disabled,
 .secondaryButton:disabled,
-.leaveButton:disabled,
-.optionButton:disabled,
-.closeButton:disabled {
+.leaveButton:disabled {
   filter: grayscale(1);
   cursor: not-allowed;
   transform: none;
@@ -222,13 +249,6 @@
   justify-content: space-between;
 }
 
-.eyebrow,
-.settingTitle {
-  font-size: clamp(1.2vw, 3dvh, 1.6vw);
-  -webkit-text-stroke: 0.1vw #630000;
-  color: #ffcf40;
-}
-
 .codeBox {
   display: flex;
   align-items: center;
@@ -244,6 +264,7 @@
 
 .statusPill,
 .waitingText,
+.waitingNote,
 .feedback,
 .errorText,
 .helperText,
@@ -264,8 +285,12 @@
   box-shadow: 0 0.45vw 0 rgba(161, 20, 37, 0.7);
 }
 
+.waitingNote {
+  color: #fff1f1;
+}
+
 .feedback {
-  color: #ffefad;
+  color: #fff1f1;
 }
 
 .summaryBar {
@@ -275,15 +300,15 @@
   align-items: center;
 }
 
+.optionButton {
+  margin-left: auto;
+}
+
 .summaryChip {
   padding: 0.5vw 0.9vw 0.7vw 0.9vw;
   border-radius: 999vw;
   background-color: rgba(255, 207, 64, 0.18);
   border: 0.18vw solid rgba(99, 0, 0, 0.26);
-}
-
-.optionButton {
-  margin-left: auto;
 }
 
 .sectionHeader {
@@ -293,7 +318,13 @@
   gap: 1vw;
 }
 
-.sectionTitle,
+.sectionTitle {
+  font-size: clamp(1.8vw, 4.5dvh, 2.6vw);
+  text-align: center;
+  -webkit-text-stroke: 0.15vw #630000;
+  color: #ffcf40;
+}
+
 .modalTitle {
   font-size: clamp(1.8vw, 4.5dvh, 2.6vw);
   text-align: center;
@@ -309,19 +340,6 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.8vw;
-}
-
-.playerTile,
-.settingCard {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4vw;
-  background-color: #fff1f1;
-  border: 0.18vw solid #a11425;
-  border-radius: 1.2vw;
-  padding: 0.7vw 0.9vw;
-  color: #a11425;
-  box-shadow: 0 0.3vw 0 #ff6b6b;
 }
 
 .playerTopLine {
@@ -409,33 +427,6 @@
   gap: 1vw;
 }
 
-.settingsGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.9vw;
-}
-
-.settingControl {
-  width: 100%;
-  border: 0.18vw solid #a11425;
-  border-radius: 1vw;
-  background-color: #fff1f1;
-  color: #a11425;
-  font-family: "Cherry Bomb One", system-ui;
-  font-size: clamp(1vw, 2.5dvh, 1.4vw);
-  padding: 0.45vw 0.7vw;
-}
-
-.toggleCard {
-  justify-content: space-between;
-}
-
-.checkbox {
-  width: 1.7vw;
-  height: 1.7vw;
-  accent-color: #e31f2f;
-}
-
 @media (orientation: portrait) and (max-width: 650px) {
   .page {
     flex-direction: column;
@@ -479,9 +470,8 @@
   .primaryButton,
   .secondaryButton,
   .leaveButton,
-  .optionButton,
-  .closeButton,
   .waitingText,
+  .waitingNote,
   .feedback,
   .errorText,
   .helperText,
@@ -507,15 +497,14 @@
   .actions,
   .roomActions,
   .footerRow,
-  .modalHeader,
   .sectionHeader {
     flex-direction: column;
   }
 
+  .settingsPanel,
   .joinBox,
   .waitingBox,
-  .playersSection,
-  .settingsModal {
+  .playersSection {
     border-width: min(0.6vw, 0.3dvh);
     border-radius: min(5vw, 2.5dvh);
     box-shadow: 0 min(1vw, 0.6dvh) 0 #a11425;
@@ -525,9 +514,7 @@
 
   .primaryButton,
   .secondaryButton,
-  .leaveButton,
-  .optionButton,
-  .closeButton {
+  .leaveButton {
     border-width: min(0.6vw, 0.3dvh);
     border-radius: min(4vw, 2dvh);
     padding: min(2vw, 1.1dvh) min(3vw, 1.6dvh) min(2.6vw, 1.3dvh) min(3vw, 1.6dvh);
@@ -539,6 +526,14 @@
     grid-template-columns: 1fr;
   }
 
+  .sectionHeader,
+  .modalHeader,
+  .footerRow,
+  .roomActions,
+  .actions {
+    flex-direction: column;
+  }
+
   .codeBox {
     font-size: min(12vw, 6dvh);
     letter-spacing: min(1vw, 0.5dvh);
@@ -547,12 +542,7 @@
     padding: min(3vw, 1.7dvh);
   }
 
-  .checkbox {
-    width: min(5vw, 2.5dvh);
-    height: min(5vw, 2.5dvh);
-  }
-
-  .optionButton {
-    margin-left: 0;
+  .settingsModal {
+    width: 92vw;
   }
 }

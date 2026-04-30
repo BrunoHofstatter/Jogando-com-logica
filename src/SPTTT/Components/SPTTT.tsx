@@ -1,22 +1,28 @@
 import { useEffect, useState } from "react";
+
 import styles from "../Style/SPTTT.module.css";
+import { getAIMove } from "../Logic/aiPlayer";
+import {
+  applyMove,
+  createInitialState,
+  getNextActiveBoard,
+  isMoveIntentValid,
+} from "../Logic/v2";
+import type { MoveIntent, SptttPlayer, SptttState } from "../Logic/v2";
 import { Piece } from "./Piece";
 import { WinnerOverlay } from "./WinnerBox";
-import { useLocation } from "react-router-dom";
-import {
-  Player,
-  BoardResult,
-  MiniBoard,
-  UltimateBoard,
-  checkWinner,
-  checkBigBoardWinner,
-  isValidMove,
-  getNextBoard,
-} from "../Logic/gameUtils";
-import { getAIMove } from "../Logic/aiPlayer";
 
 interface SPTTTProps {
-  winCondition: "line" | "majority";
+  mode?: "local" | "remote";
+  gameState?: SptttState;
+  onGameStateChange?: (state: SptttState) => void;
+  onMoveIntent?: (intent: MoveIntent) => void;
+  playerMark?: SptttPlayer;
+  interactionLocked?: boolean;
+  onPlayAgain?: () => void;
+  onPlayAgainDisabled?: boolean;
+  playAgainLabel?: string;
+  statusMessage?: string | null;
   isAiMode?: boolean;
   difficulty?: 1 | 2 | 3 | 4;
   onUnlockNext?: () => void;
@@ -25,40 +31,58 @@ interface SPTTTProps {
   showNextLevel?: boolean;
 }
 
-export default function SPTTT({ winCondition, isAiMode = false, difficulty = 1, onUnlockNext, onMenu, onNextLevel, showNextLevel }: SPTTTProps) {
-  const [boards, setBoards] = useState<UltimateBoard>(
-    Array.from({ length: 9 }, () => Array(9).fill(null))
+export default function SPTTT({
+  mode = "local",
+  gameState: externalGameState,
+  onGameStateChange,
+  onMoveIntent,
+  playerMark,
+  interactionLocked = false,
+  onPlayAgain,
+  onPlayAgainDisabled = false,
+  playAgainLabel,
+  statusMessage,
+  isAiMode = false,
+  difficulty = 1,
+  onUnlockNext,
+  onMenu,
+  onNextLevel,
+  showNextLevel,
+}: SPTTTProps) {
+  const [internalGameState, setInternalGameState] = useState<SptttState>(() =>
+    createInitialState(),
   );
-  const [winners, setWinners] = useState<Array<BoardResult>>(
-    Array(9).fill(null)
-  );
-  const [hoveredCell, setHoveredCell] = useState<{
-    boardIndex: number;
-    cellIndex: number;
-  } | null>(null);
+  const [hoveredCell, setHoveredCell] = useState<MoveIntent | null>(null);
   const [previewBoard, setPreviewBoard] = useState<number | null>(null);
-  const [scores, setScores] = useState({ X: 0, O: 0 });
-  const [currentPlayer, setCurrentPlayer] = useState<Player>("X");
-  const [activeBoard, setActiveBoard] = useState<number | null>(null);
-  const location = useLocation();
-  const [winningBoardLine, setWinningBoardLine] = useState<number[] | null>(
-    null
-  );
+  const [highlightedWinningLine, setHighlightedWinningLine] = useState<number[] | null>(null);
+  const [displayedWinner, setDisplayedWinner] = useState<SptttState["winner"]>(null);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
-  const [tapCell, setTapCell] = useState<{
-    boardIndex: number;
-    cellIndex: number;
-  } | null>(null);
+  const [tapCell, setTapCell] = useState<MoveIntent | null>(null);
+  const [hasAwardedUnlock, setHasAwardedUnlock] = useState(false);
 
-  const [finalWinner, setFinalWinner] = useState<"X" | "O" | "tie" | null>(
-    null
-  );
+  const gameState = externalGameState ?? internalGameState;
+  const turnLabel =
+    statusMessage ??
+    (mode === "remote" && playerMark
+      ? gameState.currentPlayer === playerMark
+        ? "Sua vez"
+        : "Vez do oponente"
+      : isAiMode
+        ? gameState.currentPlayer === "O"
+          ? "Vez do computador"
+          : "Sua vez"
+        : "Turno do jogador:");
+  const interactionBlocked =
+    gameState.status === "ended" ||
+    (mode === "remote"
+      ? interactionLocked ||
+        !playerMark ||
+        gameState.currentPlayer !== playerMark
+      : isAiMode && gameState.currentPlayer === "O");
 
   useEffect(() => {
     const checkTouchDevice = () => {
-      setIsTouchDevice(
-        "ontouchstart" in window || navigator.maxTouchPoints > 0
-      );
+      setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0);
     };
 
     checkTouchDevice();
@@ -69,231 +93,252 @@ export default function SPTTT({ winCondition, isAiMode = false, difficulty = 1, 
     };
   }, []);
 
-  // AI Logic
-  // AI Logic
-  useEffect(() => {
-    const { winner: currentWinner } = checkBigBoardWinner(winners, winCondition);
-
-    if (
-      isAiMode &&
-      currentPlayer === "O" &&
-      !finalWinner &&
-      !currentWinner && // Check immediate winner state
-      winners.some((w) => w === null) // Ensure game isn't over (rough check, checkBigBoardWinner handles real end)
-    ) {
-      // Small delay for UX
-      const timer = setTimeout(() => {
-        try {
-          // Double check winner inside timeout just in case
-          const { winner: winnerNow } = checkBigBoardWinner(winners, winCondition);
-          if (winnerNow) return;
-
-          const aiMove = getAIMove(boards, winners, activeBoard, difficulty);
-          handleClick(aiMove.boardIndex, aiMove.cellIndex);
-        } catch (e) {
-          console.error("AI failed to make a move", e);
-        }
-      }, 800);
-      return () => clearTimeout(timer);
-    }
-  }, [currentPlayer, isAiMode, finalWinner, boards, winners, activeBoard, difficulty, winCondition]);
-
-  const handleTouchStart = (boardIndex: number, cellIndex: number) => {
-    if (
-      !isValidMove(boardIndex, cellIndex, boards, winners, activeBoard)
-    )
-      return;
-
-    // Prevent human from touching if it's AI turn
-    if (isAiMode && currentPlayer === 'O') return;
-
-    if (
-      tapCell &&
-      tapCell.boardIndex === boardIndex &&
-      tapCell.cellIndex === cellIndex
-    ) {
-      handleClick(boardIndex, cellIndex);
-      setTapCell(null);
-    } else {
-      setTapCell({ boardIndex, cellIndex });
-      const nextBoard = getNextBoard(cellIndex, winners);
-      setPreviewBoard(nextBoard);
-    }
-  };
-
   useEffect(() => {
     setTapCell(null);
     setPreviewBoard(null);
-  }, [activeBoard, currentPlayer]);
+    setHoveredCell(null);
+  }, [gameState.activeBoard, gameState.currentPlayer, gameState.turnCount]);
 
   useEffect(() => {
-    if (winCondition === "majority") {
-      const newScores = {
-        X: winners.filter((winner) => winner === "X").length,
-        O: winners.filter((winner) => winner === "O").length,
-      };
-      setScores(newScores);
-    }
-  }, [winners, winCondition]);
-
-  const handleClick = (boardIndex: number, cellIndex: number) => {
-    if (winners[boardIndex] !== null) return;
-    if (boards[boardIndex][cellIndex] !== null) return;
-    if (activeBoard !== null && activeBoard !== boardIndex) return;
-    if (winners[boardIndex]) return;
-
-    const newBoards: UltimateBoard = boards.map((board, bIdx) =>
-      bIdx === boardIndex
-        ? board.map((cell, cIdx) => (cIdx === cellIndex ? currentPlayer : cell))
-        : board
-    );
-
-    const boardWinner = checkWinner(newBoards[boardIndex]);
-    const newWinners = [...winners];
-    if (boardWinner) {
-      newWinners[boardIndex] = boardWinner;
+    if (gameState.status !== "ended" || !gameState.winningLine) {
+      setHighlightedWinningLine(null);
+      return;
     }
 
-    setBoards(newBoards);
-    setWinners(newWinners);
+    setHighlightedWinningLine(gameState.winningLine);
+    const timeoutId = window.setTimeout(() => {
+      setHighlightedWinningLine(null);
+    }, 1000);
 
-    const nextBoard = getNextBoard(cellIndex, newWinners);
-    setActiveBoard(nextBoard);
-    setCurrentPlayer(currentPlayer === "X" ? "O" : "X");
+    return () => window.clearTimeout(timeoutId);
+  }, [gameState.status, gameState.winningLine, gameState.turnCount]);
 
-    const { winner: bigWinner, winningLine } = checkBigBoardWinner(
-      newWinners,
-      winCondition
-    );
-
-    if (winningLine) {
-      setWinningBoardLine(winningLine);
-      setTimeout(() => setWinningBoardLine(null), 1000);
+  useEffect(() => {
+    if (gameState.status !== "ended" || gameState.winner === null) {
+      setDisplayedWinner(null);
+      return;
     }
 
-    if (bigWinner) {
-      setTimeout(() => {
-        setFinalWinner(bigWinner);
-        if (bigWinner === 'X' && isAiMode && onUnlockNext) {
-          onUnlockNext();
+    const timeoutId = window.setTimeout(() => {
+      setDisplayedWinner(gameState.winner);
+    }, 2000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [gameState.status, gameState.winner, gameState.turnCount]);
+
+  useEffect(() => {
+    if (gameState.turnCount === 0) {
+      setDisplayedWinner(null);
+      setHasAwardedUnlock(false);
+    }
+  }, [gameState.turnCount]);
+
+  useEffect(() => {
+    if (
+      !isAiMode ||
+      hasAwardedUnlock ||
+      gameState.status !== "ended" ||
+      gameState.winner !== "X" ||
+      !onUnlockNext
+    ) {
+      return;
+    }
+
+    onUnlockNext();
+    setHasAwardedUnlock(true);
+  }, [gameState.status, gameState.winner, hasAwardedUnlock, isAiMode, onUnlockNext]);
+
+  useEffect(() => {
+    if (
+      !isAiMode ||
+      mode !== "local" ||
+      gameState.status !== "playing" ||
+      gameState.currentPlayer !== "O"
+    ) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      try {
+        const aiMove = getAIMove(gameState, difficulty);
+        const result = applyMove(gameState, aiMove);
+        if (!result.ok) {
+          return;
         }
-      }, 2000); // delay for animations if needed
+
+        if (onGameStateChange) {
+          onGameStateChange(result.state);
+          return;
+        }
+
+        setInternalGameState(result.state);
+      } catch (error) {
+        console.error("AI failed to make a move", error);
+      }
+    }, 800);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [difficulty, gameState, isAiMode, mode, onGameStateChange]);
+
+  const updateGameState = (nextState: SptttState) => {
+    if (onGameStateChange) {
+      onGameStateChange(nextState);
+      return;
     }
+
+    setInternalGameState(nextState);
   };
 
-  const restartGame = () => {
-    setBoards(Array.from({ length: 9 }, () => Array(9).fill(null)));
-    setWinners(Array(9).fill(null));
-    setCurrentPlayer("X");
-    setActiveBoard(null);
-    setFinalWinner(null);
-    setWinningBoardLine(null);
+  const commitMove = (intent: MoveIntent) => {
+    if (mode === "remote") {
+      onMoveIntent?.(intent);
+      return;
+    }
+
+    const result = applyMove(gameState, intent);
+    if (!result.ok) {
+      return;
+    }
+
+    updateGameState(result.state);
+  };
+
+  const handleTouchStart = (boardIndex: number, cellIndex: number) => {
+    const intent = { boardIndex, cellIndex };
+    if (interactionBlocked || !isMoveIntentValid(gameState, intent)) {
+      return;
+    }
+
+    if (tapCell?.boardIndex === boardIndex && tapCell.cellIndex === cellIndex) {
+      commitMove(intent);
+      setTapCell(null);
+      return;
+    }
+
+    setTapCell(intent);
+    setPreviewBoard(getNextActiveBoard(cellIndex, gameState.boardWinners));
+  };
+
+  const handleCellClick = (boardIndex: number, cellIndex: number) => {
+    const intent = { boardIndex, cellIndex };
+    if (interactionBlocked || !isMoveIntentValid(gameState, intent)) {
+      return;
+    }
+
+    commitMove(intent);
+  };
+
+  const handlePlayAgain = () => {
+    if (mode === "remote") {
+      onPlayAgain?.();
+      return;
+    }
+
+    updateGameState(createInitialState());
   };
 
   return (
-    <div className={`${styles["jogo-SPTTT"]} ${finalWinner ? styles["game-over"] : ""}`}>
+    <div
+      className={`${styles["jogo-SPTTT"]} ${displayedWinner ? styles["game-over"] : ""}`}
+    >
       <div className={styles.statWrap}>
-        {/* Turn indicator */}
         <div className={styles["turn-indicator"]} data-target="player">
-          <span>Turno do jogador:</span>
+          <span>{turnLabel}</span>
           <div className={styles["current-player-symbol"]}>
-            <Piece player={currentPlayer!} />
+            <Piece player={gameState.currentPlayer} />
           </div>
         </div>
 
         {isAiMode && (
           <div className={styles["difficulty-indicator"]}>
-            <span>Dificuldade: {difficulty === 1 ? "Muito Fácil" : difficulty === 2 ? "Fácil" : difficulty === 3 ? "Médio" : "Difícil"}</span>
-          </div>
-        )}
-
-        {winCondition === "majority" && (
-          <div className={styles.scoreDisplayWrap}>
-            <div className={styles.scoreDisplay}>
-              <div className={styles.score}>
-                <Piece player="X" />
-                <span> : {scores.X}</span>
-              </div>
-              <div className={styles.scoreSeparator}>-</div>
-              <div className={styles.score}>
-                <Piece player="O" />
-                <span> : {scores.O}</span>
-              </div>
-            </div>
+            <span>
+              Dificuldade:{" "}
+              {difficulty === 1
+                ? "Muito Fácil"
+                : difficulty === 2
+                  ? "Fácil"
+                  : difficulty === 3
+                    ? "Médio"
+                    : "Difícil"}
+            </span>
           </div>
         )}
       </div>
 
       <div className={styles["board-wrap"]}>
         <div className={styles["big-board"]} data-target="bigboard">
-          {boards.map((board, boardIndex) => {
+          {gameState.boards.map((board, boardIndex) => {
+            const boardWinner = gameState.boardWinners[boardIndex];
             const isPreviewBoard = previewBoard === boardIndex;
+            const isBoardPlayable =
+              gameState.status === "playing" &&
+              gameState.activeBoard !== null &&
+              gameState.activeBoard === boardIndex;
+            const isBoardFreelyPlayable =
+              gameState.status === "playing" && gameState.activeBoard === null;
 
             return (
               <div
                 key={boardIndex}
                 data-target={`smallboard-${boardIndex}`}
-                className={`${styles["small-board"]} ${activeBoard === null
-                  ? styles.playableStatic
-                  : activeBoard === boardIndex
-                    ? styles.playable
-                    : ""
-                  } ${winners[boardIndex]
-                    ? winners[boardIndex] === "tie"
+                className={`${styles["small-board"]} ${
+                  isBoardFreelyPlayable
+                    ? styles.playableStatic
+                    : isBoardPlayable
+                      ? styles.playable
+                      : ""
+                } ${
+                  boardWinner
+                    ? boardWinner === "tie"
                       ? styles.tied
                       : styles.won
                     : ""
-                  } ${isPreviewBoard ? styles.previewNext : ""} ${winningBoardLine?.includes(boardIndex)
-                    ? styles.winningBoard
-                    : ""
-                  }`}
+                } ${
+                  isPreviewBoard ? styles.previewNext : ""
+                } ${
+                  highlightedWinningLine?.includes(boardIndex) ? styles.winningBoard : ""
+                }`}
               >
-                {winners[boardIndex] && winners[boardIndex] !== "tie" && (
+                {boardWinner && boardWinner !== "tie" && (
                   <div className={styles["board-winner"]}>
-                    <Piece player={winners[boardIndex] as "X" | "O"} />
+                    <Piece player={boardWinner} />
                   </div>
                 )}
-                {winners[boardIndex] === "tie" && (
-                  <div className={`${styles["board-winner"]} ${styles.tie}`}>
-                    {/* Tie indicator if desired */}
-                  </div>
+
+                {boardWinner === "tie" && (
+                  <div className={`${styles["board-winner"]} ${styles.tie}`} />
                 )}
+
                 {board.map((cell, cellIndex) => {
-                  const isValid = isValidMove(
-                    boardIndex,
-                    cellIndex,
-                    boards,
-                    winners,
-                    activeBoard
-                  );
+                  const intent = { boardIndex, cellIndex };
+                  const isValid = isMoveIntentValid(gameState, intent);
                   const showHoverPreview =
-                    !cell &&
+                    cell === null &&
                     isValid &&
                     hoveredCell?.boardIndex === boardIndex &&
-                    hoveredCell?.cellIndex === cellIndex;
-
+                    hoveredCell.cellIndex === cellIndex;
                   const showTapPreview =
-                    !cell &&
+                    cell === null &&
                     isValid &&
                     tapCell?.boardIndex === boardIndex &&
-                    tapCell?.cellIndex === cellIndex;
-
-                  // Disable interaction if it's AI turn and valid (just in case)
-                  const isDisabled = !isValid || (isAiMode && currentPlayer === 'O');
+                    tapCell.cellIndex === cellIndex;
+                  const isDisabled = !isValid || interactionBlocked;
 
                   return (
                     <button
                       key={cellIndex}
-                      className={`${styles.casa} ${isValid ? styles.playableCell : ""
-                        } ${tapCell?.boardIndex === boardIndex &&
-                          tapCell?.cellIndex === cellIndex
+                      className={`${styles.casa} ${
+                        isValid ? styles.playableCell : ""
+                      } ${
+                        tapCell?.boardIndex === boardIndex &&
+                        tapCell.cellIndex === cellIndex
                           ? styles.tappedCell
                           : ""
-                        }`}
+                      }`}
                       data-cell={`${boardIndex}-${cellIndex}`}
                       onClick={() => {
                         if (!isTouchDevice && !isDisabled) {
-                          handleClick(boardIndex, cellIndex);
+                          handleCellClick(boardIndex, cellIndex);
                         }
                       }}
                       onTouchStart={() => {
@@ -303,11 +348,14 @@ export default function SPTTT({ winCondition, isAiMode = false, difficulty = 1, 
                       }}
                       disabled={isDisabled}
                       onMouseEnter={() => {
-                        if (!isDisabled) {
-                          setHoveredCell({ boardIndex, cellIndex });
-                          const nextBoard = getNextBoard(cellIndex, winners);
-                          setPreviewBoard(nextBoard);
+                        if (isDisabled) {
+                          return;
                         }
+
+                        setHoveredCell(intent);
+                        setPreviewBoard(
+                          getNextActiveBoard(cellIndex, gameState.boardWinners),
+                        );
                       }}
                       onMouseLeave={() => {
                         setHoveredCell(null);
@@ -317,12 +365,12 @@ export default function SPTTT({ winCondition, isAiMode = false, difficulty = 1, 
                       {cell && <Piece player={cell} />}
                       {showHoverPreview && (
                         <div className={styles.previewPiece}>
-                          <Piece player={currentPlayer!} />
+                          <Piece player={gameState.currentPlayer} />
                         </div>
                       )}
                       {showTapPreview && (
                         <div className={styles.previewPiece}>
-                          <Piece player={currentPlayer!} />
+                          <Piece player={gameState.currentPlayer} />
                         </div>
                       )}
                     </button>
@@ -334,11 +382,12 @@ export default function SPTTT({ winCondition, isAiMode = false, difficulty = 1, 
         </div>
       </div>
 
-      {/* Winner Overlay */}
-      {finalWinner && (
+      {displayedWinner && (
         <WinnerOverlay
-          winner={finalWinner}
-          onRestart={restartGame}
+          winner={displayedWinner}
+          onRestart={handlePlayAgain}
+          restartLabel={playAgainLabel}
+          isRestartDisabled={onPlayAgainDisabled}
           isAiMode={isAiMode}
           onMenu={onMenu}
           onNextLevel={onNextLevel}

@@ -37,10 +37,14 @@ export const ROUTES = {
   SPTTT_RULES: "/super-jogo-da-velha/regras",
   SPTTT_GAME: "/super-jogo-da-velha",
   SPTTT_AI: "/super-jogo-da-velha/computador",
+  SPTTT_MP_LOBBY: "/super-jogo-da-velha/online",
+  SPTTT_MP_GAME: "/super-jogo-da-velha/online/partida",
 
   // Caça Soma
   CACA_SOMA_RULES: "/caca-soma/regras",
   CACA_SOMA_GAME: "/caca-soma",
+  CACA_SOMA_MP_LOBBY: "/caca-soma/online",
+  CACA_SOMA_MP_GAME: "/caca-soma/online/partida",
   CACA_SOMA_LEVELS: "/caca-soma/niveis",
   CACA_SOMA_LEVEL_DYNAMIC: "/caca-soma/niveis/:levelId",
   CACA_SOMA_LEVEL_BASE: "/caca-soma/niveis",

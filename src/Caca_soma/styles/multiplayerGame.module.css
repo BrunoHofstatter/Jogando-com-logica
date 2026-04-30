@@ -1,0 +1,553 @@
+.loadingPage {
+  min-height: 100dvh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #efc9c9;
+  padding: 4vw;
+  box-sizing: border-box;
+  font-family: "Cherry Bomb One", system-ui;
+}
+
+.loadingCard {
+  width: min(78vw, 64dvh);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2vw;
+  padding: 2vw;
+  box-sizing: border-box;
+  background-color: #d18d8d;
+  border: 0.4vw solid #c62828;
+  border-radius: 2vw;
+  box-shadow: 0 0.8vw 0 #7f0000;
+  text-align: center;
+}
+
+.loadingTitle {
+  margin: 0;
+  font-size: 3.2vw;
+  color: #fff;
+  -webkit-text-stroke: 0.2vw #7f0000;
+  text-shadow: 0 0.2vw 0 #5c0000;
+}
+
+.loadingText {
+  margin: 0;
+  font-size: 1.6vw;
+  color: #fff;
+  -webkit-text-stroke: 0.1vw #7f0000;
+}
+
+.loadingButton,
+.leaveRoomButton,
+.modalPrimaryButton,
+.modalSecondaryButton {
+  font-family: "Cherry Bomb One", system-ui;
+  border-radius: 1.5vw;
+  border: 0.3vw solid #7f0000;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.loadingButton,
+.leaveRoomButton {
+  font-size: 1.9vw;
+  padding: 0.5vw 1.4vw 0.9vw 1.4vw;
+  color: #fff;
+  -webkit-text-stroke: 0.14vw #7f0000;
+  box-shadow: 0 0.6vw 0 #5c0000;
+}
+
+.loadingButton {
+  background-color: #da3e3e;
+}
+
+.loadingButton:hover,
+.leaveRoomButton:hover,
+.modalPrimaryButton:hover,
+.modalSecondaryButton:hover {
+  transform: translateY(-0.1vw);
+}
+
+.loadingButton:active,
+.leaveRoomButton:active,
+.modalPrimaryButton:active,
+.modalSecondaryButton:active {
+  transform: translateY(0.3vw);
+}
+
+.scoreTrackers {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1vw;
+}
+
+.teamTracker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5vw;
+}
+
+.teamTrackerLabel {
+  font-size: 1.8vw;
+  color: #fff;
+  -webkit-text-stroke: 0.12vw #7f0000;
+  text-shadow: 0 0.2vw 0 #5c0000;
+}
+
+.teamTrackerLabelActive {
+  color: #ffcf40;
+  -webkit-text-stroke: 0.12vw #b28900;
+  text-shadow: 0 0.2vw 0 #da9500;
+}
+
+.readyButton {
+  background-color: #4caf50;
+  border-color: #1b5e20;
+  -webkit-text-stroke: 0.15vw #1b5e20;
+  box-shadow: 0 0.6vw 0 #1b5e20;
+}
+
+.cancelReadyButton {
+  background-color: #ff9800;
+  border-color: #e65100;
+  -webkit-text-stroke: 0.15vw #e65100;
+  box-shadow: 0 0.6vw 0 #e65100;
+}
+
+.infoPanel {
+  background-color: #d18d8d;
+  border: 0.4vw solid #c62828;
+  border-radius: 2vw;
+  padding: 1vw;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9vw;
+  box-shadow: 0 0.8vw 0 #7f0000;
+}
+
+.compactHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1vw;
+}
+
+.roomCode,
+.roundLabel {
+  font-size: 1.45vw;
+  color: #fff;
+  -webkit-text-stroke: 0.1vw #7f0000;
+  text-shadow: 0 0.15vw 0 #5c0000;
+}
+
+.playersStrip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7vw;
+}
+
+.playerPill,
+.compactNotice {
+  background-color: #efc9c9;
+  border: 0.25vw solid #7f0000;
+  border-radius: 1.2vw;
+  box-shadow: 0 0.4vw 0 #5c0000;
+}
+
+.playerPill {
+  min-width: 0;
+  padding: 0.55vw 0.7vw;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25vw;
+}
+
+.playerPillActive {
+  background-color: #ffcf40;
+  border-color: #b28900;
+  box-shadow: 0 0.4vw 0 #da9500;
+}
+
+.playerPillTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5vw;
+}
+
+.playerPillLabel {
+  font-size: 1.05vw;
+  color: #fff;
+  -webkit-text-stroke: 0.08vw #7f0000;
+  text-shadow: 0 0.12vw 0 #5c0000;
+}
+
+.connectionDot {
+  width: 0.8vw;
+  height: 0.8vw;
+  border-radius: 50%;
+  border: 0.12vw solid #7f0000;
+  flex-shrink: 0;
+}
+
+.connectionDotOn {
+  background-color: #4caf50;
+}
+
+.connectionDotOff {
+  background-color: #da3e3e;
+}
+
+.playerPillName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 1.15vw;
+  color: #7f0000;
+}
+
+.compactNotice {
+  padding: 0.7vw 0.8vw;
+  font-size: 1.15vw;
+  color: #7f0000;
+  text-align: center;
+}
+
+.leaveRoomButton {
+  background-color: #da3e3e;
+}
+
+.cellShell {
+  position: relative;
+  overflow: visible;
+}
+
+.cellTeammate {
+  background-color: #6aa2ff;
+  border-color: #19478f;
+  color: #fff;
+  -webkit-text-stroke: 0.15vw #19478f;
+  box-shadow: 0 0.5vw 0 #19478f;
+}
+
+.teammateReadyBadge {
+  position: absolute;
+  top: 0.2vw;
+  right: 0.2vw;
+  width: 1.15vw;
+  height: 1.15vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: #4caf50;
+  border: 0.12vw solid #1b5e20;
+  color: #fff;
+  font-size: 0.9vw;
+  line-height: 1;
+  -webkit-text-stroke: 0.04vw #1b5e20;
+  box-shadow: 0 0.18vw 0 #1b5e20;
+}
+
+.cellDisabled {
+  cursor: default;
+  pointer-events: none;
+}
+
+.alertBox {
+  position: fixed;
+  top: 2vw;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(72vw, 92dvh);
+  padding: 0.9vw 1.1vw;
+  box-sizing: border-box;
+  background-color: #efc9c9;
+  border: 0.25vw solid #c62828;
+  border-radius: 1.4vw;
+  box-shadow: 0 0.5vw 0 #7f0000;
+  color: #7f0000;
+  font-family: "Cherry Bomb One", system-ui;
+  font-size: 1.4vw;
+  text-align: center;
+  z-index: 30;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4vw;
+  box-sizing: border-box;
+  background-color: rgba(92, 0, 0, 0.45);
+  z-index: 1200;
+}
+
+.modalCard {
+  width: min(44vw, 86dvh);
+  display: flex;
+  flex-direction: column;
+  gap: 1.2vw;
+  padding: 1.8vw;
+  box-sizing: border-box;
+  background-color: #d18d8d;
+  border: 0.35vw solid #c62828;
+  border-radius: 2vw;
+  box-shadow: 0 0.8vw 0 #7f0000;
+  text-align: center;
+  font-family: "Cherry Bomb One", system-ui;
+}
+
+.modalTitle {
+  font-size: 2.8vw;
+  color: #fff;
+  -webkit-text-stroke: 0.16vw #7f0000;
+  text-shadow: 0 0.2vw 0 #5c0000;
+}
+
+.modalText {
+  margin: 0;
+  font-size: 1.5vw;
+  color: #fff;
+  -webkit-text-stroke: 0.08vw #7f0000;
+}
+
+.modalScore {
+  display: flex;
+  justify-content: center;
+  gap: 1.2vw;
+  font-size: 1.5vw;
+  color: #fff;
+  -webkit-text-stroke: 0.09vw #7f0000;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: center;
+  gap: 1vw;
+}
+
+.modalPrimaryButton,
+.modalSecondaryButton {
+  min-width: 11vw;
+  font-size: 1.6vw;
+  padding: 0.45vw 1vw 0.75vw 1vw;
+  color: #fff;
+}
+
+.modalPrimaryButton {
+  background-color: #4caf50;
+  border-color: #1b5e20;
+  -webkit-text-stroke: 0.1vw #1b5e20;
+  box-shadow: 0 0.5vw 0 #1b5e20;
+}
+
+.modalSecondaryButton {
+  background-color: #da3e3e;
+  border-color: #7f0000;
+  -webkit-text-stroke: 0.1vw #7f0000;
+  box-shadow: 0 0.5vw 0 #5c0000;
+}
+
+@media (orientation: portrait) and (max-width: 650px) {
+  .loadingCard,
+  .infoPanel,
+  .modalCard {
+    border-width: min(0.8vw, 0.4dvh);
+    border-radius: min(3vw, 1.5dvh);
+    box-shadow: 0 min(1.5vw, 0.75dvh) 0 #7f0000;
+  }
+
+  .loadingCard {
+    width: min(90vw, 54dvh);
+    padding: min(4vw, 2dvh);
+    gap: min(2vw, 1dvh);
+  }
+
+  .loadingTitle {
+    font-size: min(7vw, 3.5dvh);
+    -webkit-text-stroke: min(0.4vw, 0.2dvh) #7f0000;
+  }
+
+  .loadingText {
+    font-size: min(3.5vw, 1.75dvh);
+    -webkit-text-stroke: min(0.18vw, 0.09dvh) #7f0000;
+  }
+
+  .loadingButton,
+  .leaveRoomButton,
+  .modalPrimaryButton,
+  .modalSecondaryButton {
+    border-width: min(0.5vw, 0.25dvh);
+    border-radius: min(3vw, 1.5dvh);
+  }
+
+  .loadingButton,
+  .leaveRoomButton {
+    font-size: min(4vw, 2dvh);
+    padding: min(1vw, 0.5dvh) min(2vw, 1dvh) min(1.7vw, 0.85dvh) min(2vw, 1dvh);
+    -webkit-text-stroke: min(0.2vw, 0.1dvh) #7f0000;
+    box-shadow: 0 min(1vw, 0.5dvh) 0 #5c0000;
+  }
+
+  .scoreTrackers {
+    gap: min(1.5vw, 0.75dvh);
+  }
+
+  .teamTrackerLabel {
+    font-size: min(3.5vw, 1.75dvh);
+    -webkit-text-stroke: min(0.2vw, 0.1dvh) #7f0000;
+  }
+
+  .teamTrackerLabelActive {
+    -webkit-text-stroke: min(0.2vw, 0.1dvh) #b28900;
+  }
+
+  .readyButton {
+    box-shadow: 0 min(1vw, 0.5dvh) 0 #1b5e20;
+  }
+
+  .cancelReadyButton {
+    box-shadow: 0 min(1vw, 0.5dvh) 0 #e65100;
+  }
+
+  .infoPanel {
+    width: 100%;
+    padding: min(2vw, 1dvh);
+    gap: min(1.5vw, 0.75dvh);
+    box-sizing: border-box;
+  }
+
+  .compactHeader {
+    gap: min(2vw, 1dvh);
+  }
+
+  .roomCode,
+  .roundLabel {
+    font-size: min(3vw, 1.5dvh);
+    -webkit-text-stroke: min(0.16vw, 0.08dvh) #7f0000;
+  }
+
+  .playersStrip {
+    gap: min(1vw, 0.5dvh);
+  }
+
+  .playerPill,
+  .compactNotice {
+    border-width: min(0.5vw, 0.25dvh);
+    border-radius: min(2vw, 1dvh);
+    box-shadow: 0 min(0.6vw, 0.3dvh) 0 #5c0000;
+  }
+
+  .playerPill {
+    padding: min(1.1vw, 0.55dvh) min(1.4vw, 0.7dvh);
+    gap: min(0.35vw, 0.18dvh);
+  }
+
+  .playerPillActive {
+    box-shadow: 0 min(0.6vw, 0.3dvh) 0 #da9500;
+  }
+
+  .playerPillTop {
+    gap: min(1vw, 0.5dvh);
+  }
+
+  .playerPillLabel {
+    font-size: min(2.3vw, 1.15dvh);
+    -webkit-text-stroke: min(0.12vw, 0.06dvh) #7f0000;
+  }
+
+  .connectionDot {
+    width: min(1.8vw, 0.9dvh);
+    height: min(1.8vw, 0.9dvh);
+    border-width: min(0.25vw, 0.12dvh);
+  }
+
+  .playerPillName,
+  .compactNotice {
+    font-size: min(2.6vw, 1.3dvh);
+  }
+
+  .compactNotice {
+    padding: min(1.2vw, 0.6dvh) min(1.5vw, 0.75dvh);
+  }
+
+  .cellTeammate {
+    -webkit-text-stroke: calc(min(1.5vw, 0.75dvh) / var(--board-size, 10)) #19478f;
+    box-shadow: 0 calc(min(5vw, 2.5dvh) / var(--board-size, 10)) 0 #19478f;
+  }
+
+  .teammateReadyBadge {
+    top: calc(min(1vw, 0.5dvh) / var(--board-size, 10));
+    right: calc(min(1vw, 0.5dvh) / var(--board-size, 10));
+    width: calc(min(10vw, 5dvh) / var(--board-size, 10));
+    height: calc(min(10vw, 5dvh) / var(--board-size, 10));
+    font-size: calc(min(8vw, 4dvh) / var(--board-size, 10));
+    border-width: calc(min(1vw, 0.5dvh) / var(--board-size, 10));
+    box-shadow: 0 calc(min(2vw, 1dvh) / var(--board-size, 10)) 0 #1b5e20;
+    -webkit-text-stroke: calc(min(0.4vw, 0.2dvh) / var(--board-size, 10)) #1b5e20;
+  }
+
+  .alertBox {
+    top: 2vw;
+    width: 90vw;
+    font-size: min(3.5vw, 1.75dvh);
+    padding: min(1.8vw, 0.9dvh) min(2vw, 1dvh);
+    border-width: min(0.5vw, 0.25dvh);
+    border-radius: min(3vw, 1.5dvh);
+    box-shadow: 0 min(0.8vw, 0.4dvh) 0 #7f0000;
+  }
+
+  .modalCard {
+    width: min(92vw, 55dvh);
+    gap: min(2vw, 1dvh);
+    padding: min(4vw, 2dvh);
+  }
+
+  .modalTitle {
+    font-size: min(7vw, 3.5dvh);
+    -webkit-text-stroke: min(0.35vw, 0.18dvh) #7f0000;
+  }
+
+  .modalText,
+  .modalScore {
+    font-size: min(3.6vw, 1.8dvh);
+    -webkit-text-stroke: min(0.16vw, 0.08dvh) #7f0000;
+  }
+
+  .modalScore {
+    flex-direction: column;
+    gap: min(0.8vw, 0.4dvh);
+  }
+
+  .modalActions {
+    flex-direction: column;
+    gap: min(1vw, 0.5dvh);
+  }
+
+  .modalPrimaryButton,
+  .modalSecondaryButton {
+    min-width: 0;
+    width: 100%;
+    font-size: min(4vw, 2dvh);
+    padding: min(1vw, 0.5dvh) min(2vw, 1dvh) min(1.7vw, 0.85dvh) min(2vw, 1dvh);
+  }
+
+  .modalPrimaryButton {
+    box-shadow: 0 min(1vw, 0.5dvh) 0 #1b5e20;
+    -webkit-text-stroke: min(0.18vw, 0.09dvh) #1b5e20;
+  }
+
+  .modalSecondaryButton {
+    box-shadow: 0 min(1vw, 0.5dvh) 0 #5c0000;
+    -webkit-text-stroke: min(0.18vw, 0.09dvh) #7f0000;
+  }
+}

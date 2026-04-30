@@ -4,6 +4,10 @@ import express from "express";
 import { Server, type Namespace } from "socket.io";
 
 import type {
+  CacaSomaClientToServerEvents,
+  CacaSomaServerToClientEvents,
+} from "../../src/Caca_soma/Logic/multiplayer/protocol.ts";
+import type {
   CrownChaseClientToServerEvents,
   CrownChaseServerToClientEvents,
 } from "../../src/CrownChase/Logic/multiplayer/protocol.ts";
@@ -15,9 +19,15 @@ import type {
   StopClientToServerEvents,
   StopServerToClientEvents,
 } from "../../src/Stop/Logic/multiplayer/protocol.ts";
+import type {
+  SptttClientToServerEvents,
+  SptttServerToClientEvents,
+} from "../../src/SPTTT/Logic/multiplayer/protocol.ts";
 import { registerRoomHandlers } from "./sockets/registerRoomHandlers.ts";
+import { registerCacaSomaRoomHandlers } from "./sockets/registerCacaSomaRoomHandlers.ts";
 import { registerMathWarRoomHandlers } from "./sockets/registerMathWarRoomHandlers.ts";
 import { registerStopRoomHandlers } from "./sockets/registerStopRoomHandlers.ts";
+import { registerSptttRoomHandlers } from "./sockets/registerSptttRoomHandlers.ts";
 
 export function createMultiplayerServer() {
   const app = express();
@@ -42,6 +52,10 @@ export function createMultiplayerServer() {
     CrownChaseClientToServerEvents,
     CrownChaseServerToClientEvents
   >;
+  const cacaSomaNamespace = io.of("/caca-soma") as Namespace<
+    CacaSomaClientToServerEvents,
+    CacaSomaServerToClientEvents
+  >;
   const mathWarNamespace = io.of("/math-war") as Namespace<
     MathWarClientToServerEvents,
     MathWarServerToClientEvents
@@ -50,10 +64,16 @@ export function createMultiplayerServer() {
     StopClientToServerEvents,
     StopServerToClientEvents
   >;
+  const sptttNamespace = io.of("/spttt") as Namespace<
+    SptttClientToServerEvents,
+    SptttServerToClientEvents
+  >;
 
   registerRoomHandlers(crownChaseNamespace);
+  registerCacaSomaRoomHandlers(cacaSomaNamespace);
   registerMathWarRoomHandlers(mathWarNamespace);
   registerStopRoomHandlers(stopNamespace);
+  registerSptttRoomHandlers(sptttNamespace);
 
   return {
     app,

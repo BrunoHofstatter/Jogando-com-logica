@@ -1,23 +1,20 @@
 export const getAvailableNumbers = (
-    board: number[][],
-    boardSize: number
+    boardSize: number,
+    usedIndices: Iterable<string> = []
 ): number[] => {
+    const used = new Set(usedIndices);
     const available: number[] = [];
-    for (let r = 0; r < boardSize; r++) {
-        for (let c = 0; c < boardSize; c++) {
-            // Assuming non-zero values are valid numbers. 
-            // If the board uses 0 for empty/used, we filter them out.
-            // However, Tabuleiro logic uses an internal 'state' board where 0=unselected, 1=selected.
-            // We need the ACTUAL values matrix.
-            // But wait, the board state in Tabuleiro is just for selection.
-            // The actual numbers are fixed in the level config or generated once?
-            // In 'LevelGamePage', 'matrix' is passed to Tabuleiro.
-            // We need to know which ones are "used" (already part of a correct sum) to filter them out?
-            // Actually, if we track 'usedNumbers' as indices or values, we can filter.
-            // But for simplicity, let's assume we pass the *remaining* available numbers or the full matrix and a mask of used cells.
+
+    for (let r = 0; r < boardSize; r += 1) {
+        for (let c = 0; c < boardSize; c += 1) {
+            const key = `${r}-${c}`;
+            if (!used.has(key)) {
+                available.push(r * boardSize + c + 1);
+            }
         }
     }
-    return [];
+
+    return available;
 };
 
 export const getPossibleSums = (
@@ -25,6 +22,10 @@ export const getPossibleSums = (
     countToSelect: number
 ): Set<number> => {
     const sums = new Set<number>();
+
+    if (countToSelect <= 0 || availableNumbers.length < countToSelect) {
+        return sums;
+    }
 
     const combine = (startIdx: number, currentSum: number, count: number) => {
         if (count === countToSelect) {
@@ -39,6 +40,23 @@ export const getPossibleSums = (
 
     combine(0, 0, 0);
     return sums;
+};
+
+export const getFilteredPossibleSums = (
+    availableNumbers: number[],
+    countToSelect: number,
+    range?: [number, number] | null
+): number[] => {
+    const possibleSums = Array.from(getPossibleSums(availableNumbers, countToSelect));
+
+    if (!range) {
+        return possibleSums.sort((left, right) => left - right);
+    }
+
+    const [min, max] = range;
+    const inRange = possibleSums.filter((value) => value >= min && value <= max);
+
+    return (inRange.length > 0 ? inRange : possibleSums).sort((left, right) => left - right);
 };
 
 export const isValidSum = (

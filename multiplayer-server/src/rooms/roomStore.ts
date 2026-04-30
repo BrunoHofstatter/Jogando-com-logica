@@ -1,14 +1,22 @@
-import type { MultiplayerRoom } from "./roomTypes.ts";
+type RoomStorePlayer = {
+  socketId: string;
+};
 
-export function createRoomStore<TState>() {
-  const rooms = new Map<string, MultiplayerRoom<TState>>();
+type RoomStoreShape = {
+  code: string;
+  players: readonly (RoomStorePlayer | null)[];
+  waitingTimeout: NodeJS.Timeout | null;
+  closeTimeout: NodeJS.Timeout | null;
+};
 
-  const getRooms = (): Map<string, MultiplayerRoom<TState>> => rooms;
+export function createRoomStore<TRoom extends RoomStoreShape>() {
+  const rooms = new Map<string, TRoom>();
 
-  const getRoom = (code: string): MultiplayerRoom<TState> | undefined =>
-    rooms.get(code);
+  const getRooms = (): Map<string, TRoom> => rooms;
 
-  const setRoom = (room: MultiplayerRoom<TState>): void => {
+  const getRoom = (code: string): TRoom | undefined => rooms.get(code);
+
+  const setRoom = (room: TRoom): void => {
     rooms.set(room.code, room);
   };
 
@@ -31,7 +39,7 @@ export function createRoomStore<TState>() {
 
   const findRoomBySocketId = (
     socketId: string,
-  ): MultiplayerRoom<TState> | undefined => {
+  ): TRoom | undefined => {
     for (const room of rooms.values()) {
       const hasSocket = room.players.some((player) => player?.socketId === socketId);
       if (hasSocket) {

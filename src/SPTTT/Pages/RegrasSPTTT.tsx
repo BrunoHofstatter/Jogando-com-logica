@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
-import styles from "../Style/RegrasSPTTT.module.css";
 import { useNavigate } from "react-router-dom";
+
 import { useTutorialCompleted } from "../../Shared/Components/DynamicTutorial";
 import { useDifficultyLock } from "../../Shared/Hooks/useDifficultyLock";
 import { ROUTES } from "../../routes";
-
+import styles from "../Style/RegrasSPTTT.module.css";
 
 type GameMode = "pvp" | "ai";
 
-function JogoStop() {
+function SPTTTRulesPage() {
   useEffect(() => {
     document.body.style.backgroundColor = "#c2e4fa";
     let metaThemeColor = document.querySelector('meta[name="theme-color"]');
@@ -24,56 +24,68 @@ function JogoStop() {
   const [gameMode, setGameMode] = useState<GameMode>("ai");
   const [aiDifficulty, setAiDifficulty] = useState<1 | 2 | 3 | 4>(1);
   const [showDetailedRules, setShowDetailedRules] = useState(false);
-  const [tutorialCompleted, resetTutorial] =
-    useTutorialCompleted("spttt_v1");
-
+  const [, resetTutorial] = useTutorialCompleted("spttt_v1");
   const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const { isUnlocked, unlockNext, resetProgress, unlockAll } = useDifficultyLock("spttt");
+  const { isUnlocked, resetProgress } = useDifficultyLock("spttt");
 
   function startGame() {
     if (gameMode === "ai") {
-      if (!isUnlocked(aiDifficulty)) return;
-      navigate(ROUTES.SPTTT_AI, { state: { winCondition: "line", difficulty: aiDifficulty } });
-    } else {
-      navigate(ROUTES.SPTTT_GAME, { state: { winCondition: "line" } });
+      if (!isUnlocked(aiDifficulty)) {
+        return;
+      }
+
+      navigate(ROUTES.SPTTT_AI, { state: { difficulty: aiDifficulty } });
+      return;
     }
+
+    navigate(ROUTES.SPTTT_GAME);
   }
 
-  const startTutorial = () => {
-    resetTutorial(); // Clear the "completed" flag
-    if (gameMode === "ai") {
-      navigate(ROUTES.SPTTT_AI, { state: { winCondition: "line", difficulty: aiDifficulty } });
-    } else {
-      navigate(ROUTES.SPTTT_GAME, { state: { winCondition: "line" } });
-    }
+  const goToOnlineLobby = () => {
+    navigate(ROUTES.SPTTT_MP_LOBBY);
   };
 
-  const toggleDifficulty = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    setAiDifficulty((prev) => {
-      const next = prev === 4 ? 1 : (prev + 1 as 1 | 2 | 3 | 4);
-      return next;
-    });
+  const startTutorial = () => {
+    resetTutorial();
+
+    if (gameMode === "ai") {
+      navigate(ROUTES.SPTTT_AI, { state: { difficulty: aiDifficulty } });
+      return;
+    }
+
+    navigate(ROUTES.SPTTT_GAME);
+  };
+
+  const toggleDifficulty = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    event.preventDefault();
+    setAiDifficulty((previousDifficulty) =>
+      previousDifficulty === 4 ? 1 : ((previousDifficulty + 1) as 1 | 2 | 3 | 4),
+    );
   };
 
   const difficultyUnlocked = isUnlocked(aiDifficulty);
 
   const getDifficultyName = (level: number) => {
     switch (level) {
-      case 1: return "Muito Fácil";
-      case 2: return "Fácil";
-      case 3: return "Médio";
-      case 4: return "Difícil";
-      default: return "Muito Fácil";
+      case 1:
+        return "Muito FÃ¡cil";
+      case 2:
+        return "FÃ¡cil";
+      case 3:
+        return "MÃ©dio";
+      case 4:
+        return "DifÃ­cil";
+      default:
+        return "Muito FÃ¡cil";
     }
   };
 
   const getTooltipText = () => {
-    const prevLevel = aiDifficulty - 1;
-    const prevName = getDifficultyName(prevLevel);
+    const previousLevel = aiDifficulty - 1;
+    const previousName = getDifficultyName(previousLevel);
     const currentName = getDifficultyName(aiDifficulty);
-    return `Ganhe da dificuldade ${prevName} para desbloquear ${currentName}`;
+    return `Ganhe da dificuldade ${previousName} para desbloquear ${currentName}`;
   };
 
   const handleResetProgress = () => {
@@ -84,8 +96,6 @@ function JogoStop() {
 
   return (
     <div className={styles.regrasPage}>
-      {/* Left Side - Rules */}
-
       <div className={styles.boxRegras}>
         <div className={styles.gameTitle}>Super Jogo da Velha</div>
         <img
@@ -94,18 +104,18 @@ function JogoStop() {
         />
       </div>
 
-      {/* Right Side - Game Controls */}
       <div className={styles.botoes}>
         <button
-          className={`${styles.button} ${gameMode === "ai" && !difficultyUnlocked ? styles.buttonDisabled : ''}`}
+          className={`${styles.button} ${
+            gameMode === "ai" && !difficultyUnlocked ? styles.buttonDisabled : ""
+          }`}
           onClick={startGame}
           disabled={gameMode === "ai" && !difficultyUnlocked}
         >
           <span>Jogar</span>
         </button>
 
-        {/* Game mode selector */}
-        <div className={styles['mode-select-rules']}>
+        <div className={styles["mode-select-rules"]}>
           <div className={styles.contraComputador}>
             <label>
               <input
@@ -119,11 +129,13 @@ function JogoStop() {
             </label>
             {gameMode === "ai" && (
               <button
-                className={`${styles.difficultyButton} ${!difficultyUnlocked ? styles.locked : ''}`}
+                className={`${styles.difficultyButton} ${
+                  !difficultyUnlocked ? styles.locked : ""
+                }`}
                 onClick={toggleDifficulty}
               >
-                {!difficultyUnlocked && <span>🔒 </span>}
-                Nível: {getDifficultyName(aiDifficulty)}
+                {!difficultyUnlocked && <span>ðŸ”’ </span>}
+                NÃ­vel: {getDifficultyName(aiDifficulty)}
                 {!difficultyUnlocked && (
                   <div className={styles.difficultyTooltip}>
                     {getTooltipText()}
@@ -148,6 +160,9 @@ function JogoStop() {
           <button className={styles.tutorialButton} onClick={startTutorial}>
             <span>Tutorial</span>
           </button>
+          <button className={styles.onlineButton} onClick={goToOnlineLobby}>
+            Online
+          </button>
           <button
             className={styles.detailedRulesButton}
             onClick={() => setShowDetailedRules(true)}
@@ -158,8 +173,14 @@ function JogoStop() {
       </div>
 
       {showDetailedRules && (
-        <div className={styles.modalOverlay} onClick={() => setShowDetailedRules(false)}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+        <div
+          className={styles.modalOverlay}
+          onClick={() => setShowDetailedRules(false)}
+        >
+          <div
+            className={styles.modalContent}
+            onClick={(event) => event.stopPropagation()}
+          >
             <button
               className={styles.closeButton}
               onClick={() => setShowDetailedRules(false)}
@@ -177,39 +198,94 @@ function JogoStop() {
               <h2>Regras do Super Jogo da Velha</h2>
 
               <h3 className={styles.rulesTitle}>Como Jogar</h3>
-              <p className={styles.rulesText}>Início: O jogador <span className={styles.rulesStrong}>X</span> começa a partida.</p>
-              <p className={styles.rulesText}><span className={styles.rulesSpan}>Jogada:</span> Em seu turno, o jogador escolhe uma casa em um dos <span className={styles.rulesStrong}>tabuleiros menores</span> disponíveis e coloca o seu símbolo ("X" ou "O").</p>
-              <p className={styles.rulesText}><span className={styles.rulesSpan}>O próximo movimento:</span> A localização da casa escolhida <span className={styles.rulesStrong}>dentro</span> do tabuleiro menor determina em <span className={styles.rulesStrong}>qual tabuleiro menor o próximo jogador deve jogar</span>.</p>
-              <p className={styles.rulesText}><span className={styles.rulesSpan}>Exemplo:</span> Se você jogar no quadrado central (posição 5) de um tabuleiro menor, o próximo jogador será enviado para o tabuleiro menor que está na posição central do tabuleiro principal.</p>
+              <p className={styles.rulesText}>
+                InÃ­cio: O jogador <span className={styles.rulesStrong}>X</span> comeÃ§a
+                a partida.
+              </p>
+              <p className={styles.rulesText}>
+                <span className={styles.rulesSpan}>Jogada:</span> Em seu turno, o
+                jogador escolhe uma casa em um dos{" "}
+                <span className={styles.rulesStrong}>tabuleiros menores</span>{" "}
+                disponÃ­veis e coloca o seu sÃ­mbolo ("X" ou "O").
+              </p>
+              <p className={styles.rulesText}>
+                <span className={styles.rulesSpan}>O prÃ³ximo movimento:</span> A
+                localizaÃ§Ã£o da casa escolhida{" "}
+                <span className={styles.rulesStrong}>dentro</span> do tabuleiro
+                menor determina em{" "}
+                <span className={styles.rulesStrong}>
+                  qual tabuleiro menor o prÃ³ximo jogador deve jogar
+                </span>
+                .
+              </p>
+              <p className={styles.rulesText}>
+                <span className={styles.rulesSpan}>Exemplo:</span> Se vocÃª jogar no
+                quadrado central (posiÃ§Ã£o 5) de um tabuleiro menor, o prÃ³ximo
+                jogador serÃ¡ enviado para o tabuleiro menor que estÃ¡ na posiÃ§Ã£o
+                central do tabuleiro principal.
+              </p>
 
-              <h3 className={styles.rulesTitle}>Jogando em Tabuleiros Já Decididos</h3>
-              <p className={styles.rulesText}>Se o próximo jogador for direcionado para um tabuleiro menor que já foi <span className={styles.rulesStrong}>vencido ou empatado</span>, ele ganha a liberdade de jogar em <span className={styles.rulesStrong}>qualquer outro tabuleiro menor</span> que ainda esteja em andamento (aberto).</p>
+              <h3 className={styles.rulesTitle}>
+                Jogando em Tabuleiros JÃ¡ Decididos
+              </h3>
+              <p className={styles.rulesText}>
+                Se o prÃ³ximo jogador for direcionado para um tabuleiro menor que jÃ¡
+                foi <span className={styles.rulesStrong}>vencido ou empatado</span>,
+                ele ganha a liberdade de jogar em{" "}
+                <span className={styles.rulesStrong}>
+                  qualquer outro tabuleiro menor
+                </span>{" "}
+                que ainda esteja em andamento (aberto).
+              </p>
 
               <h3 className={styles.rulesTitle}>Vencendo um Tabuleiro Menor</h3>
-              <p className={styles.rulesText}>Um tabuleiro menor é vencido quando um jogador consegue alinhar 3 dos seus símbolos (em linha, coluna ou diagonal).</p>
-              <p className={styles.rulesText}>Esse tabuleiro é então marcado no tabuleiro principal com um <span className={styles.rulesStrong}>X grande</span> ou <span className={styles.rulesStrong}>O grande</span> e não pode mais ser jogado.</p>
+              <p className={styles.rulesText}>
+                Um tabuleiro menor Ã© vencido quando um jogador consegue alinhar 3
+                dos seus sÃ­mbolos (em linha, coluna ou diagonal).
+              </p>
+              <p className={styles.rulesText}>
+                Esse tabuleiro Ã© entÃ£o marcado no tabuleiro principal com um{" "}
+                <span className={styles.rulesStrong}>X grande</span> ou{" "}
+                <span className={styles.rulesStrong}>O grande</span> e nÃ£o pode mais
+                ser jogado.
+              </p>
 
               <h3 className={styles.rulesTitle}>Vencendo o Jogo Geral</h3>
-              <p className={styles.rulesText}>Existem <span className={styles.rulesStrong}>duas maneiras</span> de vencer a partida. O jogo termina imediatamente quando um jogador atinge uma delas:</p>
+              <p className={styles.rulesText}>
+                O objetivo Ã© conquistar{" "}
+                <span className={styles.rulesStrong}>
+                  3 tabuleiros menores em sequÃªncia
+                </span>{" "}
+                no tabuleiro gigante.
+              </p>
 
-              <h4 className={styles.winTitle}>Vitória Estratégica (Três em Linha)</h4>
-              <p className={styles.winText}>Conquistar <span className={styles.rulesStrong}>3 tabuleiros menores em sequência</span> no tabuleiro gigante (em linha, coluna ou diagonal).</p>
-
-              <h4 className={styles.winTitle}>Vitória por Pontos (Maioria)</h4>
-              <p className={styles.winText}>Conquistar a <span className={styles.rulesStrong}>maior quantidade de tabuleiros menores</span>. Este é o critério de desempate final se ninguém conseguir uma vitória estratégica. O jogador com mais tabuleiros conquistados ao final da partida é declarado vencedor.</p>
+              <h4 className={styles.winTitle}>VitÃ³ria por TrÃªs em Linha</h4>
+              <p className={styles.winText}>
+                Conquistar{" "}
+                <span className={styles.rulesStrong}>
+                  3 tabuleiros menores em sequÃªncia
+                </span>{" "}
+                no tabuleiro gigante (em linha, coluna ou diagonal).
+              </p>
 
               <h3 className={styles.rulesTitle}>Empate</h3>
-              <p className={styles.rulesText}>O jogo termina em empate se todos os tabuleiros menores forem preenchidos ou decididos e <span className={styles.rulesStrong}>nenhum jogador</span> tiver conseguido uma <span className={styles.rulesStrong}>Vitória Estratégica (três em linha)</span>. Em caso de empate na quantidade de tabuleiros, a partida é considerada <span onClick={() => { unlockAll(); alert("Todas as dificuldades foram desbloqueadas!"); }} style={{ cursor: 'text' }}>empatada</span>.</p>
-
+              <p className={styles.rulesText}>
+                O jogo termina em empate se todos os tabuleiros menores forem
+                preenchidos ou decididos e{" "}
+                <span className={styles.rulesStrong}>nenhum jogador</span> conseguir
+                formar 3 em linha no tabuleiro gigante.
+              </p>
             </div>
           </div>
         </div>
       )}
 
-      {/* Reset Progress Confirmation Modal */}
       {showResetConfirm && (
         <div className={styles.modalOverlay}>
-          <div className={styles.confirmModal} onClick={(e) => e.stopPropagation()}>
+          <div
+            className={styles.confirmModal}
+            onClick={(event) => event.stopPropagation()}
+          >
             <div className={styles.confirmText}>
               Tem certeza que deseja deletar todo o progresso?
             </div>
@@ -224,15 +300,14 @@ function JogoStop() {
                 className={`${styles.confirmBtn} ${styles.noBtn}`}
                 onClick={() => setShowResetConfirm(false)}
               >
-                Não
+                NÃ£o
               </button>
             </div>
           </div>
         </div>
       )}
-
     </div>
   );
 }
 
-export default JogoStop;
+export default SPTTTRulesPage;
