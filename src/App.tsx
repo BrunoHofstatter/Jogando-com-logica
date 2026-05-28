@@ -82,6 +82,8 @@ const HIDDEN_RETURN_ROUTES = new Set([
   ROUTES.MANUAL,
 ]);
 
+const SHOW_UNIVERSAL_RETURN_BUTTON = false;
+
 const RETURN_ROUTE_MAP: Record<string, string> = {
   [ROUTES.TEST]: ROUTES.HOME,
   [ROUTES.STOP_RULES]: ROUTES.GAMES,
@@ -188,6 +190,11 @@ function HomeButton() {
 function ReturnButton() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  if (!SHOW_UNIVERSAL_RETURN_BUTTON) {
+    return null;
+  }
+
   const returnRoute = getReturnRoute(location.pathname);
 
   if (!returnRoute) {
