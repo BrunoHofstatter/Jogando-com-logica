@@ -1,4 +1,5 @@
 export {
+  advanceRoundPhase,
   applyPlayerAction,
   createInitialState,
   createPointsRaceConfig,
@@ -10,6 +11,7 @@ export {
 
 export type {
   ApplyPlayerActionResult,
+  AdvanceRoundPhaseResult,
   CacaSomaActionFailureReason,
   CacaSomaDifficultyConfig,
   CacaSomaEndReason,
@@ -20,6 +22,7 @@ export type {
   CacaSomaPlayerAction,
   CacaSomaPlayerState,
   CacaSomaRoundResult,
+  CacaSomaRoundPhase,
   CacaSomaRoundResultReason,
   CacaSomaRoundState,
   CacaSomaRoundTargets,

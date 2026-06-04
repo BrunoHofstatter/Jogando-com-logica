@@ -6,7 +6,7 @@ import type {
 
 export const CACA_SOMA_WAITING_ROOM_TTL_MS = 10 * 60 * 1000;
 export const CACA_SOMA_DISCONNECT_GRACE_MS = 30 * 1000;
-export const CACA_SOMA_ROOM_CAPACITY = 4;
+export const CACA_SOMA_MAX_ROOM_CAPACITY = 4;
 
 export type CacaSomaRoomStatus = "waiting" | "playing" | "ended";
 
@@ -40,11 +40,19 @@ export interface CacaSomaRoom {
 }
 
 export function getSeatInfo(
+  settings: CacaSomaRoomSettings,
   seat: CacaSomaRoomSeat,
 ): {
   team: 0 | 1;
   playerIndex: 0 | 1;
 } {
+  if (settings.mode === "1v1") {
+    return {
+      team: seat === 0 ? 0 : 1,
+      playerIndex: 0,
+    };
+  }
+
   if (seat === 0) {
     return { team: 0, playerIndex: 0 };
   }
@@ -58,4 +66,8 @@ export function getSeatInfo(
   }
 
   return { team: 1, playerIndex: 1 };
+}
+
+export function getRoomCapacity(settings: CacaSomaRoomSettings): 2 | 4 {
+  return settings.mode === "1v1" ? 2 : 4;
 }

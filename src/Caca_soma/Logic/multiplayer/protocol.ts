@@ -8,6 +8,8 @@ export type CacaSomaRoomCode = string;
 
 export type CacaSomaRoomSeat = 0 | 1 | 2 | 3;
 
+export type CacaSomaRoomMode = "1v1" | "2v2";
+
 export type MultiplayerConnectionStatus =
   | "idle"
   | "connecting"
@@ -31,6 +33,7 @@ export type MultiplayerErrorCode =
   | "server_error";
 
 export interface CacaSomaRoomSettings {
+  mode: CacaSomaRoomMode;
   difficultyId: DifficultyId;
   targetScore: 2 | 3 | 4 | 5;
 }

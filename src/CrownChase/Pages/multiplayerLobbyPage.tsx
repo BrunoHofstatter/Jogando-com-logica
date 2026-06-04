@@ -5,7 +5,7 @@ import { ROUTES } from "../../routes";
 import { useCrownChaseMultiplayer } from "../Hooks/useCrownChaseMultiplayer";
 import styles from "../styles/multiplayerLobby.module.css";
 
-type LobbyMode = "home" | "join";
+type LobbyMode = "home" | "join" | "classroom";
 
 export default function CrownChaseMultiplayerLobbyPage() {
   const navigate = useNavigate();
@@ -15,15 +15,20 @@ export default function CrownChaseMultiplayerLobbyPage() {
     playerName,
     playerSeat,
     players,
+    classroomCode,
+    openClassroomRooms,
     errorMessage,
     createRoom,
     joinRoom,
+    joinClassroom,
+    leaveClassroom,
     leaveRoom,
   } = useCrownChaseMultiplayer();
 
   const [lobbyMode, setLobbyMode] = useState<LobbyMode>("home");
   const [nameInput, setNameInput] = useState(playerName);
   const [roomInput, setRoomInput] = useState("");
+  const [classroomInput, setClassroomInput] = useState("");
   const [copyFeedback, setCopyFeedback] = useState("");
 
   useEffect(() => {
@@ -53,14 +58,6 @@ export default function CrownChaseMultiplayerLobbyPage() {
   const isBusy = connectionStatus === "connecting";
   const isWaiting = connectionStatus === "waiting" && roomCode !== null;
   const isDisconnected = connectionStatus === "disconnected" && roomCode !== null;
-
-  const handleCreateRoom = () => {
-    createRoom(nameInput);
-  };
-
-  const handleJoinRoom = () => {
-    joinRoom(roomInput, nameInput);
-  };
 
   const handleCopyCode = async () => {
     if (!roomCode) {
@@ -97,9 +94,9 @@ export default function CrownChaseMultiplayerLobbyPage() {
 
       <div className={styles.panel}>
         <div className={styles.card}>
-          <div className={styles.heading}>Sala Privada</div>
+          <div className={styles.heading}>Caça Coroa Online</div>
           <p className={styles.description}>
-            Crie uma sala e compartilhe o código com outro jogador.
+            Jogue com sua turma ou compartilhe um código de sala com outro jogador.
           </p>
 
           <div className={styles.nameWrap}>
@@ -116,53 +113,119 @@ export default function CrownChaseMultiplayerLobbyPage() {
             />
           </div>
 
-          {!isWaiting && !isDisconnected && (
+          {!isWaiting && !isDisconnected && !classroomCode && (
             <div className={styles.actions}>
               <button
                 className={styles.primaryButton}
-                onClick={handleCreateRoom}
+                onClick={() => createRoom(nameInput)}
                 disabled={isBusy}
               >
-                {isBusy && lobbyMode === "home" ? "Conectando..." : "Criar Sala"}
+                {isBusy && lobbyMode === "home" ? "Conectando..." : "Criar Sala Privada"}
               </button>
 
               <button
                 className={styles.secondaryButton}
-                onClick={() =>
-                  setLobbyMode((currentMode) =>
-                    currentMode === "join" ? "home" : "join",
-                  )
-                }
+                onClick={() => setLobbyMode((mode) => mode === "join" ? "home" : "join")}
                 disabled={isBusy}
               >
                 {lobbyMode === "join" ? "Voltar" : "Entrar em Sala"}
               </button>
+
+              <button
+                className={styles.secondaryButton}
+                onClick={() => setLobbyMode((mode) => mode === "classroom" ? "home" : "classroom")}
+                disabled={isBusy}
+              >
+                {lobbyMode === "classroom" ? "Voltar" : "Entrar em Turma"}
+              </button>
             </div>
           )}
 
-          {lobbyMode === "join" && !isWaiting && !isDisconnected && (
+          {lobbyMode === "join" && !isWaiting && !isDisconnected && !classroomCode && (
             <div className={styles.joinBox}>
-            <div className={styles.nameWrap}>
-              <label className={styles.fieldLabel} htmlFor="crown-chase-online-code">
-                Código da sala
-              </label>
-              <input
-                id="crown-chase-online-code"
-                className={styles.input}
-                value={roomInput}
-                maxLength={4}
-                onChange={(event) => setRoomInput(event.target.value.toUpperCase())}
-                placeholder="AB12"
-              />
-            </div>
+              <div className={styles.nameWrap}>
+                <label className={styles.fieldLabel} htmlFor="crown-chase-online-code">
+                  Código da sala
+                </label>
+                <input
+                  id="crown-chase-online-code"
+                  className={styles.input}
+                  value={roomInput}
+                  maxLength={4}
+                  onChange={(event) => setRoomInput(event.target.value.toUpperCase())}
+                  placeholder="ABCD"
+                />
+              </div>
 
               <button
                 className={styles.primaryButton}
-                onClick={handleJoinRoom}
+                onClick={() => joinRoom(roomInput, nameInput)}
                 disabled={isBusy}
               >
                 {isBusy ? "Entrando..." : "Entrar"}
               </button>
+            </div>
+          )}
+
+          {lobbyMode === "classroom" && !classroomCode && !isWaiting && !isDisconnected && (
+            <div className={styles.joinBox}>
+              <div className={styles.nameWrap}>
+                <label className={styles.fieldLabel} htmlFor="crown-chase-classroom-code">
+                  Código da turma
+                </label>
+                <input
+                  id="crown-chase-classroom-code"
+                  className={styles.input}
+                  value={classroomInput}
+                  maxLength={4}
+                  onChange={(event) => setClassroomInput(event.target.value.toUpperCase())}
+                  placeholder="BKRM"
+                />
+              </div>
+
+              <button
+                className={styles.primaryButton}
+                onClick={() => joinClassroom(classroomInput)}
+                disabled={isBusy}
+              >
+                {isBusy ? "Entrando..." : "Entrar na Turma"}
+              </button>
+            </div>
+          )}
+
+          {classroomCode && !isWaiting && !isDisconnected && (
+            <div className={styles.classroomBox}>
+              <div className={styles.classroomHeader}>
+                <div className={styles.waitingTitle}>Turma {classroomCode}</div>
+                <button className={styles.leaveButton} onClick={leaveClassroom}>
+                  Sair da Turma
+                </button>
+              </div>
+
+              <button
+                className={styles.primaryButton}
+                onClick={() => createRoom(nameInput, classroomCode)}
+              >
+                Criar Sala para a Turma
+              </button>
+
+              <div className={styles.roomList}>
+                {openClassroomRooms.length === 0 ? (
+                  <p className={styles.waitingText}>Nenhuma sala aberta. Crie a primeira!</p>
+                ) : (
+                  openClassroomRooms.map((room) => (
+                    <div className={styles.openRoomCard} key={room.code}>
+                      <span>Sala de {room.hostName}</span>
+                      <button
+                        className={styles.secondaryButton}
+                        onClick={() => joinRoom(room.code, nameInput)}
+                      >
+                        Entrar
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           )}
 

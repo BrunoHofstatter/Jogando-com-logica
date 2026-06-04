@@ -1,7 +1,9 @@
 import type { Namespace, Socket } from "socket.io";
 
 import type {
+  ClassroomCode,
   MultiplayerErrorCode,
+  OpenRoomSummary,
   PlayerSeat,
   RoomPlayerInfo,
   SptttClientToServerEvents,
@@ -23,6 +25,7 @@ import {
   type MultiplayerRoom,
   type RoomPlayer,
 } from "../rooms/roomTypes.ts";
+import type { ClassroomStore } from "../classrooms/classroomStore.ts";
 
 type SptttNamespace = Namespace<
   SptttClientToServerEvents,
@@ -34,18 +37,35 @@ type SptttSocket = Socket<
   SptttServerToClientEvents
 >;
 
-type SptttRoom = MultiplayerRoom<SptttState>;
+type SptttRoom = MultiplayerRoom<SptttState> & {
+  visibility: "private" | "classroom";
+  classroomCode: ClassroomCode | null;
+};
 
 const roomStore = createRoomStore<SptttRoom>();
 
-export function registerSptttRoomHandlers(io: SptttNamespace): void {
+export function registerSptttRoomHandlers(
+  io: SptttNamespace,
+  classroomStore: ClassroomStore,
+): void {
   io.on("connection", (socket) => {
-    socket.on("create_room", ({ playerName }) => {
+    socket.on("create_room", ({ playerName, classroomCode }) => {
       leaveAnyExistingRoom(io, socket, "leave_room");
 
       const normalizedName = normalizePlayerName(playerName);
       if (!normalizedName) {
         emitError(socket, "invalid_name", "Digite um nome com pelo menos 2 letras.");
+        return;
+      }
+
+      const normalizedClassroomCode = classroomCode
+        ? normalizeClassroomCode(classroomCode)
+        : null;
+      const classroom = normalizedClassroomCode
+        ? classroomStore.getClassroom(normalizedClassroomCode)
+        : undefined;
+      if (classroomCode && (!classroom || classroom.gameId !== "spttt")) {
+        emitError(socket, "classroom_not_found", "Turma não encontrada.");
         return;
       }
 
@@ -66,6 +86,8 @@ export function registerSptttRoomHandlers(io: SptttNamespace): void {
         rematchVotes: new Set(),
         waitingTimeout: null,
         closeTimeout: null,
+        visibility: normalizedClassroomCode ? "classroom" : "private",
+        classroomCode: normalizedClassroomCode,
       };
 
       room.players[CREATOR_SEAT] = hostPlayer;
@@ -80,6 +102,7 @@ export function registerSptttRoomHandlers(io: SptttNamespace): void {
         state: room.state,
         players: serializePlayers(room),
       });
+      broadcastClassroomRooms(io, room.classroomCode);
     });
 
     socket.on("join_room", ({ code, playerName }) => {
@@ -95,17 +118,17 @@ export function registerSptttRoomHandlers(io: SptttNamespace): void {
 
       const room = roomStore.getRoom(normalizedCode);
       if (!room) {
-        emitError(socket, "room_not_found", "Sala nÃ£o encontrada.");
+        emitError(socket, "room_not_found", "Sala não encontrada.");
         return;
       }
 
       if (room.status !== "waiting") {
-        emitError(socket, "room_not_joinable", "Essa sala jÃ¡ comeÃ§ou.");
+        emitError(socket, "room_not_joinable", "Essa sala já começou.");
         return;
       }
 
       if (room.players[JOINER_SEAT] !== null) {
-        emitError(socket, "room_full", "Essa sala jÃ¡ estÃ¡ cheia.");
+        emitError(socket, "room_full", "Essa sala já está cheia.");
         return;
       }
 
@@ -137,36 +160,73 @@ export function registerSptttRoomHandlers(io: SptttNamespace): void {
         state: room.state,
         players: serializePlayers(room),
       });
+      broadcastClassroomRooms(io, room.classroomCode);
+    });
+
+    socket.on("join_classroom", ({ code }) => {
+      const normalizedCode = normalizeClassroomCode(code);
+      const classroom = normalizedCode ? classroomStore.getClassroom(normalizedCode) : undefined;
+      if (!classroom || classroom.gameId !== "spttt") {
+        emitError(socket, "classroom_not_found", "Turma não encontrada.");
+        return;
+      }
+
+      socket.join(getClassroomChannel(normalizedCode));
+      socket.emit("classroom_joined", {
+        classroomCode: normalizedCode,
+        openRooms: getOpenClassroomRooms(normalizedCode),
+      });
+    });
+
+    socket.on("leave_classroom", ({ code }) => {
+      const normalizedCode = normalizeClassroomCode(code);
+      if (normalizedCode) {
+        socket.leave(getClassroomChannel(normalizedCode));
+      }
+    });
+
+    socket.on("list_open_rooms", ({ classroomCode }) => {
+      const normalizedCode = normalizeClassroomCode(classroomCode);
+      const classroom = normalizedCode ? classroomStore.getClassroom(normalizedCode) : undefined;
+      if (!classroom || classroom.gameId !== "spttt") {
+        emitError(socket, "classroom_not_found", "Turma não encontrada.");
+        return;
+      }
+
+      socket.emit("classroom_rooms_updated", {
+        classroomCode: normalizedCode,
+        openRooms: getOpenClassroomRooms(normalizedCode),
+      });
     });
 
     socket.on("submit_move", ({ code, intent }) => {
       const room = roomStore.getRoom(code.trim().toUpperCase());
       if (!room) {
-        emitError(socket, "room_not_found", "Sala nÃ£o encontrada.");
+        emitError(socket, "room_not_found", "Sala não encontrada.");
         return;
       }
 
       const player = getPlayerBySocketId(room, socket.id);
       if (!player) {
-        emitError(socket, "unauthorized", "VocÃª nÃ£o pertence a esta sala.");
+        emitError(socket, "unauthorized", "Você não pertence a esta sala.");
         return;
       }
 
       const playerMark = getPlayerMark(player.seat);
       if (room.state.currentPlayer !== playerMark) {
-        emitError(socket, "not_your_turn", "Ainda nÃ£o Ã© a sua vez.");
+        emitError(socket, "not_your_turn", "Ainda não é a sua vez.");
         return;
       }
 
       const resolvedIntent = resolveMultiplayerMove(room.state, intent, playerMark);
       if (!resolvedIntent) {
-        emitError(socket, "illegal_move", "Movimento invÃ¡lido.");
+        emitError(socket, "illegal_move", "Movimento inválido.");
         return;
       }
 
       const result = applyMultiplayerMove(room.state, resolvedIntent);
       if (!result.ok) {
-        emitError(socket, "illegal_move", "Movimento invÃ¡lido.");
+        emitError(socket, "illegal_move", "Movimento inválido.");
         return;
       }
 
@@ -184,18 +244,18 @@ export function registerSptttRoomHandlers(io: SptttNamespace): void {
     socket.on("request_rematch", ({ code }) => {
       const room = roomStore.getRoom(code.trim().toUpperCase());
       if (!room) {
-        emitError(socket, "room_not_found", "Sala nÃ£o encontrada.");
+        emitError(socket, "room_not_found", "Sala não encontrada.");
         return;
       }
 
       const player = getPlayerBySocketId(room, socket.id);
       if (!player) {
-        emitError(socket, "unauthorized", "VocÃª nÃ£o pertence a esta sala.");
+        emitError(socket, "unauthorized", "Você não pertence a esta sala.");
         return;
       }
 
       if (room.state.status !== "ended") {
-        emitError(socket, "room_not_joinable", "A revanche sÃ³ pode comeÃ§ar ao final da partida.");
+        emitError(socket, "room_not_joinable", "A revanche só pode começar ao final da partida.");
         return;
       }
 
@@ -280,6 +340,7 @@ function handlePlayerExit(
 
   if (!remainingPlayer) {
     roomStore.deleteRoom(room.code);
+    broadcastClassroomRooms(io, room.classroomCode);
     return;
   }
 
@@ -287,7 +348,7 @@ function handlePlayerExit(
     code: room.code,
     seat: player.seat as PlayerSeat,
     reason: "disconnect",
-    message: "O outro jogador desconectou. A sala serÃ¡ encerrada em instantes.",
+    message: "O outro jogador desconectou. A sala será encerrada em instantes.",
   });
 
   if (room.closeTimeout) {
@@ -303,9 +364,10 @@ function handlePlayerExit(
     io.to(remainingPlayer.socketId).emit("room_closed", {
       code: latestRoom.code,
       reason: "opponent_left",
-      message: "A sala foi encerrada porque o outro jogador nÃ£o voltou.",
+      message: "A sala foi encerrada porque o outro jogador não voltou.",
     });
     roomStore.deleteRoom(latestRoom.code);
+    broadcastClassroomRooms(io, latestRoom.classroomCode);
   }, DISCONNECT_GRACE_MS);
 }
 
@@ -335,6 +397,7 @@ function closeRoomImmediately(
   }
 
   roomStore.deleteRoom(room.code);
+  broadcastClassroomRooms(io, room.classroomCode);
 }
 
 function scheduleWaitingRoomExpiry(
@@ -356,11 +419,12 @@ function scheduleWaitingRoomExpiry(
       io.to(host.socketId).emit("room_closed", {
         code: latestRoom.code,
         reason: "room_expired",
-        message: "A sala expirou porque ninguÃ©m entrou a tempo.",
+        message: "A sala expirou porque ninguém entrou a tempo.",
       });
     }
 
     roomStore.deleteRoom(latestRoom.code);
+    broadcastClassroomRooms(io, latestRoom.classroomCode);
   }, WAITING_ROOM_TTL_MS);
 }
 
@@ -402,6 +466,44 @@ function getPlayerMark(seat: PlayerSeat): SptttPlayer {
 function normalizePlayerName(playerName: string): string | null {
   const normalizedName = playerName.trim().slice(0, 20);
   return normalizedName.length >= 2 ? normalizedName : null;
+}
+
+function normalizeClassroomCode(code: string): ClassroomCode | null {
+  const normalizedCode = code.trim().toUpperCase();
+  return /^[A-HJ-KM-NP-Z]{4}$/.test(normalizedCode) ? normalizedCode : null;
+}
+
+function getClassroomChannel(classroomCode: ClassroomCode): string {
+  return `classroom:${classroomCode}`;
+}
+
+function getOpenClassroomRooms(classroomCode: ClassroomCode): OpenRoomSummary[] {
+  return [...roomStore.getRooms().values()]
+    .filter((room) =>
+      room.visibility === "classroom"
+      && room.classroomCode === classroomCode
+      && room.status === "waiting"
+      && room.players[CREATOR_SEAT]?.connected,
+    )
+    .map((room) => ({
+      code: room.code,
+      hostName: room.players[CREATOR_SEAT]?.name ?? "",
+    }))
+    .sort((left, right) => left.hostName.localeCompare(right.hostName));
+}
+
+function broadcastClassroomRooms(
+  io: SptttNamespace,
+  classroomCode: ClassroomCode | null,
+): void {
+  if (!classroomCode) {
+    return;
+  }
+
+  io.to(getClassroomChannel(classroomCode)).emit("classroom_rooms_updated", {
+    classroomCode,
+    openRooms: getOpenClassroomRooms(classroomCode),
+  });
 }
 
 function emitError(

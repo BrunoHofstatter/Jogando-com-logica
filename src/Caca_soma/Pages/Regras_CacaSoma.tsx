@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useTutorialCompleted } from "../../Shared/Components/DynamicTutorial";
 
 import { levels } from "../Logic/levelConfigs";
-import { isLevelUnlocked, updateLevelProgress } from "../Logic/levelProgress";
+import { isLevelUnlocked, unlockAllLevelProgress } from "../Logic/levelProgress";
 import { ROUTES } from "../../routes";
 
 
@@ -27,11 +27,7 @@ function CacaSomaRegras() {
   const [showDetailedRules, setShowDetailedRules] = useState(false);
   const [gameMode, setGameMode] = useState<GameMode>("levels");
 
-  // Placeholder for current level logic (would come from progress in a real app)
-  const currentLevel = 1;
-
-  const [tutorialCompleted, resetTutorial] =
-    useTutorialCompleted("cacasoma_v1");
+  const [, resetTutorial] = useTutorialCompleted("cacasoma_v1");
 
   function jogar() {
     if (gameMode === "levels") {
@@ -64,16 +60,8 @@ function CacaSomaRegras() {
   };
 
   const unlockAllLevels = () => {
-    levels.forEach((level) => {
-      updateLevelProgress({
-        levelId: level.levelId,
-        rounds: [], // Not used for progress update
-        totalCorrect: 10,
-        totalTime: 10,
-        starsEarned: 3,
-        passed: true,
-      });
-    });
+    unlockAllLevelProgress();
+    alert("Todas as fases foram desbloqueadas!");
   };
 
   const startTutorial = () => {
@@ -173,60 +161,60 @@ function CacaSomaRegras() {
             <div className={styles.detailedRules}>
               <h2>Regras Caça Soma</h2>
 
-              <h3 className={styles.rulesTitle}>Início da Partida:</h3>
+              <h3 className={styles.rulesTitle}>Objetivo:</h3>
               <p className={styles.rulesText}>
-                O Jogador 1 começa a partida. O jogo é disputado em rodadas.
+                Encontre números na tabela que, quando somados, resultem
+                exatamente no <strong>Número Mágico</strong>.
               </p>
 
-              <h3 className={styles.rulesTitle}>Sorteio do Número:</h3>
+              <h3 className={styles.rulesTitle}>Modo Níveis:</h3>
               <p className={styles.rulesText}>
-                Em cada rodada, o sistema sorteia um número aleatório (de 3 a
-                150) para o jogador da vez.
+                Complete uma sequência de rodadas, acerte as somas e termine
+                dentro do tempo para conquistar estrelas. Os números usados em
+                respostas corretas ficam indisponíveis nas próximas rodadas.
               </p>
 
-              <h3 className={styles.rulesTitle}>Formando a Soma:</h3>
+              <h3 className={styles.rulesTitle}>Modo Versus:</h3>
               <p className={styles.rulesText}>
-                O jogador deve selecionar <strong>2 ou 3 números</strong> da
-                tabela disponível que, quando somados, resultem exatamente no
-                número sorteado.
+                Dois jogadores se alternam no mesmo aparelho. Cada jogador tenta
+                formar a soma correta com <strong>2 ou 3 números</strong>. Quem
+                resolver mais rápido ganha o ponto.
               </p>
 
-              <h3 className={styles.rulesTitle}>Ação:</h3>
+              <h3 className={styles.rulesTitle}>Modo Online:</h3>
               <p className={styles.rulesText}>
-                O jogador clica em "Iniciar" para começar a rodada, seleciona os
-                números na tabela e depois clica em "Enviar" para submeter a sua
-                resposta.
+                Crie uma sala ou entre com o código de um amigo. O anfitrião pode
+                escolher partidas <strong>1 contra 1</strong> ou{" "}
+                <strong>2 contra 2</strong>, ajustar a dificuldade e definir
+                quantos pontos são necessários para vencer.
               </p>
 
-              <h3 className={styles.rulesTitle}>Sequência de Turnos:</h3>
+              <h3 className={styles.rulesTitle}>Rodadas Online:</h3>
               <p className={styles.rulesText}>
-                O Jogador 2 recebe então um novo número sorteado e repete o
-                processo, tentando formar a sua própria soma.
+                Aguarde a contagem regressiva e o sorteio do Número Mágico. Quando
+                a rodada começar, escolha os números e clique em{" "}
+                <strong>Pronto</strong>. No modo 2 contra 2, cada jogador escolhe
+                um número e pode ver a escolha do colega de equipe.
               </p>
 
               <h3 className={styles.rulesTitle}>Números Usados:</h3>
               <p className={styles.rulesText}>
-                Os números utilizados em somas corretas são{" "}
-                <strong>riscados da tabela</strong> e não podem ser usados
-                novamente por nenhum jogador no restante da partida.
+                Os números utilizados em somas corretas ficam indisponíveis nas
+                próximas rodadas.
               </p>
 
-              <h3 className={styles.rulesTitle}>
-                Pontuação e Vencedor da Rodada:
-              </h3>
+              <h3 className={styles.rulesTitle}>Pontuação Online:</h3>
               <p className={styles.rulesText}>
-                A cada rodada, o jogador que encontrar e enviar uma soma correta
-                em <strong>menos tempo</strong> vence a rodada e ganha{" "}
-                <strong>1 ponto</strong>.
+                Cada rodada vale no máximo <strong>1 ponto</strong>. Se os dois
+                lados acertarem, vence quem for mais rápido. Se ninguém acertar
+                ou houver empate, ninguém recebe ponto.
               </p>
 
-              <h3 className={styles.rulesTitle}>Vencendo o Jogo:</h3>
               <p className={styles.rulesText}>
-                O jogo termina quando um jogador alcançar{" "}
-                <strong>5 pontos</strong>.
-              </p>
-              <p className={styles.rulesText}>
-                Esse jogador será declarado o vencedor da <span onClick={unlockAllLevels} style={{ cursor: "text" }}>partida.</span>
+                Divirta-se formando as{" "}
+                <span onClick={unlockAllLevels} style={{ cursor: "text" }}>
+                  somas!
+                </span>
               </p>
             </div>
           </div>

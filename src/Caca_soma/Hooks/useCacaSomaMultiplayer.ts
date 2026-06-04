@@ -34,6 +34,7 @@ type LeaveRoomOptions = {
 const SESSION_STORAGE_KEY = "cacasoma_multiplayer_session_v1";
 
 const DEFAULT_SETTINGS: CacaSomaRoomSettings = {
+  mode: "2v2",
   difficultyId: "medium",
   targetScore: 3,
 };
@@ -75,7 +76,7 @@ function loadSnapshot(): MultiplayerSnapshot {
     const nextSnapshot: MultiplayerSnapshot = {
       ...DEFAULT_SNAPSHOT,
       ...parsed,
-      settings: parsed.settings ?? null,
+      settings: parsed.settings ? { ...DEFAULT_SETTINGS, ...parsed.settings } : null,
       players: Array.isArray(parsed.players) ? normalizePlayers(parsed.players) : [],
     };
 
@@ -155,7 +156,7 @@ function ensureSocket(): Socket<
   if (!serverUrl) {
     updateSnapshot({
       connectionStatus: "disconnected",
-      errorMessage: "O servidor online ainda nÃ£o foi configurado.",
+      errorMessage: "O servidor online ainda não foi configurado.",
     });
     return null;
   }
@@ -186,8 +187,8 @@ function ensureSocket(): Socket<
 
     socket.on("connect_error", (error) => {
       const message = error.message === "Invalid namespace"
-        ? "O servidor online ainda nÃ£o foi atualizado para o CaÃ§a Soma."
-        : "NÃ£o foi possÃ­vel conectar ao servidor online.";
+        ? "O servidor online ainda não foi atualizado para o Caça Soma."
+        : "Não foi possível conectar ao servidor online.";
 
       updateSnapshot({
         connectionStatus: "disconnected",
@@ -303,8 +304,13 @@ function ensureSocket(): Socket<
     });
 
     socket.on("multiplayer_error", (payload) => {
+      const wasJoiningRoom =
+        sharedSnapshot.connectionStatus === "connecting"
+        && sharedSnapshot.playerSeat === null;
+
       updateSnapshot({
-        connectionStatus: sharedSnapshot.roomCode ? sharedSnapshot.connectionStatus : "idle",
+        roomCode: wasJoiningRoom ? null : sharedSnapshot.roomCode,
+        connectionStatus: wasJoiningRoom ? "idle" : sharedSnapshot.connectionStatus,
         errorMessage: payload.message,
       });
     });
@@ -399,14 +405,14 @@ export function useCacaSomaMultiplayer() {
 
     if (normalizedCode.length !== 4) {
       updateSnapshot({
-        errorMessage: "Digite um cÃ³digo de sala com 4 caracteres.",
+        errorMessage: "Digite um código de sala com 4 caracteres.",
       });
       return;
     }
 
     updateSnapshot({
       playerName: normalizedName,
-      roomCode: normalizedCode,
+      roomCode: null,
       playerSeat: null,
       players: [],
       gameState: null,

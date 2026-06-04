@@ -7,13 +7,14 @@ import baseStyles from "../styles/levelGame.module.css";
 import styles from "../styles/multiplayerGame.module.css";
 
 function formatSeconds(ms: number): string {
-  return `${Math.max(0, ms / 1000).toFixed(1)}s`;
+  return `${Math.max(0, Math.ceil(ms / 1000))}s`;
 }
 
 export default function CacaSomaMultiplayerGamePage() {
   const navigate = useNavigate();
   const [isLeaveConfirmationOpen, setIsLeaveConfirmationOpen] = useState(false);
   const [timeNow, setTimeNow] = useState(() => Date.now());
+  const [rollingMagicNumber, setRollingMagicNumber] = useState(10);
   const {
     connectionStatus,
     roomCode,
@@ -65,45 +66,37 @@ export default function CacaSomaMultiplayerGamePage() {
   const localTeamId = localPlayer?.team ?? null;
   const localPlayerIndex = localPlayer?.playerIndex ?? null;
 
-  const playerSlots = useMemo(
+  const currentRound = gameState?.currentRound ?? null;
+  const roundPhase = currentRound?.phase ?? "playing";
+  const localTeam = localTeamId !== null && gameState ? gameState.teams[localTeamId] : null;
+  const localSubmission =
+    localTeamId !== null && currentRound ? currentRound.submissions[localTeamId] : null;
+  const teamSize = gameState?.config.teamSize ?? (settings?.mode === "1v1" ? 1 : 2);
+
+  const playersByTeam = useMemo(
     () => [
-      {
-        key: "a1",
-        label: "A1",
-        player: players.find((candidate) => candidate.team === 0 && candidate.playerIndex === 0) ?? null,
-      },
-      {
-        key: "a2",
-        label: "A2",
-        player: players.find((candidate) => candidate.team === 0 && candidate.playerIndex === 1) ?? null,
-      },
-      {
-        key: "b1",
-        label: "B1",
-        player: players.find((candidate) => candidate.team === 1 && candidate.playerIndex === 0) ?? null,
-      },
-      {
-        key: "b2",
-        label: "B2",
-        player: players.find((candidate) => candidate.team === 1 && candidate.playerIndex === 1) ?? null,
-      },
+      players
+        .filter((player) => player.team === 0)
+        .sort((left, right) => left.playerIndex - right.playerIndex),
+      players
+        .filter((player) => player.team === 1)
+        .sort((left, right) => left.playerIndex - right.playerIndex),
     ],
     [players],
   );
 
-  const currentRound = gameState?.currentRound ?? null;
-  const localTeam = localTeamId !== null && gameState ? gameState.teams[localTeamId] : null;
-  const localSubmission =
-    localTeamId !== null && currentRound ? currentRound.submissions[localTeamId] : null;
-
   const selectedByLocalPlayer =
     localPlayerIndex !== null && localTeam ? localTeam.players[localPlayerIndex].selectedCellIds : [];
   const selectedByTeammate =
-    localPlayerIndex !== null && localTeam ? localTeam.players[localPlayerIndex === 0 ? 1 : 0].selectedCellIds : [];
+    teamSize === 2 && localPlayerIndex !== null && localTeam
+      ? localTeam.players[localPlayerIndex === 0 ? 1 : 0]?.selectedCellIds ?? []
+      : [];
   const localPlayerReady =
     localPlayerIndex !== null && localTeam ? localTeam.players[localPlayerIndex].ready : false;
   const teammateReady =
-    localPlayerIndex !== null && localTeam ? localTeam.players[localPlayerIndex === 0 ? 1 : 0].ready : false;
+    teamSize === 2 && localPlayerIndex !== null && localTeam
+      ? localTeam.players[localPlayerIndex === 0 ? 1 : 0]?.ready ?? false
+      : false;
 
   const matchTargetScore = gameState?.config.targetScore ?? settings?.targetScore ?? 3;
   const boardSize = gameState?.config.difficulty.boardSize
@@ -123,16 +116,33 @@ export default function CacaSomaMultiplayerGamePage() {
     connectionStatus === "playing" &&
     !roomInterrupted &&
     currentRound !== null &&
+    roundPhase === "playing" &&
     localTeam !== null &&
     localSubmission === null;
 
+  const localSelectionLimit =
+    localPlayerIndex !== null && gameState
+      ? gameState.config.selectionLimits[localPlayerIndex] ?? 1
+      : 1;
+  const localAllowedSelectionCounts = gameState?.config.allowedSelectionCounts ?? [localSelectionLimit];
+  const hasValidLocalSelection = teamSize === 1
+    ? localAllowedSelectionCounts.includes(selectedByLocalPlayer.length)
+    : selectedByLocalPlayer.length === localSelectionLimit;
+
   const isReadyButtonDisabled =
-    !isRoundPlayable || selectedByLocalPlayer.length === 0;
+    !isRoundPlayable ||
+    (!localPlayerReady && !hasValidLocalSelection);
 
   const targetNumber =
     currentRound && localTeamId !== null ? currentRound.targetNumbers[localTeamId] : null;
-  const remainingMs = currentRound ? currentRound.deadlineAtMs - timeNow : 0;
+  const remainingMs = currentRound
+    ? roundPhase === "playing"
+      ? currentRound.deadlineAtMs - timeNow
+      : currentRound.deadlineAtMs - currentRound.playStartsAtMs
+    : 0;
+  const phaseRemainingMs = currentRound ? currentRound.phaseEndsAtMs - timeNow : 0;
   const roundNumber = currentRound?.number ?? gameState?.history.length ?? 0;
+  const overlayCountdown = Math.max(1, Math.ceil(phaseRemainingMs / 1000));
 
   const readyButtonLabel = localPlayerReady ? "Cancelar Pronto" : "Pronto";
   const playAgainLabel =
@@ -146,7 +156,33 @@ export default function CacaSomaMultiplayerGamePage() {
     ? "A sala foi interrompida"
     : localSubmission
       ? "Resposta enviada"
-      : "Escolha o seu número e clique em Pronto";
+      : roundPhase !== "playing"
+        ? "Aguarde a rodada começar"
+      : teamSize === 1
+        ? localAllowedSelectionCounts.length > 1
+          ? `Escolha 2 ou 3 números e clique em Pronto`
+          : `Escolha ${localSelectionLimit} números e clique em Pronto`
+        : "Escolha o seu número e clique em Pronto";
+
+  const displayedMagicNumber = roundPhase === "playing"
+    ? targetNumber ?? "-"
+    : roundPhase === "rolling"
+      ? rollingMagicNumber
+      : "-";
+
+  useEffect(() => {
+    if (roundPhase !== "rolling") {
+      return;
+    }
+
+    const interval = window.setInterval(() => {
+      setRollingMagicNumber((currentValue) => currentValue >= 60 ? 10 : currentValue + 7);
+    }, 80);
+
+    return () => {
+      window.clearInterval(interval);
+    };
+  }, [roundPhase, currentRound?.number]);
 
   const handleLeaveRoom = () => {
     leaveRoom({ preserveName: true });
@@ -155,6 +191,20 @@ export default function CacaSomaMultiplayerGamePage() {
 
   const handleCellClick = (cellId: number) => {
     if (!isRoundPlayable) {
+      return;
+    }
+
+    if (teamSize === 1) {
+      const nextSelection = localSelectedCells.has(cellId)
+        ? selectedByLocalPlayer.filter((selectedCellId) => selectedCellId !== cellId)
+        : selectedByLocalPlayer.length < localSelectionLimit
+          ? [...selectedByLocalPlayer, cellId]
+          : selectedByLocalPlayer;
+
+      submitAction({
+        type: "set_player_selection",
+        cellIds: nextSelection,
+      });
       return;
     }
 
@@ -194,19 +244,16 @@ export default function CacaSomaMultiplayerGamePage() {
   return (
     <>
       <div className={baseStyles.container}>
-        <div className={baseStyles.leftPanel}>
+        <div className={`${baseStyles.leftPanel} ${styles.leftPanelOnline}`}>
           <div className={baseStyles.controlsBox}>
             <div className={styles.scoreTrackers}>
               <div className={styles.teamTracker}>
-                <span className={`${styles.teamTrackerLabel} ${localTeamId === 0 ? styles.teamTrackerLabelActive : ""}`}>
-                  Equipe A
-                </span>
                 <div className={baseStyles.roundTracker}>
                   {Array.from({ length: matchTargetScore }, (_, index) => (
                     <span
                       key={`team-a-${index}`}
-                      className={`${baseStyles.roundDot} ${
-                        index < (gameState?.teams[0].score ?? 0) ? baseStyles.roundDotCompleted : ""
+                      className={`${baseStyles.roundDot} ${styles.scoreDot} ${styles.scoreDotOrange} ${
+                        index < (gameState?.teams[0].score ?? 0) ? styles.scoreDotFilled : ""
                       }`}
                     />
                   ))}
@@ -214,15 +261,12 @@ export default function CacaSomaMultiplayerGamePage() {
               </div>
 
               <div className={styles.teamTracker}>
-                <span className={`${styles.teamTrackerLabel} ${localTeamId === 1 ? styles.teamTrackerLabelActive : ""}`}>
-                  Equipe B
-                </span>
                 <div className={baseStyles.roundTracker}>
                   {Array.from({ length: matchTargetScore }, (_, index) => (
                     <span
                       key={`team-b-${index}`}
-                      className={`${baseStyles.roundDot} ${
-                        index < (gameState?.teams[1].score ?? 0) ? baseStyles.roundDotCompleted : ""
+                      className={`${baseStyles.roundDot} ${styles.scoreDot} ${styles.scoreDotBlue} ${
+                        index < (gameState?.teams[1].score ?? 0) ? styles.scoreDotFilled : ""
                       }`}
                     />
                   ))}
@@ -237,7 +281,7 @@ export default function CacaSomaMultiplayerGamePage() {
                   <span className={baseStyles.magicNumberTitle}>Mágico</span>
                 </div>
                 <div className={baseStyles.magicNumberDisplay}>
-                  {targetNumber ?? "-"}
+                  {displayedMagicNumber}
                 </div>
               </div>
 
@@ -262,11 +306,9 @@ export default function CacaSomaMultiplayerGamePage() {
               )}
             </div>
 
-            <div className={baseStyles.timerDisplay}>
-              <span className={baseStyles.timerLabel}>Tempo Restante:</span>
-              <span className={baseStyles.timerValue}>{formatSeconds(remainingMs)}</span>
-            </div>
           </div>
+
+          <div className={styles.standaloneTimer}>{formatSeconds(remainingMs)}</div>
 
           <div className={styles.infoPanel}>
             <div className={styles.compactHeader}>
@@ -275,20 +317,26 @@ export default function CacaSomaMultiplayerGamePage() {
             </div>
 
             <div className={styles.playersStrip}>
-              {playerSlots.map(({ key, label, player }) => (
+              {playersByTeam.map((teamPlayers, teamIndex) => (
                 <div
-                  key={key}
-                  className={`${styles.playerPill} ${player?.seat === playerSeat ? styles.playerPillActive : ""}`}
+                  key={`team-${teamIndex}`}
+                  className={`${styles.playerTeamColumn} ${
+                    teamIndex === 0 ? styles.playerTeamOrange : styles.playerTeamBlue
+                  }`}
                 >
-                  <span className={styles.playerPillTop}>
-                    <span className={styles.playerPillLabel}>{label}</span>
-                    <span
-                      className={`${styles.connectionDot} ${
-                        player?.connected ? styles.connectionDotOn : styles.connectionDotOff
-                      }`}
-                    />
-                  </span>
-                  <span className={styles.playerPillName}>{player?.name ?? "-"}</span>
+                  {teamPlayers.map((player) => (
+                    <div
+                      key={`${player.team}-${player.playerIndex}-${player.seat}`}
+                      className={`${styles.playerPill} ${player.seat === playerSeat ? styles.playerPillActive : ""}`}
+                    >
+                      <span
+                        className={`${styles.connectionDot} ${
+                          player.connected ? styles.connectionDotOn : styles.connectionDotOff
+                        }`}
+                      />
+                      <span className={styles.playerPillName}>{player.name}</span>
+                    </div>
+                  ))}
                 </div>
               ))}
             </div>
@@ -330,7 +378,7 @@ export default function CacaSomaMultiplayerGamePage() {
               return (
                 <div
                   key={cellId}
-                  className={`${baseStyles.celula} ${styles.cellShell} ${cellClassName} ${!isRoundPlayable || isLocked || isTeammate ? styles.cellDisabled : ""}`}
+                  className={`${baseStyles.celula} ${styles.cellShell} ${cellClassName} ${isLocked || isTeammate ? styles.cellDisabled : ""}`}
                   onClick={() => handleCellClick(cellId)}
                 >
                   <span>{value}</span>
@@ -346,6 +394,24 @@ export default function CacaSomaMultiplayerGamePage() {
 
       {errorMessage && (
         <div className={styles.alertBox}>{errorMessage}</div>
+      )}
+
+      {currentRound && roundPhase !== "playing" && !roomInterrupted && gameState?.status !== "ended" && (
+        <div className={styles.roundOverlay}>
+          <div className={styles.roundOverlayCard}>
+            <div className={styles.roundOverlayTitle}>
+              Rodada {currentRound.number}
+            </div>
+            <div className={styles.roundOverlayText}>
+              {roundPhase === "countdown"
+                ? "começa em"
+                : "Número mágico..."}
+            </div>
+            <div className={styles.roundOverlayValue}>
+              {roundPhase === "countdown" ? overlayCountdown : rollingMagicNumber}
+            </div>
+          </div>
+        </div>
       )}
 
       {gameState?.status === "ended" && (

@@ -256,13 +256,13 @@ export function registerStopRoomHandlers(io: StopNamespace): void {
     socket.on("request_rematch", ({ code }) => {
       const room = roomStore.getRoom(code.trim().toUpperCase());
       if (!room) {
-        emitError(socket, "room_not_found", "Sala nÃ£o encontrada.");
+        emitError(socket, "room_not_found", "Sala não encontrada.");
         return;
       }
 
       const participant = getParticipantBySocketId(room, socket.id);
       if (!participant) {
-        emitError(socket, "unauthorized", "VocÃª nÃ£o pertence a esta sala.");
+        emitError(socket, "unauthorized", "Você não pertence a esta sala.");
         return;
       }
 

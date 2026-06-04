@@ -22,6 +22,7 @@ import RotateDeviceOverlay from "./Main/Components/RotateDeviceOverlay";
 import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import ReactGA from "react-ga4";
 import { useEffect } from "react";
+import { ArrowLeft } from "lucide-react";
 import DamasRegras from "./AA_baseGame/Pages/regrasPage";
 import CrownChasePage from "./CrownChase/Pages/baseGamePage";
 import CrownChaseRegras from "./CrownChase/Pages/regrasPage";
@@ -40,6 +41,7 @@ import MathWarAIPage from "./MathWar/Pages/aiGamePage";
 import MathWarMultiplayerGamePage from "./MathWar/Pages/multiplayerGamePage";
 import MathWarMultiplayerLobbyPage from "./MathWar/Pages/multiplayerLobbyPage";
 import Manual from "./Main/Pages/manual";
+import ClassroomsPage from "./Main/Pages/classroomsPage";
 import LevelsMenuPage from "./Stop/Pages/LevelsMenuPage";
 import StopMultiplayerGamePage from "./Stop/Pages/multiplayerGamePage";
 import StopMultiplayerLobbyPage from "./Stop/Pages/multiplayerLobbyPage";
@@ -80,9 +82,10 @@ const HIDDEN_RETURN_ROUTES = new Set([
   ROUTES.ABOUT,
   ROUTES.CONTACT,
   ROUTES.MANUAL,
+  ROUTES.CLASSROOMS,
 ]);
 
-const SHOW_UNIVERSAL_RETURN_BUTTON = false;
+const SHOW_UNIVERSAL_RETURN_BUTTON = true;
 
 const RETURN_ROUTE_MAP: Record<string, string> = {
   [ROUTES.TEST]: ROUTES.HOME,
@@ -211,7 +214,7 @@ function ReturnButton() {
       aria-label="Voltar"
       type="button"
     >
-      <span aria-hidden="true">{"<"}</span>
+      <ArrowLeft className="universal-return-icon" aria-hidden="true" />
     </button>
   );
 }
@@ -318,6 +321,7 @@ function App() {
         <Route path={ROUTES.MATH_WAR_MP_LOBBY} element={<MathWarMultiplayerLobbyPage />} />
         <Route path={ROUTES.MATH_WAR_MP_GAME} element={<MathWarMultiplayerGamePage />} />
         <Route path={ROUTES.MANUAL} element={<Manual />} />
+        <Route path={ROUTES.CLASSROOMS} element={<ClassroomsPage />} />
         <Route path={ROUTES.CUBE_TEST} element={<CubeTestPage />} />
         <Route path={ROUTES.CLASS_1} element={<Class1Dimensions />} />
         <Route path={ROUTES.CLASS_2} element={<Class2FaceArea />} />

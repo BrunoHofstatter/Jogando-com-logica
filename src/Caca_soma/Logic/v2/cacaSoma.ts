@@ -1,5 +1,6 @@
 import { getFilteredPossibleSums } from "../gameLogic";
 import type {
+  AdvanceRoundPhaseResult,
   ApplyPlayerActionResult,
   CacaSomaEvent,
   CacaSomaMatchConfig,
@@ -25,9 +26,9 @@ const BOARD_SIZE_BY_DIFFICULTY: Record<DifficultyId, 5 | 7 | 10> = {
 };
 
 const MAX_CELL_VALUE_BY_DIFFICULTY: Record<DifficultyId, number> = {
-  easy: 30,
-  medium: 50,
-  hard: 120,
+  easy: 25,
+  medium: 49,
+  hard: 100,
 };
 
 const ROUND_TIME_MS_BY_DIFFICULTY: Record<DifficultyId, number> = {
@@ -43,16 +44,21 @@ export function createPointsRaceConfig(
     difficultyId,
     targetScore,
     teamSize,
-    selectionChangeCooldownMs = 1_000,
+    selectionChangeCooldownMs,
     timePrecisionMs = 10,
     preferSharedTargets = true,
+    roundCountdownMs = 3_000,
+    targetRollMs = 1_500,
   } = options;
+
+  const resolvedSelectionChangeCooldownMs =
+    selectionChangeCooldownMs ?? (teamSize === 1 ? 0 : 1_000);
 
   if (!Number.isInteger(targetScore) || targetScore < 1) {
     throw new Error("targetScore must be an integer greater than zero.");
   }
 
-  if (selectionChangeCooldownMs < 0) {
+  if (resolvedSelectionChangeCooldownMs < 0) {
     throw new Error("selectionChangeCooldownMs cannot be negative.");
   }
 
@@ -60,11 +66,22 @@ export function createPointsRaceConfig(
     throw new Error("timePrecisionMs must be a positive integer.");
   }
 
+  if (!Number.isInteger(roundCountdownMs) || roundCountdownMs < 0) {
+    throw new Error("roundCountdownMs must be a non-negative integer.");
+  }
+
+  if (!Number.isInteger(targetRollMs) || targetRollMs < 0) {
+    throw new Error("targetRollMs must be a non-negative integer.");
+  }
+
   const requiredSelections = teamSize === 1
     ? difficultyId === "easy"
       ? 2
       : 3
     : 2;
+  const allowedSelectionCounts = teamSize === 1 && difficultyId !== "easy"
+    ? [2, 3]
+    : [requiredSelections];
 
   return {
     difficulty: {
@@ -72,16 +89,22 @@ export function createPointsRaceConfig(
       boardSize: BOARD_SIZE_BY_DIFFICULTY[difficultyId],
       maxCellValue: MAX_CELL_VALUE_BY_DIFFICULTY[difficultyId],
       roundTimeLimitMs: ROUND_TIME_MS_BY_DIFFICULTY[difficultyId],
-      targetRange: null,
+      targetRange: {
+        min: 10,
+        max: 60,
+      },
     },
     targetScore,
     teamSize,
     requiredSelections,
+    allowedSelectionCounts,
     selectionLimits:
       teamSize === 1 ? [requiredSelections] : Array.from({ length: teamSize }, () => 1),
-    selectionChangeCooldownMs,
+    selectionChangeCooldownMs: resolvedSelectionChangeCooldownMs,
     timePrecisionMs,
     preferSharedTargets,
+    roundCountdownMs,
+    targetRollMs,
   };
 }
 
@@ -96,7 +119,7 @@ export function createInitialState(
   const teams = createInitialTeams(config);
   const boardValues = boardValuesOverride
     ? normalizeBoardValues(config, boardValuesOverride)
-    : createBoardValues(config, random);
+    : createBoardValues(config);
   const roundTargets = generateRoundTargets(teams, config, boardValues, random);
 
   if (!roundTargets) {
@@ -188,6 +211,13 @@ export function applyPlayerAction(
     };
   }
 
+  if (state.currentRound.phase !== "playing") {
+    return {
+      ok: false,
+      reason: "round_not_playing",
+    };
+  }
+
   if (!isTeamId(action.team)) {
     return {
       ok: false,
@@ -239,7 +269,59 @@ export function expireRound(
   }
 
   return {
-    ...resolveRound(state, random),
+    ...resolveRound(state, random, nowMs),
+    changed: true,
+  };
+}
+
+export function advanceRoundPhase(
+  state: CacaSomaMatchState,
+  nowMs: number,
+): AdvanceRoundPhaseResult {
+  if (state.status === "ended" || !state.currentRound) {
+    return {
+      state,
+      events: [],
+      changed: false,
+    };
+  }
+
+  let nextRound = state.currentRound;
+  const events: CacaSomaEvent[] = [];
+
+  while (nextRound.phase !== "playing" && nowMs >= nextRound.phaseEndsAtMs) {
+    const nextPhase = nextRound.phase === "countdown" ? "rolling" : "playing";
+    nextRound = {
+      ...nextRound,
+      phase: nextPhase,
+      phaseEndsAtMs: nextPhase === "rolling"
+        ? nextRound.playStartsAtMs
+        : nextRound.deadlineAtMs,
+    };
+    events.push({
+      type: "round_phase_changed",
+      roundNumber: nextRound.number,
+      phase: nextRound.phase,
+      phaseEndsAtMs: nextRound.phaseEndsAtMs,
+      playStartsAtMs: nextRound.playStartsAtMs,
+      deadlineAtMs: nextRound.deadlineAtMs,
+    });
+  }
+
+  if (events.length === 0) {
+    return {
+      state,
+      events: [],
+      changed: false,
+    };
+  }
+
+  return {
+    state: {
+      ...state,
+      currentRound: nextRound,
+    },
+    events,
     changed: true,
   };
 }
@@ -438,7 +520,7 @@ function applyReadyAction(
     },
   ];
 
-  if (canSubmitTeam(nextTeamState, state.config.requiredSelections)) {
+  if (canSubmitTeam(nextTeamState, state.config.allowedSelectionCounts)) {
     const submission = createSubmission(
       nextState.currentRound as CacaSomaRoundState,
       nextState.boardValues,
@@ -458,7 +540,7 @@ function applyReadyAction(
     });
 
     if (nextState.currentRound?.submissions.every((roundSubmission) => roundSubmission !== null)) {
-      const resolved = resolveRound(nextState, random);
+      const resolved = resolveRound(nextState, random, action.nowMs);
       return {
         ok: true,
         state: resolved.state,
@@ -477,6 +559,7 @@ function applyReadyAction(
 function resolveRound(
   state: CacaSomaMatchState,
   random: () => number,
+  nowMs: number,
 ): {
   state: CacaSomaMatchState;
   events: CacaSomaEvent[];
@@ -569,7 +652,7 @@ function resolveRound(
     nextRoundTargets,
     currentRound.number + 1,
     state.config,
-    currentRound.deadlineAtMs,
+    nowMs,
   );
   events.push({
     type: "round_started",
@@ -611,8 +694,17 @@ function validateConfig(config: CacaSomaMatchConfig): void {
     0,
   );
 
-  if (totalSelectionCapacity < config.requiredSelections) {
-    throw new Error("selectionLimits must allow the team to reach requiredSelections.");
+  if (totalSelectionCapacity < Math.max(...config.allowedSelectionCounts)) {
+    throw new Error("selectionLimits must allow the team to reach the maximum allowed selection count.");
+  }
+
+  if (
+    config.allowedSelectionCounts.length === 0 ||
+    config.allowedSelectionCounts.some(
+      (selectionCount) => !Number.isInteger(selectionCount) || selectionCount < 1,
+    )
+  ) {
+    throw new Error("allowedSelectionCounts must contain positive integers.");
   }
 }
 
@@ -640,16 +732,9 @@ function createInitialTeams(config: CacaSomaMatchConfig): [CacaSomaTeamState, Ca
 
 function createBoardValues(
   config: CacaSomaMatchConfig,
-  random: () => number,
 ): number[] {
   const totalCells = config.difficulty.boardSize * config.difficulty.boardSize;
-  const valuePool = Array.from(
-    { length: config.difficulty.maxCellValue },
-    (_, index) => index + 1,
-  );
-
-  shuffleInPlace(valuePool, random);
-  return valuePool.slice(0, totalCells);
+  return Array.from({ length: totalCells }, (_, index) => index + 1);
 }
 
 function normalizeBoardValues(
@@ -685,7 +770,7 @@ function getCandidateTargetsForTeam(
     boardValues,
   );
 
-  if (availableNumbers.length < config.requiredSelections) {
+  if (availableNumbers.length < Math.min(...config.allowedSelectionCounts)) {
     return [];
   }
 
@@ -693,11 +778,17 @@ function getCandidateTargetsForTeam(
     ? [config.difficulty.targetRange.min, config.difficulty.targetRange.max] as [number, number]
     : null;
 
-  return getFilteredPossibleSums(
-    availableNumbers,
-    config.requiredSelections,
-    range,
-  );
+  return Array.from(
+    new Set(
+      config.allowedSelectionCounts.flatMap((selectionCount) =>
+        getFilteredPossibleSums(
+          availableNumbers,
+          selectionCount,
+          range,
+        ),
+      ),
+    ),
+  ).sort((left, right) => left - right);
 }
 
 function createRoundState(
@@ -706,11 +797,26 @@ function createRoundState(
   config: CacaSomaMatchConfig,
   startedAtMs: number,
 ): CacaSomaRoundState {
+  const playStartsAtMs = startedAtMs + config.roundCountdownMs + config.targetRollMs;
+  const deadlineAtMs = playStartsAtMs + config.difficulty.roundTimeLimitMs;
+  const phase = config.roundCountdownMs > 0
+    ? "countdown"
+    : config.targetRollMs > 0
+      ? "rolling"
+      : "playing";
+
   return {
     ...targets,
     number: roundNumber,
-    startedAtMs,
-    deadlineAtMs: startedAtMs + config.difficulty.roundTimeLimitMs,
+    phase,
+    phaseEndsAtMs: phase === "countdown"
+      ? startedAtMs + config.roundCountdownMs
+      : phase === "rolling"
+        ? playStartsAtMs
+        : deadlineAtMs,
+    playStartsAtMs,
+    startedAtMs: playStartsAtMs,
+    deadlineAtMs,
     submissions: [null, null],
   };
 }
@@ -832,11 +938,13 @@ function applyCorrectLocks(
 
 function canSubmitTeam(
   teamState: CacaSomaTeamState,
-  requiredSelections: number,
+  allowedSelectionCounts: readonly number[],
 ): boolean {
+  const selectedCount = flattenSelections(teamState.players).length;
+
   return (
     teamState.players.every((player) => player.ready) &&
-    flattenSelections(teamState.players).length === requiredSelections
+    allowedSelectionCounts.includes(selectedCount)
   );
 }
 
@@ -946,17 +1054,6 @@ function toRoundedTimeUnits(elapsedMs: number, precisionMs: number): number {
 
 function getCellValue(boardValues: readonly number[], cellId: number): number {
   return boardValues[cellId] ?? 0;
-}
-
-function shuffleInPlace(values: number[], random: () => number): void {
-  for (let index = values.length - 1; index > 0; index -= 1) {
-    const rawRandomValue = random();
-    const randomValue = Number.isFinite(rawRandomValue) ? rawRandomValue : 0;
-    const nextIndex = Math.max(0, Math.min(index, Math.floor(randomValue * (index + 1))));
-    const currentValue = values[index];
-    values[index] = values[nextIndex];
-    values[nextIndex] = currentValue;
-  }
 }
 
 function pickRandom(values: readonly number[], random: () => number): number {

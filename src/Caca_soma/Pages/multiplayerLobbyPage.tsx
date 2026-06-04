@@ -4,18 +4,21 @@ import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../routes";
 import { useCacaSomaMultiplayer } from "../Hooks/useCacaSomaMultiplayer";
 import type {
+  CacaSomaRoomMode,
+  CacaSomaRoomSeat,
   CacaSomaRoomSettings,
   RoomPlayerInfo,
 } from "../Logic/multiplayer/protocol";
 import styles from "../styles/multiplayerLobby.module.css";
 
 type LobbyMode = "home" | "join";
+type RoomModeOption = CacaSomaRoomSettings["mode"];
 type DifficultyOption = CacaSomaRoomSettings["difficultyId"];
 type TargetScoreOption = CacaSomaRoomSettings["targetScore"];
 
+const ROOM_MODE_OPTIONS: RoomModeOption[] = ["1v1", "2v2"];
 const DIFFICULTY_OPTIONS: DifficultyOption[] = ["easy", "medium", "hard"];
 const TARGET_SCORE_OPTIONS: TargetScoreOption[] = [2, 3, 4, 5];
-const PLAYER_SLOTS = [0, 1, 2, 3] as const;
 
 const DIFFICULTY_LABELS: Record<DifficultyOption, string> = {
   easy: "Fácil",
@@ -23,10 +26,24 @@ const DIFFICULTY_LABELS: Record<DifficultyOption, string> = {
   hard: "Difícil",
 };
 
+const ROOM_MODE_LABELS: Record<CacaSomaRoomMode, string> = {
+  "1v1": "1 contra 1",
+  "2v2": "2 contra 2",
+};
+
 const DEFAULT_SETTINGS: CacaSomaRoomSettings = {
+  mode: "2v2",
   difficultyId: "medium",
   targetScore: 3,
 };
+
+function getRoomCapacity(mode: CacaSomaRoomMode): 2 | 4 {
+  return mode === "1v1" ? 2 : 4;
+}
+
+function getRoomSlots(mode: CacaSomaRoomMode): CacaSomaRoomSeat[] {
+  return mode === "1v1" ? [0, 1] : [0, 1, 2, 3];
+}
 
 export default function CacaSomaMultiplayerLobbyPage() {
   const navigate = useNavigate();
@@ -93,10 +110,12 @@ export default function CacaSomaMultiplayerLobbyPage() {
   const isInRoom = roomCode !== null && connectionStatus !== "disconnected";
   const isDisconnected = connectionStatus === "disconnected" && roomCode !== null;
   const roomSettings = settings ?? DEFAULT_SETTINGS;
-  const canStart = isHost && roomPlayersCount === 4 && players.every((player) => player.connected);
+  const roomCapacity = getRoomCapacity(roomSettings.mode);
+  const roomSlots = getRoomSlots(roomSettings.mode);
+  const canStart = isHost && roomPlayersCount === roomCapacity && players.every((player) => player.connected);
 
   const settingsSummary = [
-    "2 contra 2",
+    ROOM_MODE_LABELS[roomSettings.mode],
     DIFFICULTY_LABELS[roomSettings.difficultyId],
     `Primeiro a ${roomSettings.targetScore}`,
   ];
@@ -136,6 +155,12 @@ export default function CacaSomaMultiplayerLobbyPage() {
     setRoomInput("");
     setCopyFeedback("");
     setIsSettingsOpen(false);
+  };
+
+  const handleRoomModeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    updateRoomSettings({
+      mode: event.target.value as RoomModeOption,
+    });
   };
 
   const handleDifficultyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -253,7 +278,7 @@ export default function CacaSomaMultiplayerLobbyPage() {
 
                 <div className={styles.roomActions}>
                   <div className={styles.statusPill}>
-                    Jogadores: {roomPlayersCount}/4
+                    Jogadores: {roomPlayersCount}/{roomCapacity}
                   </div>
                   <button className={styles.secondaryButton} onClick={handleCopyCode}>
                     Copiar Código
@@ -302,10 +327,14 @@ export default function CacaSomaMultiplayerLobbyPage() {
                 </div>
 
                 <div className={styles.playerGrid}>
-                  {PLAYER_SLOTS.map((slot) => {
+                  {roomSlots.map((slot) => {
                     const player = playersBySeat.get(slot) ?? null;
-                    const teamLabel = slot <= 1 ? "Equipe A" : "Equipe B";
-                    const seatLabel = slot % 2 === 0 ? "Jogador 1" : "Jogador 2";
+                    const teamLabel = roomSettings.mode === "1v1"
+                      ? slot === 0 ? "Equipe A" : "Equipe B"
+                      : slot <= 1 ? "Equipe A" : "Equipe B";
+                    const seatLabel = roomSettings.mode === "1v1"
+                      ? "Jogador 1"
+                      : slot % 2 === 0 ? "Jogador 1" : "Jogador 2";
 
                     return (
                       <div key={slot} className={styles.playerTile}>
@@ -358,6 +387,21 @@ export default function CacaSomaMultiplayerLobbyPage() {
                     </div>
 
                     <div className={styles.settingsGrid}>
+                      <label className={styles.settingCard}>
+                        <span className={styles.settingTitle}>Modalidade</span>
+                        <select
+                          className={styles.settingControl}
+                          value={roomSettings.mode}
+                          onChange={handleRoomModeChange}
+                        >
+                          {ROOM_MODE_OPTIONS.map((roomMode) => (
+                            <option key={roomMode} value={roomMode}>
+                              {ROOM_MODE_LABELS[roomMode]}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+
                       <label className={styles.settingCard}>
                         <span className={styles.settingTitle}>Dificuldade</span>
                         <select

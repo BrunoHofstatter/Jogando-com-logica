@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  advanceRoundPhase,
   applyPlayerAction,
   createInitialState,
   createPointsRaceConfig,
@@ -26,14 +27,37 @@ describe("Caca Soma v2 match engine", () => {
     });
 
     expect(twoVersusTwo.difficulty.boardSize).toBe(7);
-    expect(twoVersusTwo.difficulty.maxCellValue).toBe(50);
+    expect(twoVersusTwo.difficulty.maxCellValue).toBe(49);
+    expect(twoVersusTwo.difficulty.targetRange).toEqual({ min: 10, max: 60 });
     expect(twoVersusTwo.requiredSelections).toBe(2);
+    expect(twoVersusTwo.allowedSelectionCounts).toEqual([2]);
     expect(twoVersusTwo.selectionLimits).toEqual([1, 1]);
+    expect(twoVersusTwo.selectionChangeCooldownMs).toBe(1_000);
+    expect(twoVersusTwo.roundCountdownMs).toBe(3_000);
+    expect(twoVersusTwo.targetRollMs).toBe(1_500);
 
     expect(oneVersusOne.difficulty.boardSize).toBe(10);
-    expect(oneVersusOne.difficulty.maxCellValue).toBe(120);
+    expect(oneVersusOne.difficulty.maxCellValue).toBe(100);
+    expect(oneVersusOne.difficulty.targetRange).toEqual({ min: 10, max: 60 });
     expect(oneVersusOne.requiredSelections).toBe(3);
+    expect(oneVersusOne.allowedSelectionCounts).toEqual([2, 3]);
     expect(oneVersusOne.selectionLimits).toEqual([3]);
+    expect(oneVersusOne.selectionChangeCooldownMs).toBe(0);
+    expect(oneVersusOne.roundCountdownMs).toBe(3_000);
+    expect(oneVersusOne.targetRollMs).toBe(1_500);
+  });
+
+  it("creates ordered board values that match the board cell count", () => {
+    const config = createPointsRaceConfig({
+      difficultyId: "medium",
+      targetScore: 3,
+      teamSize: 2,
+    });
+
+    const state = createInitialState(config, 0, () => 0);
+
+    expect(state.boardValues).toEqual(Array.from({ length: 49 }, (_, index) => index + 1));
+    expect(state.boardValues).not.toContain(50);
   });
 
   it("starts with a shared target when both boards can solve the same number", () => {
@@ -48,8 +72,60 @@ describe("Caca Soma v2 match engine", () => {
 
     expect(state.status).toBe("playing");
     expect(state.boardValues).toEqual(boardValues);
-    expect(state.currentRound?.targetNumbers).toEqual([3, 3]);
+    expect(state.currentRound?.targetNumbers).toEqual([10, 10]);
     expect(state.currentRound?.targetStrategy).toBe("shared");
+    expect(state.currentRound).toMatchObject({
+      phase: "countdown",
+      phaseEndsAtMs: 3_000,
+      playStartsAtMs: 4_500,
+      startedAtMs: 4_500,
+      deadlineAtMs: 64_500,
+    });
+  });
+
+  it("blocks actions before play starts and advances round phases", () => {
+    const config = createPointsRaceConfig({
+      difficultyId: "easy",
+      targetScore: 3,
+      teamSize: 2,
+      selectionChangeCooldownMs: 0,
+    });
+    let state = createInitialState(config, 0, () => 0, createSequentialBoard(30, 25));
+
+    expect(applyPlayerAction(state, {
+      type: "set_player_selection",
+      team: 0,
+      playerIndex: 0,
+      cellIds: [0],
+      nowMs: 100,
+    })).toEqual({
+      ok: false,
+      reason: "round_not_playing",
+    });
+
+    const rolling = advanceRoundPhase(state, 3_000);
+    expect(rolling.changed).toBe(true);
+    expect(rolling.state.currentRound?.phase).toBe("rolling");
+    expect(rolling.events).toEqual([
+      expect.objectContaining({
+        type: "round_phase_changed",
+        phase: "rolling",
+      }),
+    ]);
+
+    const playing = advanceRoundPhase(rolling.state, 4_500);
+    expect(playing.changed).toBe(true);
+    expect(playing.state.currentRound?.phase).toBe("playing");
+    state = playing.state;
+
+    const pick = applyPlayerAction(state, {
+      type: "set_player_selection",
+      team: 0,
+      playerIndex: 0,
+      cellIds: [0],
+      nowMs: 4_600,
+    });
+    expect(pick.ok).toBe(true);
   });
 
   it("falls back to different targets when the remaining boards no longer intersect", () => {
@@ -91,6 +167,8 @@ describe("Caca Soma v2 match engine", () => {
       targetScore: 1,
       teamSize: 2,
       selectionChangeCooldownMs: 0,
+      roundCountdownMs: 0,
+      targetRollMs: 0,
     });
     const boardValues = createSequentialBoard(30, 25);
 
@@ -98,7 +176,7 @@ describe("Caca Soma v2 match engine", () => {
 
     const actions = [
       { type: "set_player_selection", team: 0 as const, playerIndex: 0, cellIds: [0], nowMs: 100 },
-      { type: "set_player_selection", team: 0 as const, playerIndex: 1, cellIds: [1], nowMs: 200 },
+      { type: "set_player_selection", team: 0 as const, playerIndex: 1, cellIds: [8], nowMs: 200 },
       { type: "set_player_ready", team: 0 as const, playerIndex: 0, ready: true, nowMs: 300 },
       { type: "set_player_ready", team: 0 as const, playerIndex: 1, ready: true, nowMs: 400 },
       { type: "set_player_selection", team: 1 as const, playerIndex: 0, cellIds: [0], nowMs: 500 },
@@ -120,7 +198,7 @@ describe("Caca Soma v2 match engine", () => {
     expect(state.endReason).toBe("target_score");
     expect(state.teams[0].score).toBe(1);
     expect(state.teams[1].score).toBe(0);
-    expect(state.teams[0].lockedCellIds).toEqual([0, 1]);
+    expect(state.teams[0].lockedCellIds).toEqual([0, 8]);
     expect(state.teams[1].lockedCellIds).toEqual([]);
     expect(state.history).toHaveLength(1);
     expect(state.history[0]).toMatchObject({
@@ -129,12 +207,85 @@ describe("Caca Soma v2 match engine", () => {
     });
   });
 
+  it("lets 1v1 players select multiple cells before readying", () => {
+    const config = createPointsRaceConfig({
+      difficultyId: "medium",
+      targetScore: 1,
+      teamSize: 1,
+      selectionChangeCooldownMs: 0,
+      roundCountdownMs: 0,
+      targetRollMs: 0,
+    });
+    const boardValues = createSequentialBoard(50, 49);
+
+    let state = createInitialState(config, 0, () => 0, boardValues);
+
+    expect(state.currentRound?.targetNumbers).toEqual([10, 10]);
+
+    const actions = [
+      { type: "set_player_selection", team: 0 as const, playerIndex: 0, cellIds: [0, 1, 6], nowMs: 100 },
+      { type: "set_player_ready", team: 0 as const, playerIndex: 0, ready: true, nowMs: 200 },
+      { type: "set_player_selection", team: 1 as const, playerIndex: 0, cellIds: [0, 1, 3], nowMs: 300 },
+      { type: "set_player_ready", team: 1 as const, playerIndex: 0, ready: true, nowMs: 400 },
+    ] as const;
+
+    for (const action of actions) {
+      const result = applyPlayerAction(state, action, () => 0);
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        state = result.state;
+      }
+    }
+
+    expect(state.status).toBe("ended");
+    expect(state.winner).toBe(0);
+    expect(state.teams[0].score).toBe(1);
+    expect(state.teams[0].lockedCellIds).toEqual([0, 1, 6]);
+    expect(state.teams[1].lockedCellIds).toEqual([]);
+  });
+
+  it("lets 1v1 medium and hard submit with two selected cells", () => {
+    const config = createPointsRaceConfig({
+      difficultyId: "hard",
+      targetScore: 1,
+      teamSize: 1,
+      selectionChangeCooldownMs: 0,
+      roundCountdownMs: 0,
+      targetRollMs: 0,
+    });
+    const boardValues = createSequentialBoard(100, 100);
+
+    let state = createInitialState(config, 0, () => 0, boardValues);
+    expect(state.currentRound?.targetNumbers).toEqual([10, 10]);
+
+    const actions = [
+      { type: "set_player_selection", team: 0 as const, playerIndex: 0, cellIds: [0, 8], nowMs: 100 },
+      { type: "set_player_ready", team: 0 as const, playerIndex: 0, ready: true, nowMs: 200 },
+      { type: "set_player_selection", team: 1 as const, playerIndex: 0, cellIds: [0, 1], nowMs: 300 },
+      { type: "set_player_ready", team: 1 as const, playerIndex: 0, ready: true, nowMs: 400 },
+    ] as const;
+
+    for (const action of actions) {
+      const result = applyPlayerAction(state, action, () => 0);
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        state = result.state;
+      }
+    }
+
+    expect(state.status).toBe("ended");
+    expect(state.winner).toBe(0);
+    expect(state.teams[0].lockedCellIds).toEqual([0, 8]);
+  });
+
   it("enforces the selection cooldown before a player can change their pick again", () => {
     const config = createPointsRaceConfig({
       difficultyId: "easy",
       targetScore: 3,
       teamSize: 2,
       selectionChangeCooldownMs: 1_000,
+      roundCountdownMs: 0,
+      targetRollMs: 0,
     });
 
     let state = createInitialState(config, 0, () => 0, createSequentialBoard(30, 25));
@@ -171,6 +322,8 @@ describe("Caca Soma v2 match engine", () => {
       difficultyId: "easy",
       targetScore: 2,
       teamSize: 2,
+      roundCountdownMs: 0,
+      targetRollMs: 0,
     });
 
     const initialState = createInitialState(config, 0, () => 0, createSequentialBoard(30, 25));

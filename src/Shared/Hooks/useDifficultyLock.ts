@@ -1,11 +1,23 @@
 import { useState, useEffect } from "react";
 
 const STORAGE_PREFIX = "game_progress_";
+const MIN_DIFFICULTY = 1;
+const MAX_DIFFICULTY = 4;
+
+const normalizeDifficulty = (value: string | number | null): number => {
+    const parsed = typeof value === "number" ? value : Number.parseInt(value ?? "", 10);
+
+    if (!Number.isFinite(parsed)) {
+        return MIN_DIFFICULTY;
+    }
+
+    return Math.min(MAX_DIFFICULTY, Math.max(MIN_DIFFICULTY, parsed));
+};
 
 export const useDifficultyLock = (gameId: string) => {
     const [maxUnlockedDifficulty, setMaxUnlockedDifficulty] = useState<number>(() => {
         const saved = localStorage.getItem(`${STORAGE_PREFIX}${gameId}`);
-        return saved ? parseInt(saved, 10) : 1;
+        return normalizeDifficulty(saved);
     });
 
     // Save to local storage whenever it changes
@@ -24,18 +36,18 @@ export const useDifficultyLock = (gameId: string) => {
         if (currentDifficulty === maxUnlockedDifficulty) {
             // Only unlock if we beat the hardest current difficulty
             // And cap at 4 (Difícil)
-            if (maxUnlockedDifficulty < 4) {
-                setMaxUnlockedDifficulty((prev) => prev + 1);
+            if (maxUnlockedDifficulty < MAX_DIFFICULTY) {
+                setMaxUnlockedDifficulty((prev) => normalizeDifficulty(prev + 1));
             }
         }
     };
 
     const unlockAll = () => {
-        setMaxUnlockedDifficulty(4);
+        setMaxUnlockedDifficulty(MAX_DIFFICULTY);
     };
 
     const resetProgress = () => {
-        setMaxUnlockedDifficulty(1);
+        setMaxUnlockedDifficulty(MIN_DIFFICULTY);
         localStorage.removeItem(`${STORAGE_PREFIX}${gameId}`);
     };
 

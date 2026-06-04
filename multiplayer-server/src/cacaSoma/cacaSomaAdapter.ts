@@ -1,10 +1,12 @@
 import {
+  advanceRoundPhase,
   applyPlayerAction,
   createInitialState,
   createPointsRaceConfig,
   expireRound,
 } from "../../../src/Caca_soma/Logic/v2/index.ts";
 import type {
+  AdvanceRoundPhaseResult,
   ApplyPlayerActionResult,
   CacaSomaMatchState,
   CacaSomaPlayerAction,
@@ -24,18 +26,19 @@ export function createMultiplayerInitialState(
   const config = createPointsRaceConfig({
     difficultyId: settings.difficultyId,
     targetScore: settings.targetScore,
-    teamSize: 2,
+    teamSize: settings.mode === "1v1" ? 1 : 2,
   });
 
   return createInitialState(config, nowMs);
 }
 
 export function resolveMultiplayerAction(
+  settings: CacaSomaRoomSettings,
   seat: CacaSomaRoomSeat,
   intent: PlayerIntent,
   nowMs: number,
 ): CacaSomaPlayerAction {
-  const { team, playerIndex } = getSeatInfo(seat);
+  const { team, playerIndex } = getSeatInfo(settings, seat);
 
   if (intent.type === "set_player_selection") {
     return {
@@ -68,4 +71,11 @@ export function expireMultiplayerRound(
   nowMs: number,
 ): ExpireRoundResult {
   return expireRound(state, nowMs);
+}
+
+export function advanceMultiplayerRoundPhase(
+  state: CacaSomaMatchState,
+  nowMs: number,
+): AdvanceRoundPhaseResult {
+  return advanceRoundPhase(state, nowMs);
 }

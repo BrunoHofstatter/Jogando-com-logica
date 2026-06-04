@@ -143,7 +143,7 @@ export const levels: LevelConfig[] = [
       twoStarTime: 90,       // 1.5 minutes
       threeStarTime: 60      // 1 minute
     },
-    description: "Tabuleiro 5x5, soma de 2 números",
+    description: "Tabuleiro 7x7, soma de 2 números",
     requiredStars: 2  // First level always unlocked
   }
   ,
@@ -167,7 +167,7 @@ export const levels: LevelConfig[] = [
       twoStarTime: 70,
       threeStarTime: 45
     },
-    description: "Tabuleiro 5x5, soma de 2 números",
+    description: "Tabuleiro 7x7, soma de 2 números",
     requiredStars: 2
   }
   ,
@@ -192,7 +192,7 @@ export const levels: LevelConfig[] = [
       twoStarTime: 90,
       threeStarTime: 60
     },
-    description: "Tabuleiro 5x5, soma de 2 números",
+    description: "Tabuleiro 7x7, soma de 2 números",
     requiredStars: 2  // First level always unlocked
   }
   ,
@@ -218,7 +218,7 @@ export const levels: LevelConfig[] = [
       twoStarTime: 90,       // 1.5 minutes
       threeStarTime: 60      // 1 minute
     },
-    description: "Tabuleiro 5x5, soma de 2 números",
+    description: "Tabuleiro 7x7, soma de 2 números",
     requiredStars: 2  // First level always unlocked
   }
   ,
@@ -242,7 +242,7 @@ export const levels: LevelConfig[] = [
       twoStarTime: 90,       // 1.5 minutes
       threeStarTime: 60      // 1 minute
     },
-    description: "Tabuleiro 5x5, soma de 2 números",
+    description: "Tabuleiro 7x7, soma de 2 números",
     requiredStars: 2  // First level always unlocked
   }
   // More levels can be added here

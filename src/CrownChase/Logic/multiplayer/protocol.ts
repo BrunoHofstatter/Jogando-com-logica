@@ -6,6 +6,8 @@ import type {
 } from "../v2";
 
 export type CrownChaseRoomCode = string;
+export type ClassroomCode = string;
+export type ClassroomGameId = "crown_chase" | "spttt" | "math_war";
 
 export type MultiplayerConnectionStatus =
   | "idle"
@@ -20,6 +22,7 @@ export type MultiplayerErrorCode =
   | "room_not_found"
   | "room_full"
   | "room_not_joinable"
+  | "classroom_not_found"
   | "not_your_turn"
   | "illegal_move"
   | "unauthorized"
@@ -33,6 +36,7 @@ export interface RoomPlayerInfo {
 
 export interface CreateRoomPayload {
   playerName: string;
+  classroomCode?: ClassroomCode;
 }
 
 export interface JoinRoomPayload {
@@ -51,6 +55,73 @@ export interface RequestRematchPayload {
 
 export interface LeaveRoomPayload {
   code: CrownChaseRoomCode;
+}
+
+export interface ClassroomSummary {
+  code: ClassroomCode;
+  gameId: ClassroomGameId;
+  expiresAt: number;
+}
+
+export interface ManagedClassroom extends ClassroomSummary {
+  managementToken: string;
+}
+
+export interface OpenRoomSummary {
+  code: CrownChaseRoomCode;
+  hostName: string;
+}
+
+export interface CreateClassroomPayload {
+  gameId: ClassroomGameId;
+}
+
+export interface ListManagedClassroomsPayload {
+  managementTokens: string[];
+}
+
+export interface DeleteClassroomPayload {
+  code: ClassroomCode;
+  managementToken: string;
+}
+
+export interface JoinClassroomPayload {
+  code: ClassroomCode;
+}
+
+export interface LeaveClassroomPayload {
+  code: ClassroomCode;
+}
+
+export interface ListOpenRoomsPayload {
+  classroomCode: ClassroomCode;
+}
+
+export interface ClassroomCreatedPayload {
+  classroom: ManagedClassroom;
+}
+
+export interface ManagedClassroomsPayload {
+  classrooms: ManagedClassroom[];
+}
+
+export interface ClassroomDeletedPayload {
+  code: ClassroomCode;
+}
+
+export interface ClassroomJoinedPayload {
+  classroomCode: ClassroomCode;
+  openRooms: OpenRoomSummary[];
+}
+
+export interface ClassroomRoomsUpdatedPayload {
+  classroomCode: ClassroomCode;
+  openRooms: OpenRoomSummary[];
+}
+
+export interface ClassroomUnavailablePayload {
+  classroomCode: ClassroomCode;
+  message: string;
 }
 
 export interface RoomCreatedPayload {
@@ -113,6 +184,12 @@ export interface CrownChaseClientToServerEvents {
   submit_move: (payload: SubmitMovePayload) => void;
   request_rematch: (payload: RequestRematchPayload) => void;
   leave_room: (payload: LeaveRoomPayload) => void;
+  create_classroom: (payload: CreateClassroomPayload) => void;
+  list_managed_classrooms: (payload: ListManagedClassroomsPayload) => void;
+  delete_classroom: (payload: DeleteClassroomPayload) => void;
+  join_classroom: (payload: JoinClassroomPayload) => void;
+  leave_classroom: (payload: LeaveClassroomPayload) => void;
+  list_open_rooms: (payload: ListOpenRoomsPayload) => void;
 }
 
 export interface CrownChaseServerToClientEvents {
@@ -125,4 +202,10 @@ export interface CrownChaseServerToClientEvents {
   opponent_left: (payload: OpponentLeftPayload) => void;
   room_closed: (payload: RoomClosedPayload) => void;
   multiplayer_error: (payload: MultiplayerErrorPayload) => void;
+  classroom_created: (payload: ClassroomCreatedPayload) => void;
+  managed_classrooms: (payload: ManagedClassroomsPayload) => void;
+  classroom_deleted: (payload: ClassroomDeletedPayload) => void;
+  classroom_joined: (payload: ClassroomJoinedPayload) => void;
+  classroom_rooms_updated: (payload: ClassroomRoomsUpdatedPayload) => void;
+  classroom_unavailable: (payload: ClassroomUnavailablePayload) => void;
 }

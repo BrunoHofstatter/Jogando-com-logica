@@ -170,13 +170,7 @@
 }
 
 .bottomAuxButtons {
-  position: absolute;
-  bottom: 4.2dvh;
-  left: 0;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: contents;
 }
 
 .tutorialButton {
@@ -198,6 +192,10 @@
 }
 
 .onlineButton {
+  position: absolute;
+  bottom: 4.2dvh;
+  left: 50%;
+  transform: translateX(-50%);
   border: 0.3vw solid #4c1d95;
   background-color: #fbbf24;
   border-radius: 1.7vw;
@@ -215,12 +213,12 @@
 
 .onlineButton:hover {
   background-color: #fcd34d;
-  transform: translateY(-0.1vw);
+  transform: translateX(-50%) translateY(-0.1vw);
   box-shadow: 0 0.5vw 0 #b45309;
 }
 
 .onlineButton:active {
-  transform: translateY(0.3vw);
+  transform: translateX(-50%) translateY(0.3vw);
   box-shadow: 0 0.1vw 0 #b45309;
 }
 

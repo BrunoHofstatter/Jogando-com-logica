@@ -4,6 +4,7 @@ export const ROUTES = {
   ABOUT: "/sobre",
   CONTACT: "/contato",
   MANUAL: "/manual",
+  CLASSROOMS: "/turmas",
   TEST: "/teste",
 
   // Damas (Checkers)

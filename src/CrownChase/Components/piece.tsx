@@ -15,8 +15,6 @@ const PieceComponent: React.FC<PieceProps> = ({
   onPieceClick,
 }) => {
   const display = getPieceDisplay(piece);
-  const pieceName = getPieceName(piece.type);
-
   return (
     <div
       className={`${styles.piece} ${piece.owner === 0 ? styles.pieceRed : styles.pieceBlue} ${styles[piece.type] || ""} ${
@@ -32,7 +30,6 @@ const PieceComponent: React.FC<PieceProps> = ({
         event.stopPropagation();
         onPieceClick();
       }}
-      title={`${pieceName} (Jogador ${piece.owner + 1})`}
     >
       <div className={styles.pieceContent}>{display.symbol}</div>
       {piece.type === "king" && (

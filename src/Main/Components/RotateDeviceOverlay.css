@@ -45,6 +45,26 @@
     -webkit-text-stroke: 0.2vw #000;
 }
 
+.rotate-bypass-button {
+    margin-top: 3dvh;
+    padding: 1.4dvh 4vw;
+    border: min(0.45vw, 0.35dvh) solid #000000;
+    border-radius: 2dvh;
+    background-color: #ffcf40;
+    color: #000000;
+    cursor: pointer;
+    font-family: "Cherry Bomb One", system-ui;
+    font-size: min(4vw, 4dvh);
+    line-height: 1;
+    text-align: center;
+    box-shadow: 0 min(0.7vw, 0.5dvh) 0 #000000;
+}
+
+.rotate-bypass-button:active {
+    transform: translateY(min(0.5vw, 0.4dvh));
+    box-shadow: 0 min(0.25vw, 0.2dvh) 0 #000000;
+}
+
 /* Pure CSS Device Icon and Animation */
 .rotate-icon-container {
     position: relative;

@@ -5,7 +5,7 @@ import { ROUTES } from "../../routes";
 import { useMathWarMultiplayer } from "../Hooks/useMathWarMultiplayer";
 import styles from "../styles/multiplayerLobby.module.css";
 
-type LobbyMode = "home" | "join";
+type LobbyMode = "home" | "join" | "classroom";
 
 export default function MathWarMultiplayerLobbyPage() {
   const navigate = useNavigate();
@@ -15,15 +15,20 @@ export default function MathWarMultiplayerLobbyPage() {
     playerName,
     playerSeat,
     players,
+    classroomCode,
+    openClassroomRooms,
     errorMessage,
     createRoom,
     joinRoom,
+    joinClassroom,
+    leaveClassroom,
     leaveRoom,
   } = useMathWarMultiplayer();
 
   const [lobbyMode, setLobbyMode] = useState<LobbyMode>("home");
   const [nameInput, setNameInput] = useState(playerName);
   const [roomInput, setRoomInput] = useState("");
+  const [classroomInput, setClassroomInput] = useState("");
   const [copyFeedback, setCopyFeedback] = useState("");
 
   useEffect(() => {
@@ -81,6 +86,7 @@ export default function MathWarMultiplayerLobbyPage() {
     leaveRoom({ preserveName: true });
     setLobbyMode("home");
     setRoomInput("");
+    setClassroomInput("");
     setCopyFeedback("");
   };
 
@@ -116,14 +122,14 @@ export default function MathWarMultiplayerLobbyPage() {
             />
           </div>
 
-          {!isWaiting && !isDisconnected && (
+          {!isWaiting && !isDisconnected && !classroomCode && (
             <div className={styles.actions}>
               <button
                 className={styles.primaryButton}
                 onClick={handleCreateRoom}
                 disabled={isBusy}
               >
-                {isBusy && lobbyMode === "home" ? "Conectando..." : "Criar Sala"}
+                {isBusy && lobbyMode === "home" ? "Conectando..." : "Criar Sala Privada"}
               </button>
 
               <button
@@ -137,23 +143,35 @@ export default function MathWarMultiplayerLobbyPage() {
               >
                 {lobbyMode === "join" ? "Voltar" : "Entrar em Sala"}
               </button>
+
+              <button
+                className={styles.secondaryButton}
+                onClick={() =>
+                  setLobbyMode((currentMode) =>
+                    currentMode === "classroom" ? "home" : "classroom",
+                  )
+                }
+                disabled={isBusy}
+              >
+                {lobbyMode === "classroom" ? "Voltar" : "Entrar em Turma"}
+              </button>
             </div>
           )}
 
-          {lobbyMode === "join" && !isWaiting && !isDisconnected && (
+          {lobbyMode === "join" && !isWaiting && !isDisconnected && !classroomCode && (
             <div className={styles.joinBox}>
               <div className={styles.nameWrap}>
-              <label className={styles.fieldLabel} htmlFor="math-war-online-code">
+                <label className={styles.fieldLabel} htmlFor="math-war-online-code">
                 Código da sala
-              </label>
-              <input
+                </label>
+                <input
                 id="math-war-online-code"
                 className={styles.input}
                 value={roomInput}
                 maxLength={4}
                 onChange={(event) => setRoomInput(event.target.value.toUpperCase())}
                 placeholder="AB12"
-              />
+                />
               </div>
 
               <button
@@ -163,6 +181,68 @@ export default function MathWarMultiplayerLobbyPage() {
               >
                 {isBusy ? "Entrando..." : "Entrar"}
               </button>
+            </div>
+          )}
+
+          {lobbyMode === "classroom" && !classroomCode && !isWaiting && !isDisconnected && (
+            <div className={styles.joinBox}>
+              <div className={styles.nameWrap}>
+                <label className={styles.fieldLabel} htmlFor="math-war-classroom-code">
+                  Código da turma
+                </label>
+                <input
+                  id="math-war-classroom-code"
+                  className={styles.input}
+                  value={classroomInput}
+                  maxLength={4}
+                  onChange={(event) => setClassroomInput(event.target.value.toUpperCase())}
+                  placeholder="BKRM"
+                />
+              </div>
+
+              <button
+                className={styles.primaryButton}
+                onClick={() => joinClassroom(classroomInput)}
+                disabled={isBusy}
+              >
+                {isBusy ? "Entrando..." : "Entrar na Turma"}
+              </button>
+            </div>
+          )}
+
+          {classroomCode && !isWaiting && !isDisconnected && (
+            <div className={styles.classroomBox}>
+              <div className={styles.classroomHeader}>
+                <div className={styles.waitingTitle}>Turma {classroomCode}</div>
+                <button className={styles.leaveButton} onClick={leaveClassroom}>
+                  Sair da Turma
+                </button>
+              </div>
+
+              <button
+                className={styles.primaryButton}
+                onClick={() => createRoom(nameInput, classroomCode)}
+              >
+                Criar Sala para a Turma
+              </button>
+
+              <div className={styles.roomList}>
+                {openClassroomRooms.length === 0 ? (
+                  <p className={styles.waitingText}>Nenhuma sala aberta. Crie a primeira!</p>
+                ) : (
+                  openClassroomRooms.map((room) => (
+                    <div className={styles.openRoomCard} key={room.code}>
+                      <span>Sala de {room.hostName}</span>
+                      <button
+                        className={styles.secondaryButton}
+                        onClick={() => joinRoom(room.code, nameInput)}
+                      >
+                        Entrar
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           )}
 

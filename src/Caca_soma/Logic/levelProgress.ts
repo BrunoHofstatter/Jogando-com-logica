@@ -3,6 +3,20 @@ import { levels } from './levelConfigs';
 
 const STORAGE_KEY = 'cacasoma_level_progress';
 
+const createDefaultProgress = (levelId: number): LevelProgress => ({
+  levelId,
+  completed: false,
+  bestStars: 0,
+  bestTime: Infinity,
+  bestCorrect: 0,
+  attempts: 0,
+  lastPlayed: ''
+});
+
+const isValidNumber = (value: unknown): value is number => (
+  typeof value === 'number' && Number.isFinite(value)
+);
+
 // Get all level progress from localStorage, ensuring synchronization with current config
 export const getAllProgress = (): LevelProgress[] => {
   const stored = localStorage.getItem(STORAGE_KEY);
@@ -16,22 +30,40 @@ export const getAllProgress = (): LevelProgress[] => {
     }
   }
 
-  // Synchronization: Add missing levels from config to progress
-  // This handles cases where new levels are added to the code but not yet in localStorage
+  // Synchronization: add missing levels and repair older saved progress shapes.
   let changed = false;
-  levels.forEach(level => {
-    if (!progress.find(p => p.levelId === level.levelId)) {
-      progress.push({
-        levelId: level.levelId,
-        completed: false,
-        bestStars: 0,
-        bestTime: Infinity,
-        bestCorrect: 0,
-        attempts: 0,
-        lastPlayed: ''
-      });
+  progress = levels.map(level => {
+    const savedProgress = progress.find(p => p.levelId === level.levelId);
+
+    if (!savedProgress) {
+      changed = true;
+      return createDefaultProgress(level.levelId);
+    }
+
+    const normalizedProgress: LevelProgress = {
+      levelId: level.levelId,
+      completed: Boolean(savedProgress.completed),
+      bestStars: isValidNumber(savedProgress.bestStars) ? savedProgress.bestStars : 0,
+      bestTime: isValidNumber(savedProgress.bestTime) ? savedProgress.bestTime : Infinity,
+      bestCorrect: isValidNumber(savedProgress.bestCorrect) ? savedProgress.bestCorrect : 0,
+      attempts: isValidNumber(savedProgress.attempts) ? savedProgress.attempts : 0,
+      lastPlayed: typeof savedProgress.lastPlayed === 'string' ? savedProgress.lastPlayed : ''
+    };
+    const savedBestTimeMatches = normalizedProgress.bestTime === savedProgress.bestTime ||
+      (!isValidNumber(savedProgress.bestTime) && normalizedProgress.bestTime === Infinity);
+
+    if (
+      normalizedProgress.completed !== savedProgress.completed ||
+      normalizedProgress.bestStars !== savedProgress.bestStars ||
+      !savedBestTimeMatches ||
+      normalizedProgress.bestCorrect !== savedProgress.bestCorrect ||
+      normalizedProgress.attempts !== savedProgress.attempts ||
+      normalizedProgress.lastPlayed !== savedProgress.lastPlayed
+    ) {
       changed = true;
     }
+
+    return normalizedProgress;
   });
 
   // If we initialized empty or added new levels, save back to storage
@@ -39,21 +71,6 @@ export const getAllProgress = (): LevelProgress[] => {
     saveAllProgress(progress);
   }
 
-  return progress;
-};
-
-// Initialize progress for all levels (helper, mostly used internally or for reset)
-const initializeProgress = (): LevelProgress[] => {
-  const progress = levels.map(level => ({
-    levelId: level.levelId,
-    completed: false,
-    bestStars: 0,
-    bestTime: Infinity,
-    bestCorrect: 0,
-    attempts: 0,
-    lastPlayed: ''
-  }));
-  saveAllProgress(progress);
   return progress;
 };
 
@@ -89,6 +106,27 @@ export const updateLevelProgress = (result: LevelAttemptResult): void => {
   };
 
   saveAllProgress(allProgress);
+};
+
+export const unlockAllLevelProgress = (): void => {
+  const allProgress = getAllProgress();
+  const now = new Date().toISOString();
+
+  const unlockedProgress = levels.map(level => {
+    const current = allProgress.find(progress => progress.levelId === level.levelId);
+
+    return {
+      ...(current ?? createDefaultProgress(level.levelId)),
+      levelId: level.levelId,
+      completed: true,
+      bestStars: 3,
+      bestTime: 0,
+      bestCorrect: level.rounds,
+      lastPlayed: now
+    };
+  });
+
+  saveAllProgress(unlockedProgress);
 };
 
 // Check if level is unlocked

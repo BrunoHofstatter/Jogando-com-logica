@@ -5,6 +5,7 @@ import type {
   CrownChaseClientToServerEvents,
   CrownChaseServerToClientEvents,
   MultiplayerConnectionStatus,
+  OpenRoomSummary,
   RoomPlayerInfo,
 } from "../Logic/multiplayer/protocol";
 import type { CrownChaseState, MoveIntent, PlayerId } from "../Logic/v2";
@@ -20,6 +21,8 @@ type MultiplayerSnapshot = {
   opponentDisconnected: boolean;
   rematchRequestedBy: PlayerId | null;
   rematchPending: boolean;
+  classroomCode: string | null;
+  openClassroomRooms: OpenRoomSummary[];
 };
 
 type LeaveRoomOptions = {
@@ -39,6 +42,8 @@ const DEFAULT_SNAPSHOT: MultiplayerSnapshot = {
   opponentDisconnected: false,
   rematchRequestedBy: null,
   rematchPending: false,
+  classroomCode: null,
+  openClassroomRooms: [],
 };
 
 let socket: Socket<
@@ -64,6 +69,7 @@ function loadSnapshot(): MultiplayerSnapshot {
       ...DEFAULT_SNAPSHOT,
       ...parsed,
       players: Array.isArray(parsed.players) ? normalizePlayers(parsed.players) : [],
+      openClassroomRooms: Array.isArray(parsed.openClassroomRooms) ? parsed.openClassroomRooms : [],
     };
 
     if (nextSnapshot.roomCode && nextSnapshot.connectionStatus !== "waiting") {
@@ -260,8 +266,44 @@ function ensureSocket(): Socket<
     });
 
     socket.on("multiplayer_error", (payload) => {
+      const wasJoiningRoom =
+        sharedSnapshot.connectionStatus === "connecting"
+        && sharedSnapshot.playerSeat === null;
+
       updateSnapshot({
-        connectionStatus: sharedSnapshot.roomCode ? sharedSnapshot.connectionStatus : "idle",
+        roomCode: wasJoiningRoom ? null : sharedSnapshot.roomCode,
+        connectionStatus: wasJoiningRoom ? "idle" : sharedSnapshot.connectionStatus,
+        errorMessage: payload.message,
+      });
+    });
+
+    socket.on("classroom_joined", (payload) => {
+      updateSnapshot({
+        classroomCode: payload.classroomCode,
+        openClassroomRooms: payload.openRooms,
+        errorMessage: null,
+      });
+    });
+
+    socket.on("classroom_rooms_updated", (payload) => {
+      if (payload.classroomCode !== sharedSnapshot.classroomCode) {
+        return;
+      }
+
+      updateSnapshot({
+        openClassroomRooms: payload.openRooms,
+        errorMessage: null,
+      });
+    });
+
+    socket.on("classroom_unavailable", (payload) => {
+      if (payload.classroomCode !== sharedSnapshot.classroomCode) {
+        return;
+      }
+
+      updateSnapshot({
+        classroomCode: null,
+        openClassroomRooms: [],
         errorMessage: payload.message,
       });
     });
@@ -275,7 +317,7 @@ function ensureSocket(): Socket<
 }
 
 export function hasActiveCrownChaseMultiplayerSession(): boolean {
-  return sharedSnapshot.roomCode !== null;
+  return sharedSnapshot.roomCode !== null || sharedSnapshot.classroomCode !== null;
 }
 
 export function leaveCrownChaseMultiplayerRoom(
@@ -285,6 +327,10 @@ export function leaveCrownChaseMultiplayerRoom(
 
   if (socket && sharedSnapshot.roomCode) {
     socket.emit("leave_room", { code: sharedSnapshot.roomCode });
+  }
+
+  if (socket && sharedSnapshot.classroomCode) {
+    socket.emit("leave_classroom", { code: sharedSnapshot.classroomCode });
   }
 
   if (socket) {
@@ -313,7 +359,7 @@ export function useCrownChaseMultiplayer() {
     };
   }, []);
 
-  const createRoom = (playerName: string) => {
+  const createRoom = (playerName: string, classroomCode?: string) => {
     const normalizedName = playerName.trim().slice(0, 20);
     if (normalizedName.length < 2) {
       updateSnapshot({
@@ -336,7 +382,10 @@ export function useCrownChaseMultiplayer() {
     });
 
     const activeSocket = ensureSocket();
-    activeSocket?.emit("create_room", { playerName: normalizedName });
+    activeSocket?.emit("create_room", {
+      playerName: normalizedName,
+      classroomCode,
+    });
   };
 
   const joinRoom = (code: string, playerName: string) => {
@@ -359,7 +408,7 @@ export function useCrownChaseMultiplayer() {
 
     updateSnapshot({
       playerName: normalizedName,
-      roomCode: normalizedCode,
+      roomCode: null,
       playerSeat: null,
       players: [],
       gameState: null,
@@ -406,12 +455,43 @@ export function useCrownChaseMultiplayer() {
     });
   };
 
+  const joinClassroom = (classroomCode: string) => {
+    const normalizedCode = classroomCode.trim().toUpperCase();
+    if (normalizedCode.length !== 4) {
+      updateSnapshot({
+        errorMessage: "Digite um código de turma com 4 letras.",
+      });
+      return;
+    }
+
+    updateSnapshot({
+      errorMessage: null,
+    });
+
+    const activeSocket = ensureSocket();
+    activeSocket?.emit("join_classroom", { code: normalizedCode });
+  };
+
+  const leaveClassroom = () => {
+    if (socket && sharedSnapshot.classroomCode) {
+      socket.emit("leave_classroom", { code: sharedSnapshot.classroomCode });
+    }
+
+    updateSnapshot({
+      classroomCode: null,
+      openClassroomRooms: [],
+      errorMessage: null,
+    });
+  };
+
   return {
     ...snapshot,
     createRoom,
     joinRoom,
     submitMove,
     requestRematch,
+    joinClassroom,
+    leaveClassroom,
     leaveRoom: leaveCrownChaseMultiplayerRoom,
   };
 }

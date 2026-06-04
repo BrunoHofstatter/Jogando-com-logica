@@ -9,6 +9,7 @@ import type {
   RoomPlayerInfo,
 } from "../../../src/Caca_soma/Logic/multiplayer/protocol.ts";
 import {
+  advanceMultiplayerRoundPhase,
   applyMultiplayerAction,
   createMultiplayerInitialState,
   expireMultiplayerRound,
@@ -16,8 +17,10 @@ import {
 } from "../cacaSoma/cacaSomaAdapter.ts";
 import {
   CACA_SOMA_DISCONNECT_GRACE_MS,
-  CACA_SOMA_ROOM_CAPACITY,
+  CACA_SOMA_MAX_ROOM_CAPACITY,
   CACA_SOMA_WAITING_ROOM_TTL_MS,
+  getRoomCapacity,
+  getSeatInfo,
   type CacaSomaRoom,
   type CacaSomaRoomPlayer,
 } from "../cacaSoma/cacaSomaRoomTypes.ts";
@@ -37,6 +40,7 @@ type CacaSomaSocket = Socket<
 const roomStore = createRoomStore<CacaSomaRoom>();
 
 const DEFAULT_ROOM_SETTINGS: CacaSomaRoomSettings = {
+  mode: "2v2",
   difficultyId: "medium",
   targetScore: 3,
 };
@@ -59,7 +63,7 @@ export function registerCacaSomaRoomHandlers(io: CacaSomaNamespace): void {
         settings: DEFAULT_ROOM_SETTINGS,
         state: null,
         status: "waiting",
-        players: [createPlayer(socket.id, normalizedName, 0, true), null, null, null],
+        players: [createPlayer(socket.id, normalizedName, 0, true, DEFAULT_ROOM_SETTINGS), null, null, null],
         createdAt: now,
         updatedAt: now,
         rematchVotes: new Set(),
@@ -109,7 +113,7 @@ export function registerCacaSomaRoomHandlers(io: CacaSomaNamespace): void {
         return;
       }
 
-      room.players[availableSeat] = createPlayer(socket.id, normalizedName, availableSeat, false);
+      room.players[availableSeat] = createPlayer(socket.id, normalizedName, availableSeat, false, room.settings);
       room.updatedAt = Date.now();
       room.rematchVotes.clear();
 
@@ -159,7 +163,13 @@ export function registerCacaSomaRoomHandlers(io: CacaSomaNamespace): void {
         return;
       }
 
+      if (!canApplySettingsToCurrentPlayers(room, nextSettings)) {
+        emitError(socket, "invalid_settings", "Essa modalidade não cabe nos jogadores atuais da sala.");
+        return;
+      }
+
       room.settings = nextSettings;
+      syncPlayerSeatInfo(room);
       room.updatedAt = Date.now();
       room.rematchVotes.clear();
       emitRoomUpdated(io, room);
@@ -189,8 +199,9 @@ export function registerCacaSomaRoomHandlers(io: CacaSomaNamespace): void {
         return;
       }
 
-      if (!isRoomFull(room) || room.players.some((registeredPlayer) => registeredPlayer === null || !registeredPlayer.connected)) {
-        emitError(socket, "not_enough_players", "A sala precisa de 4 jogadores conectados.");
+      const roomCapacity = getRoomCapacity(room.settings);
+      if (!isRoomFull(room) || getActiveRegisteredPlayers(room).some((registeredPlayer) => !registeredPlayer.connected)) {
+        emitError(socket, "not_enough_players", `A sala precisa de ${roomCapacity} jogadores conectados.`);
         return;
       }
 
@@ -232,7 +243,7 @@ export function registerCacaSomaRoomHandlers(io: CacaSomaNamespace): void {
         return;
       }
 
-      const resolvedAction = resolveMultiplayerAction(player.seat, intent, Date.now());
+      const resolvedAction = resolveMultiplayerAction(room.settings, player.seat, intent, Date.now());
       const result = applyMultiplayerAction(room.state, resolvedAction);
       if (!result.ok) {
         emitActionError(socket, result.reason, result.remainingCooldownMs);
@@ -275,8 +286,9 @@ export function registerCacaSomaRoomHandlers(io: CacaSomaNamespace): void {
         return;
       }
 
-      if (room.players.some((registeredPlayer) => registeredPlayer === null || !registeredPlayer.connected)) {
-        emitError(socket, "room_not_joinable", "A sala precisa de quatro jogadores conectados para a revanche.");
+      const roomCapacity = getRoomCapacity(room.settings);
+      if (!isRoomFull(room) || getActiveRegisteredPlayers(room).some((registeredPlayer) => !registeredPlayer.connected)) {
+        emitError(socket, "room_not_joinable", `A sala precisa de ${roomCapacity} jogadores conectados para a revanche.`);
         return;
       }
 
@@ -291,7 +303,7 @@ export function registerCacaSomaRoomHandlers(io: CacaSomaNamespace): void {
         requestedBy: player.seat,
       });
 
-      if (room.rematchVotes.size < CACA_SOMA_ROOM_CAPACITY) {
+      if (room.rematchVotes.size < roomCapacity) {
         return;
       }
 
@@ -471,10 +483,29 @@ function syncRoundTimeout(
     return;
   }
 
-  const delayMs = Math.max(0, room.state.currentRound.deadlineAtMs - Date.now());
+  const nextWakeAtMs = room.state.currentRound.phase === "playing"
+    ? room.state.currentRound.deadlineAtMs
+    : room.state.currentRound.phaseEndsAtMs;
+  const delayMs = Math.max(0, nextWakeAtMs - Date.now());
   room.roundTimeout = setTimeout(() => {
     const latestRoom = roomStore.getRoom(room.code);
     if (!latestRoom || !latestRoom.state) {
+      return;
+    }
+
+    const phaseResult = advanceMultiplayerRoundPhase(latestRoom.state, Date.now());
+    if (phaseResult.changed) {
+      latestRoom.state = phaseResult.state;
+      latestRoom.status = phaseResult.state.status === "ended" ? "ended" : "playing";
+      latestRoom.updatedAt = Date.now();
+
+      syncRoundTimeout(io, latestRoom);
+
+      io.to(latestRoom.code).emit("state_updated", {
+        code: latestRoom.code,
+        state: latestRoom.state,
+        events: phaseResult.events,
+      });
       return;
     }
 
@@ -548,9 +579,9 @@ function createPlayer(
   name: string,
   seat: CacaSomaRoomSeat,
   isHost: boolean,
+  settings: CacaSomaRoomSettings,
 ): CacaSomaRoomPlayer {
-  const team = seat <= 1 ? 0 : 1;
-  const playerIndex = seat % 2 === 0 ? 0 : 1;
+  const { team, playerIndex } = getSeatInfo(settings, seat);
 
   return {
     socketId,
@@ -564,7 +595,7 @@ function createPlayer(
 }
 
 function serializePlayers(room: CacaSomaRoom): RoomPlayerInfo[] {
-  return room.players
+  return getActivePlayers(room)
     .filter((player): player is CacaSomaRoomPlayer => player !== null)
     .map((player) => ({
       seat: player.seat,
@@ -577,7 +608,7 @@ function serializePlayers(room: CacaSomaRoom): RoomPlayerInfo[] {
 }
 
 function getAvailableSeat(room: CacaSomaRoom): CacaSomaRoomSeat | null {
-  for (let seat = 0; seat < CACA_SOMA_ROOM_CAPACITY; seat += 1) {
+  for (let seat = 0; seat < getRoomCapacity(room.settings); seat += 1) {
     if (room.players[seat as CacaSomaRoomSeat] === null) {
       return seat as CacaSomaRoomSeat;
     }
@@ -587,18 +618,51 @@ function getAvailableSeat(room: CacaSomaRoom): CacaSomaRoomSeat | null {
 }
 
 function isRoomFull(room: CacaSomaRoom): boolean {
-  return room.players.every((player) => player !== null);
+  return getActivePlayers(room).every((player) => player !== null);
 }
 
 function isValidSettings(settings: CacaSomaRoomSettings): boolean {
   return (
     typeof settings === "object" &&
     settings !== null &&
+    (settings.mode === "1v1" || settings.mode === "2v2") &&
     (settings.difficultyId === "easy" ||
       settings.difficultyId === "medium" ||
       settings.difficultyId === "hard") &&
     [2, 3, 4, 5].includes(settings.targetScore)
   );
+}
+
+function getActivePlayers(room: CacaSomaRoom): Array<CacaSomaRoomPlayer | null> {
+  return room.players.slice(0, getRoomCapacity(room.settings));
+}
+
+function getActiveRegisteredPlayers(room: CacaSomaRoom): CacaSomaRoomPlayer[] {
+  return getActivePlayers(room).filter(
+    (player): player is CacaSomaRoomPlayer => player !== null,
+  );
+}
+
+function canApplySettingsToCurrentPlayers(
+  room: CacaSomaRoom,
+  settings: CacaSomaRoomSettings,
+): boolean {
+  const nextCapacity = getRoomCapacity(settings);
+  return room.players
+    .slice(nextCapacity, CACA_SOMA_MAX_ROOM_CAPACITY)
+    .every((player) => player === null);
+}
+
+function syncPlayerSeatInfo(room: CacaSomaRoom): void {
+  room.players.forEach((player) => {
+    if (!player) {
+      return;
+    }
+
+    const seatInfo = getSeatInfo(room.settings, player.seat);
+    player.team = seatInfo.team;
+    player.playerIndex = seatInfo.playerIndex;
+  });
 }
 
 function normalizePlayerName(playerName: string): string | null {
@@ -621,6 +685,11 @@ function emitActionError(
 ): void {
   if (reason === "round_expired") {
     emitError(socket, "round_expired", "Essa rodada já terminou.");
+    return;
+  }
+
+  if (reason === "round_not_playing") {
+    emitError(socket, "round_expired", "Aguarde a rodada comecar.");
     return;
   }
 
