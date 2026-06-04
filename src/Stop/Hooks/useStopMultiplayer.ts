@@ -206,10 +206,13 @@ function ensureSocket(): Socket<
     });
 
     socket.on("multiplayer_error", (payload) => {
+      const wasJoiningRoom =
+        sharedSnapshot.connectionStatus === "connecting"
+        && sharedSnapshot.playerId === null;
+
       updateSnapshot({
-        connectionStatus: sharedSnapshot.roomCode
-          ? sharedSnapshot.connectionStatus
-          : "idle",
+        roomCode: wasJoiningRoom ? null : sharedSnapshot.roomCode,
+        connectionStatus: wasJoiningRoom ? "idle" : sharedSnapshot.connectionStatus,
         errorMessage: payload.message,
       });
     });
@@ -305,7 +308,7 @@ export function useStopMultiplayer() {
 
     updateSnapshot({
       playerName: normalizedName,
-      roomCode: normalizedCode,
+      roomCode: null,
       playerId: null,
       state: null,
       connectionStatus: "connecting",

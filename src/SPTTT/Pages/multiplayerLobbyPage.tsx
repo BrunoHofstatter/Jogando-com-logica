@@ -5,7 +5,7 @@ import { ROUTES } from "../../routes";
 import { useSPTTTMultiplayer } from "../Hooks/useSPTTTMultiplayer";
 import styles from "../Style/multiplayerLobby.module.css";
 
-type LobbyMode = "home" | "join";
+type LobbyMode = "home" | "join" | "classroom";
 
 export default function SPTTTMultiplayerLobbyPage() {
   const navigate = useNavigate();
@@ -15,15 +15,20 @@ export default function SPTTTMultiplayerLobbyPage() {
     playerName,
     playerSeat,
     players,
+    classroomCode,
+    openClassroomRooms,
     errorMessage,
     createRoom,
     joinRoom,
+    joinClassroom,
+    leaveClassroom,
     leaveRoom,
   } = useSPTTTMultiplayer();
 
   const [lobbyMode, setLobbyMode] = useState<LobbyMode>("home");
   const [nameInput, setNameInput] = useState(playerName);
   const [roomInput, setRoomInput] = useState("");
+  const [classroomInput, setClassroomInput] = useState("");
   const [copyFeedback, setCopyFeedback] = useState("");
 
   useEffect(() => {
@@ -54,14 +59,6 @@ export default function SPTTTMultiplayerLobbyPage() {
   const isWaiting = connectionStatus === "waiting" && roomCode !== null;
   const isDisconnected = connectionStatus === "disconnected" && roomCode !== null;
 
-  const handleCreateRoom = () => {
-    createRoom(nameInput);
-  };
-
-  const handleJoinRoom = () => {
-    joinRoom(roomInput, nameInput);
-  };
-
   const handleCopyCode = async () => {
     if (!roomCode) {
       return;
@@ -81,6 +78,7 @@ export default function SPTTTMultiplayerLobbyPage() {
     leaveRoom({ preserveName: true });
     setLobbyMode("home");
     setRoomInput("");
+    setClassroomInput("");
     setCopyFeedback("");
   };
 
@@ -97,9 +95,9 @@ export default function SPTTTMultiplayerLobbyPage() {
 
       <div className={styles.panel}>
         <div className={styles.card}>
-          <div className={styles.heading}>Sala Privada</div>
+          <div className={styles.heading}>Super Jogo da Velha Online</div>
           <p className={styles.description}>
-            Crie uma sala e compartilhe o codigo com outro jogador.
+            Jogue com sua turma ou compartilhe o codigo com outro jogador.
           </p>
 
           <div className={styles.nameWrap}>
@@ -116,14 +114,14 @@ export default function SPTTTMultiplayerLobbyPage() {
             />
           </div>
 
-          {!isWaiting && !isDisconnected && (
+          {!isWaiting && !isDisconnected && !classroomCode && (
             <div className={styles.actions}>
               <button
                 className={styles.primaryButton}
-                onClick={handleCreateRoom}
+                onClick={() => createRoom(nameInput)}
                 disabled={isBusy}
               >
-                {isBusy && lobbyMode === "home" ? "Conectando..." : "Criar Sala"}
+                {isBusy && lobbyMode === "home" ? "Conectando..." : "Criar Sala Privada"}
               </button>
 
               <button
@@ -137,10 +135,22 @@ export default function SPTTTMultiplayerLobbyPage() {
               >
                 {lobbyMode === "join" ? "Voltar" : "Entrar em Sala"}
               </button>
+
+              <button
+                className={styles.secondaryButton}
+                onClick={() =>
+                  setLobbyMode((currentMode) =>
+                    currentMode === "classroom" ? "home" : "classroom",
+                  )
+                }
+                disabled={isBusy}
+              >
+                {lobbyMode === "classroom" ? "Voltar" : "Entrar em Turma"}
+              </button>
             </div>
           )}
 
-          {lobbyMode === "join" && !isWaiting && !isDisconnected && (
+          {lobbyMode === "join" && !isWaiting && !isDisconnected && !classroomCode && (
             <div className={styles.joinBox}>
               <div className={styles.nameWrap}>
                 <label className={styles.fieldLabel} htmlFor="spttt-online-code">
@@ -158,11 +168,73 @@ export default function SPTTTMultiplayerLobbyPage() {
 
               <button
                 className={styles.primaryButton}
-                onClick={handleJoinRoom}
+                onClick={() => joinRoom(roomInput, nameInput)}
                 disabled={isBusy}
               >
                 {isBusy ? "Entrando..." : "Entrar"}
               </button>
+            </div>
+          )}
+
+          {lobbyMode === "classroom" && !classroomCode && !isWaiting && !isDisconnected && (
+            <div className={styles.joinBox}>
+              <div className={styles.nameWrap}>
+                <label className={styles.fieldLabel} htmlFor="spttt-classroom-code">
+                  Codigo da turma
+                </label>
+                <input
+                  id="spttt-classroom-code"
+                  className={styles.input}
+                  value={classroomInput}
+                  maxLength={4}
+                  onChange={(event) => setClassroomInput(event.target.value.toUpperCase())}
+                  placeholder="BKRM"
+                />
+              </div>
+
+              <button
+                className={styles.primaryButton}
+                onClick={() => joinClassroom(classroomInput)}
+                disabled={isBusy}
+              >
+                {isBusy ? "Entrando..." : "Entrar na Turma"}
+              </button>
+            </div>
+          )}
+
+          {classroomCode && !isWaiting && !isDisconnected && (
+            <div className={styles.classroomBox}>
+              <div className={styles.classroomHeader}>
+                <div className={styles.waitingTitle}>Turma {classroomCode}</div>
+                <button className={styles.leaveButton} onClick={leaveClassroom}>
+                  Sair da Turma
+                </button>
+              </div>
+
+              <button
+                className={styles.primaryButton}
+                onClick={() => createRoom(nameInput, classroomCode)}
+              >
+                Criar Sala para a Turma
+              </button>
+
+              <div className={styles.roomList}>
+                {openClassroomRooms.length === 0 ? (
+                  <p className={styles.waitingText}>Nenhuma sala aberta. Crie a primeira!</p>
+                ) : (
+                  openClassroomRooms.map((room) => (
+                    <div className={styles.openRoomCard} key={room.code}>
+                      <span>Sala de {room.hostName}</span>
+                      <button
+                        className={styles.secondaryButton}
+                        onClick={() => joinRoom(room.code, nameInput)}
+                      >
+                        Entrar
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           )}
 

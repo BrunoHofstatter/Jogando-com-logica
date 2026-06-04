@@ -20,19 +20,27 @@ body {
   top: 2.5vh;
   left: 2dvh;
   z-index: 9999;
-  width: 5vw;
-  height: 5vw;
+  width: min(5vw, 8dvh);
+  height: min(5vw, 8dvh);
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 50%;
-  background-color: #ffffffd9;
-  color: #222;
-  font-size: 3vw;
-  font-weight: 700;
+  border-radius: 50dvh;
+  background-color: transparent;
+  color: #111111;
   line-height: 1;
   cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.universal-return-icon {
+  width: 62%;
+  height: 62%;
+  stroke-width: 3;
 }
 
 .homeButton {
@@ -44,8 +52,15 @@ body {
   transform: scale(1.05);
 }
 
-.universal-return-button:hover {
+.universal-return-button:hover,
+.universal-return-button:focus-visible {
+  background-color: #ffffff77;
+  box-shadow: 0 0.4dvh 1dvh rgba(0, 0, 0, 0.18);
   transform: scale(1.05);
+}
+
+.universal-return-button:active {
+  transform: scale(0.96);
 }
 
 @media (orientation: portrait) and (max-width: 650px) {
@@ -60,9 +75,8 @@ body {
 
   .universal-return-button {
     top: 2dvh;
-    left: 2vw;
+    left: 1vw;
     width: min(12vw, 10dvh);
     height: min(12vw, 10dvh);
-    font-size: min(7vw, 6dvh);
   }
 }

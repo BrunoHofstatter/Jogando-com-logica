@@ -14,8 +14,11 @@ export type CacaSomaRoundResultReason =
   | "tied_correct"
   | "no_correct";
 
+export type CacaSomaRoundPhase = "countdown" | "rolling" | "playing";
+
 export type CacaSomaActionFailureReason =
   | "game_ended"
+  | "round_not_playing"
   | "round_expired"
   | "invalid_team"
   | "invalid_player"
@@ -48,6 +51,8 @@ export interface CreatePointsRaceConfigOptions {
   selectionChangeCooldownMs?: number;
   timePrecisionMs?: number;
   preferSharedTargets?: boolean;
+  roundCountdownMs?: number;
+  targetRollMs?: number;
 }
 
 export interface CacaSomaMatchConfig {
@@ -55,10 +60,13 @@ export interface CacaSomaMatchConfig {
   targetScore: number;
   teamSize: 1 | 2;
   requiredSelections: number;
+  allowedSelectionCounts: number[];
   selectionLimits: number[];
   selectionChangeCooldownMs: number;
   timePrecisionMs: number;
   preferSharedTargets: boolean;
+  roundCountdownMs: number;
+  targetRollMs: number;
 }
 
 export interface CacaSomaPlayerState {
@@ -92,6 +100,9 @@ export interface CacaSomaRoundTargets {
 
 export interface CacaSomaRoundState extends CacaSomaRoundTargets {
   number: number;
+  phase: CacaSomaRoundPhase;
+  phaseEndsAtMs: number;
+  playStartsAtMs: number;
   startedAtMs: number;
   deadlineAtMs: number;
   submissions: [CacaSomaTeamSubmission | null, CacaSomaTeamSubmission | null];
@@ -189,6 +200,14 @@ export type CacaSomaEvent =
       deadlineAtMs: number;
     }
   | {
+      type: "round_phase_changed";
+      roundNumber: number;
+      phase: CacaSomaRoundPhase;
+      phaseEndsAtMs: number;
+      playStartsAtMs: number;
+      deadlineAtMs: number;
+    }
+  | {
       type: "match_ended";
       winner: TeamId | null;
       reason: CacaSomaEndReason;
@@ -207,6 +226,12 @@ export type ApplyPlayerActionResult =
     };
 
 export interface ExpireRoundResult {
+  state: CacaSomaMatchState;
+  events: CacaSomaEvent[];
+  changed: boolean;
+}
+
+export interface AdvanceRoundPhaseResult {
   state: CacaSomaMatchState;
   events: CacaSomaEvent[];
   changed: boolean;

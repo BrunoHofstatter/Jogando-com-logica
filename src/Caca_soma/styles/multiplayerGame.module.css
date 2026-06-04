@@ -89,20 +89,29 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5vw;
+  gap: 0;
 }
 
-.teamTrackerLabel {
-  font-size: 1.8vw;
-  color: #fff;
-  -webkit-text-stroke: 0.12vw #7f0000;
-  text-shadow: 0 0.2vw 0 #5c0000;
+.scoreDot {
+  background-color: rgba(255, 255, 255, 0.22);
 }
 
-.teamTrackerLabelActive {
-  color: #ffcf40;
-  -webkit-text-stroke: 0.12vw #b28900;
-  text-shadow: 0 0.2vw 0 #da9500;
+.scoreDotOrange {
+  border-color: #a64a00;
+}
+
+.scoreDotBlue {
+  border-color: #19478f;
+}
+
+.scoreDotOrange.scoreDotFilled {
+  background-color: #ff9800;
+  box-shadow: inset 0 0.2vw 0 rgba(255, 255, 255, 0.28);
+}
+
+.scoreDotBlue.scoreDotFilled {
+  background-color: #3f7cff;
+  box-shadow: inset 0 0.2vw 0 rgba(255, 255, 255, 0.28);
 }
 
 .readyButton {
@@ -112,11 +121,39 @@
   box-shadow: 0 0.6vw 0 #1b5e20;
 }
 
+.readyButton:disabled,
+.cancelReadyButton:disabled {
+  background-color: #9a9a9a;
+  border-color: #4e4e4e;
+  color: #f2f2f2;
+  -webkit-text-stroke: 0.15vw #4e4e4e;
+  box-shadow: 0 0.6vw 0 #4e4e4e;
+  cursor: not-allowed;
+  filter: none;
+}
+
 .cancelReadyButton {
   background-color: #ff9800;
   border-color: #e65100;
   -webkit-text-stroke: 0.15vw #e65100;
   box-shadow: 0 0.6vw 0 #e65100;
+}
+
+.leftPanelOnline {
+  position: relative;
+}
+
+.standaloneTimer {
+  position: absolute;
+  top: 0.3vw;
+  right: -6.6vw;
+  min-width: 5.8vw;
+  font-size: 2.4vw;
+  color: #fff;
+  -webkit-text-stroke: 0.12vw #7f0000;
+  text-shadow: 0 0.2vw 0 #5c0000;
+  text-align: center;
+  pointer-events: none;
 }
 
 .infoPanel {
@@ -148,43 +185,59 @@
 .playersStrip {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.7vw;
+  gap: 1vw;
 }
 
 .playerPill,
 .compactNotice {
-  background-color: #efc9c9;
   border: 0.25vw solid #7f0000;
   border-radius: 1.2vw;
   box-shadow: 0 0.4vw 0 #5c0000;
 }
 
-.playerPill {
+.compactNotice {
+  background-color: #efc9c9;
+}
+
+.playerTeamColumn {
   min-width: 0;
-  padding: 0.55vw 0.7vw;
   display: flex;
   flex-direction: column;
-  gap: 0.25vw;
+  gap: 0.45vw;
+}
+
+.playerPill {
+  min-width: 0;
+  min-height: 2.2vw;
+  padding: 0.35vw 0.6vw 0.5vw 0.6vw;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.45vw;
+  box-sizing: border-box;
+}
+
+.playerTeamOrange .playerPill {
+  background-color: #ff9800;
+  border-color: #a64a00;
+  box-shadow: 0 0.35vw 0 #a64a00;
+}
+
+.playerTeamBlue .playerPill {
+  background-color: #3f7cff;
+  border-color: #19478f;
+  box-shadow: 0 0.35vw 0 #19478f;
 }
 
 .playerPillActive {
-  background-color: #ffcf40;
-  border-color: #b28900;
-  box-shadow: 0 0.4vw 0 #da9500;
+  border-color: #ffcf40;
+  box-shadow: 0 0.35vw 0 #da9500;
 }
 
-.playerPillTop {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5vw;
-}
-
-.playerPillLabel {
-  font-size: 1.05vw;
-  color: #fff;
-  -webkit-text-stroke: 0.08vw #7f0000;
-  text-shadow: 0 0.12vw 0 #5c0000;
+.playerTeamOrange .playerPillActive,
+.playerTeamBlue .playerPillActive {
+  border-color: #ffcf40;
+  box-shadow: 0 0.35vw 0 #da9500;
 }
 
 .connectionDot {
@@ -208,8 +261,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 1.15vw;
-  color: #7f0000;
+  font-size: 1.05vw;
+  color: #fff;
+  -webkit-text-stroke: 0.06vw rgba(92, 0, 0, 0.9);
+  text-shadow: 0 0.12vw 0 rgba(92, 0, 0, 0.75);
 }
 
 .compactNotice {
@@ -277,6 +332,51 @@
   font-size: 1.4vw;
   text-align: center;
   z-index: 30;
+}
+
+.roundOverlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(92, 0, 0, 0.28);
+  pointer-events: none;
+  z-index: 900;
+  font-family: "Cherry Bomb One", system-ui;
+}
+
+.roundOverlayCard {
+  min-width: 22vw;
+  padding: 1.5vw 2.2vw 1.9vw 2.2vw;
+  box-sizing: border-box;
+  background-color: #d18d8d;
+  border: 0.35vw solid #c62828;
+  border-radius: 2vw;
+  box-shadow: 0 0.8vw 0 #7f0000;
+  text-align: center;
+}
+
+.roundOverlayTitle {
+  font-size: 2.6vw;
+  color: #fff;
+  -webkit-text-stroke: 0.16vw #7f0000;
+  text-shadow: 0 0.2vw 0 #5c0000;
+}
+
+.roundOverlayText {
+  font-size: 1.7vw;
+  color: #ffcf40;
+  -webkit-text-stroke: 0.1vw #7f0000;
+  text-shadow: 0 0.15vw 0 #5c0000;
+}
+
+.roundOverlayValue {
+  font-size: 6vw;
+  line-height: 1;
+  color: #fff;
+  -webkit-text-stroke: 0.25vw #7f0000;
+  text-shadow: 0 0.35vw 0 #5c0000;
 }
 
 .modalOverlay {
@@ -402,17 +502,19 @@
     gap: min(1.5vw, 0.75dvh);
   }
 
-  .teamTrackerLabel {
-    font-size: min(3.5vw, 1.75dvh);
-    -webkit-text-stroke: min(0.2vw, 0.1dvh) #7f0000;
-  }
-
-  .teamTrackerLabelActive {
-    -webkit-text-stroke: min(0.2vw, 0.1dvh) #b28900;
+  .scoreDotOrange.scoreDotFilled,
+  .scoreDotBlue.scoreDotFilled {
+    box-shadow: inset 0 min(0.3vw, 0.15dvh) 0 rgba(255, 255, 255, 0.28);
   }
 
   .readyButton {
     box-shadow: 0 min(1vw, 0.5dvh) 0 #1b5e20;
+  }
+
+  .readyButton:disabled,
+  .cancelReadyButton:disabled {
+    -webkit-text-stroke: min(0.2vw, 0.1dvh) #4e4e4e;
+    box-shadow: 0 min(1vw, 0.5dvh) 0 #4e4e4e;
   }
 
   .cancelReadyButton {
@@ -440,6 +542,14 @@
     gap: min(1vw, 0.5dvh);
   }
 
+  .standaloneTimer {
+    position: static;
+    min-width: 0;
+    margin-top: min(-0.5vw, -0.25dvh);
+    font-size: min(5vw, 2.5dvh);
+    -webkit-text-stroke: min(0.22vw, 0.11dvh) #7f0000;
+  }
+
   .playerPill,
   .compactNotice {
     border-width: min(0.5vw, 0.25dvh);
@@ -448,21 +558,13 @@
   }
 
   .playerPill {
-    padding: min(1.1vw, 0.55dvh) min(1.4vw, 0.7dvh);
-    gap: min(0.35vw, 0.18dvh);
+    min-height: min(5.2vw, 2.6dvh);
+    padding: min(0.8vw, 0.4dvh) min(1.2vw, 0.6dvh) min(1vw, 0.5dvh) min(1.2vw, 0.6dvh);
+    gap: min(0.8vw, 0.4dvh);
   }
 
   .playerPillActive {
     box-shadow: 0 min(0.6vw, 0.3dvh) 0 #da9500;
-  }
-
-  .playerPillTop {
-    gap: min(1vw, 0.5dvh);
-  }
-
-  .playerPillLabel {
-    font-size: min(2.3vw, 1.15dvh);
-    -webkit-text-stroke: min(0.12vw, 0.06dvh) #7f0000;
   }
 
   .connectionDot {
@@ -478,6 +580,10 @@
 
   .compactNotice {
     padding: min(1.2vw, 0.6dvh) min(1.5vw, 0.75dvh);
+  }
+
+  .playerPillName {
+    -webkit-text-stroke: min(0.1vw, 0.05dvh) rgba(92, 0, 0, 0.9);
   }
 
   .cellTeammate {
@@ -504,6 +610,29 @@
     border-width: min(0.5vw, 0.25dvh);
     border-radius: min(3vw, 1.5dvh);
     box-shadow: 0 min(0.8vw, 0.4dvh) 0 #7f0000;
+  }
+
+  .roundOverlayCard {
+    min-width: min(54vw, 27dvh);
+    padding: min(3vw, 1.5dvh) min(4vw, 2dvh) min(3.5vw, 1.75dvh) min(4vw, 2dvh);
+    border-width: min(0.7vw, 0.35dvh);
+    border-radius: min(4vw, 2dvh);
+    box-shadow: 0 min(1.4vw, 0.7dvh) 0 #7f0000;
+  }
+
+  .roundOverlayTitle {
+    font-size: min(7vw, 3.5dvh);
+    -webkit-text-stroke: min(0.35vw, 0.18dvh) #7f0000;
+  }
+
+  .roundOverlayText {
+    font-size: min(4vw, 2dvh);
+    -webkit-text-stroke: min(0.18vw, 0.09dvh) #7f0000;
+  }
+
+  .roundOverlayValue {
+    font-size: min(16vw, 8dvh);
+    -webkit-text-stroke: min(0.55vw, 0.28dvh) #7f0000;
   }
 
   .modalCard {

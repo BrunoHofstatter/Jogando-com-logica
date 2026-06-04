@@ -1,4 +1,11 @@
 import type {
+  ClassroomCode,
+  ClassroomJoinedPayload,
+  ClassroomRoomsUpdatedPayload,
+  ClassroomUnavailablePayload,
+  OpenRoomSummary,
+} from "../../../CrownChase/Logic/multiplayer/protocol";
+import type {
   MathWarEvent,
   MathWarState,
   MoveIntent,
@@ -6,6 +13,7 @@ import type {
 } from "../v2";
 
 export type MathWarRoomCode = string;
+export type { ClassroomCode, OpenRoomSummary };
 
 export type MultiplayerConnectionStatus =
   | "idle"
@@ -20,6 +28,7 @@ export type MultiplayerErrorCode =
   | "room_not_found"
   | "room_full"
   | "room_not_joinable"
+  | "classroom_not_found"
   | "not_your_turn"
   | "illegal_move"
   | "unauthorized"
@@ -33,6 +42,7 @@ export interface RoomPlayerInfo {
 
 export interface CreateRoomPayload {
   playerName: string;
+  classroomCode?: ClassroomCode;
 }
 
 export interface JoinRoomPayload {
@@ -51,6 +61,18 @@ export interface RequestRematchPayload {
 
 export interface LeaveRoomPayload {
   code: MathWarRoomCode;
+}
+
+export interface JoinClassroomPayload {
+  code: ClassroomCode;
+}
+
+export interface LeaveClassroomPayload {
+  code: ClassroomCode;
+}
+
+export interface ListOpenRoomsPayload {
+  classroomCode: ClassroomCode;
 }
 
 export interface RoomCreatedPayload {
@@ -113,6 +135,9 @@ export interface MathWarClientToServerEvents {
   submit_move: (payload: SubmitMovePayload) => void;
   request_rematch: (payload: RequestRematchPayload) => void;
   leave_room: (payload: LeaveRoomPayload) => void;
+  join_classroom: (payload: JoinClassroomPayload) => void;
+  leave_classroom: (payload: LeaveClassroomPayload) => void;
+  list_open_rooms: (payload: ListOpenRoomsPayload) => void;
 }
 
 export interface MathWarServerToClientEvents {
@@ -125,4 +150,7 @@ export interface MathWarServerToClientEvents {
   opponent_left: (payload: OpponentLeftPayload) => void;
   room_closed: (payload: RoomClosedPayload) => void;
   multiplayer_error: (payload: MultiplayerErrorPayload) => void;
+  classroom_joined: (payload: ClassroomJoinedPayload) => void;
+  classroom_rooms_updated: (payload: ClassroomRoomsUpdatedPayload) => void;
+  classroom_unavailable: (payload: ClassroomUnavailablePayload) => void;
 }

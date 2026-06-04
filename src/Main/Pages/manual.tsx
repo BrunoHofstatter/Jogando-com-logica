@@ -94,6 +94,14 @@ function Manual() {
           Por meio de jogos educativos e dinâmicos, o projeto busca transformar o aprendizado lógico em algo divertido, competitivo e colaborativo — mostrando que pensar logicamente também pode ser brincar.
         </p>
         <div className={styles.feedbackButtonContainer}>
+          <button
+            className={styles.feedbackButton}
+            onClick={() => {
+              window.location.href = ROUTES.CLASSROOMS;
+            }}
+          >
+            Gerenciar turmas online
+          </button>
           <div className={styles.feedbackHighlight}>
             Sua opinião é fundamental para o futuro do projeto!
           </div>
@@ -222,7 +230,7 @@ function Manual() {
             <div>
               <h3>Descrição do Jogo</h3>
               <p>
-                O Caça-Soma gera um <strong>Número Mágico</strong> e o jogador deve escolher <strong>2 ou mais números</strong> na tabela que, somados, resultem nesse valor. A tabela pode ter 25, 49 ou 100 números dependendo do nível. Se a soma estiver correta, os números utilizados ficam indisponíveis para as próximas rodadas.
+                O Caça-Soma gera um <strong>Número Mágico</strong> e o jogador deve escolher números na tabela que, somados, resultem nesse valor. A tabela pode ter 25, 49 ou 100 números dependendo da dificuldade. Se a soma estiver correta, os números utilizados ficam indisponíveis para as próximas rodadas.
               </p>
 
             </div>
@@ -237,6 +245,7 @@ function Manual() {
               <ul>
                 <li><strong>2 Jogadores:</strong> Cada um joga uma rodada, quem for mais rápido ganha o ponto. Quem fizer 5 pontos vence. (Tempo médio: 4 a 8 min)</li>
                 <li><strong>Níveis:</strong> Joga-se uma série de rodadas. Dependendo do tempo e acertos, ganha-se 1, 2 ou 3 estrelas (2 para passar). (Tempo médio: 1 a 4 min)</li>
+                <li><strong>Online:</strong> Crie uma sala privada para jogar 1 contra 1 ou 2 contra 2. No modo em duplas, cada jogador escolhe um número e acompanha a escolha do colega antes de clicar em Pronto.</li>
               </ul>
             </li>
             <li><strong>Dificuldade:</strong> Os níveis começam com tabela de 25 números pequenos. Conforme avança, a tabela cresce e os números ficam maiores.</li>

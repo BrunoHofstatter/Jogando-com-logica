@@ -1,9 +1,11 @@
 import type { Namespace, Socket } from "socket.io";
 
 import type {
+  ClassroomCode,
   CrownChaseClientToServerEvents,
   CrownChaseServerToClientEvents,
   MultiplayerErrorCode,
+  OpenRoomSummary,
   RoomPlayerInfo,
 } from "../../../src/CrownChase/Logic/multiplayer/protocol.ts";
 import type { CrownChaseState, PlayerId } from "../../../src/CrownChase/Logic/v2/index.ts";
@@ -22,6 +24,7 @@ import {
   type MultiplayerRoom,
   type RoomPlayer,
 } from "../rooms/roomTypes.ts";
+import type { ClassroomStore } from "../classrooms/classroomStore.ts";
 
 type CrownChaseNamespace = Namespace<
   CrownChaseClientToServerEvents,
@@ -33,18 +36,35 @@ type CrownChaseSocket = Socket<
   CrownChaseServerToClientEvents
 >;
 
-type CrownChaseRoom = MultiplayerRoom<CrownChaseState>;
+type CrownChaseRoom = MultiplayerRoom<CrownChaseState> & {
+  visibility: "private" | "classroom";
+  classroomCode: ClassroomCode | null;
+};
 
 const roomStore = createRoomStore<CrownChaseRoom>();
 
-export function registerRoomHandlers(io: CrownChaseNamespace): void {
+export function registerRoomHandlers(
+  io: CrownChaseNamespace,
+  classroomStore: ClassroomStore,
+): void {
   io.on("connection", (socket) => {
-    socket.on("create_room", ({ playerName }) => {
+    socket.on("create_room", ({ playerName, classroomCode }) => {
       leaveAnyExistingRoom(io, socket, "leave_room");
 
       const normalizedName = normalizePlayerName(playerName);
       if (!normalizedName) {
         emitError(socket, "invalid_name", "Digite um nome com pelo menos 2 letras.");
+        return;
+      }
+
+      const normalizedClassroomCode = classroomCode
+        ? normalizeClassroomCode(classroomCode)
+        : null;
+      const classroom = normalizedClassroomCode
+        ? classroomStore.getClassroom(normalizedClassroomCode)
+        : undefined;
+      if (classroomCode && (!classroom || classroom.gameId !== "crown_chase")) {
+        emitError(socket, "classroom_not_found", "Turma não encontrada.");
         return;
       }
 
@@ -65,6 +85,8 @@ export function registerRoomHandlers(io: CrownChaseNamespace): void {
         rematchVotes: new Set(),
         waitingTimeout: null,
         closeTimeout: null,
+        visibility: normalizedClassroomCode ? "classroom" : "private",
+        classroomCode: normalizedClassroomCode,
       };
 
       room.players[CREATOR_SEAT] = hostPlayer;
@@ -78,6 +100,7 @@ export function registerRoomHandlers(io: CrownChaseNamespace): void {
         state: room.state,
         players: serializePlayers(room),
       });
+      broadcastClassroomRooms(io, room.classroomCode);
     });
 
     socket.on("join_room", ({ code, playerName }) => {
@@ -133,6 +156,75 @@ export function registerRoomHandlers(io: CrownChaseNamespace): void {
         code: room.code,
         state: room.state,
         players: serializePlayers(room),
+      });
+      broadcastClassroomRooms(io, room.classroomCode);
+    });
+
+    socket.on("create_classroom", ({ gameId }) => {
+      if (gameId !== "crown_chase" && gameId !== "spttt" && gameId !== "math_war") {
+        emitError(socket, "unauthorized", "Esse jogo ainda não possui turmas online.");
+        return;
+      }
+
+      socket.emit("classroom_created", {
+        classroom: classroomStore.createClassroom(gameId),
+      });
+    });
+
+    socket.on("list_managed_classrooms", ({ managementTokens }) => {
+      socket.emit("managed_classrooms", {
+        classrooms: classroomStore.getManagedClassrooms(managementTokens),
+      });
+    });
+
+    socket.on("delete_classroom", ({ code, managementToken }) => {
+      const normalizedCode = normalizeClassroomCode(code);
+      const classroom = normalizedCode
+        ? classroomStore.getClassroom(normalizedCode)
+        : undefined;
+
+      if (!classroom || classroom.managementToken !== managementToken) {
+        emitError(socket, "unauthorized", "Não foi possível excluir essa turma.");
+        return;
+      }
+
+      classroomStore.deleteClassroom(classroom.code);
+      socket.emit("classroom_deleted", { code: classroom.code });
+    });
+
+    socket.on("join_classroom", ({ code }) => {
+      const normalizedCode = normalizeClassroomCode(code);
+      const classroom = normalizedCode ? classroomStore.getClassroom(normalizedCode) : undefined;
+      if (!classroom || classroom.gameId !== "crown_chase") {
+        emitError(socket, "classroom_not_found", "Turma não encontrada.");
+        return;
+      }
+
+      socket.join(getClassroomChannel(normalizedCode));
+      socket.emit("classroom_joined", {
+        classroomCode: normalizedCode,
+        openRooms: getOpenClassroomRooms(normalizedCode),
+      });
+    });
+
+    socket.on("leave_classroom", ({ code }) => {
+      const normalizedCode = normalizeClassroomCode(code);
+      if (normalizedCode) {
+        socket.leave(getClassroomChannel(normalizedCode));
+      }
+    });
+
+    socket.on("list_open_rooms", ({ classroomCode }) => {
+      const normalizedCode = normalizeClassroomCode(classroomCode);
+      const classroom = normalizedCode ? classroomStore.getClassroom(normalizedCode) : undefined;
+      if (!classroom || classroom.gameId !== "crown_chase") {
+        emitError(socket, "classroom_not_found", "Turma não encontrada.");
+        return;
+      }
+
+      socket.emit("classroom_rooms_updated", {
+        classroomCode: normalizedCode,
+        openRooms: getOpenClassroomRooms(normalizedCode),
       });
     });
 
@@ -277,6 +369,7 @@ function handlePlayerExit(
 
   if (!remainingPlayer) {
     roomStore.deleteRoom(room.code);
+    broadcastClassroomRooms(io, room.classroomCode);
     return;
   }
 
@@ -303,6 +396,7 @@ function handlePlayerExit(
       message: "A sala foi encerrada porque o outro jogador não voltou.",
     });
     roomStore.deleteRoom(latestRoom.code);
+    broadcastClassroomRooms(io, latestRoom.classroomCode);
   }, DISCONNECT_GRACE_MS);
 }
 
@@ -332,6 +426,7 @@ function closeRoomImmediately(
   }
 
   roomStore.deleteRoom(room.code);
+  broadcastClassroomRooms(io, room.classroomCode);
 }
 
 function scheduleWaitingRoomExpiry(
@@ -358,6 +453,7 @@ function scheduleWaitingRoomExpiry(
     }
 
     roomStore.deleteRoom(latestRoom.code);
+    broadcastClassroomRooms(io, latestRoom.classroomCode);
   }, WAITING_ROOM_TTL_MS);
 }
 
@@ -394,6 +490,44 @@ function serializePlayers(room: CrownChaseRoom): RoomPlayerInfo[] {
 function normalizePlayerName(playerName: string): string | null {
   const normalizedName = playerName.trim().slice(0, 20);
   return normalizedName.length >= 2 ? normalizedName : null;
+}
+
+function normalizeClassroomCode(code: string): ClassroomCode | null {
+  const normalizedCode = code.trim().toUpperCase();
+  return /^[A-HJ-KM-NP-Z]{4}$/.test(normalizedCode) ? normalizedCode : null;
+}
+
+function getClassroomChannel(classroomCode: ClassroomCode): string {
+  return `classroom:${classroomCode}`;
+}
+
+function getOpenClassroomRooms(classroomCode: ClassroomCode): OpenRoomSummary[] {
+  return [...roomStore.getRooms().values()]
+    .filter((room) =>
+      room.visibility === "classroom"
+      && room.classroomCode === classroomCode
+      && room.status === "waiting"
+      && room.players[CREATOR_SEAT]?.connected,
+    )
+    .map((room) => ({
+      code: room.code,
+      hostName: room.players[CREATOR_SEAT]?.name ?? "",
+    }))
+    .sort((left, right) => left.hostName.localeCompare(right.hostName));
+}
+
+function broadcastClassroomRooms(
+  io: CrownChaseNamespace,
+  classroomCode: ClassroomCode | null,
+): void {
+  if (!classroomCode) {
+    return;
+  }
+
+  io.to(getClassroomChannel(classroomCode)).emit("classroom_rooms_updated", {
+    classroomCode,
+    openRooms: getOpenClassroomRooms(classroomCode),
+  });
 }
 
 function emitError(

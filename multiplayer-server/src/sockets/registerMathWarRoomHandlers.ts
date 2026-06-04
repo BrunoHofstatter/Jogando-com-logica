@@ -1,9 +1,11 @@
 import type { Namespace, Socket } from "socket.io";
 
 import type {
+  ClassroomCode,
   MathWarClientToServerEvents,
   MathWarServerToClientEvents,
   MultiplayerErrorCode,
+  OpenRoomSummary,
   RoomPlayerInfo,
 } from "../../../src/MathWar/Logic/multiplayer/protocol.ts";
 import type { MathWarState, PlayerId } from "../../../src/MathWar/Logic/v2/index.ts";
@@ -22,6 +24,7 @@ import {
   type MultiplayerRoom,
   type RoomPlayer,
 } from "../rooms/roomTypes.ts";
+import type { ClassroomStore } from "../classrooms/classroomStore.ts";
 
 type MathWarNamespace = Namespace<
   MathWarClientToServerEvents,
@@ -33,18 +36,35 @@ type MathWarSocket = Socket<
   MathWarServerToClientEvents
 >;
 
-type MathWarRoom = MultiplayerRoom<MathWarState>;
+type MathWarRoom = MultiplayerRoom<MathWarState> & {
+  visibility: "private" | "classroom";
+  classroomCode: ClassroomCode | null;
+};
 
 const roomStore = createRoomStore<MathWarRoom>();
 
-export function registerMathWarRoomHandlers(io: MathWarNamespace): void {
+export function registerMathWarRoomHandlers(
+  io: MathWarNamespace,
+  classroomStore: ClassroomStore,
+): void {
   io.on("connection", (socket) => {
-    socket.on("create_room", ({ playerName }) => {
+    socket.on("create_room", ({ playerName, classroomCode }) => {
       leaveAnyExistingRoom(io, socket, "leave_room");
 
       const normalizedName = normalizePlayerName(playerName);
       if (!normalizedName) {
         emitError(socket, "invalid_name", "Digite um nome com pelo menos 2 letras.");
+        return;
+      }
+
+      const normalizedClassroomCode = classroomCode
+        ? normalizeClassroomCode(classroomCode)
+        : null;
+      const classroom = normalizedClassroomCode
+        ? classroomStore.getClassroom(normalizedClassroomCode)
+        : undefined;
+      if (classroomCode && (!classroom || classroom.gameId !== "math_war")) {
+        emitError(socket, "classroom_not_found", "Turma não encontrada.");
         return;
       }
 
@@ -65,6 +85,8 @@ export function registerMathWarRoomHandlers(io: MathWarNamespace): void {
         rematchVotes: new Set(),
         waitingTimeout: null,
         closeTimeout: null,
+        visibility: normalizedClassroomCode ? "classroom" : "private",
+        classroomCode: normalizedClassroomCode,
       };
 
       room.players[CREATOR_SEAT] = hostPlayer;
@@ -78,6 +100,7 @@ export function registerMathWarRoomHandlers(io: MathWarNamespace): void {
         state: room.state,
         players: serializePlayers(room),
       });
+      broadcastClassroomRooms(io, room.classroomCode);
     });
 
     socket.on("join_room", ({ code, playerName }) => {
@@ -133,6 +156,43 @@ export function registerMathWarRoomHandlers(io: MathWarNamespace): void {
         code: room.code,
         state: room.state,
         players: serializePlayers(room),
+      });
+      broadcastClassroomRooms(io, room.classroomCode);
+    });
+
+    socket.on("join_classroom", ({ code }) => {
+      const normalizedCode = normalizeClassroomCode(code);
+      const classroom = normalizedCode ? classroomStore.getClassroom(normalizedCode) : undefined;
+      if (!classroom || classroom.gameId !== "math_war") {
+        emitError(socket, "classroom_not_found", "Turma não encontrada.");
+        return;
+      }
+
+      socket.join(getClassroomChannel(normalizedCode));
+      socket.emit("classroom_joined", {
+        classroomCode: normalizedCode,
+        openRooms: getOpenClassroomRooms(normalizedCode),
+      });
+    });
+
+    socket.on("leave_classroom", ({ code }) => {
+      const normalizedCode = normalizeClassroomCode(code);
+      if (normalizedCode) {
+        socket.leave(getClassroomChannel(normalizedCode));
+      }
+    });
+
+    socket.on("list_open_rooms", ({ classroomCode }) => {
+      const normalizedCode = normalizeClassroomCode(classroomCode);
+      const classroom = normalizedCode ? classroomStore.getClassroom(normalizedCode) : undefined;
+      if (!classroom || classroom.gameId !== "math_war") {
+        emitError(socket, "classroom_not_found", "Turma não encontrada.");
+        return;
+      }
+
+      socket.emit("classroom_rooms_updated", {
+        classroomCode: normalizedCode,
+        openRooms: getOpenClassroomRooms(normalizedCode),
       });
     });
 
@@ -277,6 +337,7 @@ function handlePlayerExit(
 
   if (!remainingPlayer) {
     roomStore.deleteRoom(room.code);
+    broadcastClassroomRooms(io, room.classroomCode);
     return;
   }
 
@@ -303,6 +364,7 @@ function handlePlayerExit(
       message: "A sala foi encerrada porque o outro jogador não voltou.",
     });
     roomStore.deleteRoom(latestRoom.code);
+    broadcastClassroomRooms(io, latestRoom.classroomCode);
   }, DISCONNECT_GRACE_MS);
 }
 
@@ -332,6 +394,7 @@ function closeRoomImmediately(
   }
 
   roomStore.deleteRoom(room.code);
+  broadcastClassroomRooms(io, room.classroomCode);
 }
 
 function scheduleWaitingRoomExpiry(
@@ -358,6 +421,7 @@ function scheduleWaitingRoomExpiry(
     }
 
     roomStore.deleteRoom(latestRoom.code);
+    broadcastClassroomRooms(io, latestRoom.classroomCode);
   }, WAITING_ROOM_TTL_MS);
 }
 
@@ -394,6 +458,44 @@ function serializePlayers(room: MathWarRoom): RoomPlayerInfo[] {
 function normalizePlayerName(playerName: string): string | null {
   const normalizedName = playerName.trim().slice(0, 20);
   return normalizedName.length >= 2 ? normalizedName : null;
+}
+
+function normalizeClassroomCode(code: string): ClassroomCode | null {
+  const normalizedCode = code.trim().toUpperCase();
+  return /^[A-HJ-KM-NP-Z]{4}$/.test(normalizedCode) ? normalizedCode : null;
+}
+
+function getClassroomChannel(classroomCode: ClassroomCode): string {
+  return `classroom:${classroomCode}`;
+}
+
+function getOpenClassroomRooms(classroomCode: ClassroomCode): OpenRoomSummary[] {
+  return [...roomStore.getRooms().values()]
+    .filter((room) =>
+      room.visibility === "classroom"
+      && room.classroomCode === classroomCode
+      && room.status === "waiting"
+      && room.players[CREATOR_SEAT]?.connected,
+    )
+    .map((room) => ({
+      code: room.code,
+      hostName: room.players[CREATOR_SEAT]?.name ?? "",
+    }))
+    .sort((left, right) => left.hostName.localeCompare(right.hostName));
+}
+
+function broadcastClassroomRooms(
+  io: MathWarNamespace,
+  classroomCode: ClassroomCode | null,
+): void {
+  if (!classroomCode) {
+    return;
+  }
+
+  io.to(getClassroomChannel(classroomCode)).emit("classroom_rooms_updated", {
+    classroomCode,
+    openRooms: getOpenClassroomRooms(classroomCode),
+  });
 }
 
 function emitError(

@@ -28,6 +28,7 @@ import { registerCacaSomaRoomHandlers } from "./sockets/registerCacaSomaRoomHand
 import { registerMathWarRoomHandlers } from "./sockets/registerMathWarRoomHandlers.ts";
 import { registerStopRoomHandlers } from "./sockets/registerStopRoomHandlers.ts";
 import { registerSptttRoomHandlers } from "./sockets/registerSptttRoomHandlers.ts";
+import { createClassroomStore } from "./classrooms/classroomStore.ts";
 
 export function createMultiplayerServer() {
   const app = express();
@@ -69,11 +70,22 @@ export function createMultiplayerServer() {
     SptttServerToClientEvents
   >;
 
-  registerRoomHandlers(crownChaseNamespace);
+  const classroomStore = createClassroomStore((classroomCode) => {
+    const payload = {
+      classroomCode,
+      message: "Essa turma não está mais disponível.",
+    };
+
+    crownChaseNamespace.to(getClassroomChannel(classroomCode)).emit("classroom_unavailable", payload);
+    sptttNamespace.to(getClassroomChannel(classroomCode)).emit("classroom_unavailable", payload);
+    mathWarNamespace.to(getClassroomChannel(classroomCode)).emit("classroom_unavailable", payload);
+  });
+
+  registerRoomHandlers(crownChaseNamespace, classroomStore);
   registerCacaSomaRoomHandlers(cacaSomaNamespace);
-  registerMathWarRoomHandlers(mathWarNamespace);
+  registerMathWarRoomHandlers(mathWarNamespace, classroomStore);
   registerStopRoomHandlers(stopNamespace);
-  registerSptttRoomHandlers(sptttNamespace);
+  registerSptttRoomHandlers(sptttNamespace, classroomStore);
 
   return {
     app,
@@ -91,4 +103,8 @@ function resolveAllowedOrigins(rawValue: string | undefined): string[] {
     .split(",")
     .map((origin) => origin.trim())
     .filter((origin) => origin.length > 0);
+}
+
+function getClassroomChannel(classroomCode: string): string {
+  return `classroom:${classroomCode}`;
 }

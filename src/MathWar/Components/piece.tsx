@@ -45,12 +45,6 @@ const PieceComponent: React.FC<PieceProps> = ({
     shape: piece.type === "sumDiag" ? "square" : "circle",
   };
 
-  const pieceTitle = piece.isCaptain
-    ? `${piece.type === "sumDiag" ? "Soma quadrada" : "Soma redonda"} - Capitão`
-    : piece.type === "sumDiag"
-      ? "Soma quadrada"
-      : "Soma redonda";
-
   return (
     <div
       className={`${styles.piece} ${piece.owner === 0 ? styles.pieceRed : styles.pieceBlue} ${styles[piece.type] || ""} ${display.shape === "square" ? styles.pieceSquare : styles.pieceCircle} ${isSelected ? styles.pieceSelected : ""}`}
@@ -65,7 +59,6 @@ const PieceComponent: React.FC<PieceProps> = ({
         event.stopPropagation();
         onPieceClick();
       }}
-      title={pieceTitle}
     >
       <div className={styles.pieceContent}>
         <div className={styles.pieceValueText}>

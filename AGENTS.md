@@ -2,6 +2,10 @@
 
 ##### ALWAYS ANSWER IN ENGLISH
 
+## Communication Note
+
+- User messages may come from voice transcription and can contain unintended wording or minor errors. Infer the likely intent from context and only ask for clarification when the meaning is genuinely ambiguous or the decision is important.
+
 **Jogando com Lógica** is a free educational game platform teaching logic and math to Brazilian public school students (ages 8-13). No login required, instant play. All user-facing text must be in Brazilian Portuguese.
 
 ## Commands
@@ -13,6 +17,11 @@ npm run lint       # ESLint
 npm run deploy     # Build and deploy to GitHub Pages
 npm run preview    # Preview production build
 ```
+
+## Verification
+
+- Browser-based visual verification, screenshots, Playwright checks, and local website preview checks are prohibited by default. Only use them when the user explicitly gives permission for that task.
+- Code-only checks such as `npm run build`, `npm run lint`, tests, or diffs are still allowed when relevant.
 
 ## Tech Stack
 
@@ -49,6 +58,7 @@ Routes follow the pattern `/{game}Pg` (play) and `/{game}Rg` (rules). `RubiksCla
 ## Key Constraints
 
 - All UI text must be in Brazilian Portuguese
+- Preserve Portuguese accents directly in UTF-8 source files (for example `não`, `código`, `Você`). Do not commit mojibake such as `nÃ£o`, `cÃ³digo`, or `VocÃª`.
 - No login and no external APIs. Games must work offline after first load
 - Performance matters. School computers may be slow, so keep bundles lean
 - **Windows reserved filenames:** Never create files named `CON`, `PRN`, `AUX`, `NUL`, `COM1-9`, or `LPT1-9` with or without extensions
@@ -74,6 +84,7 @@ Deeper project context lives in `.agents/rules/`. Read these when relevant:
 | `docs_games_overview.md` | Need the full game catalog at a glance |
 | `docs_general.md` | Need overall project context, positioning, current priorities, or future plans |
 | `docs_multiplayer_backend.md` | Working on online multiplayer architecture, backend deployment, or adding multiplayer to another game |
+| `docs_classroom_system.md` | Working on classroom codes, classroom room browsers, or adding classroom support to another online game |
 | `docs_teacher_manual.md` | Working on the `/manual` page or teacher-facing content |
 | `googleanalytics.md` | Adding or modifying GA4 event tracking |
 

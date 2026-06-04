@@ -1,0 +1,194 @@
+.page {
+  min-height: 100dvh;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  padding: 5vw;
+  background-color: #68c2e0;
+  font-family: "Cherry Bomb One", system-ui;
+}
+
+.panel {
+  width: min(82vw, 110dvh);
+  height: fit-content;
+  box-sizing: border-box;
+  padding: 3vw;
+  border: 0.4vw solid #060e13;
+  border-radius: 3vw;
+  background-color: #286a83;
+  box-shadow: 0 1vw 0 #060e13;
+  color: #fff;
+}
+
+.panel h1 {
+  margin: 0 0 1vw;
+  color: #ffcf40;
+  font-size: min(6vw, 8dvh);
+  font-weight: 400;
+  text-align: center;
+  -webkit-text-stroke: 0.2vw #060e13;
+  text-shadow: 0 0.5vw 0 #060e13;
+}
+
+.description,
+.emptyText,
+.detail,
+.errorText,
+.feedback {
+  font-size: min(2vw, 3.2dvh);
+  -webkit-text-stroke: 0.08vw #060e13;
+}
+
+.description,
+.emptyText,
+.errorText,
+.feedback {
+  text-align: center;
+}
+
+.classroomList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5vw;
+  margin-top: 2vw;
+}
+
+.gamePicker {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1vw;
+  margin: 0 auto 2vw;
+}
+
+.classroomCard {
+  display: flex;
+  justify-content: space-between;
+  gap: 2vw;
+  padding: 1.5vw;
+  border: 0.3vw solid #060e13;
+  border-radius: 2vw;
+  background-color: #68c2e0;
+  box-shadow: 0 0.6vw 0 #060e13;
+}
+
+.code {
+  color: #ffcf40;
+  font-size: min(5vw, 7dvh);
+  letter-spacing: 0.6vw;
+  -webkit-text-stroke: 0.16vw #060e13;
+}
+
+.detail {
+  margin: 0.4vw 0;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1vw;
+}
+
+.primaryButton,
+.secondaryButton,
+.deleteButton,
+.gameButton {
+  border: 0.3vw solid #060e13;
+  border-radius: 1.6vw;
+  padding: 0.8vw 1.3vw 1vw;
+  color: #fff;
+  font-family: inherit;
+  font-size: min(2vw, 3dvh);
+  cursor: pointer;
+  -webkit-text-stroke: 0.08vw #060e13;
+  box-shadow: 0 0.5vw 0 #060e13;
+}
+
+.primaryButton {
+  display: block;
+  margin: 2vw auto;
+  background-color: #f5a623;
+}
+
+.secondaryButton {
+  background-color: #286a83;
+}
+
+.deleteButton {
+  background-color: #ef4444;
+}
+
+.gameButton {
+  background-color: #68c2e0;
+}
+
+.primaryButton:disabled {
+  filter: grayscale(1);
+  cursor: not-allowed;
+}
+
+.errorText {
+  color: #fee2e2;
+}
+
+.feedback {
+  color: #dcfce7;
+}
+
+@media (orientation: portrait) and (max-width: 650px) {
+  .page {
+    padding: min(18vw, 10dvh) 4vw 6vw;
+  }
+
+  .panel {
+    width: 100%;
+    padding: 5vw;
+    border-width: 0.8vw;
+    border-radius: 6vw;
+    box-shadow: 0 1.5vw 0 #060e13;
+  }
+
+  .panel h1 {
+    font-size: min(12vw, 7dvh);
+    -webkit-text-stroke-width: min(0.5vw, 0.3dvh);
+  }
+
+  .description,
+  .emptyText,
+  .detail,
+  .errorText,
+  .feedback {
+    font-size: min(5vw, 3dvh);
+  }
+
+  .classroomList,
+  .actions,
+  .gamePicker {
+    gap: 3vw;
+  }
+
+  .gamePicker {
+    grid-template-columns: 1fr;
+  }
+
+  .classroomCard {
+    flex-direction: column;
+    padding: 4vw;
+    border-width: 0.6vw;
+    border-radius: 4vw;
+  }
+
+  .code {
+    font-size: min(14vw, 8dvh);
+  }
+
+  .primaryButton,
+  .secondaryButton,
+  .deleteButton,
+  .gameButton {
+    border-width: 0.6vw;
+    border-radius: 4vw;
+    padding: 2.5vw 3vw 3vw;
+    font-size: min(5vw, 3dvh);
+  }
+}

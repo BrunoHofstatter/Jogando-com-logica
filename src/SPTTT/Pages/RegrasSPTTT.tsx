@@ -26,7 +26,7 @@ function SPTTTRulesPage() {
   const [showDetailedRules, setShowDetailedRules] = useState(false);
   const [, resetTutorial] = useTutorialCompleted("spttt_v1");
   const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const { isUnlocked, resetProgress } = useDifficultyLock("spttt");
+  const { isUnlocked, unlockAll, resetProgress } = useDifficultyLock("spttt");
 
   function startGame() {
     if (gameMode === "ai") {
@@ -69,15 +69,15 @@ function SPTTTRulesPage() {
   const getDifficultyName = (level: number) => {
     switch (level) {
       case 1:
-        return "Muito FÃ¡cil";
+        return "Muito Fácil";
       case 2:
-        return "FÃ¡cil";
+        return "Fácil";
       case 3:
-        return "MÃ©dio";
+        return "Médio";
       case 4:
-        return "DifÃ­cil";
+        return "Difícil";
       default:
-        return "Muito FÃ¡cil";
+        return "Muito Fácil";
     }
   };
 
@@ -92,6 +92,11 @@ function SPTTTRulesPage() {
     resetProgress();
     setAiDifficulty(1);
     setShowResetConfirm(false);
+  };
+
+  const unlockAllDifficulties = () => {
+    unlockAll();
+    alert("Todas as dificuldades foram desbloqueadas!");
   };
 
   return (
@@ -134,8 +139,8 @@ function SPTTTRulesPage() {
                 }`}
                 onClick={toggleDifficulty}
               >
-                {!difficultyUnlocked && <span>ðŸ”’ </span>}
-                NÃ­vel: {getDifficultyName(aiDifficulty)}
+                {!difficultyUnlocked && <span>🔒 </span>}
+                Nível: {getDifficultyName(aiDifficulty)}
                 {!difficultyUnlocked && (
                   <div className={styles.difficultyTooltip}>
                     {getTooltipText()}
@@ -199,37 +204,37 @@ function SPTTTRulesPage() {
 
               <h3 className={styles.rulesTitle}>Como Jogar</h3>
               <p className={styles.rulesText}>
-                InÃ­cio: O jogador <span className={styles.rulesStrong}>X</span> comeÃ§a
+                Início: O jogador <span className={styles.rulesStrong}>X</span> começa
                 a partida.
               </p>
               <p className={styles.rulesText}>
                 <span className={styles.rulesSpan}>Jogada:</span> Em seu turno, o
                 jogador escolhe uma casa em um dos{" "}
                 <span className={styles.rulesStrong}>tabuleiros menores</span>{" "}
-                disponÃ­veis e coloca o seu sÃ­mbolo ("X" ou "O").
+                disponíveis e coloca o seu símbolo ("X" ou "O").
               </p>
               <p className={styles.rulesText}>
-                <span className={styles.rulesSpan}>O prÃ³ximo movimento:</span> A
-                localizaÃ§Ã£o da casa escolhida{" "}
+                <span className={styles.rulesSpan}>O próximo movimento:</span> A
+                localização da casa escolhida{" "}
                 <span className={styles.rulesStrong}>dentro</span> do tabuleiro
                 menor determina em{" "}
                 <span className={styles.rulesStrong}>
-                  qual tabuleiro menor o prÃ³ximo jogador deve jogar
+                  qual tabuleiro menor o próximo jogador deve jogar
                 </span>
                 .
               </p>
               <p className={styles.rulesText}>
-                <span className={styles.rulesSpan}>Exemplo:</span> Se vocÃª jogar no
-                quadrado central (posiÃ§Ã£o 5) de um tabuleiro menor, o prÃ³ximo
-                jogador serÃ¡ enviado para o tabuleiro menor que estÃ¡ na posiÃ§Ã£o
+                <span className={styles.rulesSpan}>Exemplo:</span> Se você jogar no
+                quadrado central (posição 5) de um tabuleiro menor, o próximo
+                jogador será enviado para o tabuleiro menor que está na posição
                 central do tabuleiro principal.
               </p>
 
               <h3 className={styles.rulesTitle}>
-                Jogando em Tabuleiros JÃ¡ Decididos
+                Jogando em Tabuleiros Já Decididos
               </h3>
               <p className={styles.rulesText}>
-                Se o prÃ³ximo jogador for direcionado para um tabuleiro menor que jÃ¡
+                Se o próximo jogador for direcionado para um tabuleiro menor que já
                 foi <span className={styles.rulesStrong}>vencido ou empatado</span>,
                 ele ganha a liberdade de jogar em{" "}
                 <span className={styles.rulesStrong}>
@@ -240,30 +245,30 @@ function SPTTTRulesPage() {
 
               <h3 className={styles.rulesTitle}>Vencendo um Tabuleiro Menor</h3>
               <p className={styles.rulesText}>
-                Um tabuleiro menor Ã© vencido quando um jogador consegue alinhar 3
-                dos seus sÃ­mbolos (em linha, coluna ou diagonal).
+                Um tabuleiro menor é vencido quando um jogador consegue alinhar 3
+                dos seus símbolos (em linha, coluna ou diagonal).
               </p>
               <p className={styles.rulesText}>
-                Esse tabuleiro Ã© entÃ£o marcado no tabuleiro principal com um{" "}
+                Esse tabuleiro é então marcado no tabuleiro principal com um{" "}
                 <span className={styles.rulesStrong}>X grande</span> ou{" "}
-                <span className={styles.rulesStrong}>O grande</span> e nÃ£o pode mais
+                <span className={styles.rulesStrong}>O grande</span> e não pode mais
                 ser jogado.
               </p>
 
               <h3 className={styles.rulesTitle}>Vencendo o Jogo Geral</h3>
               <p className={styles.rulesText}>
-                O objetivo Ã© conquistar{" "}
+                O objetivo é conquistar{" "}
                 <span className={styles.rulesStrong}>
-                  3 tabuleiros menores em sequÃªncia
+                  3 tabuleiros menores em sequência
                 </span>{" "}
                 no tabuleiro gigante.
               </p>
 
-              <h4 className={styles.winTitle}>VitÃ³ria por TrÃªs em Linha</h4>
+              <h4 className={styles.winTitle}>Vitória por Três em Linha</h4>
               <p className={styles.winText}>
                 Conquistar{" "}
                 <span className={styles.rulesStrong}>
-                  3 tabuleiros menores em sequÃªncia
+                  3 tabuleiros menores em sequência
                 </span>{" "}
                 no tabuleiro gigante (em linha, coluna ou diagonal).
               </p>
@@ -273,7 +278,10 @@ function SPTTTRulesPage() {
                 O jogo termina em empate se todos os tabuleiros menores forem
                 preenchidos ou decididos e{" "}
                 <span className={styles.rulesStrong}>nenhum jogador</span> conseguir
-                formar 3 em linha no tabuleiro gigante.
+                formar 3 em linha no tabuleiro{" "}
+                <span onClick={unlockAllDifficulties} style={{ cursor: "text" }}>
+                  gigante.
+                </span>
               </p>
             </div>
           </div>
@@ -300,7 +308,7 @@ function SPTTTRulesPage() {
                 className={`${styles.confirmBtn} ${styles.noBtn}`}
                 onClick={() => setShowResetConfirm(false)}
               >
-                NÃ£o
+                Não
               </button>
             </div>
           </div>

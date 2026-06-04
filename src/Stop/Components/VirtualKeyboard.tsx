@@ -24,13 +24,35 @@ const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
     useEffect(() => {
         if (isVisible && targetRect) {
             const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
             const isMobilePortrait = window.matchMedia("(orientation: portrait) and (max-width: 650px)").matches;
+            const isTouchLandscape = window.matchMedia("(pointer: coarse) and (orientation: landscape)").matches;
 
             const newStyle: React.CSSProperties = {
                 visibility: "visible",
+                top: "auto",
+                right: "auto",
+                bottom: "auto",
+                left: "auto",
+                transform: "none",
             };
 
-            if (isMobilePortrait) {
+            if (isTouchLandscape) {
+                const boardRect = document.querySelector<HTMLElement>('[data-target="board"]')?.getBoundingClientRect();
+                const keyboardCenter = boardRect
+                    ? boardRect.left + boardRect.width / 2
+                    : viewportWidth / 2;
+
+                // Touch Landscape: keep a compact keypad centered on the board, opposite the selected row.
+                if (targetRect.top + targetRect.height / 2 > viewportHeight / 2) {
+                    newStyle.top = "3dvh";
+                } else {
+                    newStyle.bottom = "3dvh";
+                }
+
+                newStyle.left = `${keyboardCenter}px`;
+                newStyle.transform = "translateX(-50%)";
+            } else if (isMobilePortrait) {
                 // Mobile Portrait: Center vertically, place on opposite column
                 newStyle.top = "25dvh";
                 if (targetRect.left < viewportWidth / 2) {
