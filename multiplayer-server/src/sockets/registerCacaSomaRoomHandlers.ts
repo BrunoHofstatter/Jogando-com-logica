@@ -2,9 +2,11 @@ import type { Namespace, Socket } from "socket.io";
 
 import type {
   CacaSomaClientToServerEvents,
+  CacaSomaOpenRoomSummary,
   CacaSomaRoomSeat,
   CacaSomaRoomSettings,
   CacaSomaServerToClientEvents,
+  ClassroomCode,
   MultiplayerErrorCode,
   RoomPlayerInfo,
 } from "../../../src/Caca_soma/Logic/multiplayer/protocol.ts";
@@ -26,6 +28,7 @@ import {
 } from "../cacaSoma/cacaSomaRoomTypes.ts";
 import { generateRoomCode } from "../rooms/roomCode.ts";
 import { createRoomStore } from "../rooms/roomStore.ts";
+import type { ClassroomStore } from "../classrooms/classroomStore.ts";
 
 type CacaSomaNamespace = Namespace<
   CacaSomaClientToServerEvents,
@@ -45,9 +48,12 @@ const DEFAULT_ROOM_SETTINGS: CacaSomaRoomSettings = {
   targetScore: 3,
 };
 
-export function registerCacaSomaRoomHandlers(io: CacaSomaNamespace): void {
+export function registerCacaSomaRoomHandlers(
+  io: CacaSomaNamespace,
+  classroomStore: ClassroomStore,
+): void {
   io.on("connection", (socket) => {
-    socket.on("create_room", ({ playerName }) => {
+    socket.on("create_room", ({ playerName, classroomCode }) => {
       leaveAnyExistingRoom(io, socket);
 
       const normalizedName = normalizePlayerName(playerName);
@@ -56,10 +62,23 @@ export function registerCacaSomaRoomHandlers(io: CacaSomaNamespace): void {
         return;
       }
 
+      const normalizedClassroomCode = classroomCode
+        ? normalizeClassroomCode(classroomCode)
+        : null;
+      const classroom = normalizedClassroomCode
+        ? classroomStore.getClassroom(normalizedClassroomCode)
+        : undefined;
+      if (classroomCode && !classroom) {
+        emitError(socket, "classroom_not_found", "Turma não encontrada.");
+        return;
+      }
+
       const roomCode = generateRoomCode(new Set(roomStore.getRooms().keys()));
       const now = Date.now();
       const room: CacaSomaRoom = {
         code: roomCode,
+        visibility: normalizedClassroomCode ? "classroom" : "private",
+        classroomCode: normalizedClassroomCode,
         settings: DEFAULT_ROOM_SETTINGS,
         state: null,
         status: "waiting",
@@ -83,6 +102,7 @@ export function registerCacaSomaRoomHandlers(io: CacaSomaNamespace): void {
         state: room.state,
         players: serializePlayers(room),
       });
+      broadcastClassroomRooms(io, room.classroomCode);
     });
 
     socket.on("join_room", ({ code, playerName }) => {
@@ -128,6 +148,7 @@ export function registerCacaSomaRoomHandlers(io: CacaSomaNamespace): void {
 
       emitRoomUpdated(io, room);
       scheduleWaitingRoomExpiry(io, room);
+      broadcastClassroomRooms(io, room.classroomCode);
     });
 
     socket.on("update_room_settings", ({ code, settingsPatch }) => {
@@ -174,6 +195,7 @@ export function registerCacaSomaRoomHandlers(io: CacaSomaNamespace): void {
       room.rematchVotes.clear();
       emitRoomUpdated(io, room);
       scheduleWaitingRoomExpiry(io, room);
+      broadcastClassroomRooms(io, room.classroomCode);
     });
 
     socket.on("start_match", ({ code }) => {
@@ -222,6 +244,44 @@ export function registerCacaSomaRoomHandlers(io: CacaSomaNamespace): void {
         settings: room.settings,
         state: room.state,
         players: serializePlayers(room),
+      });
+      broadcastClassroomRooms(io, room.classroomCode);
+    });
+
+    socket.on("join_classroom", ({ code }) => {
+      const normalizedCode = normalizeClassroomCode(code);
+      const classroom = normalizedCode ? classroomStore.getClassroom(normalizedCode) : undefined;
+      if (!normalizedCode || !classroom) {
+        emitError(socket, "classroom_not_found", "Turma não encontrada.");
+        return;
+      }
+
+      socket.join(getClassroomChannel(normalizedCode));
+      socket.emit("classroom_joined", {
+        classroomCode: normalizedCode,
+        expiresAt: classroom.expiresAt,
+        openRooms: getOpenClassroomRooms(normalizedCode),
+      });
+    });
+
+    socket.on("leave_classroom", ({ code }) => {
+      const normalizedCode = normalizeClassroomCode(code);
+      if (normalizedCode) {
+        socket.leave(getClassroomChannel(normalizedCode));
+      }
+    });
+
+    socket.on("list_open_rooms", ({ classroomCode }) => {
+      const normalizedCode = normalizeClassroomCode(classroomCode);
+      const classroom = normalizedCode ? classroomStore.getClassroom(normalizedCode) : undefined;
+      if (!normalizedCode || !classroom) {
+        emitError(socket, "classroom_not_found", "Turma não encontrada.");
+        return;
+      }
+
+      socket.emit("classroom_rooms_updated", {
+        classroomCode: normalizedCode,
+        openRooms: getOpenClassroomRooms(normalizedCode),
       });
     });
 
@@ -377,6 +437,7 @@ function handlePlayerExit(
 
     emitRoomUpdated(io, room);
     scheduleWaitingRoomExpiry(io, room);
+    broadcastClassroomRooms(io, room.classroomCode);
     return;
   }
 
@@ -440,6 +501,7 @@ function closeRoomImmediately(
   });
 
   roomStore.deleteRoom(room.code);
+  broadcastClassroomRooms(io, room.classroomCode);
 }
 
 function scheduleWaitingRoomExpiry(
@@ -467,6 +529,7 @@ function scheduleWaitingRoomExpiry(
       message: "A sala expirou porque a partida não começou a tempo.",
     });
     roomStore.deleteRoom(latestRoom.code);
+    broadcastClassroomRooms(io, latestRoom.classroomCode);
   }, CACA_SOMA_WAITING_ROOM_TTL_MS);
 }
 
@@ -564,6 +627,50 @@ function emitRoomUpdated(io: CacaSomaNamespace, room: CacaSomaRoom): void {
     settings: room.settings,
     state: room.state,
     players: serializePlayers(room),
+  });
+}
+
+function normalizeClassroomCode(code: string): ClassroomCode | null {
+  const normalizedCode = code.trim().toUpperCase();
+  return /^[A-HJ-KM-NP-Z]{4}$/.test(normalizedCode) ? normalizedCode : null;
+}
+
+function getClassroomChannel(classroomCode: ClassroomCode): string {
+  return `classroom:${classroomCode}`;
+}
+
+function getOpenClassroomRooms(classroomCode: ClassroomCode): CacaSomaOpenRoomSummary[] {
+  return [...roomStore.getRooms().values()]
+    .filter((room) =>
+      room.visibility === "classroom"
+      && room.classroomCode === classroomCode
+      && room.status === "waiting"
+      && room.players[0]?.connected
+      && getAvailableSeat(room) !== null,
+    )
+    .map((room) => ({
+      code: room.code,
+      hostName: room.players[0]?.name ?? "",
+      mode: room.settings.mode,
+      playerCount: getActiveRegisteredPlayers(room).length,
+      capacity: getRoomCapacity(room.settings),
+      difficultyId: room.settings.difficultyId,
+      targetScore: room.settings.targetScore,
+    }))
+    .sort((left, right) => left.hostName.localeCompare(right.hostName));
+}
+
+function broadcastClassroomRooms(
+  io: CacaSomaNamespace,
+  classroomCode: ClassroomCode | null,
+): void {
+  if (!classroomCode) {
+    return;
+  }
+
+  io.to(getClassroomChannel(classroomCode)).emit("classroom_rooms_updated", {
+    classroomCode,
+    openRooms: getOpenClassroomRooms(classroomCode),
   });
 }
 

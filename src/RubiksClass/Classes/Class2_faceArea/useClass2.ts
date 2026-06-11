@@ -1,8 +1,29 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { HighlightRegion } from "../../Components/RubiksCube";
 
-export type Class2Phase = "question" | "hint1" | "hint2" | "hint3" | "transition" | "summary";
+export type Class2Phase = "question" | "hint1" | "hint2" | "transition" | "summary";
+
+export interface LessonOption {
+    label: string;
+    value: string;
+}
+
+interface LessonHint {
+    text: string;
+    highlightRegion: HighlightRegion | HighlightRegion[] | null;
+    dimInactive?: boolean;
+    showIndices?: boolean;
+    showCounting?: boolean;
+}
+
+interface LessonStep {
+    cubeSize: number;
+    question: string;
+    options: LessonOption[];
+    correctAnswer: string;
+    hints: LessonHint[];
+}
 
 export interface CubeProps {
     size: number;
@@ -14,12 +35,14 @@ export interface CubeProps {
 }
 
 export interface UiProps {
-    options: number[];
+    options: LessonOption[];
+    question: string;
     currentPhase: Class2Phase;
     feedbackText: string;
-    handleGuess: (guessedAnswer: number) => void;
+    handleGuess: (guessedAnswer: string) => void;
     totalFlags: number;
-    currentLevelIndex: number;
+    currentStepIndex: number;
+    totalSteps: number;
     timer: number;
 }
 
@@ -28,190 +51,338 @@ export interface UseClass2Return {
     uiProps: UiProps;
 }
 
-const LEVELS = [2, 3, 4, 5, 6];
+const numericOptions = (values: number[]): LessonOption[] =>
+    values.map((value) => ({ label: String(value), value: String(value) }));
+
+const expressionOptions = (values: string[]): LessonOption[] =>
+    values.map((value) => ({ label: value, value }));
+
+const LESSON_STEPS: LessonStep[] = [
+    {
+        cubeSize: 3,
+        question: "Quantas linhas há em uma face do cubo?",
+        options: numericOptions([1, 6, 3, 10, 2, 9]),
+        correctAnswer: "3",
+        hints: [
+            {
+                text: "Uma linha atravessa a face de um lado até o outro.",
+                highlightRegion: { type: "row", index: 0 },
+                dimInactive: true,
+            },
+            {
+                text: "Conte as linhas de cima para baixo: 1, 2, 3.",
+                highlightRegion: { type: "col", index: 0 },
+                dimInactive: true,
+                showIndices: true,
+                showCounting: true,
+            },
+        ],
+    },
+    {
+        cubeSize: 3,
+        question: "Quantos quadradinhos há em cada linha?",
+        options: numericOptions([9, 2, 10, 3, 6, 1]),
+        correctAnswer: "3",
+        hints: [
+            {
+                text: "Observe apenas uma linha da face.",
+                highlightRegion: { type: "row", index: 0 },
+                dimInactive: true,
+            },
+            {
+                text: "Conte os quadradinhos desta linha: 1, 2, 3.",
+                highlightRegion: { type: "row", index: 0 },
+                dimInactive: true,
+                showIndices: true,
+                showCounting: true,
+            },
+        ],
+    },
+    {
+        cubeSize: 3,
+        question: "Quanto é 3 × 3?",
+        options: numericOptions([8, 3, 10, 0, 9, 6]),
+        correctAnswer: "9",
+        hints: [
+            {
+                text: "3 × 3 é igual a 3 + 3 + 3.",
+                highlightRegion: { type: "face", index: 0 },
+            },
+        ],
+    },
+    {
+        cubeSize: 3,
+        question: "Então, quantos quadradinhos há em uma face?",
+        options: numericOptions([6, 10, 9, 3, 0, 8]),
+        correctAnswer: "9",
+        hints: [
+            {
+                text: "Lembre-se: são 3 linhas com 3 quadradinhos em cada linha.",
+                highlightRegion: [
+                    { type: "row", index: 0 },
+                    { type: "col", index: 0 },
+                ],
+                dimInactive: true,
+            },
+            {
+                text: "Juntando todos: 3 × 3 = 9 quadradinhos.",
+                highlightRegion: { type: "face", index: 0 },
+                showIndices: true,
+                showCounting: true,
+            },
+        ],
+    },
+    {
+        cubeSize: 2,
+        question: "Quantas linhas e quantos quadradinhos por linha há nesta face?",
+        options: numericOptions([4, 1, 6, 2, 5, 3]),
+        correctAnswer: "2",
+        hints: [
+            {
+                text: "Nesta face, a quantidade de linhas é igual à quantidade de quadradinhos por linha.",
+                highlightRegion: [
+                    { type: "row", index: 0 },
+                    { type: "col", index: 0 },
+                ],
+                dimInactive: true,
+            },
+            {
+                text: "Conte: são 2 linhas e 2 quadradinhos em cada linha.",
+                highlightRegion: { type: "row", index: 0 },
+                dimInactive: true,
+                showIndices: true,
+                showCounting: true,
+            },
+        ],
+    },
+    {
+        cubeSize: 2,
+        question: "Quanto é 2 × 2?",
+        options: numericOptions([3, 8, 2, 5, 4, 6]),
+        correctAnswer: "4",
+        hints: [
+            {
+                text: "2 × 2 é igual a 2 + 2.",
+                highlightRegion: { type: "face", index: 0 },
+            },
+        ],
+    },
+    {
+        cubeSize: 2,
+        question: "Quantos quadradinhos há em uma face?",
+        options: numericOptions([6, 4, 8, 3, 5, 2]),
+        correctAnswer: "4",
+        hints: [
+            {
+                text: "São 2 linhas com 2 quadradinhos em cada linha.",
+                highlightRegion: [
+                    { type: "row", index: 0 },
+                    { type: "col", index: 0 },
+                ],
+                dimInactive: true,
+            },
+            {
+                text: "Calcule 2 × 2 para descobrir o total.",
+                highlightRegion: { type: "face", index: 0 },
+                showIndices: true,
+                showCounting: true,
+            },
+        ],
+    },
+    {
+        cubeSize: 4,
+        question: "Qual multiplicação calcula os quadradinhos desta face?",
+        options: expressionOptions(["4 + 4", "3 × 3", "4 × 6", "4 × 4", "2 × 2", "5 × 5"]),
+        correctAnswer: "4 × 4",
+        hints: [
+            {
+                text: "Observe quantas linhas há e quantos quadradinhos há em cada linha.",
+                highlightRegion: [
+                    { type: "row", index: 0 },
+                    { type: "col", index: 0 },
+                ],
+                dimInactive: true,
+            },
+            {
+                text: "São 4 linhas com 4 quadradinhos em cada linha.",
+                highlightRegion: [
+                    { type: "row", index: 0 },
+                    { type: "col", index: 0 },
+                ],
+                dimInactive: true,
+                showIndices: true,
+                showCounting: true,
+            },
+        ],
+    },
+    {
+        cubeSize: 4,
+        question: "Quantos quadradinhos há em uma face?",
+        options: numericOptions([12, 24, 8, 16, 4, 20]),
+        correctAnswer: "16",
+        hints: [
+            {
+                text: "Use a multiplicação que você escolheu: 4 × 4.",
+                highlightRegion: [
+                    { type: "row", index: 0 },
+                    { type: "col", index: 0 },
+                ],
+                dimInactive: true,
+            },
+            {
+                text: "4 × 4 = 16 quadradinhos.",
+                highlightRegion: { type: "face", index: 0 },
+                showIndices: true,
+                showCounting: true,
+            },
+        ],
+    },
+    {
+        cubeSize: 5,
+        question: "Quantos quadradinhos há em uma face?",
+        options: numericOptions([15, 5, 30, 20, 25, 10]),
+        correctAnswer: "25",
+        hints: [
+            {
+                text: "São 5 linhas com 5 quadradinhos em cada linha.",
+                highlightRegion: [
+                    { type: "row", index: 0 },
+                    { type: "col", index: 0 },
+                ],
+                dimInactive: true,
+            },
+            {
+                text: "Calcule 5 × 5 para descobrir o total.",
+                highlightRegion: { type: "face", index: 0 },
+                showIndices: true,
+                showCounting: true,
+            },
+        ],
+    },
+    {
+        cubeSize: 6,
+        question: "Quantos quadradinhos há em uma face?",
+        options: numericOptions([24, 36, 12, 30, 6, 18]),
+        correctAnswer: "36",
+        hints: [
+            {
+                text: "São 6 linhas com 6 quadradinhos em cada linha.",
+                highlightRegion: [
+                    { type: "row", index: 0 },
+                    { type: "col", index: 0 },
+                ],
+                dimInactive: true,
+            },
+            {
+                text: "Calcule 6 × 6 para descobrir o total.",
+                highlightRegion: { type: "face", index: 0 },
+                showIndices: true,
+                showCounting: true,
+            },
+        ],
+    },
+];
+
 const AUTO_HINT_THRESHOLD_S = 45;
-const TRANSITION_DELAY_MS = 1500;
-
-function generateOptions(targetArea: number): number[] {
-    const options = new Set<number>();
-    options.add(targetArea);
-
-    // Distractors based on common mistakes
-    if (targetArea === 4) { // 2x2
-        [2, 3, 5, 6, 8].forEach((n) => options.add(n));
-    } else if (targetArea === 9) { // 3x3
-        [6, 7, 8, 10, 12].forEach((n) => options.add(n));
-    } else if (targetArea === 16) { // 4x4
-        [8, 12, 14, 15, 20].forEach((n) => options.add(n));
-    } else if (targetArea === 25) { // 5x5
-        [10, 15, 20, 24, 30].forEach((n) => options.add(n));
-    } else if (targetArea === 36) { // 6x6
-        [12, 24, 30, 35, 42].forEach((n) => options.add(n));
-    }
-
-    // Fallback generation if not enough options
-    let offset = 1;
-    while (options.size < 6) {
-        if (targetArea - offset > 0) options.add(targetArea - offset);
-        if (options.size < 6) options.add(targetArea + offset);
-        offset++;
-    }
-
-    return Array.from(options).sort((a, b) => a - b);
-}
-
-function getFeedbackText(phase: Class2Phase, size: number): string {
-    switch (phase) {
-        case "hint1":
-            return `Para não contar um por um, vamos olhar as bordas! A linha de cima tem ${size} quadradinhos.`;
-        case "hint2":
-            return `E quantas linhas o cubo tem no total? Conte para baixo: são ${size} linhas!`;
-        case "hint3":
-            return `Se temos ${size} quadradinhos por linha, e ${size} linhas... basta multiplicar! Quanto é ${size} vezes ${size}?`;
-        case "transition":
-            return "Correto! 🎉";
-        case "summary":
-            return "Parabéns! Você completou a aula!";
-        default:
-            return "";
-    }
-}
+const TRANSITION_DELAY_MS = 1200;
 
 export function useClass2(): UseClass2Return {
     const location = useLocation();
-    const isGameMode = location.state?.mode === "game" || new URLSearchParams(location.search).get("mode") === "game";
+    const isGameMode =
+        location.state?.mode === "game" ||
+        new URLSearchParams(location.search).get("mode") === "game";
     const initialPhase: Class2Phase = isGameMode ? "summary" : "question";
 
-    const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
+    const [currentStepIndex, setCurrentStepIndex] = useState(0);
     const [phase, setPhase] = useState<Class2Phase>(initialPhase);
     const [totalFlags, setTotalFlags] = useState(0);
     const [timer, setTimer] = useState(0);
-
     const [shouldResetToFront, setShouldResetToFront] = useState(false);
     const transitionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    // Generate options for the current level
-    const currentSize = LEVELS[currentLevelIndex];
-    const currentArea = currentSize * currentSize;
-    const currentOptions = useRef(generateOptions(currentArea));
+    const currentStep = LESSON_STEPS[currentStepIndex];
 
-    // Update options when level changes
-    useEffect(() => {
-        currentOptions.current = generateOptions(
-            LEVELS[currentLevelIndex] * LEVELS[currentLevelIndex]
-        );
-    }, [currentLevelIndex]);
-
-    // --- Timer (1s interval, only during "question" phase) -------------------
     useEffect(() => {
         if (phase !== "question") return;
 
         const intervalId = setInterval(() => {
-            setTimer((prev) => {
-                const next = prev + 1;
-                if (next >= AUTO_HINT_THRESHOLD_S) {
-                    // Auto-transition to hint1
+            setTimer((previousTimer) => {
+                const nextTimer = previousTimer + 1;
+                if (nextTimer >= AUTO_HINT_THRESHOLD_S) {
                     setPhase("hint1");
-                    setTotalFlags((f) => f + 1);
+                    setTotalFlags((flags) => flags + 1);
                     setShouldResetToFront(true);
                 }
-                return next;
+                return nextTimer;
             });
         }, 1000);
 
         return () => clearInterval(intervalId);
     }, [phase]);
 
-    // --- Cleanup transition timer on unmount ---------------------------------
     useEffect(() => {
         return () => {
             if (transitionTimer.current) clearTimeout(transitionTimer.current);
         };
     }, []);
 
-    // --- handleGuess -----------------------------------------------------------
     const handleGuess = useCallback(
-        (guessedAnswer: number) => {
+        (guessedAnswer: string) => {
             if (phase === "transition" || phase === "summary") return;
 
-            const isCorrect = guessedAnswer === currentArea;
-
-            if (isCorrect) {
-                // --- Correct answer ---
+            if (guessedAnswer === currentStep.correctAnswer) {
                 setPhase("transition");
                 setShouldResetToFront(false);
 
                 transitionTimer.current = setTimeout(() => {
-                    const nextIndex = currentLevelIndex + 1;
+                    const nextStepIndex = currentStepIndex + 1;
 
-                    if (nextIndex >= LEVELS.length) {
-                        // All levels done
+                    if (nextStepIndex >= LESSON_STEPS.length) {
                         setPhase("summary");
                     } else {
-                        // Advance to next level
-                        setCurrentLevelIndex(nextIndex);
+                        setCurrentStepIndex(nextStepIndex);
                         setTimer(0);
                         setPhase("question");
-                        setShouldResetToFront(false);
                     }
                 }, TRANSITION_DELAY_MS);
-            } else {
-                // --- Wrong answer ---
-                setTotalFlags((f) => f + 1);
+                return;
+            }
 
-                if (phase === "question") {
-                    setPhase("hint1");
-                    setShouldResetToFront(true);
-                } else if (phase === "hint1") {
-                    setPhase("hint2");
-                    setShouldResetToFront(true);
-                } else if (phase === "hint2") {
-                    setPhase("hint3");
-                    setShouldResetToFront(true);
-                }
-                // hint3 → stays on hint3
+            setTotalFlags((flags) => flags + 1);
+            setShouldResetToFront(true);
+
+            if (phase === "question") {
+                setPhase("hint1");
+            } else if (phase === "hint1" && currentStep.hints.length > 1) {
+                setPhase("hint2");
             }
         },
-        [phase, currentLevelIndex, currentArea]
+        [currentStep, currentStepIndex, phase]
     );
 
-    // --- Build output ----------------------------------------------------------
-
-    const getHighlightRegion = ():
-        | HighlightRegion
-        | HighlightRegion[]
-        | null => {
-        if (phase === "hint1") return { type: "row", index: 0 };
-        if (phase === "hint2") return { type: "col", index: 0 };
-        if (phase === "hint3")
-            return [
-                { type: "row", index: 0 },
-                { type: "col", index: 0 },
-            ];
-        return null;
-    };
-
-    const isHintActive =
-        phase === "hint1" || phase === "hint2" || phase === "hint3";
+    const hintIndex = phase === "hint1" ? 0 : phase === "hint2" ? 1 : -1;
+    const activeHint = hintIndex >= 0 ? currentStep.hints[hintIndex] : null;
 
     const cubeProps: CubeProps = {
-        size: currentSize,
-        highlightRegion: getHighlightRegion(),
-        dimInactive: isHintActive,
-        // We show indices for all hints so they can see the sequential count
-        showIndices: isHintActive,
-        // We animate popIn for all hints
-        showCounting: isHintActive,
+        size: currentStep.cubeSize,
+        highlightRegion: activeHint?.highlightRegion ?? null,
+        dimInactive: activeHint?.dimInactive ?? false,
+        showIndices: activeHint?.showIndices ?? false,
+        showCounting: activeHint?.showCounting ?? false,
         resetToFront: shouldResetToFront,
     };
 
     const uiProps: UiProps = {
-        options: currentOptions.current,
+        options: currentStep.options,
+        question: currentStep.question,
         currentPhase: phase,
-        feedbackText: getFeedbackText(phase, currentSize),
+        feedbackText:
+            activeHint?.text ??
+            (phase === "transition" ? "Correto!" : phase === "summary" ? "Parabéns! Você completou a aula!" : ""),
         handleGuess,
         totalFlags,
-        currentLevelIndex,
+        currentStepIndex,
+        totalSteps: LESSON_STEPS.length,
         timer,
     };
 

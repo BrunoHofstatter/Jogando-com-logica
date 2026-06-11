@@ -7,8 +7,10 @@ import {
   type StopMultiplayerLogicErrorCode,
 } from "../../../src/Stop/Logic/multiplayer/matchLogic.ts";
 import type {
+  ClassroomCode,
   MultiplayerErrorCode,
   StopClientToServerEvents,
+  StopOpenRoomSummary,
   StopServerToClientEvents,
 } from "../../../src/Stop/Logic/multiplayer/protocol.ts";
 import {
@@ -32,6 +34,7 @@ import type {
 } from "../stop/stopRoomTypes.ts";
 import { generateRoomCode } from "../rooms/roomCode.ts";
 import { WAITING_ROOM_TTL_MS } from "../rooms/roomTypes.ts";
+import type { ClassroomStore } from "../classrooms/classroomStore.ts";
 
 type StopNamespace = Namespace<
   StopClientToServerEvents,
@@ -45,14 +48,28 @@ type StopSocket = Socket<
 
 const roomStore = createStopRoomStore();
 
-export function registerStopRoomHandlers(io: StopNamespace): void {
+export function registerStopRoomHandlers(
+  io: StopNamespace,
+  classroomStore: ClassroomStore,
+): void {
   io.on("connection", (socket) => {
-    socket.on("create_room", ({ playerName }) => {
+    socket.on("create_room", ({ playerName, classroomCode }) => {
       leaveAnyExistingRoom(io, socket);
 
       const normalizedName = normalizePlayerName(playerName);
       if (!normalizedName) {
         emitError(socket, "invalid_name", "Digite um nome com pelo menos 2 letras.");
+        return;
+      }
+
+      const normalizedClassroomCode = classroomCode
+        ? normalizeClassroomCode(classroomCode)
+        : null;
+      const classroom = normalizedClassroomCode
+        ? classroomStore.getClassroom(normalizedClassroomCode)
+        : undefined;
+      if (classroomCode && !classroom) {
+        emitError(socket, "classroom_not_found", "Turma não encontrada.");
         return;
       }
 
@@ -62,6 +79,8 @@ export function registerStopRoomHandlers(io: StopNamespace): void {
       const state = createStopRoomInitialState(playerId, normalizedName, now);
       const room: StopMultiplayerRoom = {
         code: roomCode,
+        visibility: normalizedClassroomCode ? "classroom" : "private",
+        classroomCode: normalizedClassroomCode,
         state,
         participants: [
           {
@@ -85,6 +104,7 @@ export function registerStopRoomHandlers(io: StopNamespace): void {
         playerId,
         state: room.state,
       });
+      broadcastClassroomRooms(io, room.classroomCode);
     });
 
     socket.on("join_room", ({ code, playerName }) => {
@@ -131,6 +151,7 @@ export function registerStopRoomHandlers(io: StopNamespace): void {
         state: room.state,
       });
       emitStateUpdated(io, room);
+      broadcastClassroomRooms(io, room.classroomCode);
     });
 
     socket.on("update_room_settings", ({ code, settingsPatch }) => {
@@ -161,6 +182,7 @@ export function registerStopRoomHandlers(io: StopNamespace): void {
       room.updatedAt = Date.now();
       scheduleLobbyExpiry(io, room);
       emitStateUpdated(io, room);
+      broadcastClassroomRooms(io, room.classroomCode);
     });
 
     socket.on("start_match", ({ code }) => {
@@ -197,6 +219,48 @@ export function registerStopRoomHandlers(io: StopNamespace): void {
 
       emitStateUpdated(io, room);
       scheduleRoundPhase(io, room);
+      broadcastClassroomRooms(io, room.classroomCode);
+    });
+
+    socket.on("join_classroom", ({ code }) => {
+      const normalizedCode = normalizeClassroomCode(code);
+      const classroom = normalizedCode
+        ? classroomStore.getClassroom(normalizedCode)
+        : undefined;
+      if (!normalizedCode || !classroom) {
+        emitError(socket, "classroom_not_found", "Turma não encontrada.");
+        return;
+      }
+
+      socket.join(getClassroomChannel(normalizedCode));
+      socket.emit("classroom_joined", {
+        classroomCode: normalizedCode,
+        expiresAt: classroom.expiresAt,
+        openRooms: getOpenClassroomRooms(normalizedCode),
+      });
+    });
+
+    socket.on("leave_classroom", ({ code }) => {
+      const normalizedCode = normalizeClassroomCode(code);
+      if (normalizedCode) {
+        socket.leave(getClassroomChannel(normalizedCode));
+      }
+    });
+
+    socket.on("list_open_rooms", ({ classroomCode }) => {
+      const normalizedCode = normalizeClassroomCode(classroomCode);
+      const classroom = normalizedCode
+        ? classroomStore.getClassroom(normalizedCode)
+        : undefined;
+      if (!normalizedCode || !classroom) {
+        emitError(socket, "classroom_not_found", "Turma não encontrada.");
+        return;
+      }
+
+      socket.emit("classroom_rooms_updated", {
+        classroomCode: normalizedCode,
+        openRooms: getOpenClassroomRooms(normalizedCode),
+      });
     });
 
     socket.on("submit_answer_snapshot", ({ code, answers }) => {
@@ -345,6 +409,7 @@ function handlePlayerExit(
   const result = removeStopRoomPlayer(room.state, participant.playerId, Date.now());
   if (!result.ok) {
     roomStore.deleteRoom(room.code);
+    broadcastClassroomRooms(io, room.classroomCode);
     return;
   }
 
@@ -353,11 +418,13 @@ function handlePlayerExit(
 
   if (room.state.players.length === 0) {
     roomStore.deleteRoom(room.code);
+    broadcastClassroomRooms(io, room.classroomCode);
     return;
   }
 
   scheduleLobbyExpiry(io, room);
   emitStateUpdated(io, room);
+  broadcastClassroomRooms(io, room.classroomCode);
 }
 
 function closeRoom(
@@ -382,6 +449,7 @@ function closeRoom(
   });
 
   roomStore.deleteRoom(room.code);
+  broadcastClassroomRooms(io, room.classroomCode);
 }
 
 function scheduleLobbyExpiry(
@@ -409,6 +477,7 @@ function scheduleLobbyExpiry(
       message: "A sala expirou porque a partida não começou a tempo.",
     });
     roomStore.deleteRoom(latestRoom.code);
+    broadcastClassroomRooms(io, latestRoom.classroomCode);
   }, WAITING_ROOM_TTL_MS);
 }
 
@@ -548,6 +617,53 @@ function emitStateUpdated(io: StopNamespace, room: StopMultiplayerRoom): void {
   });
 }
 
+function normalizeClassroomCode(code: string): ClassroomCode | null {
+  const normalizedCode = code.trim().toUpperCase();
+  return /^[A-HJ-KM-NP-Z]{4}$/.test(normalizedCode) ? normalizedCode : null;
+}
+
+function getClassroomChannel(classroomCode: ClassroomCode): string {
+  return `classroom:${classroomCode}`;
+}
+
+function getOpenClassroomRooms(classroomCode: ClassroomCode): StopOpenRoomSummary[] {
+  return [...roomStore.getRooms().values()]
+    .filter((room) =>
+      room.visibility === "classroom"
+      && room.classroomCode === classroomCode
+      && room.state.status === "lobby"
+      && room.state.players.some((player) => player.isHost && player.connected)
+      && room.state.players.length < room.state.settings.playerLimit,
+    )
+    .map((room) => {
+      const host = room.state.players.find((player) => player.isHost);
+      return {
+        code: room.code,
+        hostName: host?.name ?? "",
+        playerCount: room.state.players.length,
+        playerLimit: room.state.settings.playerLimit,
+        difficulty: room.state.settings.difficulty,
+        roundCount: room.state.settings.roundCount,
+        progressiveDifficulty: room.state.settings.progressiveDifficulty,
+      };
+    })
+    .sort((left, right) => left.hostName.localeCompare(right.hostName));
+}
+
+function broadcastClassroomRooms(
+  io: StopNamespace,
+  classroomCode: ClassroomCode | null,
+): void {
+  if (!classroomCode) {
+    return;
+  }
+
+  io.to(getClassroomChannel(classroomCode)).emit("classroom_rooms_updated", {
+    classroomCode,
+    openRooms: getOpenClassroomRooms(classroomCode),
+  });
+}
+
 function normalizePlayerName(playerName: string): string | null {
   const normalizedName = playerName.trim().slice(0, 20);
   return normalizedName.length >= 2 ? normalizedName : null;
@@ -571,6 +687,8 @@ function getErrorMessage(code: StopMultiplayerLogicErrorCode | MultiplayerErrorC
       return "Essa sala já está cheia.";
     case "room_not_joinable":
       return "Essa sala não aceita novos jogadores agora.";
+    case "classroom_not_found":
+      return "Turma não encontrada.";
     case "unauthorized":
       return "Você não pertence a esta sala.";
     case "host_only":

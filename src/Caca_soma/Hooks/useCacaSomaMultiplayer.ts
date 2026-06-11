@@ -3,6 +3,7 @@ import { io, type Socket } from "socket.io-client";
 
 import type {
   CacaSomaClientToServerEvents,
+  CacaSomaOpenRoomSummary,
   CacaSomaRoomSeat,
   CacaSomaRoomSettings,
   CacaSomaServerToClientEvents,
@@ -11,6 +12,11 @@ import type {
   RoomPlayerInfo,
 } from "../Logic/multiplayer/protocol";
 import type { CacaSomaMatchState } from "../Logic/v2";
+import {
+  clearActiveClassroomSession,
+  getActiveClassroomSession,
+  setActiveClassroomSession,
+} from "../../Shared/Classrooms/activeClassroomSession";
 
 type MultiplayerSnapshot = {
   connectionStatus: MultiplayerConnectionStatus;
@@ -25,6 +31,8 @@ type MultiplayerSnapshot = {
   roomInterrupted: boolean;
   rematchRequestedBy: CacaSomaRoomSeat | null;
   rematchPending: boolean;
+  classroomCode: string | null;
+  openClassroomRooms: CacaSomaOpenRoomSummary[];
 };
 
 type LeaveRoomOptions = {
@@ -52,6 +60,8 @@ const DEFAULT_SNAPSHOT: MultiplayerSnapshot = {
   roomInterrupted: false,
   rematchRequestedBy: null,
   rematchPending: false,
+  classroomCode: null,
+  openClassroomRooms: [],
 };
 
 let socket: Socket<
@@ -76,8 +86,10 @@ function loadSnapshot(): MultiplayerSnapshot {
     const nextSnapshot: MultiplayerSnapshot = {
       ...DEFAULT_SNAPSHOT,
       ...parsed,
+      classroomCode: null,
       settings: parsed.settings ? { ...DEFAULT_SETTINGS, ...parsed.settings } : null,
       players: Array.isArray(parsed.players) ? normalizePlayers(parsed.players) : [],
+      openClassroomRooms: [],
     };
 
     if (nextSnapshot.roomCode && nextSnapshot.connectionStatus !== "waiting") {
@@ -177,6 +189,10 @@ function ensureSocket(): Socket<
         connectionStatus: nextStatus,
         errorMessage: null,
       });
+      const classroom = getActiveClassroomSession();
+      if (classroom) {
+        socket?.emit("join_classroom", { code: classroom.code });
+      }
     });
 
     socket.on("disconnect", () => {
@@ -304,6 +320,10 @@ function ensureSocket(): Socket<
     });
 
     socket.on("multiplayer_error", (payload) => {
+      if (payload.code === "classroom_not_found") {
+        clearActiveClassroomSession();
+        updateSnapshot({ classroomCode: null, openClassroomRooms: [] });
+      }
       const wasJoiningRoom =
         sharedSnapshot.connectionStatus === "connecting"
         && sharedSnapshot.playerSeat === null;
@@ -313,6 +333,44 @@ function ensureSocket(): Socket<
         connectionStatus: wasJoiningRoom ? "idle" : sharedSnapshot.connectionStatus,
         errorMessage: payload.message,
       });
+    });
+
+    socket.on("classroom_joined", (payload) => {
+      if (payload.expiresAt) {
+        setActiveClassroomSession({
+          code: payload.classroomCode,
+          expiresAt: payload.expiresAt,
+        });
+      }
+      updateSnapshot({
+        classroomCode: payload.classroomCode,
+        openClassroomRooms: payload.openRooms,
+        errorMessage: null,
+      });
+    });
+
+    socket.on("classroom_rooms_updated", (payload) => {
+      if (payload.classroomCode !== sharedSnapshot.classroomCode) {
+        return;
+      }
+
+      updateSnapshot({
+        openClassroomRooms: payload.openRooms,
+        errorMessage: null,
+      });
+    });
+
+    socket.on("classroom_unavailable", (payload) => {
+      if (payload.classroomCode !== sharedSnapshot.classroomCode) {
+        return;
+      }
+
+      updateSnapshot({
+        classroomCode: null,
+        openClassroomRooms: [],
+        errorMessage: payload.message,
+      });
+      clearActiveClassroomSession();
     });
   }
 
@@ -356,15 +414,16 @@ export function useCacaSomaMultiplayer() {
     };
 
     subscribers.add(listener);
+    if (getActiveClassroomSession()) {
+      ensureSocket();
+    }
 
     return () => {
       subscribers.delete(listener);
     };
   }, []);
 
-  const createRoom = (
-    playerName: string,
-  ) => {
+  const createRoom = (playerName: string, classroomCode?: string) => {
     const normalizedName = playerName.trim().slice(0, 20);
     if (normalizedName.length < 2) {
       updateSnapshot({
@@ -389,7 +448,10 @@ export function useCacaSomaMultiplayer() {
     });
 
     const activeSocket = ensureSocket();
-    activeSocket?.emit("create_room", { playerName: normalizedName });
+    activeSocket?.emit("create_room", {
+      playerName: normalizedName,
+      classroomCode,
+    });
   };
 
   const joinRoom = (code: string, playerName: string) => {
@@ -483,6 +545,36 @@ export function useCacaSomaMultiplayer() {
     });
   };
 
+  const joinClassroom = (classroomCode: string) => {
+    const normalizedCode = classroomCode.trim().toUpperCase();
+    if (normalizedCode.length !== 4) {
+      updateSnapshot({
+        errorMessage: "Digite um código de turma com 4 letras.",
+      });
+      return;
+    }
+
+    updateSnapshot({
+      errorMessage: null,
+    });
+
+    const activeSocket = ensureSocket();
+    activeSocket?.emit("join_classroom", { code: normalizedCode });
+  };
+
+  const leaveClassroom = () => {
+    if (socket && sharedSnapshot.classroomCode) {
+      socket.emit("leave_classroom", { code: sharedSnapshot.classroomCode });
+    }
+
+    updateSnapshot({
+      classroomCode: null,
+      openClassroomRooms: [],
+      errorMessage: null,
+    });
+    clearActiveClassroomSession();
+  };
+
   return {
     ...snapshot,
     createRoom,
@@ -491,6 +583,8 @@ export function useCacaSomaMultiplayer() {
     startMatch,
     submitAction,
     requestRematch,
+    joinClassroom,
+    leaveClassroom,
     leaveRoom: leaveCacaSomaMultiplayerRoom,
   };
 }

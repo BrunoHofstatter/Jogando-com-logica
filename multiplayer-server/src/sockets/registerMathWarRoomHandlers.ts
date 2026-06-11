@@ -63,7 +63,7 @@ export function registerMathWarRoomHandlers(
       const classroom = normalizedClassroomCode
         ? classroomStore.getClassroom(normalizedClassroomCode)
         : undefined;
-      if (classroomCode && (!classroom || classroom.gameId !== "math_war")) {
+      if (classroomCode && !classroom) {
         emitError(socket, "classroom_not_found", "Turma não encontrada.");
         return;
       }
@@ -163,7 +163,7 @@ export function registerMathWarRoomHandlers(
     socket.on("join_classroom", ({ code }) => {
       const normalizedCode = normalizeClassroomCode(code);
       const classroom = normalizedCode ? classroomStore.getClassroom(normalizedCode) : undefined;
-      if (!classroom || classroom.gameId !== "math_war") {
+      if (!normalizedCode || !classroom) {
         emitError(socket, "classroom_not_found", "Turma não encontrada.");
         return;
       }
@@ -171,6 +171,7 @@ export function registerMathWarRoomHandlers(
       socket.join(getClassroomChannel(normalizedCode));
       socket.emit("classroom_joined", {
         classroomCode: normalizedCode,
+        expiresAt: classroom.expiresAt,
         openRooms: getOpenClassroomRooms(normalizedCode),
       });
     });
@@ -185,7 +186,7 @@ export function registerMathWarRoomHandlers(
     socket.on("list_open_rooms", ({ classroomCode }) => {
       const normalizedCode = normalizeClassroomCode(classroomCode);
       const classroom = normalizedCode ? classroomStore.getClassroom(normalizedCode) : undefined;
-      if (!classroom || classroom.gameId !== "math_war") {
+      if (!normalizedCode || !classroom) {
         emitError(socket, "classroom_not_found", "Turma não encontrada.");
         return;
       }

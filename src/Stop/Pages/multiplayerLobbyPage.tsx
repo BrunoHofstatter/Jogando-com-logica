@@ -6,7 +6,7 @@ import { difficulties, type DifficultyKey } from "../Logic/gameConfig";
 import { useStopMultiplayer } from "../Hooks/useStopMultiplayer";
 import styles from "../styles/multiplayerLobby.module.css";
 
-type LobbyMode = "home" | "join";
+type LobbyMode = "home" | "join" | "classroom";
 
 const DIFFICULTY_OPTIONS = Object.keys(difficulties) as DifficultyKey[];
 const ROUND_OPTIONS = Array.from({ length: 10 }, (_, index) => index + 1);
@@ -29,8 +29,12 @@ export default function StopMultiplayerLobbyPage() {
     playerId,
     state,
     errorMessage,
+    classroomCode,
+    openClassroomRooms,
     createRoom,
     joinRoom,
+    joinClassroom,
+    leaveClassroom,
     updateRoomSettings,
     startMatch,
     leaveRoom,
@@ -39,6 +43,7 @@ export default function StopMultiplayerLobbyPage() {
   const [lobbyMode, setLobbyMode] = useState<LobbyMode>("home");
   const [nameInput, setNameInput] = useState(playerName);
   const [roomInput, setRoomInput] = useState("");
+  const [classroomInput, setClassroomInput] = useState("");
   const [copyFeedback, setCopyFeedback] = useState("");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
@@ -120,8 +125,15 @@ export default function StopMultiplayerLobbyPage() {
     leaveRoom({ preserveName: true });
     setLobbyMode("home");
     setRoomInput("");
+    setClassroomInput("");
     setCopyFeedback("");
     setIsSettingsOpen(false);
+  };
+
+  const handleSwitchClassroom = () => {
+    leaveClassroom();
+    setClassroomInput("");
+    setLobbyMode("classroom");
   };
 
   const handleDifficultyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -161,7 +173,7 @@ export default function StopMultiplayerLobbyPage() {
 
       <div className={styles.panel}>
         <div className={cardClassName}>
-          {!isInRoom && !isDisconnected && (
+          {!isInRoom && !isDisconnected && !classroomCode && (
             <>
               <div className={styles.heading}>Sala Privada</div>
               <p className={styles.description}>
@@ -202,6 +214,18 @@ export default function StopMultiplayerLobbyPage() {
                 >
                   {lobbyMode === "join" ? "Voltar" : "Entrar em Sala"}
                 </button>
+
+                <button
+                  className={styles.secondaryButton}
+                  onClick={() =>
+                    setLobbyMode((currentMode) =>
+                      currentMode === "classroom" ? "home" : "classroom",
+                    )
+                  }
+                  disabled={isBusy}
+                >
+                  {lobbyMode === "classroom" ? "Voltar" : "Entrar em Turma"}
+                </button>
               </div>
 
               {lobbyMode === "join" && (
@@ -231,12 +255,100 @@ export default function StopMultiplayerLobbyPage() {
                   </button>
                 </div>
               )}
+
+              {lobbyMode === "classroom" && (
+                <div className={styles.joinBox}>
+                  <div className={styles.nameWrap}>
+                    <label className={styles.fieldLabel} htmlFor="stop-classroom-code">
+                      Código da turma
+                    </label>
+                    <input
+                      id="stop-classroom-code"
+                      className={styles.input}
+                      value={classroomInput}
+                      maxLength={4}
+                      onChange={(event) =>
+                        setClassroomInput(event.target.value.toUpperCase())
+                      }
+                      placeholder="ABCD"
+                    />
+                  </div>
+
+                  <button
+                    className={styles.primaryButton}
+                    onClick={() => joinClassroom(classroomInput)}
+                    disabled={isBusy}
+                  >
+                    {isBusy ? "Entrando..." : "Entrar na Turma"}
+                  </button>
+                </div>
+              )}
             </>
+          )}
+
+          {classroomCode && !isInRoom && !isDisconnected && (
+            <div className={styles.classroomBox}>
+              <div className={styles.classroomHeader}>
+                <div className={styles.sectionTitle}>Turma {classroomCode}</div>
+                <button className={styles.leaveButton} onClick={handleSwitchClassroom}>
+                  Trocar turma
+                </button>
+              </div>
+
+              <p className={styles.helperText}>
+                Entre em uma sala com vaga ou crie uma nova.
+              </p>
+
+              <button
+                className={styles.primaryButton}
+                onClick={() => createRoom(nameInput, classroomCode)}
+                disabled={isBusy}
+              >
+                Criar Sala para a Turma
+              </button>
+
+              <div className={styles.roomList}>
+                {openClassroomRooms.length === 0 ? (
+                  <p className={styles.waitingText}>
+                    Nenhuma sala aberta. Crie a primeira!
+                  </p>
+                ) : (
+                  openClassroomRooms.map((room) => (
+                    <div className={styles.openRoomCard} key={room.code}>
+                      <div className={styles.openRoomInfo}>
+                        <span className={styles.openRoomTitle}>
+                          Sala de {room.hostName}
+                        </span>
+                        <span>
+                          {room.playerCount}/{room.playerLimit} jogadores
+                        </span>
+                        <span>
+                          {DIFFICULTY_LABELS[room.difficulty]} · {room.roundCount} rodadas ·{" "}
+                          {room.progressiveDifficulty ? "Progressiva" : "Fixa"}
+                        </span>
+                      </div>
+                      <button
+                        className={styles.primaryButton}
+                        onClick={() => joinRoom(room.code, nameInput)}
+                        disabled={isBusy}
+                      >
+                        Entrar
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+              <button className={styles.secondaryButton} onClick={leaveClassroom}>
+                Jogar sem turma
+              </button>
+            </div>
           )}
 
           {isInRoom && state && roomSettings && (
             <div className={styles.roomLayout}>
-              <div className={styles.heading}>Sala Privada</div>
+              <div className={styles.heading}>
+                {classroomCode ? `Sala da Turma ${classroomCode}` : "Sala Privada"}
+              </div>
 
               <div className={styles.roomHero}>
                 <div className={styles.codeGroup}>

@@ -7,6 +7,8 @@ export interface StopRoomParticipant {
 
 export interface StopMultiplayerRoom {
   code: string;
+  visibility: "private" | "classroom";
+  classroomCode: string | null;
   state: StopMultiplayerState;
   participants: StopRoomParticipant[];
   answerSnapshotsByPlayerId: Record<string, string[]>;

@@ -82,6 +82,12 @@ export default function SPTTTMultiplayerLobbyPage() {
     setCopyFeedback("");
   };
 
+  const handleSwitchClassroom = () => {
+    leaveClassroom();
+    setClassroomInput("");
+    setLobbyMode("classroom");
+  };
+
   return (
     <div className={styles.page}>
       <div className={styles.previewColumn}>
@@ -206,8 +212,8 @@ export default function SPTTTMultiplayerLobbyPage() {
             <div className={styles.classroomBox}>
               <div className={styles.classroomHeader}>
                 <div className={styles.waitingTitle}>Turma {classroomCode}</div>
-                <button className={styles.leaveButton} onClick={leaveClassroom}>
-                  Sair da Turma
+                <button className={styles.leaveButton} onClick={handleSwitchClassroom}>
+                  Trocar turma
                 </button>
               </div>
 
@@ -235,6 +241,9 @@ export default function SPTTTMultiplayerLobbyPage() {
                   ))
                 )}
               </div>
+              <button className={styles.secondaryButton} onClick={leaveClassroom}>
+                Jogar sem turma
+              </button>
             </div>
           )}
 

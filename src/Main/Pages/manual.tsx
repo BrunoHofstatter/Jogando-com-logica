@@ -83,7 +83,17 @@ function Manual() {
       </header>
 
       <section>
-        <h2>Introdução</h2>
+        <div className={styles.introductionHeading}>
+          <button
+            className={styles.classroomsButton}
+            onClick={() => {
+              window.location.href = ROUTES.CLASSROOMS;
+            }}
+          >
+            Turmas
+          </button>
+          <h2>Introdução</h2>
+        </div>
         <p>
           O Projeto Jogando com Lógica é uma iniciativa desenvolvida por jovens com o objetivo de estimular o raciocínio lógico em crianças, ajudando-as a pensar de forma mais estruturada e a resolver problemas com mais facilidade e criatividade.
         </p>
@@ -94,14 +104,6 @@ function Manual() {
           Por meio de jogos educativos e dinâmicos, o projeto busca transformar o aprendizado lógico em algo divertido, competitivo e colaborativo — mostrando que pensar logicamente também pode ser brincar.
         </p>
         <div className={styles.feedbackButtonContainer}>
-          <button
-            className={styles.feedbackButton}
-            onClick={() => {
-              window.location.href = ROUTES.CLASSROOMS;
-            }}
-          >
-            Gerenciar turmas online
-          </button>
           <div className={styles.feedbackHighlight}>
             Sua opinião é fundamental para o futuro do projeto!
           </div>

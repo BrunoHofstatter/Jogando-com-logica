@@ -46,6 +46,75 @@
   text-align: center;
 }
 
+.explanationToggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5vw;
+  margin: 1.5vw auto 0;
+  padding: 0.35vw 1vw 0.55vw;
+  border: 0.25vw solid #060e13;
+  border-radius: 1.3vw;
+  background-color: #68c2e0;
+  box-shadow: 0 0.35vw 0 #060e13;
+  color: #ffcf40;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: min(1.6vw, 2.5dvh);
+  -webkit-text-stroke: 0.05vw #060e13;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.1s ease;
+}
+
+.explanationToggle:hover {
+  transform: translateY(-0.15vw);
+  box-shadow: 0 0.5vw 0 #060e13;
+  filter: brightness(1.1);
+}
+
+.explanationToggle:active {
+  transform: translateY(0.25vw);
+  box-shadow: 0 0.1vw 0 #060e13;
+}
+
+.explanationArrow {
+  width: 1.5vw;
+  height: 1.5vw;
+  stroke-width: 0.3vw;
+  transition: transform 0.15s ease;
+}
+
+.explanationArrowOpen {
+  transform: rotate(180deg);
+}
+
+.explanation {
+  margin: 1.2vw 0 2vw;
+  padding: 1.5vw 2vw;
+  border: 0.3vw solid #060e13;
+  border-radius: 2vw;
+  background-color: #68c2e0;
+  box-shadow: 0 0.6vw 0 #060e13;
+  font-size: min(1.55vw, 2.5dvh);
+  -webkit-text-stroke: 0.035vw #060e13;
+}
+
+.explanation p {
+  margin: 0.7vw 0;
+}
+
+.explanation ol {
+  margin: 1vw 0;
+  padding-left: 2.5vw;
+}
+
+.explanation li {
+  margin: 0.5vw 0;
+}
+
+.explanationNote {
+  color: #ffcf40;
+  -webkit-text-stroke: 0.04vw #060e13;
+}
+
 .classroomList {
   display: flex;
   flex-direction: column;
@@ -102,6 +171,25 @@
   cursor: pointer;
   -webkit-text-stroke: 0.08vw #060e13;
   box-shadow: 0 0.5vw 0 #060e13;
+  transform: translateY(0);
+  transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.1s ease;
+}
+
+.primaryButton:not(:disabled):hover,
+.secondaryButton:not(:disabled):hover,
+.deleteButton:not(:disabled):hover,
+.gameButton:not(:disabled):hover {
+  transform: translateY(-0.2vw);
+  box-shadow: 0 0.7vw 0 #060e13;
+  filter: brightness(1.12);
+}
+
+.primaryButton:not(:disabled):active,
+.secondaryButton:not(:disabled):active,
+.deleteButton:not(:disabled):active,
+.gameButton:not(:disabled):active {
+  transform: translateY(0.35vw);
+  box-shadow: 0 0.15vw 0 #060e13;
 }
 
 .primaryButton {
@@ -122,7 +210,8 @@
   background-color: #68c2e0;
 }
 
-.primaryButton:disabled {
+.primaryButton:disabled,
+.gameButton:disabled {
   filter: grayscale(1);
   cursor: not-allowed;
 }
@@ -161,6 +250,60 @@
     font-size: min(5vw, 3dvh);
   }
 
+  .explanationToggle {
+    gap: min(1.5vw, 1dvh);
+    margin-top: min(4vw, 3dvh);
+    padding: min(1.5vw, 1dvh) min(3vw, 2dvh) min(2vw, 1.5dvh);
+    border-width: min(0.6vw, 0.4dvh);
+    border-radius: min(3vw, 2dvh);
+    box-shadow: 0 min(0.8vw, 0.6dvh) 0 #060e13;
+    font-size: min(4.2vw, 2.7dvh);
+    -webkit-text-stroke-width: min(0.15vw, 0.1dvh);
+  }
+
+  .explanationToggle:hover {
+    transform: translateY(min(-0.3vw, -0.2dvh));
+    box-shadow: 0 min(1.1vw, 0.8dvh) 0 #060e13;
+  }
+
+  .explanationToggle:active {
+    transform: translateY(min(0.6vw, 0.4dvh));
+    box-shadow: 0 min(0.2vw, 0.15dvh) 0 #060e13;
+  }
+
+  .explanationArrow {
+    width: min(4vw, 2.7dvh);
+    height: min(4vw, 2.7dvh);
+    stroke-width: min(0.7vw, 0.45dvh);
+  }
+
+  .explanation {
+    margin: min(3vw, 2dvh) 0 min(5vw, 4dvh);
+    padding: 4vw;
+    border-width: 0.6vw;
+    border-radius: 4vw;
+    box-shadow: 0 1.2vw 0 #060e13;
+    font-size: min(4vw, 2.6dvh);
+    -webkit-text-stroke-width: min(0.12vw, 0.08dvh);
+  }
+
+  .explanation p {
+    margin: 2vw 0;
+  }
+
+  .explanation ol {
+    margin: 3vw 0;
+    padding-left: 7vw;
+  }
+
+  .explanation li {
+    margin: 2vw 0;
+  }
+
+  .explanationNote {
+    -webkit-text-stroke-width: min(0.15vw, 0.1dvh);
+  }
+
   .classroomList,
   .actions,
   .gamePicker {
@@ -190,5 +333,21 @@
     border-radius: 4vw;
     padding: 2.5vw 3vw 3vw;
     font-size: min(5vw, 3dvh);
+  }
+
+  .primaryButton:not(:disabled):hover,
+  .secondaryButton:not(:disabled):hover,
+  .deleteButton:not(:disabled):hover,
+  .gameButton:not(:disabled):hover {
+    transform: translateY(min(-0.4vw, -0.3dvh));
+    box-shadow: 0 min(1.6vw, 1.2dvh) 0 #060e13;
+  }
+
+  .primaryButton:not(:disabled):active,
+  .secondaryButton:not(:disabled):active,
+  .deleteButton:not(:disabled):active,
+  .gameButton:not(:disabled):active {
+    transform: translateY(min(0.8vw, 0.6dvh));
+    box-shadow: 0 min(0.4vw, 0.3dvh) 0 #060e13;
   }
 }

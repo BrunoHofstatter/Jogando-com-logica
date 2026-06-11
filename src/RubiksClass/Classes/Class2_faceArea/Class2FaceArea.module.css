@@ -108,9 +108,22 @@
     background: #d5ebfa;
     /* Slightly darker soft blue */
     padding: 4dvh 4vw;
-    gap: 12dvh;
+    gap: 6dvh;
     position: relative;
     overflow-y: auto;
+}
+
+/* --- Lesson progress ----------------------------------------- */
+.progress {
+    font-family: inherit;
+    font-size: 1.6vw;
+    color: #ffffff;
+    background: #a855f7;
+    border: 0.3vw solid #6b21a8;
+    border-radius: 1vw;
+    padding: 0.4vw 1.2vw 0.6vw;
+    box-shadow: 0 0.5vw 0 #6b21a8;
+    -webkit-text-stroke: 0.1vw #6b21a8;
 }
 
 /* --- Title --------------------------------------------------- */
@@ -250,8 +263,17 @@
     .rightPanel {
         flex: 1;
         padding: 4vw;
-        gap: 3vw;
+        gap: min(3vw, 1.7dvh);
         overflow-y: auto;
+    }
+
+    .progress {
+        font-size: min(3.5vw, 2dvh);
+        border-width: min(0.6vw, 0.35dvh);
+        border-radius: min(2vw, 1.1dvh);
+        padding: min(1vw, 0.55dvh) min(2.5vw, 1.4dvh) min(1.4vw, 0.8dvh);
+        box-shadow: 0 min(1vw, 0.55dvh) 0 #6b21a8;
+        -webkit-text-stroke: min(0.2vw, 0.11dvh) #6b21a8;
     }
 
     .title {

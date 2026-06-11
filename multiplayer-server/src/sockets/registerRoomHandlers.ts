@@ -63,7 +63,7 @@ export function registerRoomHandlers(
       const classroom = normalizedClassroomCode
         ? classroomStore.getClassroom(normalizedClassroomCode)
         : undefined;
-      if (classroomCode && (!classroom || classroom.gameId !== "crown_chase")) {
+      if (classroomCode && !classroom) {
         emitError(socket, "classroom_not_found", "Turma não encontrada.");
         return;
       }
@@ -160,14 +160,9 @@ export function registerRoomHandlers(
       broadcastClassroomRooms(io, room.classroomCode);
     });
 
-    socket.on("create_classroom", ({ gameId }) => {
-      if (gameId !== "crown_chase" && gameId !== "spttt" && gameId !== "math_war") {
-        emitError(socket, "unauthorized", "Esse jogo ainda não possui turmas online.");
-        return;
-      }
-
+    socket.on("create_classroom", () => {
       socket.emit("classroom_created", {
-        classroom: classroomStore.createClassroom(gameId),
+        classroom: classroomStore.createClassroom(),
       });
     });
 
@@ -195,7 +190,7 @@ export function registerRoomHandlers(
     socket.on("join_classroom", ({ code }) => {
       const normalizedCode = normalizeClassroomCode(code);
       const classroom = normalizedCode ? classroomStore.getClassroom(normalizedCode) : undefined;
-      if (!classroom || classroom.gameId !== "crown_chase") {
+      if (!normalizedCode || !classroom) {
         emitError(socket, "classroom_not_found", "Turma não encontrada.");
         return;
       }
@@ -203,6 +198,7 @@ export function registerRoomHandlers(
       socket.join(getClassroomChannel(normalizedCode));
       socket.emit("classroom_joined", {
         classroomCode: normalizedCode,
+        expiresAt: classroom.expiresAt,
         openRooms: getOpenClassroomRooms(normalizedCode),
       });
     });
@@ -217,7 +213,7 @@ export function registerRoomHandlers(
     socket.on("list_open_rooms", ({ classroomCode }) => {
       const normalizedCode = normalizeClassroomCode(classroomCode);
       const classroom = normalizedCode ? classroomStore.getClassroom(normalizedCode) : undefined;
-      if (!classroom || classroom.gameId !== "crown_chase") {
+      if (!normalizedCode || !classroom) {
         emitError(socket, "classroom_not_found", "Turma não encontrada.");
         return;
       }

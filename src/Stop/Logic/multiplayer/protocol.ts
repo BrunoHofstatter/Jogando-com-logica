@@ -3,6 +3,10 @@ import type {
   StopMultiplayerSettingsPatch,
   StopMultiplayerState,
 } from "./types";
+import type {
+  ClassroomCode,
+  ClassroomUnavailablePayload,
+} from "../../../CrownChase/Logic/multiplayer/protocol";
 
 export type StopRoomCode = string;
 export type StopPlayerId = string;
@@ -20,6 +24,7 @@ export type MultiplayerErrorCode =
   | "room_not_found"
   | "room_full"
   | "room_not_joinable"
+  | "classroom_not_found"
   | "unauthorized"
   | "host_only"
   | "invalid_settings"
@@ -30,6 +35,7 @@ export type MultiplayerErrorCode =
 
 export interface CreateRoomPayload {
   playerName: string;
+  classroomCode?: ClassroomCode;
 }
 
 export interface JoinRoomPayload {
@@ -62,6 +68,34 @@ export interface PressStopPayload {
 
 export interface RequestRematchPayload {
   code: StopRoomCode;
+}
+
+export interface StopOpenRoomSummary {
+  code: StopRoomCode;
+  hostName: string;
+  playerCount: number;
+  playerLimit: number;
+  difficulty: StopMultiplayerSettings["difficulty"];
+  roundCount: number;
+  progressiveDifficulty: boolean;
+}
+
+export interface JoinClassroomPayload {
+  code: ClassroomCode;
+}
+
+export interface LeaveClassroomPayload {
+  code: ClassroomCode;
+}
+
+export interface ListOpenRoomsPayload {
+  classroomCode: ClassroomCode;
+}
+
+export interface StopClassroomRoomsPayload {
+  classroomCode: ClassroomCode;
+  expiresAt?: number;
+  openRooms: StopOpenRoomSummary[];
 }
 
 export interface RoomCreatedPayload {
@@ -101,6 +135,9 @@ export interface StopClientToServerEvents {
   press_stop: (payload: PressStopPayload) => void;
   request_rematch: (payload: RequestRematchPayload) => void;
   leave_room: (payload: LeaveRoomPayload) => void;
+  join_classroom: (payload: JoinClassroomPayload) => void;
+  leave_classroom: (payload: LeaveClassroomPayload) => void;
+  list_open_rooms: (payload: ListOpenRoomsPayload) => void;
 }
 
 export interface StopServerToClientEvents {
@@ -109,6 +146,9 @@ export interface StopServerToClientEvents {
   state_updated: (payload: StateUpdatedPayload) => void;
   room_closed: (payload: RoomClosedPayload) => void;
   multiplayer_error: (payload: MultiplayerErrorPayload) => void;
+  classroom_joined: (payload: StopClassroomRoomsPayload) => void;
+  classroom_rooms_updated: (payload: StopClassroomRoomsPayload) => void;
+  classroom_unavailable: (payload: ClassroomUnavailablePayload) => void;
 }
 
-export type { StopMultiplayerSettings, StopMultiplayerState };
+export type { ClassroomCode, StopMultiplayerSettings, StopMultiplayerState };

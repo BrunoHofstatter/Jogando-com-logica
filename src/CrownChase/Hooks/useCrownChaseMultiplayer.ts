@@ -9,6 +9,11 @@ import type {
   RoomPlayerInfo,
 } from "../Logic/multiplayer/protocol";
 import type { CrownChaseState, MoveIntent, PlayerId } from "../Logic/v2";
+import {
+  clearActiveClassroomSession,
+  getActiveClassroomSession,
+  setActiveClassroomSession,
+} from "../../Shared/Classrooms/activeClassroomSession";
 
 type MultiplayerSnapshot = {
   connectionStatus: MultiplayerConnectionStatus;
@@ -68,8 +73,9 @@ function loadSnapshot(): MultiplayerSnapshot {
     const nextSnapshot: MultiplayerSnapshot = {
       ...DEFAULT_SNAPSHOT,
       ...parsed,
+      classroomCode: null,
       players: Array.isArray(parsed.players) ? normalizePlayers(parsed.players) : [],
-      openClassroomRooms: Array.isArray(parsed.openClassroomRooms) ? parsed.openClassroomRooms : [],
+      openClassroomRooms: [],
     };
 
     if (nextSnapshot.roomCode && nextSnapshot.connectionStatus !== "waiting") {
@@ -159,6 +165,10 @@ function ensureSocket(): Socket<
         connectionStatus: nextStatus,
         errorMessage: null,
       });
+      const classroom = getActiveClassroomSession();
+      if (classroom) {
+        socket?.emit("join_classroom", { code: classroom.code });
+      }
     });
 
     socket.on("disconnect", () => {
@@ -266,6 +276,10 @@ function ensureSocket(): Socket<
     });
 
     socket.on("multiplayer_error", (payload) => {
+      if (payload.code === "classroom_not_found") {
+        clearActiveClassroomSession();
+        updateSnapshot({ classroomCode: null, openClassroomRooms: [] });
+      }
       const wasJoiningRoom =
         sharedSnapshot.connectionStatus === "connecting"
         && sharedSnapshot.playerSeat === null;
@@ -278,6 +292,10 @@ function ensureSocket(): Socket<
     });
 
     socket.on("classroom_joined", (payload) => {
+      setActiveClassroomSession({
+        code: payload.classroomCode,
+        expiresAt: payload.expiresAt,
+      });
       updateSnapshot({
         classroomCode: payload.classroomCode,
         openClassroomRooms: payload.openRooms,
@@ -306,6 +324,7 @@ function ensureSocket(): Socket<
         openClassroomRooms: [],
         errorMessage: payload.message,
       });
+      clearActiveClassroomSession();
     });
   }
 
@@ -317,7 +336,7 @@ function ensureSocket(): Socket<
 }
 
 export function hasActiveCrownChaseMultiplayerSession(): boolean {
-  return sharedSnapshot.roomCode !== null || sharedSnapshot.classroomCode !== null;
+  return sharedSnapshot.roomCode !== null;
 }
 
 export function leaveCrownChaseMultiplayerRoom(
@@ -327,10 +346,6 @@ export function leaveCrownChaseMultiplayerRoom(
 
   if (socket && sharedSnapshot.roomCode) {
     socket.emit("leave_room", { code: sharedSnapshot.roomCode });
-  }
-
-  if (socket && sharedSnapshot.classroomCode) {
-    socket.emit("leave_classroom", { code: sharedSnapshot.classroomCode });
   }
 
   if (socket) {
@@ -353,6 +368,9 @@ export function useCrownChaseMultiplayer() {
     };
 
     subscribers.add(listener);
+    if (getActiveClassroomSession()) {
+      ensureSocket();
+    }
 
     return () => {
       subscribers.delete(listener);
@@ -482,6 +500,7 @@ export function useCrownChaseMultiplayer() {
       openClassroomRooms: [],
       errorMessage: null,
     });
+    clearActiveClassroomSession();
   };
 
   return {

@@ -11,7 +11,7 @@ import type {
 } from "../Logic/multiplayer/protocol";
 import styles from "../styles/multiplayerLobby.module.css";
 
-type LobbyMode = "home" | "join";
+type LobbyMode = "home" | "join" | "classroom";
 type RoomModeOption = CacaSomaRoomSettings["mode"];
 type DifficultyOption = CacaSomaRoomSettings["difficultyId"];
 type TargetScoreOption = CacaSomaRoomSettings["targetScore"];
@@ -54,9 +54,13 @@ export default function CacaSomaMultiplayerLobbyPage() {
     playerSeat,
     settings,
     players,
+    classroomCode,
+    openClassroomRooms,
     errorMessage,
     createRoom,
     joinRoom,
+    joinClassroom,
+    leaveClassroom,
     updateRoomSettings,
     startMatch,
     leaveRoom,
@@ -65,6 +69,7 @@ export default function CacaSomaMultiplayerLobbyPage() {
   const [lobbyMode, setLobbyMode] = useState<LobbyMode>("home");
   const [nameInput, setNameInput] = useState(playerName);
   const [roomInput, setRoomInput] = useState("");
+  const [classroomInput, setClassroomInput] = useState("");
   const [copyFeedback, setCopyFeedback] = useState("");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
@@ -153,8 +158,15 @@ export default function CacaSomaMultiplayerLobbyPage() {
     leaveRoom({ preserveName: true });
     setLobbyMode("home");
     setRoomInput("");
+    setClassroomInput("");
     setCopyFeedback("");
     setIsSettingsOpen(false);
+  };
+
+  const handleSwitchClassroom = () => {
+    leaveClassroom();
+    setClassroomInput("");
+    setLobbyMode("classroom");
   };
 
   const handleRoomModeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -194,9 +206,9 @@ export default function CacaSomaMultiplayerLobbyPage() {
         <div className={`${styles.card} ${isInRoom ? styles.roomCard : ""}`}>
           {!isInRoom && !isDisconnected && (
             <>
-              <div className={styles.heading}>Sala Privada</div>
+              <div className={styles.heading}>Caça Soma Online</div>
               <p className={styles.description}>
-                Monte duas duplas, crie a sala e ajuste as regras com o anfitrião.
+                Monte duas duplas, crie uma sala privada ou entre em uma turma.
               </p>
 
               <div className={styles.nameWrap}>
@@ -213,13 +225,14 @@ export default function CacaSomaMultiplayerLobbyPage() {
                 />
               </div>
 
-              <div className={styles.actions}>
+              {!classroomCode && (
+                <div className={styles.actions}>
                 <button
                   className={styles.primaryButton}
                   onClick={handleCreateRoom}
                   disabled={isBusy}
                 >
-                  {isBusy && lobbyMode === "home" ? "Conectando..." : "Criar Sala"}
+                  {isBusy && lobbyMode === "home" ? "Conectando..." : "Criar Sala Privada"}
                 </button>
 
                 <button
@@ -233,9 +246,21 @@ export default function CacaSomaMultiplayerLobbyPage() {
                 >
                   {lobbyMode === "join" ? "Voltar" : "Entrar em Sala"}
                 </button>
-              </div>
+                <button
+                  className={styles.secondaryButton}
+                  onClick={() =>
+                    setLobbyMode((currentMode) =>
+                      currentMode === "classroom" ? "home" : "classroom",
+                    )
+                  }
+                  disabled={isBusy}
+                >
+                  {lobbyMode === "classroom" ? "Voltar" : "Entrar em Turma"}
+                </button>
+                </div>
+              )}
 
-              {lobbyMode === "join" && (
+              {lobbyMode === "join" && !classroomCode && (
                 <div className={styles.joinBox}>
                   <div className={styles.nameWrap}>
                     <label className={styles.fieldLabel} htmlFor="caca-soma-online-code">
@@ -262,12 +287,95 @@ export default function CacaSomaMultiplayerLobbyPage() {
                   </button>
                 </div>
               )}
+
+              {lobbyMode === "classroom" && !classroomCode && (
+                <div className={styles.joinBox}>
+                  <div className={styles.nameWrap}>
+                    <label className={styles.fieldLabel} htmlFor="caca-soma-classroom-code">
+                      Código da turma
+                    </label>
+                    <input
+                      id="caca-soma-classroom-code"
+                      className={styles.input}
+                      value={classroomInput}
+                      maxLength={4}
+                      onChange={(event) =>
+                        setClassroomInput(event.target.value.toUpperCase())
+                      }
+                      placeholder="BKRM"
+                    />
+                  </div>
+
+                  <button
+                    className={styles.primaryButton}
+                    onClick={() => joinClassroom(classroomInput)}
+                    disabled={isBusy}
+                  >
+                    {isBusy ? "Entrando..." : "Entrar na Turma"}
+                  </button>
+                </div>
+              )}
+
+              {classroomCode && (
+                <div className={styles.classroomBox}>
+                  <div className={styles.classroomHeader}>
+                    <div className={styles.sectionTitle}>Turma {classroomCode}</div>
+                    <button className={styles.leaveButton} onClick={handleSwitchClassroom}>
+                      Trocar turma
+                    </button>
+                  </div>
+
+                  <button
+                    className={styles.primaryButton}
+                    onClick={() => createRoom(nameInput, classroomCode)}
+                  >
+                    Criar Sala para a Turma
+                  </button>
+
+                  <p className={styles.waitingText}>
+                    Os jogadores entram na ordem: os dois primeiros formam a Equipe A.
+                  </p>
+
+                  <div className={styles.roomList}>
+                    {openClassroomRooms.length === 0 ? (
+                      <p className={styles.waitingText}>
+                        Nenhuma sala aberta. Crie a primeira!
+                      </p>
+                    ) : (
+                      openClassroomRooms.map((room) => (
+                        <div className={styles.openRoomCard} key={room.code}>
+                          <div className={styles.openRoomInfo}>
+                            <span className={styles.openRoomTitle}>Sala de {room.hostName}</span>
+                            <span>
+                              {ROOM_MODE_LABELS[room.mode]} · {room.playerCount}/{room.capacity} jogadores
+                            </span>
+                            <span>
+                              {DIFFICULTY_LABELS[room.difficultyId]} · Primeiro a {room.targetScore}
+                            </span>
+                          </div>
+                          <button
+                            className={styles.secondaryButton}
+                            onClick={() => joinRoom(room.code, nameInput)}
+                          >
+                            Entrar
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  <button className={styles.secondaryButton} onClick={leaveClassroom}>
+                    Jogar sem turma
+                  </button>
+                </div>
+              )}
             </>
           )}
 
           {isInRoom && roomCode && (
             <div className={styles.roomLayout}>
-              <div className={styles.heading}>Sala Privada</div>
+              <div className={styles.heading}>
+                {classroomCode ? `Sala da Turma ${classroomCode}` : "Sala Privada"}
+              </div>
 
               <div className={styles.roomHero}>
                 <div className={styles.codeGroup}>

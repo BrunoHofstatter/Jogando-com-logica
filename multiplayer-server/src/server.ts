@@ -79,12 +79,14 @@ export function createMultiplayerServer() {
     crownChaseNamespace.to(getClassroomChannel(classroomCode)).emit("classroom_unavailable", payload);
     sptttNamespace.to(getClassroomChannel(classroomCode)).emit("classroom_unavailable", payload);
     mathWarNamespace.to(getClassroomChannel(classroomCode)).emit("classroom_unavailable", payload);
+    cacaSomaNamespace.to(getClassroomChannel(classroomCode)).emit("classroom_unavailable", payload);
+    stopNamespace.to(getClassroomChannel(classroomCode)).emit("classroom_unavailable", payload);
   });
 
   registerRoomHandlers(crownChaseNamespace, classroomStore);
-  registerCacaSomaRoomHandlers(cacaSomaNamespace);
+  registerCacaSomaRoomHandlers(cacaSomaNamespace, classroomStore);
   registerMathWarRoomHandlers(mathWarNamespace, classroomStore);
-  registerStopRoomHandlers(stopNamespace);
+  registerStopRoomHandlers(stopNamespace, classroomStore);
   registerSptttRoomHandlers(sptttNamespace, classroomStore);
 
   return {

@@ -1,24 +1,15 @@
 import { useEffect, useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { io, type Socket } from "socket.io-client";
 
 import type {
   CrownChaseClientToServerEvents,
   CrownChaseServerToClientEvents,
-  ClassroomGameId,
   ManagedClassroom,
 } from "../../CrownChase/Logic/multiplayer/protocol";
 import styles from "../CSS/classrooms.module.css";
 
 const STORAGE_KEY = "managed_classroom_tokens_v1";
-
-const CLASSROOM_GAMES: Array<{
-  id: ClassroomGameId;
-  label: string;
-}> = [
-  { id: "crown_chase", label: "Caça Coroa" },
-  { id: "spttt", label: "Super Jogo da Velha" },
-  { id: "math_war", label: "Guerra Matemática" },
-];
 
 type ClassroomSocket = Socket<
   CrownChaseServerToClientEvents,
@@ -30,7 +21,7 @@ export default function ClassroomsPage() {
   const [classrooms, setClassrooms] = useState<ManagedClassroom[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [copyFeedback, setCopyFeedback] = useState("");
-  const [isChoosingGame, setIsChoosingGame] = useState(false);
+  const [isExplanationOpen, setIsExplanationOpen] = useState(false);
 
   useEffect(() => {
     document.body.style.backgroundColor = "#68c2e0";
@@ -79,9 +70,8 @@ export default function ClassroomsPage() {
     };
   }, []);
 
-  const createClassroom = (gameId: ClassroomGameId) => {
-    socket?.emit("create_classroom", { gameId });
-    setIsChoosingGame(false);
+  const createClassroom = () => {
+    socket?.emit("create_classroom");
   };
 
   const deleteClassroom = (classroom: ManagedClassroom) => {
@@ -107,32 +97,49 @@ export default function ClassroomsPage() {
       <section className={styles.panel}>
         <h1>Turmas Online</h1>
         <p className={styles.description}>
-          Crie uma turma temporária para organizar partidas online.
-          O código funciona por 8 horas.
+          Crie uma turma temporária para organizar partidas online com seus alunos.
         </p>
 
         <button
+          className={styles.explanationToggle}
+          onClick={() => setIsExplanationOpen((current) => !current)}
+          aria-expanded={isExplanationOpen}
+          aria-controls="classroom-explanation"
+        >
+          Como funciona?
+          <ChevronDown
+            className={`${styles.explanationArrow} ${
+              isExplanationOpen ? styles.explanationArrowOpen : ""
+            }`}
+            aria-hidden="true"
+          />
+        </button>
+
+        {isExplanationOpen && (
+          <div className={styles.explanation} id="classroom-explanation">
+            <p>
+              Uma turma reúne as salas abertas pelos alunos em todos os jogos online
+              compatíveis. O mesmo código acompanha os alunos enquanto eles trocam de jogo.
+            </p>
+            <ol>
+              <li>Crie uma turma.</li>
+              <li>Escreva o código de quatro letras no quadro.</li>
+              <li>Os alunos entram em <strong>Turma</strong> em qualquer jogo online.</li>
+              <li>Ao trocar de jogo, a turma será reconhecida automaticamente.</li>
+            </ol>
+            <p className={styles.explanationNote}>
+              A turma dura 8 horas, não exige cadastro e só pode ser excluída neste dispositivo.
+            </p>
+          </div>
+        )}
+
+        <button
           className={styles.primaryButton}
-          onClick={() => setIsChoosingGame((current) => !current)}
+          onClick={createClassroom}
           disabled={!socket}
         >
           Criar Nova Turma
         </button>
-
-        {isChoosingGame && (
-          <div className={styles.gamePicker}>
-            {CLASSROOM_GAMES.map((game) => (
-              <button
-                className={styles.gameButton}
-                key={game.id}
-                onClick={() => createClassroom(game.id)}
-                disabled={!socket}
-              >
-                {game.label}
-              </button>
-            ))}
-          </div>
-        )}
 
         {errorMessage && <p className={styles.errorText}>{errorMessage}</p>}
         {copyFeedback && <p className={styles.feedback}>{copyFeedback}</p>}
@@ -145,7 +152,6 @@ export default function ClassroomsPage() {
               <article className={styles.classroomCard} key={classroom.code}>
                 <div>
                   <div className={styles.code}>{classroom.code}</div>
-                  <p className={styles.detail}>Jogo: {getGameLabel(classroom.gameId)}</p>
                   <p className={styles.detail}>
                     Expira às {formatExpiry(classroom.expiresAt)}
                   </p>
@@ -185,10 +191,6 @@ function loadManagementTokens(): string[] {
 
 function saveManagementTokens(tokens: string[]): void {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify([...new Set(tokens)]));
-}
-
-function getGameLabel(gameId: ClassroomGameId): string {
-  return CLASSROOM_GAMES.find((game) => game.id === gameId)?.label ?? "Jogo online";
 }
 
 function formatExpiry(expiresAt: number): string {
