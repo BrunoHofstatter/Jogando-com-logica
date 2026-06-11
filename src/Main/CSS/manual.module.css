@@ -38,6 +38,52 @@
   font-size: 4vw;
 }
 
+.introductionHeading {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  margin-top: 2.5vw;
+  padding-bottom: 2vw;
+  border-bottom: 0.4vw solid #060e13;
+}
+
+.introductionHeading h2 {
+  grid-column: 2;
+  margin: 0;
+  padding: 0;
+  border-bottom: 0;
+  text-align: center;
+}
+
+.classroomsButton {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: start;
+  flex: 0 0 auto;
+  padding: 0.6vw 2vw 0.9vw;
+  border: 0.4vw solid #060e13;
+  border-radius: 2vw;
+  background-color: #286a83;
+  box-shadow: 0 0.6vw 0 #060e13;
+  color: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 2vw;
+  -webkit-text-stroke: 0.12vw #060e13;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.1s ease;
+}
+
+.classroomsButton:hover {
+  transform: translateY(-0.2vw);
+  box-shadow: 0 0.8vw 0 #060e13;
+  background-color: #3aa6d1;
+}
+
+.classroomsButton:active {
+  transform: translateY(0.4vw);
+  box-shadow: 0 0.2vw 0 #060e13;
+}
+
 .manualPage h3 {
   color: #ffcf40;
   -webkit-text-stroke: 0.15vw #060e13;
@@ -802,6 +848,37 @@
     border-bottom: min(0.8vw, 0.6dvh) solid #060e13;
     -webkit-text-stroke: min(0.4vw, 0.3dvh) #060e13;
     text-shadow: 0 min(0.8vw, 0.6dvh) 0 #060e13;
+  }
+
+  .introductionHeading {
+    margin-top: min(6vw, 4dvh);
+    padding-bottom: min(4vw, 3dvh);
+    border-bottom-width: min(0.8vw, 0.6dvh);
+  }
+
+  .introductionHeading h2 {
+    margin: 0;
+    padding: 0;
+    border-bottom: 0;
+  }
+
+  .classroomsButton {
+    padding: min(2vw, 1.5dvh) min(4vw, 3dvh) min(2.5vw, 2dvh);
+    border-width: min(0.8vw, 0.6dvh);
+    border-radius: min(4vw, 3dvh);
+    box-shadow: 0 min(1.2vw, 0.8dvh) 0 #060e13;
+    font-size: min(4.5vw, 3.2dvh);
+    -webkit-text-stroke-width: min(0.3vw, 0.2dvh);
+  }
+
+  .classroomsButton:hover {
+    transform: translateY(min(-0.4vw, -0.3dvh));
+    box-shadow: 0 min(1.6vw, 1.2dvh) 0 #060e13;
+  }
+
+  .classroomsButton:active {
+    transform: translateY(min(0.8vw, 0.6dvh));
+    box-shadow: 0 min(0.4vw, 0.3dvh) 0 #060e13;
   }
 
   .manualPage h3 {

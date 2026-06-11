@@ -7,7 +7,6 @@ import type {
 
 export type CrownChaseRoomCode = string;
 export type ClassroomCode = string;
-export type ClassroomGameId = "crown_chase" | "spttt" | "math_war";
 
 export type MultiplayerConnectionStatus =
   | "idle"
@@ -59,7 +58,6 @@ export interface LeaveRoomPayload {
 
 export interface ClassroomSummary {
   code: ClassroomCode;
-  gameId: ClassroomGameId;
   expiresAt: number;
 }
 
@@ -70,10 +68,6 @@ export interface ManagedClassroom extends ClassroomSummary {
 export interface OpenRoomSummary {
   code: CrownChaseRoomCode;
   hostName: string;
-}
-
-export interface CreateClassroomPayload {
-  gameId: ClassroomGameId;
 }
 
 export interface ListManagedClassroomsPayload {
@@ -111,6 +105,7 @@ export interface ClassroomDeletedPayload {
 
 export interface ClassroomJoinedPayload {
   classroomCode: ClassroomCode;
+  expiresAt: number;
   openRooms: OpenRoomSummary[];
 }
 
@@ -184,7 +179,7 @@ export interface CrownChaseClientToServerEvents {
   submit_move: (payload: SubmitMovePayload) => void;
   request_rematch: (payload: RequestRematchPayload) => void;
   leave_room: (payload: LeaveRoomPayload) => void;
-  create_classroom: (payload: CreateClassroomPayload) => void;
+  create_classroom: () => void;
   list_managed_classrooms: (payload: ListManagedClassroomsPayload) => void;
   delete_classroom: (payload: DeleteClassroomPayload) => void;
   join_classroom: (payload: JoinClassroomPayload) => void;

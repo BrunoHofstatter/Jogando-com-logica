@@ -64,7 +64,7 @@ export function registerSptttRoomHandlers(
       const classroom = normalizedClassroomCode
         ? classroomStore.getClassroom(normalizedClassroomCode)
         : undefined;
-      if (classroomCode && (!classroom || classroom.gameId !== "spttt")) {
+      if (classroomCode && !classroom) {
         emitError(socket, "classroom_not_found", "Turma não encontrada.");
         return;
       }
@@ -166,7 +166,7 @@ export function registerSptttRoomHandlers(
     socket.on("join_classroom", ({ code }) => {
       const normalizedCode = normalizeClassroomCode(code);
       const classroom = normalizedCode ? classroomStore.getClassroom(normalizedCode) : undefined;
-      if (!classroom || classroom.gameId !== "spttt") {
+      if (!normalizedCode || !classroom) {
         emitError(socket, "classroom_not_found", "Turma não encontrada.");
         return;
       }
@@ -174,6 +174,7 @@ export function registerSptttRoomHandlers(
       socket.join(getClassroomChannel(normalizedCode));
       socket.emit("classroom_joined", {
         classroomCode: normalizedCode,
+        expiresAt: classroom.expiresAt,
         openRooms: getOpenClassroomRooms(normalizedCode),
       });
     });
@@ -188,7 +189,7 @@ export function registerSptttRoomHandlers(
     socket.on("list_open_rooms", ({ classroomCode }) => {
       const normalizedCode = normalizeClassroomCode(classroomCode);
       const classroom = normalizedCode ? classroomStore.getClassroom(normalizedCode) : undefined;
-      if (!classroom || classroom.gameId !== "spttt") {
+      if (!normalizedCode || !classroom) {
         emitError(socket, "classroom_not_found", "Turma não encontrada.");
         return;
       }

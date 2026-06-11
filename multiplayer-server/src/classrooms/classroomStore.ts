@@ -2,7 +2,6 @@ import { randomUUID } from "node:crypto";
 
 import type {
   ClassroomCode,
-  ClassroomGameId,
   ManagedClassroom,
 } from "../../../src/CrownChase/Logic/multiplayer/protocol.ts";
 
@@ -32,11 +31,10 @@ export function createClassroomStore(onDelete: (code: ClassroomCode) => void) {
     return true;
   };
 
-  const createClassroom = (gameId: ClassroomGameId): ManagedClassroom => {
+  const createClassroom = (): ManagedClassroom => {
     const code = generateClassroomCode(new Set(classrooms.keys()));
     const classroom: TemporaryClassroom = {
       code,
-      gameId,
       managementToken: randomUUID(),
       expiresAt: Date.now() + CLASSROOM_TTL_MS,
       expiryTimeout: setTimeout(() => deleteClassroom(code), CLASSROOM_TTL_MS),
@@ -82,7 +80,6 @@ function generateClassroomCode(existingCodes: Set<ClassroomCode>): ClassroomCode
 function serializeClassroom(classroom: TemporaryClassroom): ManagedClassroom {
   return {
     code: classroom.code,
-    gameId: classroom.gameId,
     managementToken: classroom.managementToken,
     expiresAt: classroom.expiresAt,
   };

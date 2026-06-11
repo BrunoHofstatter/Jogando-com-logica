@@ -30,8 +30,7 @@ const Class2FaceArea: React.FC = () => {
     const isTransition = uiProps.currentPhase === "transition";
     const showHint =
         uiProps.currentPhase === "hint1" ||
-        uiProps.currentPhase === "hint2" ||
-        uiProps.currentPhase === "hint3";
+        uiProps.currentPhase === "hint2";
 
     return (
         <div className={styles.container}>
@@ -71,21 +70,24 @@ const Class2FaceArea: React.FC = () => {
 
             {/* --- Right panel: Interaction --- */}
             <div className={styles.rightPanel}>
-                {/* Title */}
+                <div className={styles.progress}>
+                    Pergunta {uiProps.currentStepIndex + 1} de {uiProps.totalSteps}
+                </div>
+
                 <h1 className={styles.title}>
-                    Quantos quadradinhos tem em um lado do cubo?
+                    {uiProps.question}
                 </h1>
 
                 {/* Options grid */}
                 <div className={styles.optionsGrid}>
                     {uiProps.options.map((opt) => (
                         <button
-                            key={opt}
+                            key={opt.value}
                             className={styles.optionButton}
                             disabled={isTransition}
-                            onClick={() => uiProps.handleGuess(opt)}
+                            onClick={() => uiProps.handleGuess(opt.value)}
                         >
-                            {opt}
+                            {opt.label}
                         </button>
                     ))}
                 </div>

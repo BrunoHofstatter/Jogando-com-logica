@@ -3,6 +3,7 @@ import type {
   CacaSomaRoomSeat,
   CacaSomaRoomSettings,
 } from "../../../src/Caca_soma/Logic/multiplayer/protocol.ts";
+import type { ClassroomCode } from "../../../src/CrownChase/Logic/multiplayer/protocol.ts";
 
 export const CACA_SOMA_WAITING_ROOM_TTL_MS = 10 * 60 * 1000;
 export const CACA_SOMA_DISCONNECT_GRACE_MS = 30 * 1000;
@@ -22,6 +23,8 @@ export interface CacaSomaRoomPlayer {
 
 export interface CacaSomaRoom {
   code: string;
+  visibility: "private" | "classroom";
+  classroomCode: ClassroomCode | null;
   settings: CacaSomaRoomSettings;
   state: CacaSomaMatchState | null;
   status: CacaSomaRoomStatus;

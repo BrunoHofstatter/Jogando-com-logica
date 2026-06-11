@@ -3,6 +3,10 @@ import type {
   CacaSomaMatchState,
   DifficultyId,
 } from "../v2";
+import type {
+  ClassroomCode,
+  ClassroomUnavailablePayload,
+} from "../../../CrownChase/Logic/multiplayer/protocol";
 
 export type CacaSomaRoomCode = string;
 
@@ -24,6 +28,7 @@ export type MultiplayerErrorCode =
   | "room_not_found"
   | "room_full"
   | "room_not_joinable"
+  | "classroom_not_found"
   | "host_only"
   | "not_enough_players"
   | "illegal_move"
@@ -49,6 +54,7 @@ export interface RoomPlayerInfo {
 
 export interface CreateRoomPayload {
   playerName: string;
+  classroomCode?: ClassroomCode;
 }
 
 export interface JoinRoomPayload {
@@ -86,6 +92,34 @@ export interface RequestRematchPayload {
 
 export interface LeaveRoomPayload {
   code: CacaSomaRoomCode;
+}
+
+export interface CacaSomaOpenRoomSummary {
+  code: CacaSomaRoomCode;
+  hostName: string;
+  mode: CacaSomaRoomMode;
+  playerCount: number;
+  capacity: 2 | 4;
+  difficultyId: DifficultyId;
+  targetScore: 2 | 3 | 4 | 5;
+}
+
+export interface JoinClassroomPayload {
+  code: ClassroomCode;
+}
+
+export interface LeaveClassroomPayload {
+  code: ClassroomCode;
+}
+
+export interface ListOpenRoomsPayload {
+  classroomCode: ClassroomCode;
+}
+
+export interface CacaSomaClassroomRoomsPayload {
+  classroomCode: ClassroomCode;
+  expiresAt?: number;
+  openRooms: CacaSomaOpenRoomSummary[];
 }
 
 export interface RoomCreatedPayload {
@@ -160,6 +194,9 @@ export interface CacaSomaClientToServerEvents {
   submit_action: (payload: SubmitActionPayload) => void;
   request_rematch: (payload: RequestRematchPayload) => void;
   leave_room: (payload: LeaveRoomPayload) => void;
+  join_classroom: (payload: JoinClassroomPayload) => void;
+  leave_classroom: (payload: LeaveClassroomPayload) => void;
+  list_open_rooms: (payload: ListOpenRoomsPayload) => void;
 }
 
 export interface CacaSomaServerToClientEvents {
@@ -173,4 +210,9 @@ export interface CacaSomaServerToClientEvents {
   player_left: (payload: PlayerLeftPayload) => void;
   room_closed: (payload: RoomClosedPayload) => void;
   multiplayer_error: (payload: MultiplayerErrorPayload) => void;
+  classroom_joined: (payload: CacaSomaClassroomRoomsPayload) => void;
+  classroom_rooms_updated: (payload: CacaSomaClassroomRoomsPayload) => void;
+  classroom_unavailable: (payload: ClassroomUnavailablePayload) => void;
 }
+
+export type { ClassroomCode };

@@ -118,6 +118,7 @@
 .settingsPanel,
 .joinBox,
 .waitingBox,
+.classroomBox,
 .playersSection {
   display: flex;
   flex-direction: column;
@@ -128,6 +129,39 @@
   box-shadow: 0 0.7vw 0 #a11425;
   padding: 1.4vw;
   color: #ffcf40;
+}
+
+.classroomHeader,
+.openRoomCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1vw;
+}
+
+.roomList,
+.openRoomInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8vw;
+}
+
+.openRoomCard {
+  border: 0.18vw solid #a11425;
+  border-radius: 1.2vw;
+  background-color: #fff1f1;
+  color: #a11425;
+  padding: 0.8vw 1vw;
+  box-shadow: 0 0.3vw 0 #ff6b6b;
+}
+
+.openRoomInfo {
+  font-size: clamp(1vw, 2.4dvh, 1.4vw);
+}
+
+.openRoomTitle {
+  font-size: clamp(1.3vw, 3dvh, 1.8vw);
+  color: #7f1d1d;
 }
 
 .settingsGrid {
@@ -504,12 +538,24 @@
   .settingsPanel,
   .joinBox,
   .waitingBox,
+  .classroomBox,
   .playersSection {
     border-width: min(0.6vw, 0.3dvh);
     border-radius: min(5vw, 2.5dvh);
     box-shadow: 0 min(1vw, 0.6dvh) 0 #a11425;
     padding: min(4vw, 2.2dvh);
     gap: min(2vw, 1dvh);
+  }
+
+  .classroomHeader,
+  .openRoomCard {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .openRoomInfo,
+  .openRoomTitle {
+    font-size: min(5vw, 2.6dvh);
   }
 
   .primaryButton,
