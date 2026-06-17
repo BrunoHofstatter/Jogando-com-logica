@@ -47,7 +47,7 @@ export function createPointsRaceConfig(
     selectionChangeCooldownMs,
     timePrecisionMs = 10,
     preferSharedTargets = true,
-    roundCountdownMs = 3_000,
+    roundCountdownMs = 5_000,
     targetRollMs = 1_500,
   } = options;
 

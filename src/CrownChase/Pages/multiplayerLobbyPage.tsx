@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { ROUTES } from "../../routes";
+import { useDelayedOnlineWaitHint } from "../../Shared/Hooks/useDelayedOnlineWaitHint";
 import { useCrownChaseMultiplayer } from "../Hooks/useCrownChaseMultiplayer";
 import styles from "../styles/multiplayerLobby.module.css";
 
@@ -58,6 +59,7 @@ export default function CrownChaseMultiplayerLobbyPage() {
   const isBusy = connectionStatus === "connecting";
   const isWaiting = connectionStatus === "waiting" && roomCode !== null;
   const isDisconnected = connectionStatus === "disconnected" && roomCode !== null;
+  const showOnlineWaitHint = useDelayedOnlineWaitHint(isBusy);
 
   const handleCopyCode = async () => {
     if (!roomCode) {
@@ -236,6 +238,12 @@ export default function CrownChaseMultiplayerLobbyPage() {
                 Jogar sem turma
               </button>
             </div>
+          )}
+
+          {showOnlineWaitHint && (
+            <p className={styles.waitingText}>
+              Aguarde um pouco. Isso pode levar até 30 segundos.
+            </p>
           )}
 
           {isWaiting && (

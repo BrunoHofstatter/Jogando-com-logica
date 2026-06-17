@@ -33,7 +33,7 @@ describe("Caca Soma v2 match engine", () => {
     expect(twoVersusTwo.allowedSelectionCounts).toEqual([2]);
     expect(twoVersusTwo.selectionLimits).toEqual([1, 1]);
     expect(twoVersusTwo.selectionChangeCooldownMs).toBe(1_000);
-    expect(twoVersusTwo.roundCountdownMs).toBe(3_000);
+    expect(twoVersusTwo.roundCountdownMs).toBe(5_000);
     expect(twoVersusTwo.targetRollMs).toBe(1_500);
 
     expect(oneVersusOne.difficulty.boardSize).toBe(10);
@@ -43,7 +43,7 @@ describe("Caca Soma v2 match engine", () => {
     expect(oneVersusOne.allowedSelectionCounts).toEqual([2, 3]);
     expect(oneVersusOne.selectionLimits).toEqual([3]);
     expect(oneVersusOne.selectionChangeCooldownMs).toBe(0);
-    expect(oneVersusOne.roundCountdownMs).toBe(3_000);
+    expect(oneVersusOne.roundCountdownMs).toBe(5_000);
     expect(oneVersusOne.targetRollMs).toBe(1_500);
   });
 
@@ -76,10 +76,10 @@ describe("Caca Soma v2 match engine", () => {
     expect(state.currentRound?.targetStrategy).toBe("shared");
     expect(state.currentRound).toMatchObject({
       phase: "countdown",
-      phaseEndsAtMs: 3_000,
-      playStartsAtMs: 4_500,
-      startedAtMs: 4_500,
-      deadlineAtMs: 64_500,
+      phaseEndsAtMs: 5_000,
+      playStartsAtMs: 6_500,
+      startedAtMs: 6_500,
+      deadlineAtMs: 66_500,
     });
   });
 
@@ -103,7 +103,7 @@ describe("Caca Soma v2 match engine", () => {
       reason: "round_not_playing",
     });
 
-    const rolling = advanceRoundPhase(state, 3_000);
+    const rolling = advanceRoundPhase(state, 5_000);
     expect(rolling.changed).toBe(true);
     expect(rolling.state.currentRound?.phase).toBe("rolling");
     expect(rolling.events).toEqual([
@@ -113,7 +113,7 @@ describe("Caca Soma v2 match engine", () => {
       }),
     ]);
 
-    const playing = advanceRoundPhase(rolling.state, 4_500);
+    const playing = advanceRoundPhase(rolling.state, 6_500);
     expect(playing.changed).toBe(true);
     expect(playing.state.currentRound?.phase).toBe("playing");
     state = playing.state;
@@ -123,7 +123,7 @@ describe("Caca Soma v2 match engine", () => {
       team: 0,
       playerIndex: 0,
       cellIds: [0],
-      nowMs: 4_600,
+      nowMs: 6_600,
     });
     expect(pick.ok).toBe(true);
   });

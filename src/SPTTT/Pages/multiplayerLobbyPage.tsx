@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { ROUTES } from "../../routes";
+import { useDelayedOnlineWaitHint } from "../../Shared/Hooks/useDelayedOnlineWaitHint";
 import { useSPTTTMultiplayer } from "../Hooks/useSPTTTMultiplayer";
 import styles from "../Style/multiplayerLobby.module.css";
 
@@ -58,6 +59,7 @@ export default function SPTTTMultiplayerLobbyPage() {
   const isBusy = connectionStatus === "connecting";
   const isWaiting = connectionStatus === "waiting" && roomCode !== null;
   const isDisconnected = connectionStatus === "disconnected" && roomCode !== null;
+  const showOnlineWaitHint = useDelayedOnlineWaitHint(isBusy);
 
   const handleCopyCode = async () => {
     if (!roomCode) {
@@ -245,6 +247,12 @@ export default function SPTTTMultiplayerLobbyPage() {
                 Jogar sem turma
               </button>
             </div>
+          )}
+
+          {showOnlineWaitHint && (
+            <p className={styles.waitingText}>
+              Aguarde um pouco. Isso pode levar até 30 segundos.
+            </p>
           )}
 
           {isWaiting && (

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { ROUTES } from "../../routes";
+import { useDelayedOnlineWaitHint } from "../../Shared/Hooks/useDelayedOnlineWaitHint";
 import { useCacaSomaMultiplayer } from "../Hooks/useCacaSomaMultiplayer";
 import type {
   CacaSomaRoomMode,
@@ -114,6 +115,7 @@ export default function CacaSomaMultiplayerLobbyPage() {
   const isBusy = connectionStatus === "connecting";
   const isInRoom = roomCode !== null && connectionStatus !== "disconnected";
   const isDisconnected = connectionStatus === "disconnected" && roomCode !== null;
+  const showOnlineWaitHint = useDelayedOnlineWaitHint(isBusy);
   const roomSettings = settings ?? DEFAULT_SETTINGS;
   const roomCapacity = getRoomCapacity(roomSettings.mode);
   const roomSlots = getRoomSlots(roomSettings.mode);
@@ -369,6 +371,12 @@ export default function CacaSomaMultiplayerLobbyPage() {
                 </div>
               )}
             </>
+          )}
+
+          {showOnlineWaitHint && (
+            <p className={styles.waitingText}>
+              Aguarde um pouco. Isso pode levar até 30 segundos.
+            </p>
           )}
 
           {isInRoom && roomCode && (

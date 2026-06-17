@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { ROUTES } from "../../routes";
+import { useDelayedOnlineWaitHint } from "../../Shared/Hooks/useDelayedOnlineWaitHint";
 import { difficulties, type DifficultyKey } from "../Logic/gameConfig";
 import { useStopMultiplayer } from "../Hooks/useStopMultiplayer";
 import styles from "../styles/multiplayerLobby.module.css";
@@ -79,6 +80,7 @@ export default function StopMultiplayerLobbyPage() {
   const isBusy = connectionStatus === "connecting";
   const isInRoom = roomCode !== null && state !== null && state.status === "lobby";
   const isDisconnected = connectionStatus === "disconnected" && roomCode !== null;
+  const showOnlineWaitHint = useDelayedOnlineWaitHint(isBusy);
   const canStart = isHost && (state?.players.length ?? 0) >= 2;
   const roomSettings = state?.settings ?? null;
   const cardClassName = `${styles.card} ${isInRoom ? styles.roomCard : ""}`;
@@ -342,6 +344,12 @@ export default function StopMultiplayerLobbyPage() {
                 Jogar sem turma
               </button>
             </div>
+          )}
+
+          {showOnlineWaitHint && (
+            <p className={styles.waitingText}>
+              Aguarde um pouco. Isso pode levar até 30 segundos.
+            </p>
           )}
 
           {isInRoom && state && roomSettings && (
