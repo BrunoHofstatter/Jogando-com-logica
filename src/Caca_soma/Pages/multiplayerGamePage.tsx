@@ -3,11 +3,80 @@ import { useNavigate } from "react-router-dom";
 
 import { ROUTES } from "../../routes";
 import { useCacaSomaMultiplayer } from "../Hooks/useCacaSomaMultiplayer";
+import type { CacaSomaRoundResult, TeamId } from "../Logic/v2";
 import baseStyles from "../styles/levelGame.module.css";
 import styles from "../styles/multiplayerGame.module.css";
 
 function formatSeconds(ms: number): string {
   return `${Math.max(0, Math.ceil(ms / 1000))}s`;
+}
+
+const TEAM_LABELS: Record<TeamId, string> = {
+  0: "Equipe Laranja",
+  1: "Equipe Azul",
+};
+
+function getRoundResultTitle(result: CacaSomaRoundResult): string {
+  if (result.winner === null) {
+    return result.reason === "tied_correct" ? "Empate na rodada!" : "Ninguém pontuou!";
+  }
+
+  const teamName = TEAM_LABELS[result.winner];
+  if (result.reason === "one_correct") {
+    return `${teamName} acertou!`;
+  }
+
+  if (result.reason === "faster_correct") {
+    return `${teamName} foi mais rápida!`;
+  }
+
+  return `${teamName} venceu a rodada!`;
+}
+
+function getRoundResultSubtitle(result: CacaSomaRoundResult): string {
+  if (result.reason === "faster_correct") {
+    return "Ponto para quem respondeu certo primeiro.";
+  }
+
+  if (result.reason === "one_correct") {
+    return "Só uma equipe acertou a soma.";
+  }
+
+  if (result.reason === "tied_correct") {
+    return "As duas equipes acertaram no mesmo tempo.";
+  }
+
+  return "As equipes não acertaram desta vez.";
+}
+
+function formatElapsedTime(elapsedMs: number | null): string {
+  if (elapsedMs === null) {
+    return "-";
+  }
+
+  return `${Math.max(0, Math.round(elapsedMs / 1000))}s`;
+}
+
+function getDisplayElapsedMs(result: CacaSomaRoundResult): [number | null, number | null] {
+  const displayTimes = result.teams.map((team) => (
+    team.elapsedMs === null ? null : Math.max(0, Math.round(team.elapsedMs / 1000) * 1000)
+  )) as [number | null, number | null];
+
+  if (
+    result.reason === "faster_correct" &&
+    result.winner !== null &&
+    displayTimes[0] !== null &&
+    displayTimes[1] !== null &&
+    displayTimes[0] === displayTimes[1]
+  ) {
+    const loser = result.winner === 0 ? 1 : 0;
+    const winnerDisplayTime = displayTimes[result.winner];
+    if (winnerDisplayTime !== null) {
+      displayTimes[loser] = winnerDisplayTime + 1000;
+    }
+  }
+
+  return displayTimes;
 }
 
 export default function CacaSomaMultiplayerGamePage() {
@@ -143,6 +212,11 @@ export default function CacaSomaMultiplayerGamePage() {
   const phaseRemainingMs = currentRound ? currentRound.phaseEndsAtMs - timeNow : 0;
   const roundNumber = currentRound?.number ?? gameState?.history.length ?? 0;
   const overlayCountdown = Math.max(1, Math.ceil(phaseRemainingMs / 1000));
+  const previousRoundResult = gameState && gameState.history.length > 0
+    ? gameState.history[gameState.history.length - 1]
+    : null;
+  const isResultCountdown = roundPhase === "countdown" && previousRoundResult !== null;
+  const resultDisplayTimes = previousRoundResult ? getDisplayElapsedMs(previousRoundResult) : null;
 
   const readyButtonLabel = localPlayerReady ? "Cancelar Pronto" : "Pronto";
   const playAgainLabel =
@@ -400,13 +474,78 @@ export default function CacaSomaMultiplayerGamePage() {
         <div className={styles.roundOverlay}>
           <div className={styles.roundOverlayCard}>
             <div className={styles.roundOverlayTitle}>
-              Rodada {currentRound.number}
+              {isResultCountdown && previousRoundResult
+                ? getRoundResultTitle(previousRoundResult)
+                : currentRound.number === 1
+                  ? "A partida vai começar!"
+                  : `Rodada ${currentRound.number}`}
             </div>
             <div className={styles.roundOverlayText}>
               {roundPhase === "countdown"
-                ? "começa em"
+                ? isResultCountdown && previousRoundResult
+                  ? getRoundResultSubtitle(previousRoundResult)
+                  : "Prepare-se..."
                 : "Número mágico..."}
             </div>
+            {roundPhase === "countdown" && (
+              <div className={styles.roundOverlayScoreboard}>
+                {([0, 1] as const).map((teamId) => (
+                  <div
+                    key={`overlay-score-${teamId}`}
+                    className={`${styles.roundOverlayTeamScore} ${
+                      teamId === 0 ? styles.roundOverlayTeamOrange : styles.roundOverlayTeamBlue
+                    }`}
+                  >
+                    <span className={styles.roundOverlayTeamLabel}>
+                      {teamId === 0 ? "Laranja" : "Azul"}
+                    </span>
+                    <div className={styles.roundOverlayDots}>
+                      {Array.from({ length: matchTargetScore }, (_, index) => {
+                        const teamScore = gameState?.teams[teamId].score ?? 0;
+                        const isFilled = index < teamScore;
+                        const isNewPoint =
+                          isResultCountdown &&
+                          previousRoundResult?.winner === teamId &&
+                          index === teamScore - 1;
+
+                        return (
+                          <span
+                            key={`overlay-dot-${teamId}-${index}`}
+                            className={`${baseStyles.roundDot} ${styles.scoreDot} ${
+                              teamId === 0 ? styles.scoreDotOrange : styles.scoreDotBlue
+                            } ${isFilled ? styles.scoreDotFilled : ""} ${
+                              isNewPoint ? styles.scoreDotJustScored : ""
+                            }`}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {isResultCountdown && previousRoundResult && resultDisplayTimes && (
+              <div className={styles.roundOverlayTimes}>
+                {([0, 1] as const).map((teamId) => (
+                  <span
+                    key={`overlay-time-${teamId}`}
+                    className={`${styles.roundOverlayTimePill} ${
+                      previousRoundResult.winner === teamId ? styles.roundOverlayTimeWinner : ""
+                    }`}
+                  >
+                    {teamId === 0 ? "Laranja" : "Azul"}:{" "}
+                    {previousRoundResult.teams[teamId].submitted
+                      ? formatElapsedTime(resultDisplayTimes[teamId])
+                      : "sem resposta"}
+                  </span>
+                ))}
+              </div>
+            )}
+            {roundPhase === "countdown" && (
+              <div className={styles.roundOverlayNextText}>
+                {currentRound.number === 1 ? "Começa em" : `Rodada ${currentRound.number} em`}
+              </div>
+            )}
             <div className={styles.roundOverlayValue}>
               {roundPhase === "countdown" ? overlayCountdown : rollingMagicNumber}
             </div>
