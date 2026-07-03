@@ -42,6 +42,10 @@
   cursor: default;
 }
 
+.noInteraction {
+  cursor: default;
+}
+
 /* --- Inner Solid Core ---------------------------------------- */
 .innerCore {
   position: absolute;
@@ -103,6 +107,23 @@
   border-radius: calc(var(--cube-size) / var(--grid-size) * 0.07);
   /* Sticker cell size — inherited by children for proportional shadow scaling */
   --ss: calc(var(--cube-size) / var(--grid-size));
+}
+
+.faceLabel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 4;
+  font-family: "Cherry Bomb One", cursive;
+  font-size: calc(var(--cube-size) * 0.22);
+  line-height: 0.9;
+  color: #fff;
+  -webkit-text-stroke: calc(var(--cube-size) * 0.018) #111;
+  text-shadow: 0 calc(var(--cube-size) * 0.025) calc(var(--cube-size) * 0.04) rgba(0, 0, 0, 0.7);
+  animation: popIn 0.4s ease-out backwards;
 }
 
 /* Face transforms — translateZ = half cube size */

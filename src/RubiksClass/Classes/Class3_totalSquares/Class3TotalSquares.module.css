@@ -1,0 +1,588 @@
+/* ============================================================
+   Class3TotalSquares.module.css
+   Layout & styling for Class 3: total cube squares
+   ============================================================ */
+
+.container {
+    display: flex;
+    height: 100dvh;
+    width: 100vw;
+    overflow: hidden;
+    background-color: #e0f2fe;
+    font-family: "Cherry Bomb One", system-ui;
+    box-sizing: border-box;
+}
+
+.feedbackOverlay {
+    position: absolute;
+    top: 3dvh;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+    width: 100%;
+    gap: 1vw;
+}
+
+.aulasButton {
+    position: absolute;
+    top: 2vw;
+    left: 2vw;
+    z-index: 1000;
+    font-family: inherit;
+    font-size: 2vw;
+    background: #a855f7;
+    color: #ffffff;
+    border: 0.3vw solid #6b21a8;
+    border-radius: 1vw;
+    padding: 0.5vw 1.5vw 0.8vw;
+    cursor: pointer;
+    box-shadow: 0 0.6vw 0 #6b21a8;
+    transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+    -webkit-text-stroke: 0.15vw #6b21a8;
+}
+
+.aulasButton:hover {
+    background: #c084fc;
+    transform: translateY(-0.2vw);
+    box-shadow: 0 0.8vw 0 #6b21a8;
+}
+
+.aulasButton:active {
+    transform: translateY(0.4vw);
+    box-shadow: 0 0.2vw 0 #6b21a8;
+}
+
+.headerOverlay {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    z-index: 10;
+    transform: translateY(-4vw);
+}
+
+.cubeTitle {
+    background: #9bcbff;
+    border: 0.3vw solid #013873;
+    border-radius: 1vw;
+    padding: 0.8vw 2vw 1vw;
+    font-family: inherit;
+    font-size: 2vw;
+    color: #ffffff;
+    box-shadow: 0 0.6vw 0 #013873;
+    -webkit-text-stroke: 0.15vw #013873;
+    text-shadow: 0 0.3vw 0 #013873;
+}
+
+.leftPanel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: #e0f2fe;
+    border-right: 0.3vw solid #013873;
+    gap: 2vw;
+}
+
+.rightPanel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #d5ebfa;
+    padding: 4dvh 4vw;
+    gap: 6dvh;
+    position: relative;
+    overflow-y: auto;
+}
+
+.title {
+    font-family: inherit;
+    font-size: 3.3vw;
+    color: #ffffff;
+    text-align: center;
+    margin: 0;
+    -webkit-text-stroke: 0.2vw #013873;
+    text-shadow: 0 0.4vw 0 #013873;
+    line-height: 1.18;
+}
+
+.hintCard,
+.successCard {
+    border-radius: 1vw;
+    padding: 0.8vw 1.8vw 1vw;
+    text-align: center;
+    font-family: inherit;
+    font-size: 1.8vw;
+    color: #ffffff;
+    animation: fadeSlideIn 0.4s ease-out;
+    pointer-events: auto;
+    max-width: 62vw;
+}
+
+.hintCard {
+    background: #ffe874;
+    border: 0.4vw solid #ca8a04;
+    box-shadow: 0 0.6vw 0 #a16207;
+    -webkit-text-stroke: 0.15vw #ca8a04;
+}
+
+.successCard {
+    background: #5ee991;
+    border: 0.4vw solid #16a34a;
+    box-shadow: 0 0.6vw 0 #15803d;
+    -webkit-text-stroke: 0.15vw #16a34a;
+}
+
+.hintIcon {
+    margin-right: 0.5vw;
+    font-size: 1.8vw;
+}
+
+.optionsGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5vw;
+    width: 90%;
+    max-width: 40vw;
+}
+
+.optionButton,
+.completeButton {
+    font-family: inherit;
+    font-size: 2vw;
+    padding: 0.8vw 0 1vw;
+    border: 0.4vw solid #013873;
+    border-radius: 1vw;
+    background: #98defc;
+    color: #ffffff;
+    cursor: pointer;
+    box-shadow: 0 0.6vw 0 #013873;
+    transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+    -webkit-text-stroke: 0.15vw #013873;
+    text-shadow: 0 0.2vw 0 #013873;
+}
+
+.optionButton:hover:not(:disabled),
+.completeButton:hover {
+    transform: translateY(-0.2vw);
+    box-shadow: 0 0.8vw 0 #013873;
+    background: #7dd3fc;
+}
+
+.optionButton:active:not(:disabled),
+.completeButton:active {
+    transform: translateY(0.4vw);
+    box-shadow: 0 0.2vw 0 #013873;
+}
+
+.optionButton:disabled {
+    opacity: 0.8;
+    cursor: not-allowed;
+    background: #e0f2fe;
+    box-shadow: 0 0.2vw 0 #013873;
+    transform: translateY(0.4vw);
+}
+
+.calculationCard {
+    width: min(38vw, 86%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2vw;
+}
+
+.completeCard {
+    width: min(38vw, 78%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2vw;
+    background: #ffffff;
+    border: 0.4vw solid #013873;
+    border-radius: 2vw;
+    box-shadow: 0 0.9vw 0 #013873;
+    padding: 1.4vw 1.8vw 1.8vw;
+}
+
+.supportingText,
+.completeText,
+.completeStats {
+    margin: 0;
+    text-align: center;
+    font-family: inherit;
+    font-size: 1.8vw;
+    line-height: 1.15;
+    color: #ffffff;
+    -webkit-text-stroke: 0.13vw #013873;
+    text-shadow: 0 0.22vw 0 #013873;
+}
+
+.completeTitle {
+    margin: 0;
+    text-align: center;
+    font-size: 3.2vw;
+    color: #ffffff;
+    -webkit-text-stroke: 0.2vw #013873;
+    text-shadow: 0 0.4vw 0 #013873;
+}
+
+.completeButton {
+    width: 72%;
+    margin-top: 0.8vw;
+}
+
+.calculationRoot {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    gap: 1vw;
+    color: #013873;
+}
+
+.calculationGrid {
+    width: min(22vw, 100%);
+    gap: 0.45vw;
+}
+
+.calculationCell {
+    border: 0.28vw solid #013873;
+    border-radius: 0.65vw;
+    background: #ffffff;
+    color: #013873;
+    font-size: 2.6vw;
+    box-shadow: inset 0 -0.25vw 0 #bfe8fb;
+    -webkit-text-stroke: 0.06vw #013873;
+}
+
+.operandCell {
+    background: #e0f2fe;
+}
+
+.resultCell {
+    background: #ffe874;
+}
+
+.carryCell {
+    width: 76%;
+    font-size: 1.65vw;
+    background: #d9f99d;
+    border-color: #4d7c0f;
+    color: #365314;
+    -webkit-text-stroke: 0.04vw #365314;
+}
+
+.activeCell {
+    outline: 0.35vw solid #facc15;
+    outline-offset: 0.18vw;
+}
+
+.disabledCell {
+    opacity: 1;
+}
+
+.calculationOperator {
+    color: #ffffff;
+    font-size: 2.5vw;
+    -webkit-text-stroke: 0.12vw #013873;
+    text-shadow: 0 0.22vw 0 #013873;
+}
+
+.calculationBar {
+    height: 0.35vw;
+    background: #013873;
+    border-radius: 999vw;
+}
+
+.calculationMessage {
+    min-height: 2.8vw;
+    margin: 0;
+    text-align: center;
+    color: #ffffff;
+    font-size: 1.35vw;
+    line-height: 1.1;
+    background: #ffe874;
+    border: 0.25vw solid #ca8a04;
+    border-radius: 0.9vw;
+    box-shadow: 0 0.35vw 0 #a16207;
+    padding: 0.55vw 1vw 0.7vw;
+    -webkit-text-stroke: 0.09vw #013873;
+    text-shadow: 0 0.15vw 0 #013873;
+}
+
+.calculationToolbar {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.8vw;
+    width: 100%;
+}
+
+.calculationActionButton,
+.keypadButton {
+    border: 0.25vw solid #013873;
+    border-radius: 0.8vw;
+    padding: 0.45vw 1vw 0.65vw;
+    background: #98defc;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 1.25vw;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 0.35vw 0 #013873;
+    transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+    -webkit-text-stroke: 0.08vw #013873;
+    text-shadow: 0 0.14vw 0 #013873;
+}
+
+.calculationActionButton:hover,
+.keypadButton:hover {
+    background: #7dd3fc;
+    transform: translateY(-0.1vw);
+    box-shadow: 0 0.45vw 0 #013873;
+}
+
+.calculationActionButton:active,
+.keypadButton:active {
+    transform: translateY(0.25vw);
+    box-shadow: 0 0.1vw 0 #013873;
+}
+
+.checkButton {
+    background: #5ee991;
+    border-color: #15803d;
+    box-shadow: 0 0.55vw 0 #15803d;
+    flex-basis: 58%;
+    font-size: 1.7vw;
+    padding: 0.75vw 1vw 0.95vw;
+    -webkit-text-stroke: 0.11vw #15803d;
+    text-shadow: 0 0.18vw 0 #15803d;
+}
+
+.keypad {
+    width: min(19vw, 100%);
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.55vw;
+}
+
+.keypadButton {
+    min-height: 2.6vw;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+@media (max-width: 650px) and (orientation: portrait) {
+    .container {
+        flex-direction: column;
+    }
+
+    .aulasButton {
+        font-size: min(4vw, 2.2dvh);
+        top: min(3vw, 1.65dvh);
+        left: min(3vw, 1.65dvh);
+        padding: min(1.5vw, 0.83dvh) min(3vw, 1.65dvh) min(2vw, 1.1dvh);
+        border-radius: min(2vw, 1.1dvh);
+        border-width: min(0.6vw, 0.33dvh);
+        box-shadow: 0 min(1.2vw, 0.66dvh) 0 #6b21a8;
+        -webkit-text-stroke: min(0.25vw, 0.14dvh) #6b21a8;
+    }
+
+    .leftPanel {
+        flex: 0 0 42dvh;
+        border-right: none;
+        border-bottom: min(0.3vw, 0.17dvh) solid #013873;
+        gap: min(2vw, 1.1dvh);
+    }
+
+    .headerOverlay {
+        transform: translateY(calc(-1 * min(2vw, 1.1dvh)));
+    }
+
+    .cubeTitle {
+        font-size: min(4vw, 2.2dvh);
+        padding: min(1.5vw, 0.83dvh) min(3vw, 1.65dvh) min(1.9vw, 1.05dvh);
+        border-radius: min(2vw, 1.1dvh);
+        border-width: min(0.5vw, 0.28dvh);
+        box-shadow: 0 min(1vw, 0.55dvh) 0 #013873;
+        -webkit-text-stroke: min(0.25vw, 0.14dvh) #013873;
+        text-shadow: 0 min(0.5vw, 0.28dvh) 0 #013873;
+    }
+
+    .feedbackOverlay {
+        top: 39dvh;
+    }
+
+    .rightPanel {
+        flex: 1;
+        padding: min(4vw, 2.2dvh);
+        gap: min(3vw, 1.7dvh);
+        overflow-y: auto;
+    }
+
+    .title {
+        font-size: min(5.6vw, 3.1dvh);
+        -webkit-text-stroke: min(0.32vw, 0.18dvh) #013873;
+        text-shadow: 0 min(0.55vw, 0.3dvh) 0 #013873;
+    }
+
+    .optionsGrid {
+        width: 90%;
+        max-width: 82vw;
+        gap: min(3vw, 1.65dvh);
+    }
+
+    .optionButton,
+    .completeButton {
+        font-size: min(5vw, 2.75dvh);
+        padding: min(2vw, 1.1dvh) 0 min(2.5vw, 1.38dvh);
+        border-width: min(0.6vw, 0.33dvh);
+        border-radius: min(2vw, 1.1dvh);
+        box-shadow: 0 min(1.2vw, 0.66dvh) 0 #013873;
+        -webkit-text-stroke: min(0.25vw, 0.14dvh) #013873;
+        text-shadow: 0 min(0.4vw, 0.22dvh) 0 #013873;
+    }
+
+    .hintCard,
+    .successCard {
+        font-size: min(3.4vw, 1.87dvh);
+        padding: min(1.5vw, 0.83dvh) min(3vw, 1.65dvh) min(2vw, 1.1dvh);
+        border-radius: min(2vw, 1.1dvh);
+        max-width: 86vw;
+        border-width: min(0.6vw, 0.33dvh);
+    }
+
+    .hintIcon {
+        font-size: min(3.4vw, 1.87dvh);
+        margin-right: min(0.8vw, 0.44dvh);
+    }
+
+.calculationCard {
+        width: 86vw;
+        gap: min(1.4vw, 0.77dvh);
+    }
+
+    .completeCard {
+        width: 86vw;
+        gap: min(1.4vw, 0.77dvh);
+        border-width: min(0.6vw, 0.33dvh);
+        border-radius: min(3vw, 1.65dvh);
+        box-shadow: 0 min(1.2vw, 0.66dvh) 0 #013873;
+        padding: min(2vw, 1.1dvh) min(3vw, 1.65dvh) min(2.4vw, 1.32dvh);
+    }
+
+    .supportingText,
+    .completeText,
+    .completeStats {
+        font-size: min(3.2vw, 1.76dvh);
+        -webkit-text-stroke: min(0.18vw, 0.1dvh) #013873;
+        text-shadow: 0 min(0.25vw, 0.14dvh) 0 #013873;
+    }
+
+    .completeTitle {
+        font-size: min(6vw, 3.3dvh);
+        -webkit-text-stroke: min(0.34vw, 0.19dvh) #013873;
+        text-shadow: 0 min(0.55vw, 0.3dvh) 0 #013873;
+    }
+
+    .calculationRoot {
+        gap: min(1.2vw, 0.66dvh);
+    }
+
+    .calculationGrid {
+        width: min(42vw, 23dvh);
+        gap: min(0.7vw, 0.39dvh);
+    }
+
+    .calculationCell {
+        border-width: min(0.45vw, 0.25dvh);
+        border-radius: min(1.3vw, 0.72dvh);
+        font-size: min(5vw, 2.75dvh);
+        box-shadow: inset 0 calc(-1 * min(0.45vw, 0.25dvh)) 0 #bfe8fb;
+        -webkit-text-stroke: min(0.12vw, 0.07dvh) #013873;
+    }
+
+    .carryCell {
+        font-size: min(3.2vw, 1.76dvh);
+        -webkit-text-stroke: min(0.08vw, 0.04dvh) #365314;
+    }
+
+    .activeCell {
+        outline-width: min(0.65vw, 0.36dvh);
+        outline-offset: min(0.25vw, 0.14dvh);
+    }
+
+    .calculationOperator {
+        font-size: min(4.8vw, 2.64dvh);
+        -webkit-text-stroke: min(0.22vw, 0.12dvh) #013873;
+        text-shadow: 0 min(0.35vw, 0.19dvh) 0 #013873;
+    }
+
+    .calculationBar {
+        height: min(0.7vw, 0.39dvh);
+    }
+
+    .calculationMessage {
+        min-height: min(5.2vw, 2.86dvh);
+        font-size: min(2.9vw, 1.6dvh);
+        border-width: min(0.45vw, 0.25dvh);
+        border-radius: min(1.4vw, 0.77dvh);
+        box-shadow: 0 min(0.65vw, 0.36dvh) 0 #a16207;
+        padding: min(0.8vw, 0.44dvh) min(1.6vw, 0.88dvh) min(1vw, 0.55dvh);
+        -webkit-text-stroke: min(0.16vw, 0.09dvh) #013873;
+        text-shadow: 0 min(0.2vw, 0.11dvh) 0 #013873;
+    }
+
+    .calculationToolbar {
+        gap: min(1.4vw, 0.77dvh);
+    }
+
+    .calculationActionButton,
+    .keypadButton {
+        border-width: min(0.45vw, 0.25dvh);
+        border-radius: min(1.4vw, 0.77dvh);
+        padding: min(0.8vw, 0.44dvh) min(1.6vw, 0.88dvh) min(1vw, 0.55dvh);
+        font-size: min(2.8vw, 1.54dvh);
+        box-shadow: 0 min(0.65vw, 0.36dvh) 0 #013873;
+        -webkit-text-stroke: min(0.16vw, 0.09dvh) #013873;
+        text-shadow: 0 min(0.2vw, 0.11dvh) 0 #013873;
+    }
+
+    .checkButton {
+        box-shadow: 0 min(0.95vw, 0.52dvh) 0 #15803d;
+        flex-basis: 58%;
+        font-size: min(3.5vw, 1.93dvh);
+        padding: min(1.2vw, 0.66dvh) min(1.6vw, 0.88dvh) min(1.5vw, 0.83dvh);
+        -webkit-text-stroke: min(0.2vw, 0.11dvh) #15803d;
+        text-shadow: 0 min(0.2vw, 0.11dvh) 0 #15803d;
+    }
+
+    .keypad {
+        width: min(40vw, 22dvh);
+        gap: min(1vw, 0.55dvh);
+    }
+
+    .keypadButton {
+        min-height: min(5.2vw, 2.86dvh);
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
+
+@keyframes fadeSlideIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-2vw);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

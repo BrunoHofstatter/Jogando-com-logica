@@ -754,6 +754,7 @@
   .onlineButton,
   .detailedRulesButton {
     position: static;
+    transform: none;
     width: 30%;
     height: min(10vw, 5dvh);
     border-radius: min(3vw, 2dvh);

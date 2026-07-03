@@ -5,9 +5,10 @@ interface ClassIconProps {
   pagina: string;
   label: string;
   imageSrc?: string;
+  hasGame?: boolean;
 }
 
-function ClassIcon({ pagina, label, imageSrc }: ClassIconProps) {
+function ClassIcon({ pagina, label, imageSrc, hasGame = true }: ClassIconProps) {
   const navigate = useNavigate();
 
   const isDisabled = label === "Em Breve" || !pagina;
@@ -37,7 +38,9 @@ function ClassIcon({ pagina, label, imageSrc }: ClassIconProps) {
         {!isDisabled && (
           <div className={styles.buttonGroup}>
             <button className={`${styles.actionButton} ${styles.btnLearn}`} onClick={handleLearnClick}>Aprender</button>
-            <button className={`${styles.actionButton} ${styles.btnGame}`} onClick={handleGameClick}>Jogar</button>
+            {hasGame && (
+              <button className={`${styles.actionButton} ${styles.btnGame}`} onClick={handleGameClick}>Jogar</button>
+            )}
           </div>
         )}
       </div>

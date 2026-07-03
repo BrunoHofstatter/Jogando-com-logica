@@ -411,7 +411,10 @@ const Board: React.FC<BoardProps> = ({
                 </span>
               </div>
               <div className={styles.nextRollIndicator}>
-                Próximo: {roundsUntilNextRoll} {roundsUntilNextRoll === 1 ? "rodada" : "rodadas"}
+                <span>Próximo</span>
+                <span>
+                  {roundsUntilNextRoll} {roundsUntilNextRoll === 1 ? "rodada" : "rodadas"}
+                </span>
               </div>
             </div>
 

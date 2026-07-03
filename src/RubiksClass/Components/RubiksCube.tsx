@@ -1,4 +1,5 @@
 import React, { useRef, useState, useCallback, useEffect } from "react";
+import { CubeRotation } from "./RubiksCubeAnimations";
 import styles from "./RubiksCube.module.css";
 
 // --- Types -------------------------------------------------------------------
@@ -25,6 +26,14 @@ interface RubiksCubeProps {
   showIndices?: boolean;
   /** Animate counting numbers with staggered popIn (default false). */
   showCounting?: boolean;
+  /** Highlight a whole cube face for face/side-level lessons. Uses FACES order. */
+  focusedFaceIndex?: number | null;
+  /** Centered label shown on the focused face, such as "1" or "1 lado". */
+  focusedFaceLabel?: string | null;
+  /** Lesson-controlled cube rotation. When set, it replaces auto/manual rotation. */
+  scriptedRotation?: CubeRotation | null;
+  /** Prevent pointer dragging while a lesson owns the cube motion. */
+  disableInteraction?: boolean;
 }
 
 // --- Face config -------------------------------------------------------------
@@ -164,6 +173,10 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
   dimInactive = false,
   showIndices = false,
   showCounting = false,
+  focusedFaceIndex = null,
+  focusedFaceLabel = null,
+  scriptedRotation = null,
+  disableInteraction = false,
 }) => {
   const cubeRef = useRef<HTMLDivElement>(null);
   const [mode, setMode] = useState<RotationMode>("auto");
@@ -187,6 +200,24 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
   const [animOffset, setAnimOffset] = useState(0);
   // X angle at the moment inertia stopped — smoothly eased back to -25deg on resume
   const [autoX, setAutoX] = useState(-25);
+
+  useEffect(() => {
+    if (!disableInteraction && !scriptedRotation) return;
+
+    if (resumeTimer.current) clearTimeout(resumeTimer.current);
+    if (rafId.current !== null) {
+      cancelAnimationFrame(rafId.current);
+      rafId.current = null;
+    }
+    if (xNormalizeRaf.current !== null) {
+      cancelAnimationFrame(xNormalizeRaf.current);
+      xNormalizeRaf.current = null;
+    }
+    if (scriptedRotation) {
+      rotationRef.current = scriptedRotation;
+      setRotation(scriptedRotation);
+    }
+  }, [disableInteraction, scriptedRotation]);
 
   // --- resetToFront effect ---------------------------------------------------
   useEffect(() => {
@@ -234,6 +265,8 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
 
   const onPointerDown = useCallback(
     (e: React.PointerEvent) => {
+      if (disableInteraction || scriptedRotation) return;
+
       e.currentTarget.setPointerCapture(e.pointerId);
 
       // Cancel any running inertia or settle loops
@@ -264,11 +297,12 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
       lastPointer.current = { x: e.clientX, y: e.clientY };
       setMode("dragging");
     },
-    [mode]
+    [disableInteraction, mode, scriptedRotation]
   );
 
   const onPointerMove = useCallback(
     (e: React.PointerEvent) => {
+      if (disableInteraction || scriptedRotation) return;
       if (mode !== "dragging") return;
 
       const dx = e.clientX - lastPointer.current.x;
@@ -306,10 +340,11 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
         return next;
       });
     },
-    [mode]
+    [disableInteraction, isHighVelocity, mode, scriptedRotation]
   );
 
   const onPointerUp = useCallback(() => {
+    if (disableInteraction || scriptedRotation) return;
     if (mode !== "dragging") return;
 
     setMode("idle");
@@ -357,7 +392,7 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
     };
 
     rafId.current = requestAnimationFrame(inertiaLoop);
-  }, [mode, resumeAuto]);
+  }, [disableInteraction, isHighVelocity, mode, resumeAuto, scriptedRotation]);
 
   // Cleanup timers and animation frames on unmount
   useEffect(() => {
@@ -372,9 +407,10 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
 
   const cubeClasses = [
     styles.cube,
-    mode === "auto" ? styles.autoRotate : "",
+    mode === "auto" && !scriptedRotation ? styles.autoRotate : "",
     mode === "dragging" || mode === "idle" ? styles.dragging : "",
-    mode === "locked" ? styles.locked : "",
+    mode === "locked" || scriptedRotation ? styles.locked : "",
+    disableInteraction || scriptedRotation ? styles.noInteraction : "",
     isHighVelocity ? styles.fastSpin : "",
   ]
     .filter(Boolean)
@@ -383,13 +419,13 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
   // In auto mode: use animation-delay to resume from current angle.
   // In dragging/locked: use inline transform.
   const inlineStyle: React.CSSProperties =
-    mode === "auto"
+    scriptedRotation
+      ? { transform: `rotateX(${scriptedRotation.x}deg) rotateY(${scriptedRotation.y}deg)` }
+      : mode === "auto"
       ? { animationDelay: `${animOffset}s` }
       : { transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)` };
 
   // --- Sticker rendering helper ----------------------------------------------
-
-  const hasHighlight = highlightRegion !== null;
 
   const renderSticker = (
     face: FaceConfig,
@@ -407,9 +443,10 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
       const isTargetFace =
         r.type === "face" ? face.name === FACES[r.index]?.name : isFrontFace;
       return isTargetFace && isStickerHighlighted(stickerIdx, size, r);
-    });
+    }) || face.name === FACES[focusedFaceIndex ?? -1]?.name;
 
-    const isDimmed = regions.length > 0 && dimInactive && !isHighlighted;
+    const hasFocusedFace = focusedFaceIndex !== null;
+    const isDimmed = (regions.length > 0 || hasFocusedFace) && dimInactive && !isHighlighted;
 
     const stickerClasses = [
       styles.sticker,
@@ -422,7 +459,7 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
 
     // Show counting number inside highlighted stickers
     const shouldShowNumber =
-      isHighlighted && (showIndices || showCounting);
+      isHighlighted && regions.length > 0 && (showIndices || showCounting);
 
     const displayNum = shouldShowNumber
       ? getRegionDisplayIndex(stickerIdx, size, highlightRegion!)
@@ -481,6 +518,11 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
           >
             {Array.from({ length: stickerCount }, (_, i) =>
               renderSticker(face, i, face.name === "front")
+            )}
+            {focusedFaceLabel && face.name === FACES[focusedFaceIndex ?? -1]?.name && (
+              <div className={`${styles.faceLabel} ${face.darkText ? styles.darkText : ""}`}>
+                {focusedFaceLabel}
+              </div>
             )}
           </div>
         ))}

@@ -238,6 +238,22 @@ function MathWarRegras() {
                 Se o Capitão for capturado, o jogador que o capturou vence imediatamente.
               </p>
 
+              <h3 className={styles.rulesTitle}>Modos de Jogo</h3>
+              <p className={styles.rulesText}>
+                Em <span className={styles.rulesStrong}>Contra Computador</span>, você joga contra a IA em quatro níveis:
+                Muito Fácil, Fácil, Médio e Difícil.
+              </p>
+              <p className={styles.rulesText}>
+                Ganhar do computador desbloqueia a próxima dificuldade.
+              </p>
+              <p className={styles.rulesText}>
+                Em <span className={styles.rulesStrong}>Dois Jogadores</span>, duas pessoas jogam no mesmo aparelho.
+              </p>
+              <p className={styles.rulesText}>
+                Em <span className={styles.rulesStrong}>Online</span>, você cria uma sala e compartilha o código
+                para jogar com outra pessoa em outro aparelho.
+              </p>
+
               <h3 className={styles.rulesTitle}>Preparação e Peças</h3>
 
               <p className={styles.rulesText}>
@@ -295,12 +311,12 @@ function MathWarRegras() {
 
               <p className={styles.rulesSpan}>Rolagem de Dados (Automática)</p>
               <p className={styles.rulesText}>
-                O dado é rolado a cada <span className={styles.rulesStrong}>3 turnos</span>.
+                Os dados são rolados automaticamente no início da partida e depois a cada{" "}
+                <span className={styles.rulesStrong}>3 turnos completos</span>.
               </p>
               <p className={styles.rulesText}>
-                no turno que rola o resultado dos <span className={styles.rulesStrong}>
-                  2 dados de 5 faces (2d5)
-                </span> gera um número de 2 a 10.
+                O resultado dos <span className={styles.rulesStrong}>2 dados de 5 faces (2d5)</span>{" "}
+                gera um número de 2 a 10 e vale até a próxima rolagem.
               </p>
 
               <p className={styles.rulesSpan}>Cálculo da Energia</p>
@@ -363,6 +379,20 @@ function MathWarRegras() {
               <p className={styles.rulesText}>
                 <span className={styles.rulesSpan}>Movimento:</span> Move-se
                 apenas diagonalmente. Não pode se mover ortogonalmente.
+              </p>
+
+              <h3 className={styles.rulesTitle}>Ajuda Durante o Jogo</h3>
+              <p className={styles.rulesText}>
+                Ao selecionar uma peça, o jogo mostra setas indicando as direções possíveis,
+                mas não mostra imediatamente todas as casas exatas onde ela pode parar.
+              </p>
+              <p className={styles.rulesText}>
+                Use o valor da peça, o resultado dos dados e o custo de energia para calcular
+                até onde a peça consegue chegar.
+              </p>
+              <p className={styles.rulesText}>
+                Se você tentar um movimento inválido, o jogo explica o motivo. Depois de algumas
+                tentativas, ele pode mostrar exatamente as casas para onde a peça pode se mover.
               </p>
 
               <h3 className={styles.rulesTitle}>Fim de Jogo</h3>

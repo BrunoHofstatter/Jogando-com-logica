@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import styles from "./ClassMenu.module.css";
 import ClassIcon from "./ClassIcon";
 import { ROUTES } from "../../routes";
@@ -34,9 +33,10 @@ const ClassMenu: React.FC = () => {
           imageSrc={`${import.meta.env.BASE_URL}3x3.png`}
         />
         <ClassIcon
-          pagina=""
-          label="Em Breve"
+          pagina={ROUTES.CLASS_3}
+          label="Aula 3: Cubo Inteiro"
           imageSrc={`${import.meta.env.BASE_URL}4x4.png`}
+          hasGame={false}
         />
         <ClassIcon
           pagina=""

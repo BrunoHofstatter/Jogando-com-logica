@@ -18,6 +18,12 @@
   padding: 0;
 }
 
+.headerIntro {
+  max-width: 78vw;
+  margin: 2vw auto 0;
+  text-align: center;
+}
+
 .manualPage h1 {
   margin: 2vw 0 0 0;
   font-size: 5vw;
@@ -133,6 +139,92 @@
   position: absolute;
   left: -2vw;
   font-size: 2vw;
+}
+
+.teacherHighlights {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5vw;
+  margin: 3vw 0;
+}
+
+.teacherHighlights div,
+.classroomSection {
+  border: 0.35vw solid #060e13;
+  box-shadow: 0 0.6vw 0 #060e13;
+}
+
+.teacherHighlights div {
+  background-color: #286a83;
+  border-radius: 1.2vw;
+  padding: 1.4vw;
+}
+
+.teacherHighlights p {
+  margin: 0.6vw 0 0;
+  font-size: 1.45vw;
+}
+
+.classroomSection {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2vw;
+  align-items: center;
+  background-color: #ffcf40;
+  border-radius: 1.5vw;
+  padding: 2vw;
+  margin: 3vw 0;
+}
+
+.classroomSection h2 {
+  margin-top: 0;
+}
+
+.classroomSection p,
+.classroomSection li {
+  color: #fff;
+  -webkit-text-stroke-color: #060e13;
+}
+
+.classroomSection .classroomsButton {
+  grid-column: auto;
+  grid-row: auto;
+  justify-self: end;
+  white-space: normal;
+  min-width: 18vw;
+}
+
+.cardMeta,
+.infoBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7vw;
+}
+
+.cardMeta {
+  margin: 0.5vw 0 1vw;
+}
+
+.cardMeta span,
+.infoBadges span {
+  display: inline-flex;
+  align-items: center;
+  border: 0.25vw solid #060e13;
+  border-radius: 1vw;
+  padding: 0.25vw 0.8vw 0.45vw;
+  background-color: rgba(255, 255, 255, 0.22);
+  color: #fff;
+  font-size: 1.15vw;
+  line-height: 1.2;
+  -webkit-text-stroke: 0.1vw #060e13;
+}
+
+.infoBadges {
+  margin: 1.5vw 0;
+}
+
+.infoBadges span {
+  font-size: 1.25vw;
 }
 
 /* New class for game detail lists */
@@ -774,6 +866,16 @@
     grid-template-columns: 1fr;
     gap: 4vw;
   }
+
+  .teacherHighlights,
+  .classroomSection {
+    grid-template-columns: 1fr;
+  }
+
+  .classroomSection .classroomsButton {
+    justify-self: stretch;
+    min-width: 0;
+  }
 }
 
 /* Animation for sections */
@@ -936,6 +1038,61 @@
     padding: min(2vw, 1.5dvh) min(3vw, 2dvh);
     margin: min(3vw, 2dvh) 0;
     border-radius: 0 min(2vw, 1.5dvh) min(2vw, 1.5dvh) 0;
+  }
+
+  .headerIntro {
+    max-width: 95vw;
+    margin-top: min(4vw, 3dvh);
+  }
+
+  .teacherHighlights {
+    grid-template-columns: 1fr;
+    gap: min(3vw, 2dvh);
+    margin: min(6vw, 4dvh) 0;
+  }
+
+  .teacherHighlights div,
+  .classroomSection {
+    border-width: min(0.7vw, 0.5dvh);
+    box-shadow: 0 min(1.2vw, 0.8dvh) 0 #060e13;
+  }
+
+  .teacherHighlights div {
+    border-radius: min(3vw, 2dvh);
+    padding: min(3vw, 2dvh);
+  }
+
+  .teacherHighlights p {
+    font-size: min(4vw, 2.8dvh);
+    margin-top: min(1.5vw, 1dvh);
+  }
+
+  .classroomSection {
+    grid-template-columns: 1fr;
+    gap: min(4vw, 3dvh);
+    border-radius: min(4vw, 3dvh);
+    padding: min(4vw, 3dvh);
+    margin: min(6vw, 4dvh) 0;
+  }
+
+  .classroomSection .classroomsButton {
+    grid-column: auto;
+    justify-self: stretch;
+    min-width: 0;
+  }
+
+  .cardMeta,
+  .infoBadges {
+    gap: min(1.5vw, 1dvh);
+  }
+
+  .cardMeta span,
+  .infoBadges span {
+    border-width: min(0.5vw, 0.35dvh);
+    border-radius: min(2.5vw, 1.8dvh);
+    padding: min(0.8vw, 0.6dvh) min(1.8vw, 1.2dvh) min(1vw, 0.8dvh);
+    font-size: min(3.4vw, 2.5dvh);
+    -webkit-text-stroke-width: min(0.2vw, 0.15dvh);
   }
 
   /* 2. The Game Navigation Grid */

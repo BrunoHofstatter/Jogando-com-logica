@@ -649,7 +649,6 @@
   }
 
   .mode-select-rules {
-    padding-top: 4vw;
     width: 90%;
     margin-bottom: 0;
     gap: min(3vw, 1dvh);
