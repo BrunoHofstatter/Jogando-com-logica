@@ -2,6 +2,30 @@ import { useRef, useState, useEffect } from 'react';
 import styles from '../CSS/manual.module.css';
 import { ROUTES } from "../../routes";
 
+type GameId =
+  | 'stop-matematico'
+  | 'caca-soma'
+  | 'cubo-magico'
+  | 'super-velha'
+  | 'caca-coroa'
+  | 'guerra-matematica';
+
+type GameGuide = {
+  id: GameId;
+  name: string;
+  shortUse: string;
+  grades: string;
+  time: string;
+  format: string;
+  setup: string;
+  preview: string;
+  rulesRoute: string;
+  description: string;
+  teaches: string[];
+  modes: string[];
+  notes: string[];
+  limitations: string;
+};
 
 function Manual() {
   const gameSections = useRef<(HTMLElement | null)[]>([]);
@@ -42,34 +66,208 @@ function Manual() {
     gameSections.current[index]?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Game routes - you can update these later
-  const gameRoutes = {
-    'stop-matematico': ROUTES.STOP_RULES,
-    'caca-soma': ROUTES.CACA_SOMA_RULES,
-    'cubo-magico': ROUTES.CLASS_1_OLD,
-    'super-velha': ROUTES.SPTTT_RULES,
-    'caca-coroa': ROUTES.CROWN_CHASE_RULES,
-    'guerra-matematica': ROUTES.MATH_WAR_RULES
+  const navigateToRules = (route: string) => {
+    window.location.href = route;
   };
 
-  const navigateToRules = (gameId: keyof typeof gameRoutes) => {
-    // For now, just log - you can replace with actual navigation later
-
-    window.location.href = gameRoutes[gameId];
-  };
-
-  const games = [
-    { id: 'stop-matematico', name: 'Stop Matemático', description: 'Jogo de fazer contas matemáticas mentalmente com tempo', preview: 'stopPreview.png' },
-    { id: 'caca-soma', name: 'Caça-soma', description: 'Jogo de achar combinações de números para formar somas', preview: 'cacasomaPreview.png' },
-    { id: 'cubo-magico', name: 'Cubo mágico', description: 'Várias aulas de matemática usando o cubo mágico', preview: 'cuboPreview.png' },
-    { id: 'super-velha', name: 'Super jogo da velha', description: 'Versão mais complexa do jogo da velha', preview: 'sptttPreview.png' },
-    { id: 'caca-coroa', name: 'Caça coroa', description: 'Jogo de tabuleiro com objetivo de capturar o rei', preview: 'crownchasePreview.png' },
-    { id: 'guerra-matematica', name: 'Guerra matemática', description: 'Jogo de tabuleiro com contas matemáticas para calcular movimento', preview: 'mathwarPreview.png' }
+  const games: GameGuide[] = [
+    {
+      id: 'stop-matematico',
+      name: 'Stop Matemático',
+      shortUse: 'Cálculo mental rápido com pressão de tempo.',
+      grades: '3º ao 7º ano',
+      time: '1 a 5 min por rodada',
+      format: 'Individual, online e turma',
+      setup: 'Baixa mediação',
+      preview: 'stopPreview.png',
+      rulesRoute: ROUTES.STOP_RULES,
+      description:
+        'Um jogo de aritmética inspirado no Stop tradicional. A cada rodada, aparece um Número Mágico, e os alunos resolvem contas usando esse número como ponto de partida. O foco é calcular de cabeça com rapidez e precisão.',
+      teaches: [
+        'Cálculo mental com adição, subtração, multiplicação e divisão',
+        'Atenção concentrada sob limite de tempo',
+        'Estratégias flexíveis para chegar ao resultado com agilidade',
+      ],
+      modes: [
+        'Modo aleatório para rodadas rápidas',
+        'Modo níveis com progressão por estrelas',
+        'Tutorial inicial para apresentar a lógica do jogo',
+        'Modo online com salas para 2 a 8 jogadores, configurações do anfitrião e turmas online',
+      ],
+      notes: [
+        'Cada caixa começa de novo a partir do Número Mágico.',
+        'Caixas com duas operações pedem apenas o resultado final.',
+        'O modo online permite partidas rápidas com vários alunos na mesma sala.',
+      ],
+      limitations:
+        'A pressão de tempo pode ser intensa para alguns alunos; nesses casos, use níveis iniciais ou rodadas sem foco em competição.',
+    },
+    {
+      id: 'caca-soma',
+      name: 'Caça Soma',
+      shortUse: 'Encontrar combinações de números que formam uma soma.',
+      grades: '4º ao 7º ano',
+      time: '1 a 4 min nos níveis',
+      format: 'Individual, duplas, online e turma',
+      setup: 'Baixa mediação',
+      preview: 'cacasomaPreview.png',
+      rulesRoute: ROUTES.CACA_SOMA_RULES,
+      description:
+        'O aluno recebe um Número Mágico e precisa selecionar números no tabuleiro cuja soma chegue exatamente ao alvo. As células usadas em respostas corretas ficam bloqueadas, então o jogo também exige planejamento.',
+      teaches: [
+        'Adição rápida e conferência mental',
+        'Composição e decomposição de números',
+        'Busca visual, precisão e tomada de decisão sob tempo',
+        'Coordenação em equipe no modo online 2 contra 2',
+      ],
+      modes: [
+        'Modo níveis com estrelas e desbloqueio de fases',
+        'Modo local de 2 jogadores no mesmo dispositivo',
+        'Modo online 1 contra 1',
+        'Modo online 2 contra 2, em que cada colega escolhe parte da soma',
+        'Salas privadas e salas visíveis por código de turma',
+      ],
+      notes: [
+        'O modo 2 contra 2 destaca a colaboração, porque cada colega escolhe uma parte da soma.',
+        'Uma mesma meta pode ter diferentes combinações possíveis.',
+        'Células usadas em respostas corretas ficam bloqueadas, criando decisões de planejamento.',
+      ],
+      limitations:
+        'O modo local antigo ainda existe, mas o online é a direção principal para partidas competitivas em turma.',
+    },
+    {
+      id: 'cubo-magico',
+      name: 'Cubo Mágico',
+      shortUse: 'Aulas interativas de matemática com cubos.',
+      grades: '3º ao 6º ano',
+      time: 'Bloco de aula guiado',
+      format: 'Individual ou professor guiando',
+      setup: 'Mediação média',
+      preview: 'cubomagicoPreview.png',
+      rulesRoute: ROUTES.CLASS_MENU,
+      description:
+        'O Cubo Mágico não é um jogo tradicional. Ele funciona como uma sequência de aulas interativas e revisões jogáveis, usando cubos para tornar conceitos matemáticos mais visuais e concretos.',
+      teaches: [
+        'Percepção espacial e leitura da estrutura do cubo',
+        'Contagem, agrupamento e multiplicação visual',
+        'Dimensões, quadradinhos em uma face e padrões geométricos',
+        'Resolução de problemas por tentativa, dica e descoberta',
+      ],
+      modes: [
+        'Aula 1: Dimensões',
+        'Aula 2: Quadradinhos em uma face e multiplicação visual',
+        'Opção Aprender para seguir a aula completa',
+        'Opção Jogar para ir direto à revisão da aula',
+      ],
+      notes: [
+        'É mais próximo de uma aula interativa do que de uma partida competitiva.',
+        'As dicas aparecem de forma progressiva, mantendo a ideia de tentar antes da explicação completa.',
+        'As revisões são mais jogáveis e servem para retomar o conteúdo da aula.',
+      ],
+      limitations:
+        'Apenas as primeiras aulas estão implementadas por enquanto; os próximos módulos ainda são planejamento.',
+    },
+    {
+      id: 'super-velha',
+      name: 'Super Jogo da Velha',
+      shortUse: 'Estratégia com objetivos locais e globais.',
+      grades: '5º ao 7º ano',
+      time: '10 a 30 min',
+      format: 'Duplas, computador, online e turma',
+      setup: 'Mediação média',
+      preview: 'sptttPreview.png',
+      rulesRoute: ROUTES.SPTTT_RULES,
+      description:
+        'Uma versão mais estratégica do jogo da velha. Existem 9 tabuleiros pequenos dentro de um tabuleiro maior, e cada jogada define onde o próximo jogador deverá jogar. Vence quem conquistar 3 tabuleiros pequenos em linha.',
+      teaches: [
+        'Planejamento de curto e longo prazo',
+        'Antecipação de jogadas do adversário',
+        'Reconhecimento de padrões e tomada de decisão com restrições',
+        'Gestão de objetivos locais e globais ao mesmo tempo',
+      ],
+      modes: [
+        '2 jogadores no mesmo dispositivo',
+        'Contra o computador',
+        'Online 1 contra 1 com sala privada',
+        'Salas visíveis por código de turma',
+      ],
+      notes: [
+        'Cada jogada define o tabuleiro em que o adversário joga em seguida.',
+        'O jogo combina objetivos pequenos, dentro de cada tabuleiro, com o objetivo maior da partida.',
+        'O modo contra o computador permite prática individual.',
+      ],
+      limitations:
+        'Pode ser abstrato para alunos que ainda não estão confortáveis em pensar várias jogadas à frente.',
+    },
+    {
+      id: 'caca-coroa',
+      name: 'Caça Coroa',
+      shortUse: 'Estratégia de tabuleiro simples e rápida.',
+      grades: '3º ao 7º ano',
+      time: '5 a 20 min',
+      format: 'Duplas, computador, online e turma',
+      setup: 'Baixa a média mediação',
+      preview: 'crownchasePreview.png',
+      rulesRoute: ROUTES.CROWN_CHASE_RULES,
+      description:
+        'Um jogo de estratégia em tabuleiro 5x5, parecido com uma introdução ao pensamento do xadrez, mas mais curto e simples. O objetivo é capturar o Rei adversário, que permanece parado.',
+      teaches: [
+        'Raciocínio espacial em grade',
+        'Planejamento, ataque, defesa e antecipação',
+        'Comparação de riscos antes de mover uma peça',
+      ],
+      modes: [
+        '2 jogadores no mesmo dispositivo',
+        'Contra o computador',
+        'Online 1 contra 1 com sala privada',
+        'Salas visíveis por código de turma',
+      ],
+      notes: [
+        'O tabuleiro 5x5 torna as partidas mais curtas que jogos estratégicos tradicionais.',
+        'O Rei fica parado, então a partida gira em torno de ataque, defesa e proteção de espaço.',
+        'É uma boa ponte para raciocínio estratégico sem exigir as regras completas do xadrez.',
+      ],
+      limitations:
+        'Algumas turmas podem precisar de uma rodada demonstrativa para diferenciar as peças e suas formas de movimento.',
+    },
+    {
+      id: 'guerra-matematica',
+      name: 'Guerra Matemática',
+      shortUse: 'Estratégia de tabuleiro com energia calculada.',
+      grades: '6º ao 7º ano',
+      time: '10 a 30 min',
+      format: 'Duplas, computador, online e turma',
+      setup: 'Mediação média',
+      preview: 'mathwarPreview.png',
+      rulesRoute: ROUTES.MATH_WAR_RULES,
+      description:
+        'Um jogo de tabuleiro inspirado no xadrez, mas com movimento baseado em cálculo. Cada peça tem um valor, os dados geram uma energia, e o aluno precisa decidir se aquela energia basta para mover ou capturar. O objetivo é capturar o Capitão adversário.',
+      teaches: [
+        'Cálculo mental em decisões de jogo',
+        'Gestão de recursos e comparação de custos',
+        'Planejamento tático, proteção do Capitão e leitura do tabuleiro',
+        'Tomada de decisão em múltiplas etapas',
+      ],
+      modes: [
+        '2 jogadores no mesmo dispositivo',
+        'Contra o computador com dificuldades desbloqueáveis',
+        'Online 1 contra 1 com sala privada',
+        'Salas visíveis por código de turma',
+      ],
+      notes: [
+        'A energia é calculada a partir do valor da peça e dos dados.',
+        'Mover custa energia por casa, e capturar tem custo adicional.',
+        'É o jogo com maior carga de regras entre os jogos atuais da plataforma.',
+      ],
+      limitations:
+        'É um dos jogos mais complexos da plataforma e tende a funcionar melhor depois que os alunos já experimentaram jogos estratégicos mais simples.',
+    },
   ];
+
+  const onlineGames = games.filter(game => game.id !== 'cubo-magico');
 
   return (
     <main className={styles.manualPage}>
-      {/* Scroll to top button */}
       <button
         className={`${styles.scrollTopButton} ${showScrollTop ? styles.visible : ''}`}
         onClick={scrollToTop}
@@ -79,33 +277,156 @@ function Manual() {
       </button>
 
       <header>
-        <h1>Guia do site para professores</h1>
+        <h1>Guia para professores</h1>
+        <p className={styles.headerIntro}>
+          Escolha jogos, organize a turma e use o Jogando com Lógica como apoio prático para aulas de matemática e raciocínio lógico.
+        </p>
       </header>
 
       <section>
-        <div className={styles.introductionHeading}>
-          <button
-            className={styles.classroomsButton}
-            onClick={() => {
-              window.location.href = ROUTES.CLASSROOMS;
-            }}
-          >
-            Turmas
-          </button>
-          <h2>Introdução</h2>
+        <h2>Como usar o projeto</h2>
+        <p>
+          O Jogando com Lógica é uma plataforma gratuita de jogos educativos para alunos do ensino fundamental. A ideia é ajudar professores a trabalhar cálculo mental, estratégia, lógica espacial e resolução de problemas por meio de atividades rápidas, acessíveis e sem cadastro.
+        </p>
+        <p>
+          As indicações de série são sugestões práticas. Cada turma pode responder de um jeito diferente, então o professor pode adaptar o jogo, o tempo e o nível de ajuda conforme a realidade dos alunos.
+        </p>
+
+        <div className={styles.teacherHighlights}>
+          <div>
+            <strong>Sem login</strong>
+            <p>Os alunos entram no site e começam a jogar sem conta, senha ou cadastro.</p>
+          </div>
+          <div>
+            <strong>Uso flexível</strong>
+            <p>Funciona como aquecimento, rotação por estações, prática individual, disputa em duplas ou desafio online.</p>
+          </div>
+          <div>
+            <strong>Professor no controle</strong>
+            <p>O projeto apoia a aula, mas não substitui a mediação do professor e a discussão das estratégias usadas.</p>
+          </div>
         </div>
-        <p>
-          O Projeto Jogando com Lógica é uma iniciativa desenvolvida por jovens com o objetivo de estimular o raciocínio lógico em crianças, ajudando-as a pensar de forma mais estruturada e a resolver problemas com mais facilidade e criatividade.
-        </p>
-        <p>
-          A proposta nasce da observação de uma dificuldade comum nas escolas: muitos alunos apresentam desafios ao lidar com situações que exigem pensamento analítico e resolução de problemas de forma independente.
-        </p>
-        <p>
-          Por meio de jogos educativos e dinâmicos, o projeto busca transformar o aprendizado lógico em algo divertido, competitivo e colaborativo — mostrando que pensar logicamente também pode ser brincar.
-        </p>
+      </section>
+
+      <section className={styles.classroomSection}>
+        <div>
+          <h2>Turmas Online</h2>
+          <p>
+            Para organizar partidas online em sala, o professor pode criar uma turma temporária. O site gera um código de quatro letras, os alunos entram com esse código no lobby online do jogo, e passam a ver as salas abertas daquela turma.
+          </p>
+          <ul className={styles.gameDetails}>
+            <li>O código da turma dura 8 horas.</li>
+            <li>Não há login, senha, lista de alunos ou cadastro permanente.</li>
+            <li>Salas privadas continuam disponíveis para quem preferir entrar por código de sala.</li>
+            <li>Jogos com turma online: {onlineGames.map(game => game.name).join(', ')}.</li>
+          </ul>
+        </div>
+        <button
+          className={styles.classroomsButton}
+          onClick={() => {
+            window.location.href = ROUTES.CLASSROOMS;
+          }}
+        >
+          Gerenciar turmas online
+        </button>
+      </section>
+
+      <section ref={jogosSection}>
+        <h2>Jogos</h2>
+        <div className={styles.gamesList}>
+          {games.map((game, index) => (
+            <div key={game.id} className={styles.gameCard} data-game-id={game.id}>
+              <h3>{game.name}</h3>
+              <p>{game.shortUse}</p>
+              <div className={styles.cardMeta}>
+                <span>{game.grades}</span>
+                <span>{game.time}</span>
+                <span>{game.format}</span>
+                <span>{game.setup}</span>
+              </div>
+              <button
+                className={styles.viewButton}
+                onClick={() => scrollToSection(index)}
+              >
+                Ver detalhes
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {games.map((game, index) => (
+        <section
+          key={game.id}
+          ref={el => {
+            if (el) {
+              gameSections.current[index] = el;
+            }
+          }}
+          id={game.id}
+          className={styles.gameSection}
+          data-game-id={game.id}
+        >
+          <button
+            className={styles.rulesButton}
+            onClick={() => navigateToRules(game.rulesRoute)}
+          >
+            Ver regras completas
+          </button>
+
+          <h2>{game.name}</h2>
+
+          <div className={styles.gameText}>
+            <div className={styles.descriptionWithImage}>
+              <div>
+                <h3>Para que serve em aula</h3>
+                <p>{game.description}</p>
+                <div className={styles.infoBadges}>
+                  <span>{game.grades}</span>
+                  <span>{game.time}</span>
+                  <span>{game.format}</span>
+                  <span>{game.setup}</span>
+                </div>
+              </div>
+              <img
+                src={`${import.meta.env.BASE_URL}${game.preview}`}
+                alt={`Prévia de ${game.name}`}
+                className={styles.preview}
+              />
+            </div>
+
+            <h3>Habilidades trabalhadas</h3>
+            <ul>
+              {game.teaches.map(item => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+
+            <h3>Modos disponíveis</h3>
+            <ul className={styles.gameDetails}>
+              {game.modes.map(item => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+
+            <h3>Observações úteis</h3>
+            <ul>
+              {game.notes.map(item => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+
+            <h3>Limitação atual</h3>
+            <p>{game.limitations}</p>
+          </div>
+        </section>
+      ))}
+
+      <section>
+        <h2>Feedback</h2>
         <div className={styles.feedbackButtonContainer}>
           <div className={styles.feedbackHighlight}>
-            Sua opinião é fundamental para o futuro do projeto!
+            Sua opinião é fundamental para melhorar o projeto.
           </div>
           <button
             className={styles.feedbackButton}
@@ -120,379 +441,10 @@ function Manual() {
           </button>
           <div className={styles.feedbackBox}>
             <p>
-              Queremos melhorar o projeto para que ele atenda melhor as necessidades das crianças e professores.
-              Por favor, reserve alguns minutos para nos contar o que achou!
+              Depois de usar os jogos com uma turma, conte o que funcionou, o que confundiu os alunos e quais melhorias fariam diferença na sala de aula.
             </p>
           </div>
         </div>
-      </section>
-
-      <section ref={jogosSection}>
-        <h2>Jogos</h2>
-        <div className={styles.gamesList}>
-          {games.map((game, index) => (
-            <div key={index} className={styles.gameCard} data-game-id={game.id}>
-              <h3>{game.name}</h3>
-              <p>{game.description}</p>
-              <button
-                className={styles.viewButton}
-                onClick={() => scrollToSection(index)}
-              >
-                Ver Detalhes
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section
-        ref={el => {
-          if (el) {
-            gameSections.current[0] = el;
-          }
-        }}
-        id="stop-matematico"
-        className={styles.gameSection}
-        data-game-id="stop-matematico"
-      >
-        <button
-          className={styles.rulesButton}
-          onClick={() => navigateToRules('stop-matematico')}
-        >
-          Ver regras completas
-        </button>
-
-        <h2> Stop Matemático</h2>
-
-
-        <div className={styles.gameText}>
-          <div className={styles.descriptionWithImage}>
-            <div>
-              <h3>Descrição do Jogo</h3>
-              <p>
-                O Stop Matemático funciona como o Stop tradicional, mas usando contas em vez de palavras. Cada rodada sorteia um <strong>Número Mágico</strong>, e o jogador precisa resolver rapidamente cálculos de adição, subtração, multiplicação ou divisão. Ao terminar, basta clicar em <strong>STOP</strong>, e o sistema corrige automaticamente.
-              </p>
-
-            </div>
-            <img
-              src={`${import.meta.env.BASE_URL}stopPreview.png`}
-              alt="Stop Matemático Preview"
-              className={styles.preview}
-            />
-          </div>
-          <ul className={styles.gameDetails}>
-            <li><strong>Número de jogadores:</strong> 1 (modo solo)</li>
-            <li><strong>Modos de jogo:</strong> 2 modos: Dificuldade Aleatória e Níveis</li>
-            <li><strong>Tempo médio:</strong> 1 a 5 minutos por rodada</li>
-            <li><em>(Planejado futuramente: modo multijogador, quem fizer em menos tempo ganha)</em></li>
-          </ul>
-
-
-
-          <h3>Habilidades e Conteúdos Trabalhados</h3>
-          <ul>
-            <li>Cálculo mental rápido</li>
-            <li>Operações básicas (adição, subtração, multiplicação e divisão)</li>
-            <li>Atenção concentrada com limite de tempo</li>
-          </ul>
-
-          <h3>Dificuldades e Séries Recomendadas</h3>
-          <ul>
-            <li><strong>Dificuldades:</strong> Níveis iniciais com números pequenos e apenas adição. A dificuldade aumenta com números maiores e inclusão de subtração, multiplicação e divisão</li>
-            <li><strong>Séries indicadas:</strong> 3º ao 7º ano</li>
-          </ul>
-        </div>
-
-
-
-      </section>
-
-      <section
-        ref={el => {
-          if (el) {
-            gameSections.current[1] = el;
-          }
-        }}
-        id="caca-soma"
-        className={styles.gameSection}
-        data-game-id="caca-soma"
-      >
-        <button
-          className={styles.rulesButton}
-          onClick={() => navigateToRules('caca-soma')}
-        >
-          Ver regras completas
-        </button>
-
-        <h2>Caça-Soma</h2>
-
-
-        <div className={styles.gameText}>
-          <div className={styles.descriptionWithImage}>
-            <div>
-              <h3>Descrição do Jogo</h3>
-              <p>
-                O Caça-Soma gera um <strong>Número Mágico</strong> e o jogador deve escolher números na tabela que, somados, resultem nesse valor. A tabela pode ter 25, 49 ou 100 números dependendo da dificuldade. Se a soma estiver correta, os números utilizados ficam indisponíveis para as próximas rodadas.
-              </p>
-
-            </div>
-            <img
-              src={`${import.meta.env.BASE_URL}cacasomaPreview.png`}
-              alt="Caça-Soma Preview"
-              className={styles.preview}
-            />
-          </div>
-          <ul className={styles.gameDetails}>
-            <li><strong>Modos de jogo:</strong>
-              <ul>
-                <li><strong>2 Jogadores:</strong> Cada um joga uma rodada, quem for mais rápido ganha o ponto. Quem fizer 5 pontos vence. (Tempo médio: 4 a 8 min)</li>
-                <li><strong>Níveis:</strong> Joga-se uma série de rodadas. Dependendo do tempo e acertos, ganha-se 1, 2 ou 3 estrelas (2 para passar). (Tempo médio: 1 a 4 min)</li>
-                <li><strong>Online:</strong> Crie uma sala privada para jogar 1 contra 1 ou 2 contra 2. No modo em duplas, cada jogador escolhe um número e acompanha a escolha do colega antes de clicar em Pronto.</li>
-              </ul>
-            </li>
-            <li><strong>Dificuldade:</strong> Os níveis começam com tabela de 25 números pequenos. Conforme avança, a tabela cresce e os números ficam maiores.</li>
-          </ul>
-
-          <h3>Habilidades e Conteúdos Trabalhados</h3>
-          <ul>
-            <li>Adição rápida</li>
-            <li>Decomposição de números (separar um número em partes úteis)</li>
-            <li>Velocidade e precisão em tempo real</li>
-          </ul>
-
-          <h3>Séries Recomendadas</h3>
-          <ul>
-            <li><strong>Séries indicadas:</strong> 4º ao 7º ano</li>
-          </ul>
-        </div>
-
-
-
-      </section>
-
-      <section
-        ref={el => {
-          if (el) {
-            gameSections.current[2] = el;
-          }
-        }}
-        id="cubo-magico"
-        className={styles.gameSection}
-        data-game-id="cubo-magico"
-      >
-        <button
-          className={styles.rulesButton}
-          onClick={() => navigateToRules('cubo-magico')}
-        >
-          Ver regras completas
-        </button>
-
-        <h2>Aula de cubo mágico</h2>
-
-
-        <div className={styles.gameText}>
-          <div className={styles.descriptionWithImage}>
-            <div>
-              <h3>Descrição do Jogo</h3>
-              <p>
-                As Aulas de Cubo Mágico usam cubos 2×2, 3×3, 4×4 e maiores para ensinar conceitos matemáticos de forma visual e concreta. Os alunos exploram dimensões, área, volume, contagem de quadradinhos, multiplicação e, futuramente, divisão e fração.
-              </p>
-
-            </div>
-            <img
-              src={`${import.meta.env.BASE_URL}cubomagicoPreview.png`}
-              alt="Cubo Mágico Preview"
-              className={styles.preview}
-            />
-          </div>
-          <ul className={styles.gameDetails}>
-            <li><strong>Número de jogadores:</strong> individual</li>
-            <li><strong>Modos de jogo:</strong> aulas e desafios guiados</li>
-            <li><strong>Status:</strong> temos somente 2 aulas por enquanto, temos mais em desenvolvimento</li>
-          </ul>
-
-          <h3>Séries Recomendadas</h3>
-          <ul>
-            <li><strong>Séries indicadas:</strong> 3º ao 6º ano (com módulos diferentes por série)</li>
-          </ul>
-        </div>
-
-
-
-      </section>
-
-      <section
-        ref={el => {
-          if (el) {
-            gameSections.current[3] = el;
-          }
-        }}
-        id="super-velha"
-        className={styles.gameSection}
-        data-game-id="super-velha"
-      >
-        <button
-          className={styles.rulesButton}
-          onClick={() => navigateToRules('super-velha')}
-        >
-          Ver regras completas
-        </button>
-
-        <h2>Super jogo da velha</h2>
-
-
-        <div className={styles.gameText}>
-          <div className={styles.descriptionWithImage}>
-            <div>
-              <h3>Descrição do Jogo</h3>
-              <p>
-                O Super Jogo da Velha expande o jogo tradicional para <strong>9 tabuleiros</strong>, onde cada jogada define em qual tabuleiro o próximo jogador atuará. Para vencer, é preciso conquistar 3 tabuleiros alinhados (horizontal, vertical ou diagonal) no tabuleiro maior.
-              </p>
-
-            </div>
-            <img
-              src={`${import.meta.env.BASE_URL}sptttPreview.png`}
-              alt="Super Jogo da Velha Preview"
-              className={styles.preview}
-            />
-          </div>
-          <ul className={styles.gameDetails}>
-            <li><strong>Modos de jogo:</strong> 2 Jogadores e Contra Computador</li>
-            <li><strong>Dificuldades:</strong> 4 níveis (Muito Fácil, Fácil, Médio e Difícil). O Muito Fácil é totalmente aleatório, enquanto o nível Difícil oferece um desafio lógico avançado, simulando um jogador experiente.</li>
-            <li><strong>Tempo médio:</strong> 10 a 30 minutos</li>
-          </ul>
-
-          <h3>Habilidades e Conteúdos Trabalhados</h3>
-          <ul>
-            <li>Planejamento estratégico</li>
-            <li>Antecipação de jogadas</li>
-            <li>Raciocínio lógico</li>
-          </ul>
-
-          <h3>Séries Recomendadas</h3>
-          <ul>
-            <li><strong>Séries indicadas:</strong> 5º a 7º ano</li>
-          </ul>
-        </div>
-
-
-
-      </section>
-
-      <section
-        ref={el => {
-          if (el) {
-            gameSections.current[4] = el;
-          }
-        }}
-        id="caca-coroa"
-        className={styles.gameSection}
-        data-game-id="caca-coroa"
-      >
-        <button
-          className={styles.rulesButton}
-          onClick={() => navigateToRules('caca-coroa')}
-        >
-          Ver regras completas
-        </button>
-
-        <h2>Caça-Coroa</h2>
-
-
-        <div className={styles.gameText}>
-          <div className={styles.descriptionWithImage}>
-            <div>
-              <h3>Descrição do Jogo</h3>
-              <p>
-                O Caça-Coroa é um jogo de estratégia semelhante ao xadrez, porém mais simples e rápido, usando um tabuleiro 5×5. O objetivo é capturar o Rei inimigo, que fica parado. Os jogadores utilizam dois tipos de peças — <strong>Saltador</strong> e <strong>Assassino</strong> — com movimentos distintos.
-              </p>
-
-            </div>
-            <img
-              src={`${import.meta.env.BASE_URL}crownchasePreview.png`}
-              alt="Caça-Coroa Preview"
-              className={styles.preview}
-            />
-          </div>
-          <ul className={styles.gameDetails}>
-            <li><strong>Modos de jogo:</strong> 2 Jogadores e Contra Computador</li>
-            <li><strong>Dificuldades:</strong> 4 níveis (Muito Fácil, Fácil, Médio e Difícil). O Muito Fácil é totalmente aleatório, enquanto o nível Difícil oferece um desafio lógico avançado.</li>
-            <li><strong>Tempo médio:</strong> 5 a 20 minutos</li>
-          </ul>
-
-          <h3>Habilidades e Conteúdos Trabalhados</h3>
-          <ul>
-            <li>Planejamento estratégico</li>
-            <li>Antecipação de jogadas</li>
-            <li>Raciocínio lógico e tático</li>
-          </ul>
-
-          <h3>Séries Recomendadas</h3>
-          <ul>
-            <li><strong>Séries indicadas:</strong> 3º ao 7º ano</li>
-          </ul>
-        </div>
-
-
-
-      </section>
-
-      <section
-        ref={el => {
-          if (el) {
-            gameSections.current[5] = el;
-          }
-        }}
-        id="guerra-matematica"
-        className={styles.gameSection}
-        data-game-id="guerra-matematica"
-      >
-        <button
-          className={styles.rulesButton}
-          onClick={() => navigateToRules('guerra-matematica')}
-        >
-          Ver regras completas
-        </button>
-
-        <h2>Guerra Matemática</h2>
-
-
-        <div className={styles.gameText}>
-          <div className={styles.descriptionWithImage}>
-            <div>
-              <h3>Descrição do Jogo</h3>
-              <p>
-                A Guerra Matemática é um jogo de tabuleiro inspirado no Xadrez que combina estratégia com cálculo. Cada peça possui um valor, e a movimentação depende do resultado do dado + valor da peça, que gera a <strong>energia da peça</strong>. A energia é gasta para mover, que custa 2, e para capturar, que custa 4. O objetivo é eliminar o Capitão adversário.
-              </p>
-
-            </div>
-            <img
-              src={`${import.meta.env.BASE_URL}mathwarPreview.png`}
-              alt="Guerra Matemática Preview"
-              className={styles.preview}
-            />
-          </div>
-          <ul className={styles.gameDetails}>
-            <li><strong>Modos de jogo:</strong> 2 Jogadores e Contra Computador</li>
-            <li><strong>Dificuldades:</strong> 4 níveis (Muito Fácil, Fácil, Médio e Difícil). O Muito Fácil é totalmente aleatório, enquanto o nível Difícil oferece um desafio lógico avançado.</li>
-            <li><strong>Tempo médio:</strong> 10 a 30 minutos</li>
-          </ul>
-
-          <h3>Habilidades e Conteúdos Trabalhados</h3>
-          <ul>
-            <li>Cálculo mental rápido</li>
-            <li>Estratégia e planejamento</li>
-            <li>Raciocínio lógico e tático</li>
-          </ul>
-
-          <h3>Séries Recomendadas</h3>
-          <ul>
-            <li><strong>Séries indicadas:</strong> 6º e 7º ano</li>
-          </ul>
-        </div>
-
-
-
       </section>
     </main>
   );

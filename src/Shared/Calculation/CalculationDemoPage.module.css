@@ -1,0 +1,127 @@
+.page {
+  width: 100%;
+  min-height: 100dvh;
+  padding: min(5vw, 4dvh);
+  display: flex;
+  flex-direction: column;
+  gap: min(4vw, 3dvh);
+  align-items: center;
+  background: #f4f0ff;
+  color: #243238;
+}
+
+.header {
+  width: min(92vw, 110dvh);
+  text-align: center;
+}
+
+.header h1,
+.demoCard h2,
+.header p {
+  margin: 0;
+}
+
+.header h1 {
+  font-size: min(12vw, 8dvh);
+  line-height: 1;
+}
+
+.header p {
+  margin-top: min(2vw, 1.5dvh);
+  font-size: min(4.8vw, 3.2dvh);
+  line-height: 1.1;
+}
+
+.statusPanel {
+  width: min(92vw, 110dvh);
+  padding: min(3vw, 2dvh);
+  border: min(0.45vw, 0.32dvh) solid #243238;
+  border-radius: min(2vw, 1.5dvh);
+  background: #fffdf5;
+  text-align: center;
+  font-size: min(4.6vw, 3.2dvh);
+}
+
+.demoGrid {
+  width: min(94vw, 150dvh);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(88vw, 54dvh), 1fr));
+  gap: min(4vw, 3dvh);
+}
+
+.demoCard {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: min(2vw, 1.6dvh);
+  padding: min(3vw, 2.2dvh);
+  border: min(0.45vw, 0.32dvh) solid #243238;
+  border-radius: min(2vw, 1.5dvh);
+  background: #ffffff;
+}
+
+.demoCard h2 {
+  font-size: min(6vw, 4dvh);
+  line-height: 1;
+  text-align: center;
+}
+
+.calcRoot {
+  width: 100%;
+  padding: min(2vw, 1.5dvh);
+}
+
+.calcGrid {
+  width: min(76vw, 42dvh);
+}
+
+.calcCell {
+  border-color: #243238;
+  border-radius: min(1.4vw, 1dvh);
+  box-shadow: 0 min(0.6vw, 0.45dvh) 0 #243238;
+}
+
+.operandCell {
+  background: #e4f5ff;
+}
+
+.resultCell {
+  background: #fff0b8;
+}
+
+.carryCell {
+  background: #dff7d0;
+}
+
+.borrowCell {
+  background: #ffd9e1;
+}
+
+.activeCell {
+  outline-color: #f06292;
+}
+
+.operator {
+  color: #5d3fd3;
+}
+
+.bar {
+  background: #5d3fd3;
+}
+
+.message {
+  min-height: min(11vw, 7dvh);
+  font-size: min(4.3vw, 3dvh);
+}
+
+.keypad {
+  width: min(72vw, 38dvh);
+}
+
+.keypadButton,
+.actionButton {
+  background: #f6f0ff;
+  color: #243238;
+  border-color: #5d3fd3;
+}

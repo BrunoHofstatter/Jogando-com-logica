@@ -70,10 +70,6 @@ const Class2FaceArea: React.FC = () => {
 
             {/* --- Right panel: Interaction --- */}
             <div className={styles.rightPanel}>
-                <div className={styles.progress}>
-                    Pergunta {uiProps.currentStepIndex + 1} de {uiProps.totalSteps}
-                </div>
-
                 <h1 className={styles.title}>
                     {uiProps.question}
                 </h1>

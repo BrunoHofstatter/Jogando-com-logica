@@ -69,7 +69,9 @@ export const ROUTES = {
   CLASS_1_OLD: "/aulas/1-antiga",
   CLASS_1: "/aulas/1-dimensoes",
   CLASS_2: "/aulas/2-area-da-face",
+  CLASS_3: "/aulas/3-cubo-inteiro",
   CUBE_TEST: "/aulas/teste-cubo",
+  CALCULATION_DEMO: "/teste-calculo",
 
   // Base Game component test/route
   BASE_GAME: "/jogo-base",

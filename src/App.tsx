@@ -35,6 +35,8 @@ import Dimensions from "./RubiksClass/Classes/oldClass1/old_class1.tsx";
 import CubeTestPage from "./RubiksClass/Classes/Class1_dimensions/CubeTestPage";
 import Class1Dimensions from "./RubiksClass/Classes/Class1_dimensions/Class1Dimensions";
 import Class2FaceArea from "./RubiksClass/Classes/Class2_faceArea/Class2FaceArea";
+import Class3TotalSquares from "./RubiksClass/Classes/Class3_totalSquares/Class3TotalSquares";
+import CalculationDemoPage from "./Shared/Calculation/CalculationDemoPage";
 import MathWarRegras from "./MathWar/Pages/regrasPage";
 import MathWarPage from "./MathWar/Pages/baseGamePage";
 import MathWarAIPage from "./MathWar/Pages/aiGamePage";
@@ -82,6 +84,9 @@ const HIDDEN_RETURN_ROUTES = new Set([
   ROUTES.ABOUT,
   ROUTES.CONTACT,
   ROUTES.MANUAL,
+  ROUTES.CLASS_1,
+  ROUTES.CLASS_2,
+  ROUTES.CLASS_3
 ]);
 
 const SHOW_UNIVERSAL_RETURN_BUTTON = true;
@@ -124,7 +129,9 @@ const RETURN_ROUTE_MAP: Record<string, string> = {
   [ROUTES.CLASS_1_OLD]: ROUTES.CLASS_MENU,
   [ROUTES.CLASS_1]: ROUTES.CLASS_MENU,
   [ROUTES.CLASS_2]: ROUTES.CLASS_MENU,
+  [ROUTES.CLASS_3]: ROUTES.CLASS_MENU,
   [ROUTES.CUBE_TEST]: ROUTES.CLASS_MENU,
+  [ROUTES.CALCULATION_DEMO]: ROUTES.HOME,
   [ROUTES.MATH_WAR_RULES]: ROUTES.GAMES,
   [ROUTES.MATH_WAR_GAME]: ROUTES.MATH_WAR_RULES,
   [ROUTES.MATH_WAR_AI]: ROUTES.MATH_WAR_RULES,
@@ -323,8 +330,10 @@ function App() {
         <Route path={ROUTES.MANUAL} element={<Manual />} />
         <Route path={ROUTES.CLASSROOMS} element={<ClassroomsPage />} />
         <Route path={ROUTES.CUBE_TEST} element={<CubeTestPage />} />
+        <Route path={ROUTES.CALCULATION_DEMO} element={<CalculationDemoPage />} />
         <Route path={ROUTES.CLASS_1} element={<Class1Dimensions />} />
         <Route path={ROUTES.CLASS_2} element={<Class2FaceArea />} />
+        <Route path={ROUTES.CLASS_3} element={<Class3TotalSquares />} />
       </Routes>
     </main>
   );
