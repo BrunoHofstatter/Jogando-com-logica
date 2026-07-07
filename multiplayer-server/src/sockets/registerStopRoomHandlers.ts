@@ -19,6 +19,7 @@ import {
   advanceStopRoomRound,
   archiveStopRoomCurrentRound,
   createStopRoomInitialState,
+  markStopRoomPlayerConnection,
   moveStopRoomToPlaying,
   moveStopRoomToResults,
   removeStopRoomPlayer,
@@ -396,7 +397,28 @@ function handlePlayerExit(
     return;
   }
 
-  if (room.state.status !== "lobby" || leavingPlayer.isHost) {
+  if (room.state.status !== "lobby" && !leavingPlayer.isHost) {
+    const result = markStopRoomPlayerConnection(
+      room.state,
+      participant.playerId,
+      false,
+      Date.now(),
+    );
+    if (!result.ok) {
+      closeRoom(io, room, leavingPlayer, reason);
+      return;
+    }
+
+    room.state = result.state;
+    room.updatedAt = Date.now();
+    room.participants = room.participants.filter(
+      (currentParticipant) => currentParticipant.socketId !== socketId,
+    );
+    emitStateUpdated(io, room);
+    return;
+  }
+
+  if (leavingPlayer.isHost) {
     closeRoom(io, room, leavingPlayer, reason);
     return;
   }
