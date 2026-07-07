@@ -175,9 +175,11 @@ export default function StopMultiplayerLobbyPage() {
 
       <div className={styles.panel}>
         <div className={cardClassName}>
-          {!isInRoom && !isDisconnected && !classroomCode && (
+          {!isInRoom && !isDisconnected && (
             <>
-              <div className={styles.heading}>Sala Privada</div>
+              <div className={styles.heading}>
+                {classroomCode ? "Stop Matemático Online" : "Sala Privada"}
+              </div>
               <p className={styles.description}>
                 Crie uma sala, ajuste as regras e compartilhe o código com a turma.
               </p>
@@ -196,6 +198,8 @@ export default function StopMultiplayerLobbyPage() {
                 />
               </div>
 
+              {!classroomCode && (
+                <>
               <div className={styles.actions}>
                 <button
                   className={styles.primaryButton}
@@ -284,6 +288,8 @@ export default function StopMultiplayerLobbyPage() {
                     {isBusy ? "Entrando..." : "Entrar na Turma"}
                   </button>
                 </div>
+              )}
+                </>
               )}
             </>
           )}

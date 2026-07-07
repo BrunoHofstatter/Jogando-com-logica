@@ -713,6 +713,7 @@
     width: 100%;
     padding: min(4vw, 2dvh);
     box-sizing: border-box;
+    position: static;
     pointer-events: auto;
   }
 

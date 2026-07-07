@@ -128,6 +128,7 @@ export interface RoomCreatedPayload {
   settings: CacaSomaRoomSettings;
   state: CacaSomaMatchState | null;
   players: RoomPlayerInfo[];
+  serverNowMs: number;
 }
 
 export interface RoomJoinedPayload {
@@ -136,6 +137,7 @@ export interface RoomJoinedPayload {
   settings: CacaSomaRoomSettings;
   state: CacaSomaMatchState | null;
   players: RoomPlayerInfo[];
+  serverNowMs: number;
 }
 
 export interface RoomUpdatedPayload {
@@ -143,6 +145,7 @@ export interface RoomUpdatedPayload {
   settings: CacaSomaRoomSettings;
   state: CacaSomaMatchState | null;
   players: RoomPlayerInfo[];
+  serverNowMs: number;
 }
 
 export interface RoomReadyPayload {
@@ -150,12 +153,14 @@ export interface RoomReadyPayload {
   settings: CacaSomaRoomSettings;
   state: CacaSomaMatchState;
   players: RoomPlayerInfo[];
+  serverNowMs: number;
 }
 
 export interface StateUpdatedPayload {
   code: CacaSomaRoomCode;
   state: CacaSomaMatchState;
   events: CacaSomaEvent[];
+  serverNowMs: number;
 }
 
 export interface RematchRequestedPayload {
@@ -166,6 +171,7 @@ export interface RematchRequestedPayload {
 export interface RematchStartedPayload {
   code: CacaSomaRoomCode;
   state: CacaSomaMatchState;
+  serverNowMs: number;
 }
 
 export interface PlayerLeftPayload {

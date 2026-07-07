@@ -37,6 +37,12 @@ const ROUND_TIME_MS_BY_DIFFICULTY: Record<DifficultyId, number> = {
   hard: 120_000,
 };
 
+const TARGET_RANGE_BY_DIFFICULTY: Record<DifficultyId, { min: number; max: number }> = {
+  easy: { min: 5, max: 35 },
+  medium: { min: 10, max: 70 },
+  hard: { min: 20, max: 150 },
+};
+
 export function createPointsRaceConfig(
   options: CreatePointsRaceConfigOptions,
 ): CacaSomaMatchConfig {
@@ -89,10 +95,7 @@ export function createPointsRaceConfig(
       boardSize: BOARD_SIZE_BY_DIFFICULTY[difficultyId],
       maxCellValue: MAX_CELL_VALUE_BY_DIFFICULTY[difficultyId],
       roundTimeLimitMs: ROUND_TIME_MS_BY_DIFFICULTY[difficultyId],
-      targetRange: {
-        min: 10,
-        max: 60,
-      },
+      targetRange: TARGET_RANGE_BY_DIFFICULTY[difficultyId],
     },
     targetScore,
     teamSize,

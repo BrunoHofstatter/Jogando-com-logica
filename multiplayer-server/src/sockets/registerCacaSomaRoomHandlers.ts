@@ -101,6 +101,7 @@ export function registerCacaSomaRoomHandlers(
         settings: room.settings,
         state: room.state,
         players: serializePlayers(room),
+        serverNowMs: Date.now(),
       });
       broadcastClassroomRooms(io, room.classroomCode);
     });
@@ -144,6 +145,7 @@ export function registerCacaSomaRoomHandlers(
         settings: room.settings,
         state: room.state,
         players: serializePlayers(room),
+        serverNowMs: Date.now(),
       });
 
       emitRoomUpdated(io, room);
@@ -244,6 +246,7 @@ export function registerCacaSomaRoomHandlers(
         settings: room.settings,
         state: room.state,
         players: serializePlayers(room),
+        serverNowMs: Date.now(),
       });
       broadcastClassroomRooms(io, room.classroomCode);
     });
@@ -325,6 +328,7 @@ export function registerCacaSomaRoomHandlers(
         code: room.code,
         state: room.state,
         events: result.events,
+        serverNowMs: Date.now(),
       });
     });
 
@@ -377,6 +381,7 @@ export function registerCacaSomaRoomHandlers(
       io.to(room.code).emit("rematch_started", {
         code: room.code,
         state: room.state,
+        serverNowMs: Date.now(),
       });
     });
 
@@ -568,6 +573,7 @@ function syncRoundTimeout(
         code: latestRoom.code,
         state: latestRoom.state,
         events: phaseResult.events,
+        serverNowMs: Date.now(),
       });
       return;
     }
@@ -588,6 +594,7 @@ function syncRoundTimeout(
       code: latestRoom.code,
       state: latestRoom.state,
       events: result.events,
+      serverNowMs: Date.now(),
     });
   }, delayMs);
 }
@@ -627,6 +634,7 @@ function emitRoomUpdated(io: CacaSomaNamespace, room: CacaSomaRoom): void {
     settings: room.settings,
     state: room.state,
     players: serializePlayers(room),
+    serverNowMs: Date.now(),
   });
 }
 

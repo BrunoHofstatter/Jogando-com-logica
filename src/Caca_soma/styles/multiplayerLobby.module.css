@@ -7,10 +7,7 @@
   gap: 4vw;
   padding: 3vw;
   box-sizing: border-box;
-  background:
-    radial-gradient(circle at top left, #ffe1e1 0%, transparent 35%),
-    radial-gradient(circle at bottom right, #ff9ba4 0%, transparent 30%),
-    #efc9c9;
+  background-color: #efc9c9;
   font-family: "Cherry Bomb One", system-ui;
 }
 
@@ -26,8 +23,8 @@
 .title {
   font-size: clamp(3vw, 7dvh, 5vw);
   color: #ffffff;
-  -webkit-text-stroke: 0.17vw #630000;
-  text-shadow: 0 0.4vw 0 #a11425;
+  -webkit-text-stroke: 0.17vw #7f0000;
+  text-shadow: 0 0.4vw 0 #5c0000;
   text-align: center;
 }
 
@@ -57,37 +54,38 @@
 
 .card {
   width: 100%;
-  background-color: #e31f2f;
-  border: 0.4vw solid #a11425;
+  background-color: #c62828;
+  border: 0.4vw solid #7f0000;
   border-radius: 3vw;
-  box-shadow: 0 1vw 0 #a11425;
+  box-shadow: 0 1vw 0 #7f0000;
   padding: 1vw 2vw;
   display: flex;
   flex-direction: column;
   gap: 1vw;
-  color: #ffcf40;
+  color: #ffffff;
   box-sizing: border-box;
 }
 
 .roomCard {
-  background-color: #ef5b66;
-  border-color: #a11425;
-  box-shadow: 0 1vw 0 #a11425;
+  background-color: #c62828;
+  border-color: #7f0000;
+  box-shadow: 0 1vw 0 #7f0000;
   padding: 1.3vw 2vw 1.5vw 2vw;
 }
 
 .heading {
   font-size: clamp(2.5vw, 5.5dvh, 4vw);
   text-align: center;
-  -webkit-text-stroke: 0.16vw #630000;
-  text-shadow: 0 0.3vw 0 #a11425;
+  -webkit-text-stroke: 0.16vw #7f0000;
+  text-shadow: 0 0.3vw 0 #5c0000;
 }
 
 .description {
   margin: 0;
   text-align: center;
   font-size: clamp(1.3vw, 3.3dvh, 2vw);
-  -webkit-text-stroke: 0.1vw #630000;
+  color: #ffffff;
+  -webkit-text-stroke: 0.1vw #7f0000;
 }
 
 .nameWrap {
@@ -98,15 +96,16 @@
 
 .fieldLabel {
   font-size: clamp(1.2vw, 4dvh, 3vw);
-  -webkit-text-stroke: 0.13vw #630000;
+  color: #ffffff;
+  -webkit-text-stroke: 0.13vw #7f0000;
 }
 
 .input {
   width: 50%;
-  border: 0.25vw solid #630000;
+  border: 0.25vw solid #7f0000;
   border-radius: 1.4vw;
-  background-color: #fff1f1;
-  color: #630000;
+  background-color: #ffffff;
+  color: #7f0000;
   font-family: "Cherry Bomb One", system-ui;
   font-size: clamp(1.2vw, 2.4dvh, 1.8vw);
   padding: 0.8vw 1vw;
@@ -123,12 +122,12 @@
   display: flex;
   flex-direction: column;
   gap: 1vw;
-  background-color: #ff8d8d;
-  border: 0.3vw solid #a11425;
+  background-color: #d32f2f;
+  border: 0.3vw solid #7f0000;
   border-radius: 2vw;
-  box-shadow: 0 0.7vw 0 #a11425;
+  box-shadow: 0 0.7vw 0 #7f0000;
   padding: 1.4vw;
-  color: #ffcf40;
+  color: #ffffff;
 }
 
 .classroomHeader,
@@ -147,12 +146,12 @@
 }
 
 .openRoomCard {
-  border: 0.18vw solid #a11425;
+  border: 0.18vw solid #7f0000;
   border-radius: 1.2vw;
-  background-color: #fff1f1;
-  color: #a11425;
+  background-color: #e8e8e8;
+  color: #c62828;
   padding: 0.8vw 1vw;
-  box-shadow: 0 0.3vw 0 #ff6b6b;
+  box-shadow: 0 0.3vw 0 #7f0000;
 }
 
 .openRoomInfo {
@@ -161,7 +160,7 @@
 
 .openRoomTitle {
   font-size: clamp(1.3vw, 3dvh, 1.8vw);
-  color: #7f1d1d;
+  color: #7f0000;
 }
 
 .settingsGrid {
@@ -175,27 +174,27 @@
   display: flex;
   flex-direction: column;
   gap: 0.4vw;
-  background-color: #fff1f1;
-  border: 0.18vw solid #a11425;
+  background-color: #e8e8e8;
+  border: 0.18vw solid #7f0000;
   border-radius: 1.2vw;
   padding: 0.7vw 0.9vw;
-  color: #a11425;
-  box-shadow: 0 0.3vw 0 #ff6b6b;
+  color: #c62828;
+  box-shadow: 0 0.3vw 0 #7f0000;
 }
 
 .settingTitle,
 .eyebrow {
   font-size: clamp(1.2vw, 3dvh, 1.6vw);
-  -webkit-text-stroke: 0.1vw #630000;
-  color: #ffcf40;
+  -webkit-text-stroke: 0.1vw #7f0000;
+  color: #ffffff;
 }
 
 .settingControl {
   width: 100%;
-  border: 0.18vw solid #a11425;
+  border: 0.18vw solid #7f0000;
   border-radius: 1vw;
-  background-color: #fff1f1;
-  color: #a11425;
+  background-color: #ffffff;
+  color: #7f0000;
   font-family: "Cherry Bomb One", system-ui;
   font-size: clamp(1vw, 2.5dvh, 1.4vw);
   padding: 0.45vw 0.7vw;
@@ -209,7 +208,7 @@
 .primaryButton,
 .secondaryButton,
 .leaveButton {
-  border: 0.3vw solid #630000;
+  border: 0.3vw solid #7f0000;
   border-radius: 1.8vw;
   font-family: "Cherry Bomb One", system-ui;
   font-size: clamp(1.2vw, 3dvh, 1.9vw);
@@ -219,24 +218,24 @@
 }
 
 .primaryButton {
-  background-color: #ffcf40;
-  color: #a11425;
-  -webkit-text-stroke: 0.08vw #630000;
-  box-shadow: 0 0.6vw 0 #da9500;
+  background-color: #c62828;
+  color: #ffffff;
+  -webkit-text-stroke: 0.08vw #7f0000;
+  box-shadow: 0 0.6vw 0 #7f0000;
 }
 
 .secondaryButton {
-  background-color: #ffdede;
-  color: #a11425;
-  -webkit-text-stroke: 0.08vw #630000;
-  box-shadow: 0 0.6vw 0 #ff6b6b;
+  background-color: #e8e8e8;
+  color: #c62828;
+  -webkit-text-stroke: 0.08vw #5c0000;
+  box-shadow: 0 0.6vw 0 #7f0000;
 }
 
 .leaveButton {
-  background-color: #fff1f1;
-  color: #a11425;
-  -webkit-text-stroke: 0.08vw #630000;
-  box-shadow: 0 0.6vw 0 #ff6b6b;
+  background-color: #ffffff;
+  color: #c62828;
+  -webkit-text-stroke: 0.08vw #5c0000;
+  box-shadow: 0 0.6vw 0 #7f0000;
 }
 
 .primaryButton:hover,
@@ -288,9 +287,9 @@
   align-items: center;
   justify-content: center;
   border-radius: 2vw;
-  border: 0.3vw dashed #630000;
-  background-color: #fff1f1;
-  color: #a11425;
+  border: 0.3vw dashed #7f0000;
+  background-color: #ffffff;
+  color: #c62828;
   font-size: clamp(3vw, 6dvh, 5vw);
   letter-spacing: 0.6vw;
   padding: 1vw;
@@ -307,24 +306,24 @@
   margin: 0;
   text-align: center;
   font-size: clamp(1.1vw, 3.2dvh, 1.55vw);
-  -webkit-text-stroke: 0.09vw #630000;
-  color: #ffcf40;
+  -webkit-text-stroke: 0.09vw #7f0000;
+  color: #ffffff;
 }
 
 .statusPill {
   border-radius: 1.4vw;
-  background-color: rgba(255, 207, 64, 0.18);
-  border: 0.2vw solid rgba(99, 0, 0, 0.3);
+  background-color: rgba(255, 255, 255, 0.18);
+  border: 0.2vw solid rgba(127, 0, 0, 0.3);
   padding: 0.8vw;
-  box-shadow: 0 0.45vw 0 rgba(161, 20, 37, 0.7);
+  box-shadow: 0 0.45vw 0 rgba(127, 0, 0, 0.7);
 }
 
 .waitingNote {
-  color: #fff1f1;
+  color: #ffffff;
 }
 
 .feedback {
-  color: #fff1f1;
+  color: #ffffff;
 }
 
 .summaryBar {
@@ -341,8 +340,8 @@
 .summaryChip {
   padding: 0.5vw 0.9vw 0.7vw 0.9vw;
   border-radius: 999vw;
-  background-color: rgba(255, 207, 64, 0.18);
-  border: 0.18vw solid rgba(99, 0, 0, 0.26);
+  background-color: rgba(255, 255, 255, 0.18);
+  border: 0.18vw solid rgba(127, 0, 0, 0.3);
 }
 
 .sectionHeader {
@@ -355,15 +354,15 @@
 .sectionTitle {
   font-size: clamp(1.8vw, 4.5dvh, 2.6vw);
   text-align: center;
-  -webkit-text-stroke: 0.15vw #630000;
-  color: #ffcf40;
+  -webkit-text-stroke: 0.15vw #7f0000;
+  color: #ffffff;
 }
 
 .modalTitle {
   font-size: clamp(1.8vw, 4.5dvh, 2.6vw);
   text-align: center;
-  -webkit-text-stroke: 0.15vw #630000;
-  color: #ffcf40;
+  -webkit-text-stroke: 0.15vw #7f0000;
+  color: #ffffff;
 }
 
 .helperText {
@@ -402,7 +401,7 @@
 }
 
 .disconnected {
-  background-color: #7f1d1d;
+  background-color: #7f0000;
 }
 
 .playerName {
@@ -411,25 +410,25 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: clamp(1.2vw, 2.6dvh, 1.6vw);
-  -webkit-text-stroke: 0.05vw #630000;
-  color: #a11425;
+  -webkit-text-stroke: 0.05vw #5c0000;
+  color: #c62828;
 }
 
 .hostBadge {
-  background-color: #ffcf40;
-  border: 0.15vw solid #a11425;
+  background-color: #ffffff;
+  border: 0.15vw solid #7f0000;
   border-radius: 1vw;
   padding: 0.15vw 0.6vw;
-  box-shadow: 0 0.25vw 0 #da9500;
+  box-shadow: 0 0.25vw 0 #7f0000;
   white-space: nowrap;
   font-size: clamp(0.82vw, 1.85dvh, 1.05vw);
-  color: #a11425;
-  -webkit-text-stroke: 0.04vw #630000;
+  color: #c62828;
+  -webkit-text-stroke: 0.04vw #5c0000;
 }
 
 .playerMeta {
   text-align: left;
-  color: #7f1d1d;
+  color: #7f0000;
   -webkit-text-stroke: 0;
 }
 
@@ -441,7 +440,7 @@
 .modalOverlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(99, 0, 0, 0.45);
+  background-color: rgba(127, 0, 0, 0.45);
   backdrop-filter: blur(0.35vw);
   display: flex;
   justify-content: center;
@@ -451,7 +450,7 @@
 
 .settingsModal {
   width: min(56vw, 88dvh);
-  background-color: #ef5b66;
+  background-color: #c62828;
 }
 
 .modalHeader {
@@ -485,7 +484,7 @@
   .card {
     border-radius: min(6vw, 3dvh);
     border-width: min(0.8vw, 0.4dvh);
-    box-shadow: 0 min(1.5vw, 0.8dvh) 0 #a11425;
+    box-shadow: 0 min(1.5vw, 0.8dvh) 0 #7f0000;
     padding: min(5vw, 2.8dvh);
     gap: min(3vw, 1.6dvh);
   }
@@ -542,7 +541,7 @@
   .playersSection {
     border-width: min(0.6vw, 0.3dvh);
     border-radius: min(5vw, 2.5dvh);
-    box-shadow: 0 min(1vw, 0.6dvh) 0 #a11425;
+    box-shadow: 0 min(1vw, 0.6dvh) 0 #7f0000;
     padding: min(4vw, 2.2dvh);
     gap: min(2vw, 1dvh);
   }

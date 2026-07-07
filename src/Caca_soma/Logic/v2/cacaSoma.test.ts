@@ -20,15 +20,24 @@ describe("Caca Soma v2 match engine", () => {
       targetScore: 3,
       teamSize: 2,
     });
+    const easy = createPointsRaceConfig({
+      difficultyId: "easy",
+      targetScore: 3,
+      teamSize: 2,
+    });
     const oneVersusOne = createPointsRaceConfig({
       difficultyId: "hard",
       targetScore: 3,
       teamSize: 1,
     });
 
+    expect(easy.difficulty.boardSize).toBe(5);
+    expect(easy.difficulty.maxCellValue).toBe(25);
+    expect(easy.difficulty.targetRange).toEqual({ min: 5, max: 35 });
+
     expect(twoVersusTwo.difficulty.boardSize).toBe(7);
     expect(twoVersusTwo.difficulty.maxCellValue).toBe(49);
-    expect(twoVersusTwo.difficulty.targetRange).toEqual({ min: 10, max: 60 });
+    expect(twoVersusTwo.difficulty.targetRange).toEqual({ min: 10, max: 70 });
     expect(twoVersusTwo.requiredSelections).toBe(2);
     expect(twoVersusTwo.allowedSelectionCounts).toEqual([2]);
     expect(twoVersusTwo.selectionLimits).toEqual([1, 1]);
@@ -38,7 +47,7 @@ describe("Caca Soma v2 match engine", () => {
 
     expect(oneVersusOne.difficulty.boardSize).toBe(10);
     expect(oneVersusOne.difficulty.maxCellValue).toBe(100);
-    expect(oneVersusOne.difficulty.targetRange).toEqual({ min: 10, max: 60 });
+    expect(oneVersusOne.difficulty.targetRange).toEqual({ min: 20, max: 150 });
     expect(oneVersusOne.requiredSelections).toBe(3);
     expect(oneVersusOne.allowedSelectionCounts).toEqual([2, 3]);
     expect(oneVersusOne.selectionLimits).toEqual([3]);
@@ -72,7 +81,7 @@ describe("Caca Soma v2 match engine", () => {
 
     expect(state.status).toBe("playing");
     expect(state.boardValues).toEqual(boardValues);
-    expect(state.currentRound?.targetNumbers).toEqual([10, 10]);
+    expect(state.currentRound?.targetNumbers).toEqual([5, 5]);
     expect(state.currentRound?.targetStrategy).toBe("shared");
     expect(state.currentRound).toMatchObject({
       phase: "countdown",
@@ -176,7 +185,7 @@ describe("Caca Soma v2 match engine", () => {
 
     const actions = [
       { type: "set_player_selection", team: 0 as const, playerIndex: 0, cellIds: [0], nowMs: 100 },
-      { type: "set_player_selection", team: 0 as const, playerIndex: 1, cellIds: [8], nowMs: 200 },
+      { type: "set_player_selection", team: 0 as const, playerIndex: 1, cellIds: [3], nowMs: 200 },
       { type: "set_player_ready", team: 0 as const, playerIndex: 0, ready: true, nowMs: 300 },
       { type: "set_player_ready", team: 0 as const, playerIndex: 1, ready: true, nowMs: 400 },
       { type: "set_player_selection", team: 1 as const, playerIndex: 0, cellIds: [0], nowMs: 500 },
@@ -198,7 +207,7 @@ describe("Caca Soma v2 match engine", () => {
     expect(state.endReason).toBe("target_score");
     expect(state.teams[0].score).toBe(1);
     expect(state.teams[1].score).toBe(0);
-    expect(state.teams[0].lockedCellIds).toEqual([0, 8]);
+    expect(state.teams[0].lockedCellIds).toEqual([0, 3]);
     expect(state.teams[1].lockedCellIds).toEqual([]);
     expect(state.history).toHaveLength(1);
     expect(state.history[0]).toMatchObject({
@@ -256,10 +265,10 @@ describe("Caca Soma v2 match engine", () => {
     const boardValues = createSequentialBoard(100, 100);
 
     let state = createInitialState(config, 0, () => 0, boardValues);
-    expect(state.currentRound?.targetNumbers).toEqual([10, 10]);
+    expect(state.currentRound?.targetNumbers).toEqual([20, 20]);
 
     const actions = [
-      { type: "set_player_selection", team: 0 as const, playerIndex: 0, cellIds: [0, 8], nowMs: 100 },
+      { type: "set_player_selection", team: 0 as const, playerIndex: 0, cellIds: [0, 18], nowMs: 100 },
       { type: "set_player_ready", team: 0 as const, playerIndex: 0, ready: true, nowMs: 200 },
       { type: "set_player_selection", team: 1 as const, playerIndex: 0, cellIds: [0, 1], nowMs: 300 },
       { type: "set_player_ready", team: 1 as const, playerIndex: 0, ready: true, nowMs: 400 },
@@ -275,7 +284,7 @@ describe("Caca Soma v2 match engine", () => {
 
     expect(state.status).toBe("ended");
     expect(state.winner).toBe(0);
-    expect(state.teams[0].lockedCellIds).toEqual([0, 8]);
+    expect(state.teams[0].lockedCellIds).toEqual([0, 18]);
   });
 
   it("enforces the selection cooldown before a player can change their pick again", () => {

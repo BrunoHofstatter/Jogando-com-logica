@@ -15,6 +15,11 @@ import {
   getActiveClassroomSession,
   setActiveClassroomSession,
 } from "../../Shared/Classrooms/activeClassroomSession";
+import {
+  getActivePlayerName,
+  normalizePlayerName,
+  setActivePlayerName,
+} from "../../Shared/PlayerName/activePlayerName";
 
 type MultiplayerSnapshot = {
   connectionStatus: MultiplayerConnectionStatus;
@@ -41,7 +46,7 @@ const SESSION_STORAGE_KEY = "spttt_multiplayer_session_v1";
 const DEFAULT_SNAPSHOT: MultiplayerSnapshot = {
   connectionStatus: "idle",
   roomCode: null,
-  playerName: "",
+  playerName: getActivePlayerName(),
   playerSeat: null,
   playerMark: null,
   players: [],
@@ -76,6 +81,7 @@ function loadSnapshot(): MultiplayerSnapshot {
     const nextSnapshot: MultiplayerSnapshot = {
       ...DEFAULT_SNAPSHOT,
       ...parsed,
+      playerName: parsed.playerName || getActivePlayerName(),
       classroomCode: null,
       players: Array.isArray(parsed.players) ? normalizePlayers(parsed.players) : [],
       openClassroomRooms: [],
@@ -375,6 +381,14 @@ export function useSPTTTMultiplayer() {
   const [snapshot, setSnapshot] = useState<MultiplayerSnapshot>(sharedSnapshot);
 
   useEffect(() => {
+    if (!sharedSnapshot.roomCode) {
+      const savedName = getActivePlayerName();
+      if (savedName && savedName !== sharedSnapshot.playerName) {
+        updateSnapshot({ playerName: savedName });
+      }
+    }
+    setSnapshot(sharedSnapshot);
+
     const listener = (nextSnapshot: MultiplayerSnapshot) => {
       setSnapshot(nextSnapshot);
     };
@@ -390,13 +404,14 @@ export function useSPTTTMultiplayer() {
   }, []);
 
   const createRoom = (playerName: string, classroomCode?: string) => {
-    const normalizedName = playerName.trim().slice(0, 20);
+    const normalizedName = normalizePlayerName(playerName);
     if (normalizedName.length < 2) {
       updateSnapshot({
         errorMessage: "Digite um nome com pelo menos 2 letras.",
       });
       return;
     }
+    setActivePlayerName(normalizedName);
 
     updateSnapshot({
       playerName: normalizedName,
@@ -419,7 +434,7 @@ export function useSPTTTMultiplayer() {
   };
 
   const joinRoom = (code: string, playerName: string) => {
-    const normalizedName = playerName.trim().slice(0, 20);
+    const normalizedName = normalizePlayerName(playerName);
     const normalizedCode = code.trim().toUpperCase();
 
     if (normalizedName.length < 2) {
@@ -435,6 +450,7 @@ export function useSPTTTMultiplayer() {
       });
       return;
     }
+    setActivePlayerName(normalizedName);
 
     updateSnapshot({
       playerName: normalizedName,
