@@ -95,6 +95,7 @@ export default function CacaSomaMultiplayerGamePage() {
     roomInterrupted,
     rematchPending,
     rematchRequestedBy,
+    serverTimeOffsetMs,
     submitAction,
     requestRematch,
     leaveRoom,
@@ -204,12 +205,14 @@ export default function CacaSomaMultiplayerGamePage() {
 
   const targetNumber =
     currentRound && localTeamId !== null ? currentRound.targetNumbers[localTeamId] : null;
+  const rollingRange = gameState?.config.difficulty.targetRange ?? { min: 10, max: 70 };
+  const serverTimeNow = timeNow + serverTimeOffsetMs;
   const remainingMs = currentRound
     ? roundPhase === "playing"
-      ? currentRound.deadlineAtMs - timeNow
+      ? currentRound.deadlineAtMs - serverTimeNow
       : currentRound.deadlineAtMs - currentRound.playStartsAtMs
     : 0;
-  const phaseRemainingMs = currentRound ? currentRound.phaseEndsAtMs - timeNow : 0;
+  const phaseRemainingMs = currentRound ? currentRound.phaseEndsAtMs - serverTimeNow : 0;
   const roundNumber = currentRound?.number ?? gameState?.history.length ?? 0;
   const overlayCountdown = Math.max(1, Math.ceil(phaseRemainingMs / 1000));
   const previousRoundResult = gameState && gameState.history.length > 0
@@ -249,14 +252,17 @@ export default function CacaSomaMultiplayerGamePage() {
       return;
     }
 
+    setRollingMagicNumber(rollingRange.min);
     const interval = window.setInterval(() => {
-      setRollingMagicNumber((currentValue) => currentValue >= 60 ? 10 : currentValue + 7);
+      setRollingMagicNumber((currentValue) => (
+        currentValue >= rollingRange.max ? rollingRange.min : currentValue + 7
+      ));
     }, 80);
 
     return () => {
       window.clearInterval(interval);
     };
-  }, [roundPhase, currentRound?.number]);
+  }, [rollingRange.max, rollingRange.min, roundPhase, currentRound?.number]);
 
   const handleLeaveRoom = () => {
     leaveRoom({ preserveName: true });

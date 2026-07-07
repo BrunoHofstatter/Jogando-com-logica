@@ -7,6 +7,7 @@ import type {
   CrownChaseServerToClientEvents,
   ManagedClassroom,
 } from "../../CrownChase/Logic/multiplayer/protocol";
+import { useDelayedOnlineWaitHint } from "../../Shared/Hooks/useDelayedOnlineWaitHint";
 import styles from "../CSS/classrooms.module.css";
 
 const STORAGE_KEY = "managed_classroom_tokens_v1";
@@ -18,10 +19,13 @@ type ClassroomSocket = Socket<
 
 export default function ClassroomsPage() {
   const [socket, setSocket] = useState<ClassroomSocket | null>(null);
+  const [isServerConnected, setIsServerConnected] = useState(false);
   const [classrooms, setClassrooms] = useState<ManagedClassroom[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [copyFeedback, setCopyFeedback] = useState("");
   const [isExplanationOpen, setIsExplanationOpen] = useState(false);
+  const isConnectingToServer = socket !== null && !isServerConnected;
+  const showOnlineWaitHint = useDelayedOnlineWaitHint(isConnectingToServer);
 
   useEffect(() => {
     document.body.style.backgroundColor = "#68c2e0";
@@ -36,12 +40,23 @@ export default function ClassroomsPage() {
       transports: ["websocket"],
     });
     const refreshClassrooms = () => {
+      if (!nextSocket.connected) {
+        return;
+      }
+
       nextSocket.emit("list_managed_classrooms", {
         managementTokens: loadManagementTokens(),
       });
     };
 
-    nextSocket.on("connect", refreshClassrooms);
+    nextSocket.on("connect", () => {
+      setIsServerConnected(true);
+      setErrorMessage(null);
+      refreshClassrooms();
+    });
+    nextSocket.on("disconnect", () => {
+      setIsServerConnected(false);
+    });
     nextSocket.on("classroom_created", ({ classroom }) => {
       saveManagementTokens([...loadManagementTokens(), classroom.managementToken]);
       setClassrooms((current) => [...current, classroom]);
@@ -58,7 +73,7 @@ export default function ClassroomsPage() {
       setErrorMessage(message);
     });
     nextSocket.on("connect_error", () => {
-      setErrorMessage("Não foi possível conectar ao servidor online.");
+      setIsServerConnected(false);
     });
 
     const refreshInterval = window.setInterval(refreshClassrooms, 60 * 1000);
@@ -136,16 +151,23 @@ export default function ClassroomsPage() {
         <button
           className={styles.primaryButton}
           onClick={createClassroom}
-          disabled={!socket}
+          disabled={!socket || !isServerConnected}
         >
-          Criar Nova Turma
+          {isConnectingToServer ? "Conectando..." : "Criar Nova Turma"}
         </button>
 
+        {showOnlineWaitHint && (
+          <p className={styles.emptyText}>
+            Aguarde um pouco. Isso pode levar até 30 segundos.
+          </p>
+        )}
         {errorMessage && <p className={styles.errorText}>{errorMessage}</p>}
         {copyFeedback && <p className={styles.feedback}>{copyFeedback}</p>}
 
         <div className={styles.classroomList}>
-          {classrooms.length === 0 ? (
+          {classrooms.length === 0 && isConnectingToServer ? (
+            <p className={styles.emptyText}>Conectando ao servidor online...</p>
+          ) : classrooms.length === 0 ? (
             <p className={styles.emptyText}>Nenhuma turma temporária criada neste dispositivo.</p>
           ) : (
             classrooms.map((classroom) => (

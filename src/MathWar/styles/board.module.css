@@ -934,8 +934,9 @@
 
   .nextRollIndicator {
     top: 45%;
-    right: -2%;
-    transform: translate(0, 0);
+    right: auto;
+    left: 100%;
+    transform: translate(min(2.5vw, 2dvh), -50%);
     font-size: min(2vw, 1.5dvh);
     line-height: 1.05;
     padding: min(0.8vw, 0.8dvh) min(1.2vw, 1.2dvh);

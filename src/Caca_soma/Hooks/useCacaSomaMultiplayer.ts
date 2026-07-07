@@ -17,6 +17,11 @@ import {
   getActiveClassroomSession,
   setActiveClassroomSession,
 } from "../../Shared/Classrooms/activeClassroomSession";
+import {
+  getActivePlayerName,
+  normalizePlayerName,
+  setActivePlayerName,
+} from "../../Shared/PlayerName/activePlayerName";
 
 type MultiplayerSnapshot = {
   connectionStatus: MultiplayerConnectionStatus;
@@ -33,6 +38,7 @@ type MultiplayerSnapshot = {
   rematchPending: boolean;
   classroomCode: string | null;
   openClassroomRooms: CacaSomaOpenRoomSummary[];
+  serverTimeOffsetMs: number;
 };
 
 type LeaveRoomOptions = {
@@ -50,7 +56,7 @@ const DEFAULT_SETTINGS: CacaSomaRoomSettings = {
 const DEFAULT_SNAPSHOT: MultiplayerSnapshot = {
   connectionStatus: "idle",
   roomCode: null,
-  playerName: "",
+  playerName: getActivePlayerName(),
   playerSeat: null,
   settings: null,
   players: [],
@@ -62,6 +68,7 @@ const DEFAULT_SNAPSHOT: MultiplayerSnapshot = {
   rematchPending: false,
   classroomCode: null,
   openClassroomRooms: [],
+  serverTimeOffsetMs: 0,
 };
 
 let socket: Socket<
@@ -86,6 +93,7 @@ function loadSnapshot(): MultiplayerSnapshot {
     const nextSnapshot: MultiplayerSnapshot = {
       ...DEFAULT_SNAPSHOT,
       ...parsed,
+      playerName: parsed.playerName || getActivePlayerName(),
       classroomCode: null,
       settings: parsed.settings ? { ...DEFAULT_SETTINGS, ...parsed.settings } : null,
       players: Array.isArray(parsed.players) ? normalizePlayers(parsed.players) : [],
@@ -124,6 +132,16 @@ function updateSnapshot(patch: Partial<MultiplayerSnapshot>): void {
     players: patch.players ? normalizePlayers(patch.players) : sharedSnapshot.players,
   };
   notifySubscribers();
+}
+
+function getServerTimePatch(serverNowMs: number): Partial<Pick<MultiplayerSnapshot, "serverTimeOffsetMs">> {
+  if (!Number.isFinite(serverNowMs)) {
+    return {};
+  }
+
+  return {
+    serverTimeOffsetMs: serverNowMs - Date.now(),
+  };
 }
 
 function replaceSnapshot(nextSnapshot: MultiplayerSnapshot): void {
@@ -214,6 +232,7 @@ function ensureSocket(): Socket<
 
     socket.on("room_created", (payload) => {
       updateSnapshot({
+        ...getServerTimePatch(payload.serverNowMs),
         roomCode: payload.code,
         playerSeat: payload.seat,
         settings: payload.settings,
@@ -230,6 +249,7 @@ function ensureSocket(): Socket<
 
     socket.on("room_joined", (payload) => {
       updateSnapshot({
+        ...getServerTimePatch(payload.serverNowMs),
         roomCode: payload.code,
         playerSeat: payload.seat,
         settings: payload.settings,
@@ -246,6 +266,7 @@ function ensureSocket(): Socket<
 
     socket.on("room_updated", (payload) => {
       updateSnapshot({
+        ...getServerTimePatch(payload.serverNowMs),
         roomCode: payload.code,
         settings: payload.settings,
         players: payload.players,
@@ -257,6 +278,7 @@ function ensureSocket(): Socket<
 
     socket.on("room_ready", (payload) => {
       updateSnapshot({
+        ...getServerTimePatch(payload.serverNowMs),
         roomCode: payload.code,
         settings: payload.settings,
         players: payload.players,
@@ -272,6 +294,7 @@ function ensureSocket(): Socket<
 
     socket.on("state_updated", (payload) => {
       updateSnapshot({
+        ...getServerTimePatch(payload.serverNowMs),
         roomCode: payload.code,
         gameState: payload.state,
         connectionStatus: getConnectionStatusFromState(payload.state),
@@ -291,6 +314,7 @@ function ensureSocket(): Socket<
 
     socket.on("rematch_started", (payload) => {
       updateSnapshot({
+        ...getServerTimePatch(payload.serverNowMs),
         roomCode: payload.code,
         gameState: payload.state,
         connectionStatus: getConnectionStatusFromState(payload.state),
@@ -409,6 +433,14 @@ export function useCacaSomaMultiplayer() {
   const [snapshot, setSnapshot] = useState<MultiplayerSnapshot>(sharedSnapshot);
 
   useEffect(() => {
+    if (!sharedSnapshot.roomCode) {
+      const savedName = getActivePlayerName();
+      if (savedName && savedName !== sharedSnapshot.playerName) {
+        updateSnapshot({ playerName: savedName });
+      }
+    }
+    setSnapshot(sharedSnapshot);
+
     const listener = (nextSnapshot: MultiplayerSnapshot) => {
       setSnapshot(nextSnapshot);
     };
@@ -424,13 +456,14 @@ export function useCacaSomaMultiplayer() {
   }, []);
 
   const createRoom = (playerName: string, classroomCode?: string) => {
-    const normalizedName = playerName.trim().slice(0, 20);
+    const normalizedName = normalizePlayerName(playerName);
     if (normalizedName.length < 2) {
       updateSnapshot({
         errorMessage: "Digite um nome com pelo menos 2 letras.",
       });
       return;
     }
+    setActivePlayerName(normalizedName);
 
     updateSnapshot({
       playerName: normalizedName,
@@ -455,7 +488,7 @@ export function useCacaSomaMultiplayer() {
   };
 
   const joinRoom = (code: string, playerName: string) => {
-    const normalizedName = playerName.trim().slice(0, 20);
+    const normalizedName = normalizePlayerName(playerName);
     const normalizedCode = code.trim().toUpperCase();
 
     if (normalizedName.length < 2) {
@@ -471,6 +504,7 @@ export function useCacaSomaMultiplayer() {
       });
       return;
     }
+    setActivePlayerName(normalizedName);
 
     updateSnapshot({
       playerName: normalizedName,
