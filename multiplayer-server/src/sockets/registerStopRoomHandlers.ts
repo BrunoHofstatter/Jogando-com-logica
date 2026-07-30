@@ -36,6 +36,7 @@ import type {
 import { generateRoomCode } from "../rooms/roomCode.ts";
 import { WAITING_ROOM_TTL_MS } from "../rooms/roomTypes.ts";
 import type { ClassroomStore } from "../classrooms/classroomStore.ts";
+import type { ClassroomMonitor } from "../classrooms/classroomMonitor.ts";
 
 type StopNamespace = Namespace<
   StopClientToServerEvents,
@@ -48,11 +49,27 @@ type StopSocket = Socket<
 >;
 
 const roomStore = createStopRoomStore();
+let activeClassroomMonitor: ClassroomMonitor;
 
 export function registerStopRoomHandlers(
   io: StopNamespace,
   classroomStore: ClassroomStore,
+  classroomMonitor: ClassroomMonitor,
 ): void {
+  activeClassroomMonitor = classroomMonitor;
+  classroomMonitor.registerProvider("stop", (classroomCode) =>
+    [...roomStore.getRooms().values()]
+      .filter((room) => room.visibility === "classroom" && room.classroomCode === classroomCode)
+      .map((room) => ({
+        code: room.code,
+        game: "stop",
+        status: room.state.status === "lobby" ? "waiting" : room.state.status,
+        players: room.state.players.map(({ name, connected }) => ({ name, connected })),
+        capacity: room.state.settings.playerLimit,
+        createdAt: room.createdAt,
+      })),
+  );
+
   io.on("connection", (socket) => {
     socket.on("create_room", ({ playerName, classroomCode }) => {
       leaveAnyExistingRoom(io, socket);
@@ -356,6 +373,65 @@ export function registerStopRoomHandlers(
       scheduleRoundPhase(io, room);
     });
 
+    socket.on("remove_player", ({ code, playerId }) => {
+      const room = roomStore.getRoom(code.trim().toUpperCase());
+      if (!room) {
+        emitError(socket, "room_not_found", "Sala não encontrada.");
+        return;
+      }
+
+      const hostParticipant = getParticipantBySocketId(room, socket.id);
+      const hostPlayer = hostParticipant
+        ? room.state.players.find((player) => player.id === hostParticipant.playerId)
+        : null;
+      if (!hostParticipant || !hostPlayer) {
+        emitError(socket, "unauthorized", "Você não pertence a esta sala.");
+        return;
+      }
+
+      if (!hostPlayer.isHost) {
+        emitError(socket, "host_only", "Só o anfitrião pode remover jogadores.");
+        return;
+      }
+
+      if (room.state.status !== "lobby") {
+        emitError(socket, "room_not_joinable", "Não é possível remover jogadores depois que a partida começa.");
+        return;
+      }
+
+      const targetPlayer = room.state.players.find((player) => player.id === playerId);
+      const targetParticipant = room.participants.find(
+        (participant) => participant.playerId === playerId,
+      );
+      if (!targetPlayer || !targetParticipant || targetPlayer.isHost) {
+        emitError(socket, "unauthorized", "Esse jogador não pode ser removido.");
+        return;
+      }
+
+      const result = removeStopRoomPlayer(room.state, playerId, Date.now());
+      if (!result.ok) {
+        emitError(socket, result.code, getErrorMessage(result.code));
+        return;
+      }
+
+      io.to(targetParticipant.socketId).emit("player_removed", {
+        code: room.code,
+        message: "Você foi removido da sala pelo anfitrião.",
+      });
+      io.sockets.get(targetParticipant.socketId)?.leave(room.code);
+
+      room.state = result.state;
+      room.participants = room.participants.filter(
+        (participant) => participant.playerId !== playerId,
+      );
+      delete room.answerSnapshotsByPlayerId[playerId];
+      room.updatedAt = Date.now();
+
+      scheduleLobbyExpiry(io, room);
+      emitStateUpdated(io, room);
+      broadcastClassroomRooms(io, room.classroomCode);
+    });
+
     socket.on("leave_room", ({ code }) => {
       const room = roomStore.getRoom(code.trim().toUpperCase());
       if (!room) {
@@ -637,6 +713,7 @@ function emitStateUpdated(io: StopNamespace, room: StopMultiplayerRoom): void {
     code: room.code,
     state: room.state,
   });
+  activeClassroomMonitor.notifyClassroomChanged(room.classroomCode);
 }
 
 function normalizeClassroomCode(code: string): ClassroomCode | null {
@@ -684,6 +761,7 @@ function broadcastClassroomRooms(
     classroomCode,
     openRooms: getOpenClassroomRooms(classroomCode),
   });
+  activeClassroomMonitor.notifyClassroomChanged(classroomCode);
 }
 
 function normalizePlayerName(playerName: string): string | null {

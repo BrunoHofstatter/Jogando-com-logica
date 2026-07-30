@@ -32,18 +32,6 @@ export default function SPTTTMultiplayerLobbyPage() {
   const [classroomInput, setClassroomInput] = useState("");
   const [copyFeedback, setCopyFeedback] = useState("");
 
-  useEffect(() => {
-    document.body.style.backgroundColor = "#c2e4fa";
-
-    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (!metaThemeColor) {
-      metaThemeColor = document.createElement("meta");
-      metaThemeColor.setAttribute("name", "theme-color");
-      document.head.appendChild(metaThemeColor);
-    }
-
-    metaThemeColor.setAttribute("content", "#c2e4fa");
-  }, []);
 
   useEffect(() => {
     setNameInput(playerName);

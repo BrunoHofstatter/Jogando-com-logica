@@ -63,18 +63,6 @@ export default function StopMultiplayerGamePage() {
     requestRematch,
   } = useStopMultiplayer();
 
-  useEffect(() => {
-    document.body.style.backgroundColor = "#ffbaba";
-
-    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (!metaThemeColor) {
-      metaThemeColor = document.createElement("meta");
-      metaThemeColor.setAttribute("name", "theme-color");
-      document.head.appendChild(metaThemeColor);
-    }
-
-    metaThemeColor.setAttribute("content", "#ffbaba");
-  }, []);
 
   useEffect(() => {
     setIsTouch(isTouchDevice());

@@ -79,6 +79,40 @@ export interface DeleteClassroomPayload {
   managementToken: string;
 }
 
+export type ClassroomMonitorGame =
+  | "crown_chase"
+  | "spttt"
+  | "math_war"
+  | "caca_soma"
+  | "stop"
+  | "bomb_game";
+
+export type ClassroomMonitorRoomStatus = "waiting" | "playing" | "ended";
+
+export interface ClassroomMonitorPlayer {
+  name: string;
+  connected: boolean;
+}
+
+export interface ClassroomMonitorRoom {
+  code: CrownChaseRoomCode;
+  game: ClassroomMonitorGame;
+  status: ClassroomMonitorRoomStatus;
+  players: ClassroomMonitorPlayer[];
+  capacity: number;
+  createdAt: number;
+}
+
+export interface WatchClassroomPayload {
+  code: ClassroomCode;
+  managementToken: string;
+}
+
+export interface ClassroomMonitorUpdatedPayload {
+  classroomCode: ClassroomCode;
+  rooms: ClassroomMonitorRoom[];
+}
+
 export interface JoinClassroomPayload {
   code: ClassroomCode;
 }
@@ -182,6 +216,8 @@ export interface CrownChaseClientToServerEvents {
   create_classroom: () => void;
   list_managed_classrooms: (payload: ListManagedClassroomsPayload) => void;
   delete_classroom: (payload: DeleteClassroomPayload) => void;
+  watch_classroom: (payload: WatchClassroomPayload) => void;
+  unwatch_classroom: (payload: WatchClassroomPayload) => void;
   join_classroom: (payload: JoinClassroomPayload) => void;
   leave_classroom: (payload: LeaveClassroomPayload) => void;
   list_open_rooms: (payload: ListOpenRoomsPayload) => void;
@@ -200,6 +236,7 @@ export interface CrownChaseServerToClientEvents {
   classroom_created: (payload: ClassroomCreatedPayload) => void;
   managed_classrooms: (payload: ManagedClassroomsPayload) => void;
   classroom_deleted: (payload: ClassroomDeletedPayload) => void;
+  classroom_monitor_updated: (payload: ClassroomMonitorUpdatedPayload) => void;
   classroom_joined: (payload: ClassroomJoinedPayload) => void;
   classroom_rooms_updated: (payload: ClassroomRoomsUpdatedPayload) => void;
   classroom_unavailable: (payload: ClassroomUnavailablePayload) => void;

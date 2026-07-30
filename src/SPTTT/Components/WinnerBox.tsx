@@ -20,6 +20,7 @@ export function WinnerOverlay({
   onNextLevel?: () => void;
   showNextLevel?: boolean;
 }) {
+  const userWon = isAiMode && winner === "X";
   let titleText = "Ganhador:";
   if (winner === "tie") {
     titleText = "Empate!";
@@ -56,7 +57,7 @@ export function WinnerOverlay({
             </button>
           </div>
 
-          {showNextLevel && onNextLevel && (
+          {userWon && showNextLevel && onNextLevel && (
             <button onClick={onNextLevel} className={styles.victoryButtonNext}>
               Próxima dificuldade
             </button>

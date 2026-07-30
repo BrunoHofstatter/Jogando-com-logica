@@ -20,16 +20,6 @@ import {
  * Orchestrates the number reveal animation, tutorial, and game board
  */
 function StopGamePage() {
-  useEffect(() => {
-    document.body.style.backgroundColor = "#ffbaba";
-    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (!metaThemeColor) {
-      metaThemeColor = document.createElement("meta");
-      metaThemeColor.setAttribute("name", "theme-color");
-      document.head.appendChild(metaThemeColor);
-    }
-    metaThemeColor.setAttribute("content", "#ffbaba");
-  }, []);
 
   const location = useLocation();
   const mode = location.state?.mode || "random";

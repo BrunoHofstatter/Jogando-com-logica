@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useTutorialCompleted } from "../../Shared/Components/DynamicTutorial";
@@ -9,16 +9,6 @@ import styles from "../Style/RegrasSPTTT.module.css";
 type GameMode = "pvp" | "ai";
 
 function SPTTTRulesPage() {
-  useEffect(() => {
-    document.body.style.backgroundColor = "#c2e4fa";
-    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (!metaThemeColor) {
-      metaThemeColor = document.createElement("meta");
-      metaThemeColor.setAttribute("name", "theme-color");
-      document.head.appendChild(metaThemeColor);
-    }
-    metaThemeColor.setAttribute("content", "#c2e4fa");
-  }, []);
 
   const navigate = useNavigate();
   const [gameMode, setGameMode] = useState<GameMode>("ai");
@@ -200,7 +190,11 @@ function SPTTTRulesPage() {
             </button>
 
             <div className={styles.detailedRules}>
-              <h2>Regras do Super Jogo da Velha</h2>
+              <h2>
+                Regras do
+                <br />
+                Super Jogo da Velha
+              </h2>
 
               <h3 className={styles.rulesTitle}>Como Jogar</h3>
               <p className={styles.rulesText}>
@@ -264,15 +258,6 @@ function SPTTTRulesPage() {
                 no tabuleiro gigante.
               </p>
 
-              <h4 className={styles.winTitle}>Vitória por Três em Linha</h4>
-              <p className={styles.winText}>
-                Conquistar{" "}
-                <span className={styles.rulesStrong}>
-                  3 tabuleiros menores em sequência
-                </span>{" "}
-                no tabuleiro gigante (em linha, coluna ou diagonal).
-              </p>
-
               <h3 className={styles.rulesTitle}>Empate</h3>
               <p className={styles.rulesText}>
                 O jogo termina em empate se todos os tabuleiros menores forem
@@ -282,6 +267,59 @@ function SPTTTRulesPage() {
                 <span onClick={unlockAllDifficulties} style={{ cursor: "text" }}>
                   gigante.
                 </span>
+              </p>
+
+              <h3 className={styles.rulesTitle}>Modos de Jogo</h3>
+              <p className={styles.rulesText}>
+                <span className={styles.rulesSpan}>Contra Computador:</span>{" "}
+                jogue contra o computador nos níveis Muito Fácil, Fácil, Médio
+                e Difícil. Ao vencer um nível, você desbloqueia o próximo.
+              </p>
+              <p className={styles.rulesText}>
+                <span className={styles.rulesSpan}>Dois Jogadores:</span>{" "}
+                duas pessoas jogam no mesmo dispositivo, alternando as jogadas
+                de X e O.
+              </p>
+              <p className={styles.rulesText}>
+                <span className={styles.rulesSpan}>Online:</span> duas pessoas
+                jogam em dispositivos diferentes por meio de uma sala.
+              </p>
+
+              <h3 className={styles.rulesTitle}>Como Jogar Online</h3>
+              <p className={styles.rulesText}>
+                Digite seu nome e crie uma{" "}
+                <span className={styles.rulesStrong}>sala privada</span> para
+                receber um código de 4 caracteres. Compartilhe esse código com
+                o outro jogador, que poderá usá-lo para entrar na sala.
+              </p>
+              <p className={styles.rulesText}>
+                Você também pode entrar em uma sala privada criada por outra
+                pessoa usando o código recebido.
+              </p>
+              <p className={styles.rulesText}>
+                Para jogar com sua turma, entre com o{" "}
+                <span className={styles.rulesStrong}>código da turma</span>. Lá,
+                você pode criar uma sala visível para a turma ou entrar em uma
+                das salas abertas, identificadas como “Sala de nome”.
+              </p>
+              <p className={styles.rulesText}>
+                As regras do tabuleiro e da vitória são as mesmas em todos os
+                modos. Depois de uma partida online, um jogador pode pedir uma
+                revanche; a nova partida começa quando o outro aceitar. Se um
+                jogador sair ou perder a conexão, a sala poderá ser encerrada.
+              </p>
+
+              <h3 className={styles.rulesTitle}>Tutorial e Progresso</h3>
+              <p className={styles.rulesText}>
+                O botão <span className={styles.rulesStrong}>Tutorial</span>{" "}
+                apresenta as partes do tabuleiro e as regras principais durante
+                uma partida.
+              </p>
+              <p className={styles.rulesText}>
+                O botão{" "}
+                <span className={styles.rulesStrong}>Deletar progresso</span>{" "}
+                bloqueia novamente as dificuldades do computador que foram
+                desbloqueadas. As regras e os modos de jogo não são apagados.
               </p>
             </div>
           </div>

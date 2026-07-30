@@ -16,6 +16,9 @@ type LobbyMode = "home" | "join" | "classroom";
 type RoomModeOption = CacaSomaRoomSettings["mode"];
 type DifficultyOption = CacaSomaRoomSettings["difficultyId"];
 type TargetScoreOption = CacaSomaRoomSettings["targetScore"];
+type RoomCreationContext = {
+  classroomCode?: string;
+};
 
 const ROOM_MODE_OPTIONS: RoomModeOption[] = ["1v1", "2v2"];
 const DIFFICULTY_OPTIONS: DifficultyOption[] = ["easy", "medium", "hard"];
@@ -64,6 +67,7 @@ export default function CacaSomaMultiplayerLobbyPage() {
     leaveClassroom,
     updateRoomSettings,
     startMatch,
+    removePlayer,
     leaveRoom,
   } = useCacaSomaMultiplayer();
 
@@ -73,19 +77,8 @@ export default function CacaSomaMultiplayerLobbyPage() {
   const [classroomInput, setClassroomInput] = useState("");
   const [copyFeedback, setCopyFeedback] = useState("");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [roomCreation, setRoomCreation] = useState<RoomCreationContext | null>(null);
 
-  useEffect(() => {
-    document.body.style.backgroundColor = "#efc9c9";
-
-    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (!metaThemeColor) {
-      metaThemeColor = document.createElement("meta");
-      metaThemeColor.setAttribute("name", "theme-color");
-      document.head.appendChild(metaThemeColor);
-    }
-
-    metaThemeColor.setAttribute("content", "#efc9c9");
-  }, []);
 
   useEffect(() => {
     setNameInput(playerName);
@@ -133,8 +126,28 @@ export default function CacaSomaMultiplayerLobbyPage() {
     }
   }, [isInRoom]);
 
-  const handleCreateRoom = () => {
-    createRoom(nameInput);
+  useEffect(() => {
+    if (!roomCreation) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setRoomCreation(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [roomCreation]);
+
+  const openRoomCreation = (roomClassroomCode?: string) => {
+    setRoomCreation({ classroomCode: roomClassroomCode });
+  };
+
+  const handleCreateRoom = (mode: RoomModeOption) => {
+    createRoom(nameInput, mode, roomCreation?.classroomCode);
+    setRoomCreation(null);
   };
 
   const handleJoinRoom = () => {
@@ -163,6 +176,13 @@ export default function CacaSomaMultiplayerLobbyPage() {
     setClassroomInput("");
     setCopyFeedback("");
     setIsSettingsOpen(false);
+  };
+
+  const handleRemovePlayer = (targetSeat: CacaSomaRoomSeat, targetPlayerName: string) => {
+    const confirmed = window.confirm(`Remover ${targetPlayerName} da sala?`);
+    if (confirmed) {
+      removePlayer(targetSeat);
+    }
   };
 
   const handleSwitchClassroom = () => {
@@ -231,7 +251,7 @@ export default function CacaSomaMultiplayerLobbyPage() {
                 <div className={styles.actions}>
                 <button
                   className={styles.primaryButton}
-                  onClick={handleCreateRoom}
+                  onClick={() => openRoomCreation()}
                   disabled={isBusy}
                 >
                   {isBusy && lobbyMode === "home" ? "Conectando..." : "Criar Sala Privada"}
@@ -329,9 +349,10 @@ export default function CacaSomaMultiplayerLobbyPage() {
 
                   <button
                     className={styles.primaryButton}
-                    onClick={() => createRoom(nameInput, classroomCode)}
+                    onClick={() => openRoomCreation(classroomCode)}
+                    disabled={isBusy}
                   >
-                    Criar Sala para a Turma
+                    {isBusy ? "Criando sala..." : "Criar Sala para a Turma"}
                   </button>
 
                   <p className={styles.waitingText}>
@@ -465,9 +486,22 @@ export default function CacaSomaMultiplayerLobbyPage() {
                               {player?.name ?? "Aguardando..."}
                             </span>
                           </div>
-                          {player?.isHost && (
-                            <span className={styles.hostBadge}>Anfitrião</span>
-                          )}
+                          <div className={styles.playerControls}>
+                            {player?.isHost && (
+                              <span className={styles.hostBadge}>Anfitrião</span>
+                            )}
+                            {isHost && player && !player.isHost && player.seat !== playerSeat && (
+                              <button
+                                type="button"
+                                className={styles.removePlayerButton}
+                                aria-label={`Remover ${player.name} da sala`}
+                                title={`Remover ${player.name}`}
+                                onClick={() => handleRemovePlayer(player.seat, player.name)}
+                              >
+                                ×
+                              </button>
+                            )}
+                          </div>
                         </div>
                         <span className={styles.playerMeta}>{teamLabel}</span>
                         <span className={styles.playerMeta}>{seatLabel}</span>
@@ -575,6 +609,54 @@ export default function CacaSomaMultiplayerLobbyPage() {
 
           {errorMessage && !isDisconnected && (
             <p className={styles.errorText}>{errorMessage}</p>
+          )}
+
+          {roomCreation && !isInRoom && !isDisconnected && (
+            <div
+              className={styles.modalOverlay}
+              onClick={() => setRoomCreation(null)}
+            >
+              <div
+                className={`${styles.card} ${styles.settingsModal} ${styles.creationModal}`}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="caca-soma-room-players-title"
+                onClick={(event) => event.stopPropagation()}
+              >
+                <div
+                  id="caca-soma-room-players-title"
+                  className={styles.modalTitle}
+                >
+                  Quantos jogadores vão jogar?
+                </div>
+                <p className={styles.creationDescription}>
+                  Escolha o formato inicial da sala.
+                </p>
+
+                <div className={styles.roomModeChoices}>
+                  {ROOM_MODE_OPTIONS.map((roomMode) => (
+                    <button
+                      key={roomMode}
+                      className={`${styles.primaryButton} ${styles.roomModeButton}`}
+                      onClick={() => handleCreateRoom(roomMode)}
+                      autoFocus={roomMode === "1v1"}
+                    >
+                      <span>{ROOM_MODE_LABELS[roomMode]}</span>
+                      <span className={styles.roomModePlayerCount}>
+                        {getRoomCapacity(roomMode)} jogadores
+                      </span>
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  className={styles.secondaryButton}
+                  onClick={() => setRoomCreation(null)}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
           )}
         </div>
       </div>

@@ -26,6 +26,7 @@ import {
   type RoomPlayer,
 } from "../rooms/roomTypes.ts";
 import type { ClassroomStore } from "../classrooms/classroomStore.ts";
+import type { ClassroomMonitor } from "../classrooms/classroomMonitor.ts";
 
 type SptttNamespace = Namespace<
   SptttClientToServerEvents,
@@ -43,11 +44,27 @@ type SptttRoom = MultiplayerRoom<SptttState> & {
 };
 
 const roomStore = createRoomStore<SptttRoom>();
+let activeClassroomMonitor: ClassroomMonitor;
 
 export function registerSptttRoomHandlers(
   io: SptttNamespace,
   classroomStore: ClassroomStore,
+  classroomMonitor: ClassroomMonitor,
 ): void {
+  activeClassroomMonitor = classroomMonitor;
+  classroomMonitor.registerProvider("spttt", (classroomCode) =>
+    [...roomStore.getRooms().values()]
+      .filter((room) => room.visibility === "classroom" && room.classroomCode === classroomCode)
+      .map((room) => ({
+        code: room.code,
+        game: "spttt",
+        status: room.status,
+        players: serializePlayers(room).map(({ name, connected }) => ({ name, connected })),
+        capacity: 2,
+        createdAt: room.createdAt,
+      })),
+  );
+
   io.on("connection", (socket) => {
     socket.on("create_room", ({ playerName, classroomCode }) => {
       leaveAnyExistingRoom(io, socket, "leave_room");
@@ -240,6 +257,7 @@ export function registerSptttRoomHandlers(
         code: room.code,
         state: room.state,
       });
+      classroomMonitor.notifyClassroomChanged(room.classroomCode);
     });
 
     socket.on("request_rematch", ({ code }) => {
@@ -289,6 +307,7 @@ export function registerSptttRoomHandlers(
         code: room.code,
         state: room.state,
       });
+      classroomMonitor.notifyClassroomChanged(room.classroomCode);
     });
 
     socket.on("leave_room", ({ code }) => {
@@ -505,6 +524,7 @@ function broadcastClassroomRooms(
     classroomCode,
     openRooms: getOpenClassroomRooms(classroomCode),
   });
+  activeClassroomMonitor.notifyClassroomChanged(classroomCode);
 }
 
 function emitError(

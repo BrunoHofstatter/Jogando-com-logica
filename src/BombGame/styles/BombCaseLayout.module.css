@@ -1,0 +1,185 @@
+.stage {
+  position: relative;
+  width: min(110vw, 172dvh);
+  aspect-ratio: 3 / 2;
+  margin: -8.5dvh auto 0;
+  isolation: isolate;
+}
+
+.artwork,
+.artwork img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+
+.artwork img {
+  object-fit: contain;
+}
+
+.timerScreen {
+  position: absolute;
+  z-index: 2;
+  left: 84.35%;
+  top: 37.4%;
+  width: 11.9%;
+  height: 26.6%;
+  box-sizing: border-box;
+  padding: 1.1% 1.4%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #ef3d52;
+  text-align: center;
+  text-shadow: 0 0 1.2vw #c3263a, 0 .25vw 0 #090204;
+  pointer-events: none;
+}
+
+.timerScreen span {
+  color: #ffc83d;
+  font-size: min(.9vw, 1.45dvh);
+  letter-spacing: .12em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.timerScreen strong {
+  font-size: min(2.85vw, 4.55dvh);
+  font-weight: 400;
+  line-height: .9;
+  letter-spacing: .03em;
+}
+
+.timerUrgent strong {
+  animation: timerPulse .7s ease-in-out infinite alternate;
+}
+
+.timerDisarmed strong {
+  color: #75ec98;
+  text-shadow: 0 0 1.2vw #2fa95a, 0 .25vw 0 #082b16;
+}
+
+.interior {
+  position: absolute;
+  z-index: 1;
+  left: 10.15%;
+  top: 22.15%;
+  width: 60.35%;
+  height: 55.45%;
+}
+
+.moduleGrid {
+  position: absolute;
+  z-index: 2;
+  inset: 2.7% 2.5%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: minmax(0, .7fr) minmax(0, 1.3fr);
+  gap: 2.6%;
+}
+
+.wireNetwork {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.wire {
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 .18vw 0 #090204);
+  transition: stroke .25s, filter .25s;
+}
+
+.redWire {
+  stroke: #ef3d52;
+}
+
+.yellowWire {
+  stroke: #ffc83d;
+}
+
+.blueWire {
+  stroke: #287ee8;
+}
+
+.wireComplete {
+  stroke: #75ec98;
+  filter: drop-shadow(0 0 .5vw #2fa95a) drop-shadow(0 .18vw 0 #090204);
+}
+
+@keyframes timerPulse {
+  to {
+    opacity: .6;
+    transform: scale(.96);
+  }
+}
+
+@media (orientation: portrait) and (max-width: 650px) {
+  .stage {
+    width: 150vw;
+    aspect-ratio: 2 / 3;
+    margin: -2dvh 0 0 -25vw;
+  }
+
+  .timerScreen {
+    left: 22.4%;
+    top: 7.15%;
+    width: 55.2%;
+    height: 13.05%;
+    padding: 1.2%;
+    text-shadow: 0 0 min(2vw, 1.1dvh) #c3263a, 0 min(.5vw, .28dvh) 0 #090204;
+  }
+
+  .timerScreen span {
+    font-size: min(3.3vw, 1.8dvh);
+  }
+
+  .timerScreen strong {
+    font-size: min(10vw, 5.5dvh);
+  }
+
+  .interior {
+    left: 20.85%;
+    top: 32.5%;
+    width: 58.3%;
+    height: 59.05%;
+  }
+
+  .moduleGrid {
+    inset: 1.7% 1.9%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.7%;
+  }
+
+  .moduleGrid > :first-child {
+    flex: 1.08;
+  }
+
+  .moduleGrid > :not(:first-child) {
+    flex: 1;
+  }
+
+  .wireNetwork {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timerUrgent strong {
+    animation: none;
+  }
+}

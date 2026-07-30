@@ -140,11 +140,11 @@
   left: 50%;
   transform: translateX(-50%);
   border: 0.3vw solid #7f0000;
-  background-color: #c62828;
+  background-color: #ffffff;
   border-radius: 1.7vw;
   padding: 0.1vw 1vw 0.5vw 1vw;
-  color: #ffffff;
-  -webkit-text-stroke: 0.15vw #7f0000;
+  color: #c62828;
+  -webkit-text-stroke: 0.15vw #5c0000;
   font-size: clamp(1.5vw, 5dvh, 2.7vw);
   font-family: "Cherry Bomb One", system-ui;
   cursor: pointer;
@@ -154,7 +154,7 @@
 }
 
 .onlineButton:hover {
-  background-color: #d32f2f;
+  background-color: #f0f0f0;
   transform: translateX(-50%) translateY(-0.1vw);
   box-shadow: 0 0.5vw 0 #7f0000;
 }

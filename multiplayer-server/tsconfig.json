@@ -18,6 +18,7 @@
     "../src/Caca_soma/Logic/multiplayer/**/*.ts",
     "../src/MathWar/Logic/v2/**/*.ts",
     "../src/MathWar/Logic/multiplayer/**/*.ts",
-    "../src/Stop/Logic/**/*.ts"
+    "../src/Stop/Logic/**/*.ts",
+    "../src/BombGame/Logic/**/*.ts"
   ]
 }

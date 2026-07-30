@@ -81,6 +81,7 @@ Deeper project context lives in `.agents/rules/`. Read these when relevant:
 | `game_stop.md` | Working on Stop Matemático |
 | `game_caca_soma.md` | Working on Caça Soma |
 | `game_rubiks.md` | Working on Cubo Mágico |
+| `game_bomb.md` | Working on Bomb Game |
 | `docs_games_overview.md` | Need the full game catalog at a glance |
 | `docs_general.md` | Need overall project context, positioning, current priorities, or future plans |
 | `docs_multiplayer_backend.md` | Working on online multiplayer architecture, backend deployment, or adding multiplayer to another game |

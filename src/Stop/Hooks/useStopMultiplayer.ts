@@ -220,6 +220,16 @@ function ensureSocket(): Socket<
       });
     });
 
+    socket.on("player_removed", (payload) => {
+      updateSnapshot({
+        roomCode: payload.code,
+        playerId: null,
+        state: null,
+        connectionStatus: "disconnected",
+        errorMessage: payload.message,
+      });
+    });
+
     socket.on("room_closed", (payload) => {
       updateSnapshot({
         connectionStatus: "disconnected",
@@ -423,6 +433,18 @@ export function useStopMultiplayer() {
     });
   };
 
+  const removePlayer = (playerId: string) => {
+    if (!sharedSnapshot.roomCode) {
+      return;
+    }
+
+    const activeSocket = ensureSocket();
+    activeSocket?.emit("remove_player", {
+      code: sharedSnapshot.roomCode,
+      playerId,
+    });
+  };
+
   const submitAnswerSnapshot = (answers: string[]) => {
     if (!sharedSnapshot.roomCode) {
       return;
@@ -494,6 +516,7 @@ export function useStopMultiplayer() {
     joinRoom,
     updateRoomSettings,
     startMatch,
+    removePlayer,
     submitAnswerSnapshot,
     pressStop,
     requestRematch,

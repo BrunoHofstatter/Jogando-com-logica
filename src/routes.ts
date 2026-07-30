@@ -21,8 +21,9 @@ export const ROUTES = {
 
   // Bomb Game
   BOMB_GAME_RULES: "/bombgame/regras",
-  BOMB_GAME_GAME: "/bombgame",
   BOMB_GAME_LEVELS: "/bombgame/niveis",
+  BOMB_GAME_MP_LOBBY: "/bombgame/online",
+  BOMB_GAME_MP_GAME: "/bombgame/online/partida",
 
   // Puzzle Wire
   PUZZLE_WIRE_RULES: "/puzzle-wire/regras",

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { HighlightRegion } from "../../Components/RubiksCube";
 import { CUBE_FACE_ROTATIONS, CubeRotation } from "../../Components/RubiksCubeAnimations";
+import type { AdaptiveGuidanceOptions } from "../../../Shared/Calculation";
 
 export type Class3Phase = "question" | "hint1" | "hint2" | "hint3" | "transition" | "complete";
 
@@ -41,7 +42,7 @@ interface CalculationLessonStep extends BaseLessonStep {
     kind: "calculation";
     topNumber: number;
     bottomNumber: number;
-    supportingText: string;
+    assistance: AdaptiveGuidanceOptions;
 }
 
 type LessonStep = OptionsLessonStep | CalculationLessonStep;
@@ -69,9 +70,10 @@ export interface UiProps {
     isCalculationStep: boolean;
     calculationTopNumber: number | null;
     calculationBottomNumber: number | null;
-    calculationSupportingText: string;
+    calculationAssistance: AdaptiveGuidanceOptions | null;
     handleGuess: (guessedAnswer: string) => void;
     handleCalculationComplete: () => void;
+    handleCalculationMistake: () => void;
 }
 
 export interface UseClass3Return {
@@ -90,6 +92,28 @@ const faceCountingHint: LessonHint = {
     dimInactive: true,
     countFaces: true,
 };
+
+const totalCalculationHints = (cubeSize: number, squaresPerFace: number): LessonHint[] => [
+    {
+        text: `Uma face tem ${cubeSize} linhas com ${cubeSize} quadradinhos: ${cubeSize} × ${cubeSize} = ${squaresPerFace}.`,
+        highlightRegion: { type: "face", index: 0 },
+        showIndices: true,
+        showCounting: true,
+        dimInactive: true,
+        resetToFront: true,
+    },
+    {
+        ...faceCountingHint,
+        text: "Agora conte as faces do cubo: são 6 faces.",
+    },
+    {
+        text: `São ${squaresPerFace} quadradinhos em cada uma das 6 faces: ${squaresPerFace} × 6.`,
+        focusedFaceIndex: 0,
+        focusedFaceLabel: `${squaresPerFace} × 6`,
+        dimInactive: true,
+        resetToFront: true,
+    },
+];
 
 const LESSON_STEPS: LessonStep[] = [
     {
@@ -270,54 +294,64 @@ const LESSON_STEPS: LessonStep[] = [
         question: "Qual cálculo encontra todos os quadradinhos do cubo?",
         options: expressionOptions(["16 × 6", "4 × 6", "4 × 4", "16 + 6", "6 × 6", "12 × 6"]),
         correctAnswer: "16 × 6",
-        hints: [
-            {
-                text: "Quantos quadradinhos há em uma face deste cubo?",
-                highlightRegion: [
-                    { type: "row", index: 0 },
-                    { type: "col", index: 0 },
-                ],
-                dimInactive: true,
-            },
-            {
-                text: "O cubo tem 6 faces, então são 6 grupos de 16 quadradinhos.",
-                focusedFaceIndex: 0,
-                focusedFaceLabel: "16",
-                dimInactive: true,
-            },
-            {
-                text: "Multiplique os quadradinhos de uma face pela quantidade de faces: 16 × 6.",
-                highlightRegion: { type: "face", index: 0 },
-                showIndices: true,
-                showCounting: true,
-            },
-        ],
+        hints: totalCalculationHints(4, 16),
     },
     {
         kind: "calculation",
         cubeSize: 4,
-        question: "Resolva 16 × 6. Quantos quadradinhos há no cubo inteiro?",
+        question: "Resolva 16 × 6.",
         topNumber: 16,
         bottomNumber: 6,
-        supportingText: "Uma face tem 16 quadradinhos. O cubo tem 6 faces. Então fazemos 16 × 6.",
+        assistance: {
+            autoHintDelayMs: 12000,
+            detailedHintDelayMs: 26000,
+            mistakesBeforeHint: 1,
+            mistakesBeforeDetailedHint: 2,
+        },
         hints: [],
+    },
+    {
+        kind: "options",
+        cubeSize: 5,
+        question: "Qual cálculo encontra todos os quadradinhos do cubo?",
+        options: expressionOptions(["25 × 6", "5 × 6", "25 + 6", "5 × 5", "30 × 6", "6 × 6"]),
+        correctAnswer: "25 × 6",
+        hints: totalCalculationHints(5, 25),
     },
     {
         kind: "calculation",
         cubeSize: 5,
-        question: "Quantos quadradinhos há no cubo inteiro?",
+        question: "Resolva 25 × 6.",
         topNumber: 25,
         bottomNumber: 6,
-        supportingText: "Uma face tem 25 quadradinhos. O cubo tem 6 faces. Então fazemos 25 × 6.",
+        assistance: {
+            autoHintDelayMs: 16000,
+            detailedHintDelayMs: 32000,
+            mistakesBeforeHint: 2,
+            mistakesBeforeDetailedHint: 3,
+        },
         hints: [],
+    },
+    {
+        kind: "options",
+        cubeSize: 6,
+        question: "Qual cálculo encontra todos os quadradinhos do cubo?",
+        options: expressionOptions(["36 × 6", "6 × 6", "36 + 6", "30 × 6", "12 × 6", "42 × 6"]),
+        correctAnswer: "36 × 6",
+        hints: totalCalculationHints(6, 36),
     },
     {
         kind: "calculation",
         cubeSize: 6,
-        question: "Quantos quadradinhos há no cubo inteiro?",
+        question: "Resolva 36 × 6.",
         topNumber: 36,
         bottomNumber: 6,
-        supportingText: "Uma face tem 36 quadradinhos. O cubo tem 6 faces. Então fazemos 36 × 6.",
+        assistance: {
+            autoHintDelayMs: 20000,
+            detailedHintDelayMs: 38000,
+            mistakesBeforeHint: 2,
+            mistakesBeforeDetailedHint: 3,
+        },
         hints: [],
     },
 ];
@@ -398,6 +432,10 @@ export function useClass3(): UseClass3Return {
         goToNextStep();
     }, [goToNextStep, phase]);
 
+    const handleCalculationMistake = useCallback(() => {
+        setTotalFlags((flags) => flags + 1);
+    }, []);
+
     const countFaceProps = useMemo(() => {
         if (!activeHint?.countFaces) {
             return null;
@@ -435,9 +473,10 @@ export function useClass3(): UseClass3Return {
         isCalculationStep: currentStep.kind === "calculation",
         calculationTopNumber: currentStep.kind === "calculation" ? currentStep.topNumber : null,
         calculationBottomNumber: currentStep.kind === "calculation" ? currentStep.bottomNumber : null,
-        calculationSupportingText: currentStep.kind === "calculation" ? currentStep.supportingText : "",
+        calculationAssistance: currentStep.kind === "calculation" ? currentStep.assistance : null,
         handleGuess,
         handleCalculationComplete,
+        handleCalculationMistake,
     };
 
     return { cubeProps, uiProps };

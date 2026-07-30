@@ -54,6 +54,7 @@ export interface RoomPlayerInfo {
 
 export interface CreateRoomPayload {
   playerName: string;
+  mode?: CacaSomaRoomMode;
   classroomCode?: ClassroomCode;
 }
 
@@ -92,6 +93,11 @@ export interface RequestRematchPayload {
 
 export interface LeaveRoomPayload {
   code: CacaSomaRoomCode;
+}
+
+export interface RemovePlayerPayload {
+  code: CacaSomaRoomCode;
+  seat: CacaSomaRoomSeat;
 }
 
 export interface CacaSomaOpenRoomSummary {
@@ -187,6 +193,11 @@ export interface RoomClosedPayload {
   message: string;
 }
 
+export interface PlayerRemovedPayload {
+  code: CacaSomaRoomCode;
+  message: string;
+}
+
 export interface MultiplayerErrorPayload {
   code: MultiplayerErrorCode;
   message: string;
@@ -199,6 +210,7 @@ export interface CacaSomaClientToServerEvents {
   start_match: (payload: StartMatchPayload) => void;
   submit_action: (payload: SubmitActionPayload) => void;
   request_rematch: (payload: RequestRematchPayload) => void;
+  remove_player: (payload: RemovePlayerPayload) => void;
   leave_room: (payload: LeaveRoomPayload) => void;
   join_classroom: (payload: JoinClassroomPayload) => void;
   leave_classroom: (payload: LeaveClassroomPayload) => void;
@@ -214,6 +226,7 @@ export interface CacaSomaServerToClientEvents {
   rematch_requested: (payload: RematchRequestedPayload) => void;
   rematch_started: (payload: RematchStartedPayload) => void;
   player_left: (payload: PlayerLeftPayload) => void;
+  player_removed: (payload: PlayerRemovedPayload) => void;
   room_closed: (payload: RoomClosedPayload) => void;
   multiplayer_error: (payload: MultiplayerErrorPayload) => void;
   classroom_joined: (payload: CacaSomaClassroomRoomsPayload) => void;

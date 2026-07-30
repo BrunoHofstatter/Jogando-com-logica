@@ -8,8 +8,12 @@ import { ROUTES } from "../../../routes";
 
 const calculationClassNames = {
     root: styles.calculationRoot,
+    workspace: styles.calculationWorkspace,
+    calculationStage: styles.calculationStage,
+    controlRail: styles.calculationControlRail,
     grid: styles.calculationGrid,
     cell: styles.calculationCell,
+    cellAnchor: styles.calculationCellAnchor,
     operandCell: styles.operandCell,
     resultCell: styles.resultCell,
     carryCell: styles.carryCell,
@@ -23,34 +27,43 @@ const calculationClassNames = {
     actionButton: styles.calculationActionButton,
     checkButton: styles.checkButton,
     message: styles.calculationMessage,
+    coach: styles.calculationCoach,
+    coachArrow: styles.calculationCoachArrow,
+    coachBadge: styles.calculationCoachBadge,
+    coachText: styles.calculationCoachText,
+    coachEquation: styles.calculationCoachEquation,
+    coachLeadingDigit: styles.calculationCoachLeadingDigit,
+    coachResultDigit: styles.calculationCoachResultDigit,
+    coachLeft: styles.calculationCoachLeft,
+    coachRight: styles.calculationCoachRight,
+    coachBelow: styles.calculationCoachBelow,
+    helpButton: styles.calculationHelpButton,
 };
 
 const Class3TotalSquares: React.FC = () => {
     const { cubeProps, uiProps } = useClass3();
     const navigate = useNavigate();
-    const [prefersTouch, setPrefersTouch] = useState(() =>
-        window.matchMedia("(pointer: coarse)").matches
+    const [needsOnScreenKeypad, setNeedsOnScreenKeypad] = useState(() =>
+        window.matchMedia("(pointer: coarse)").matches ||
+        window.matchMedia("(max-width: 650px) and (orientation: portrait)").matches
     );
 
-    useEffect(() => {
-        document.body.style.backgroundColor = "#e0f2fe";
-        let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-        if (!metaThemeColor) {
-            metaThemeColor = document.createElement("meta");
-            metaThemeColor.setAttribute("name", "theme-color");
-            document.head.appendChild(metaThemeColor);
-        }
-        metaThemeColor.setAttribute("content", "#e0f2fe");
-    }, []);
 
     useEffect(() => {
         const pointerQuery = window.matchMedia("(pointer: coarse)");
-        const updatePointerPreference = () => setPrefersTouch(pointerQuery.matches);
+        const portraitQuery = window.matchMedia("(max-width: 650px) and (orientation: portrait)");
+        const updateKeypadPreference = () => {
+            setNeedsOnScreenKeypad(pointerQuery.matches || portraitQuery.matches);
+        };
 
-        updatePointerPreference();
-        pointerQuery.addEventListener("change", updatePointerPreference);
+        updateKeypadPreference();
+        pointerQuery.addEventListener("change", updateKeypadPreference);
+        portraitQuery.addEventListener("change", updateKeypadPreference);
 
-        return () => pointerQuery.removeEventListener("change", updatePointerPreference);
+        return () => {
+            pointerQuery.removeEventListener("change", updateKeypadPreference);
+            portraitQuery.removeEventListener("change", updateKeypadPreference);
+        };
     }, []);
 
     const isTransition = uiProps.currentPhase === "transition";
@@ -67,13 +80,6 @@ const Class3TotalSquares: React.FC = () => {
             </button>
 
             <div className={styles.feedbackOverlay}>
-                {showHint && (
-                    <div className={styles.hintCard} key={uiProps.currentPhase}>
-                        <span className={styles.hintIcon}>Dica:</span>
-                        {uiProps.feedbackText}
-                    </div>
-                )}
-
                 {(isTransition || isComplete) && (
                     <div className={styles.successCard}>
                         <span className={styles.hintIcon}>{isComplete ? "Fim:" : "Boa:"}</span>
@@ -92,6 +98,13 @@ const Class3TotalSquares: React.FC = () => {
                     {...cubeProps}
                     cubeSize={window.matchMedia("(max-width: 600px) and (orientation: portrait)").matches ? 32 : 21}
                 />
+                {showHint && (
+                    <div className={styles.cubeHintCard} key={uiProps.currentPhase}>
+                        <span className={styles.cubeHintArrow} aria-hidden="true" />
+                        <span className={styles.hintIcon}>Dica:</span>
+                        {uiProps.feedbackText}
+                    </div>
+                )}
             </div>
 
             <div className={styles.rightPanel}>
@@ -111,26 +124,31 @@ const Class3TotalSquares: React.FC = () => {
                         <h1 className={styles.title}>{uiProps.question}</h1>
 
                         {uiProps.isCalculationStep && uiProps.calculationTopNumber !== null && uiProps.calculationBottomNumber !== null ? (
-                            <div className={styles.calculationCard}>
-                                <p className={styles.supportingText}>{uiProps.calculationSupportingText}</p>
+                            <div className={styles.calculationArea}>
                                 <VerticalMultiplication
                                     key={uiProps.currentStepIndex}
                                     topNumber={uiProps.calculationTopNumber}
                                     bottomNumber={uiProps.calculationBottomNumber}
                                     maxTopDigits={2}
-                                    guidanceMode="assisted"
-                                    processValidation="warn"
-                                    keypadMode={prefersTouch ? "visible" : "hidden"}
+                                    guidanceMode="adaptive"
+                                    adaptiveGuidance={uiProps.calculationAssistance ?? undefined}
+                                    processValidation="require"
+                                    keypadMode={needsOnScreenKeypad ? "visible" : "hidden"}
+                                    showClearButton={false}
                                     classNames={calculationClassNames}
                                     messages={{
-                                        chooseCell: "Clique em um espaço e use o teclado.",
-                                        assistedNextStep: "Esse espaço pode ser usado, mas tente seguir a próxima coluna indicada.",
+                                        chooseCell: "Clique em um espaço e comece pela coluna destacada.",
+                                        assistedNextStep: "Tente seguir o espaço amarelo destacado.",
                                         checkAnswer: "Verificar",
                                         clear: "Limpar",
                                         correct: "Isso! A conta está certa.",
                                         tryAgain: "Ainda não. Revise os algarismos da conta.",
+                                        help: "Preciso de ajuda",
+                                        yourTurn: "Sua vez",
+                                        hint: "Dica",
                                     }}
                                     onComplete={uiProps.handleCalculationComplete}
+                                    onMistake={uiProps.handleCalculationMistake}
                                 />
                             </div>
                         ) : (

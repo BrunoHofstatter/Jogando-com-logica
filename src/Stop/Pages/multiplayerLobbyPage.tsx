@@ -38,6 +38,7 @@ export default function StopMultiplayerLobbyPage() {
     leaveClassroom,
     updateRoomSettings,
     startMatch,
+    removePlayer,
     leaveRoom,
   } = useStopMultiplayer();
 
@@ -48,18 +49,6 @@ export default function StopMultiplayerLobbyPage() {
   const [copyFeedback, setCopyFeedback] = useState("");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  useEffect(() => {
-    document.body.style.backgroundColor = "#ffbaba";
-
-    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (!metaThemeColor) {
-      metaThemeColor = document.createElement("meta");
-      metaThemeColor.setAttribute("name", "theme-color");
-      document.head.appendChild(metaThemeColor);
-    }
-
-    metaThemeColor.setAttribute("content", "#ffbaba");
-  }, []);
 
   useEffect(() => {
     setNameInput(playerName);
@@ -130,6 +119,13 @@ export default function StopMultiplayerLobbyPage() {
     setClassroomInput("");
     setCopyFeedback("");
     setIsSettingsOpen(false);
+  };
+
+  const handleRemovePlayer = (targetPlayerId: string, targetPlayerName: string) => {
+    const confirmed = window.confirm(`Remover ${targetPlayerName} da sala?`);
+    if (confirmed) {
+      removePlayer(targetPlayerId);
+    }
   };
 
   const handleSwitchClassroom = () => {
@@ -428,9 +424,22 @@ export default function StopMultiplayerLobbyPage() {
                           />
                           <span className={styles.playerName}>{player.name}</span>
                         </div>
-                        {player.isHost && (
-                          <span className={styles.hostBadge}>Anfitrião</span>
-                        )}
+                        <div className={styles.playerControls}>
+                          {player.isHost && (
+                            <span className={styles.hostBadge}>Anfitrião</span>
+                          )}
+                          {isHost && !player.isHost && player.id !== playerId && (
+                            <button
+                              type="button"
+                              className={styles.removePlayerButton}
+                              aria-label={`Remover ${player.name} da sala`}
+                              title={`Remover ${player.name}`}
+                              onClick={() => handleRemovePlayer(player.id, player.name)}
+                            >
+                              ×
+                            </button>
+                          )}
+                        </div>
                       </div>
                       <span className={styles.playerMeta}>
                         {player.connected ? "Conectado" : "Desconectado"}

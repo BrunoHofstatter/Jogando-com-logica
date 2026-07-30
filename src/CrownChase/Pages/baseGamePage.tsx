@@ -7,16 +7,6 @@ import tutorialStyles from "../styles/DynamicTutorial.module.css";
 export default function CrownChasePage() {
   const [showTutorial, setShowTutorial] = useState(false);
 
-  useEffect(() => {
-    document.body.style.backgroundColor = "#d9b6fe";
-    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (!metaThemeColor) {
-      metaThemeColor = document.createElement("meta");
-      metaThemeColor.setAttribute("name", "theme-color");
-      document.head.appendChild(metaThemeColor);
-    }
-    metaThemeColor.setAttribute("content", "#d9b6fe");
-  }, []);
 
   useEffect(() => {
     const completed = localStorage.getItem("tutorial_crownchase_v1_completed");

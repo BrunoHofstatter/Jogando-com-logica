@@ -79,7 +79,7 @@ export const VictoryScreen: React.FC<VictoryScreenProps> = ({
               </button>
             </div>
 
-            {showNextLevel && onNextLevel && (
+            {userWon && showNextLevel && onNextLevel && (
               <button onClick={onNextLevel} className={styles.victoryButtonNext}>
                 Próxima dificuldade
               </button>

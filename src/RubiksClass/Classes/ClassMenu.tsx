@@ -1,19 +1,9 @@
-import React, { useEffect } from "react";
+import React from "react";
 import styles from "./ClassMenu.module.css";
 import ClassIcon from "./ClassIcon";
 import { ROUTES } from "../../routes";
 
 const ClassMenu: React.FC = () => {
-  useEffect(() => {
-    document.body.style.backgroundColor = "#d8b4ff";
-    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (!metaThemeColor) {
-      metaThemeColor = document.createElement("meta");
-      metaThemeColor.setAttribute("name", "theme-color");
-      document.head.appendChild(metaThemeColor);
-    }
-    metaThemeColor.setAttribute("content", "#d8b4ff");
-  }, []);
 
   return (
     <div className={styles.container}>

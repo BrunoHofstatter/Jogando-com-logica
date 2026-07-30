@@ -4,6 +4,7 @@ import type {
   ClassroomCode,
   ManagedClassroom,
 } from "../../../src/CrownChase/Logic/multiplayer/protocol.ts";
+import { isSafeGeneratedCode } from "../rooms/codeSafety.ts";
 
 export const CLASSROOM_TTL_MS = 8 * 60 * 60 * 1000;
 
@@ -72,7 +73,7 @@ function generateClassroomCode(existingCodes: Set<ClassroomCode>): ClassroomCode
     nextCode = Array.from({ length: CLASSROOM_CODE_LENGTH }, () =>
       CLASSROOM_CODE_CHARS[Math.floor(Math.random() * CLASSROOM_CODE_CHARS.length)],
     ).join("");
-  } while (existingCodes.has(nextCode));
+  } while (existingCodes.has(nextCode) || !isSafeGeneratedCode(nextCode));
 
   return nextCode;
 }

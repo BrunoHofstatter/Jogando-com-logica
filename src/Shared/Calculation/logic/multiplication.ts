@@ -28,17 +28,30 @@ export function buildMultiplicationPlan(
     const resultDigit = total % 10;
     const nextCarry = Math.floor(total / 10);
     const answerColumn = topColumn + 1;
+    const hasMoreTopDigits = topDigits
+      .slice(0, topColumn)
+      .some((topDigit) => topDigit.trim() !== "");
 
     steps.push({
       cellId: answerCellId(answerColumn),
       expected: resultDigit.toString(),
       kind: "answer",
       message: `Escreva ${resultDigit} no resultado desta coluna.`,
+      guidance: {
+        prompt: carry > 0
+          ? `Multiplique ${bottomNumber} por ${digit} e some o número que você levou.`
+          : `Comece por esta coluna: quanto é ${bottomNumber} × ${digit}?`,
+        detail: carry > 0
+          ? `${bottomNumber} × ${digit} = ${digit * bottomNumber}. Somando o ${carry} que foi levado, temos ${total}. Escreva ${resultDigit} aqui.`
+          : `${bottomNumber} × ${digit} = ${total}. Escreva o ${resultDigit} no resultado desta coluna.`,
+        equationPrefix: carry > 0
+          ? `${bottomNumber} × ${digit} + ${carry} =`
+          : `${bottomNumber} × ${digit} =`,
+        leadingDigit: total >= 10 ? Math.floor(total / 10).toString() : undefined,
+        resultDigit: resultDigit.toString(),
+        leadingDestination: hasMoreTopDigits ? "carry" : "answer",
+      },
     });
-
-    const hasMoreTopDigits = topDigits
-      .slice(0, topColumn)
-      .some((topDigit) => topDigit.trim() !== "");
 
     if (nextCarry > 0 && hasMoreTopDigits) {
       const carryColumn = topColumn;
@@ -57,6 +70,14 @@ export function buildMultiplicationPlan(
         expected: nextCarry.toString(),
         kind: "carry",
         message: `Suba o ${nextCarry} para a próxima coluna.`,
+        guidance: {
+          prompt: `O resultado tem ${nextCarry} dezena${nextCarry === 1 ? "" : "s"}. Onde ela deve ficar?`,
+          detail: `Leve o ${nextCarry} para a pequena caixa acima da próxima coluna. Ele será somado no próximo passo.`,
+          equationPrefix: `${bottomNumber} × ${digit} =`,
+          leadingDigit: nextCarry.toString(),
+          resultDigit: resultDigit.toString(),
+          leadingDestination: "carry",
+        },
       });
     }
 
@@ -66,6 +87,16 @@ export function buildMultiplicationPlan(
         expected: nextCarry.toString(),
         kind: "answer",
         message: `Escreva ${nextCarry} no começo do resultado.`,
+        guidance: {
+          prompt: `Falta registrar a dezena do ${total}.`,
+          detail: `Como não há outra coluna para multiplicar, escreva o ${nextCarry} no começo do resultado.`,
+          equationPrefix: carry > 0
+            ? `${bottomNumber} × ${digit} + ${carry} =`
+            : `${bottomNumber} × ${digit} =`,
+          leadingDigit: nextCarry.toString(),
+          resultDigit: resultDigit.toString(),
+          leadingDestination: "answer",
+        },
       });
     }
 

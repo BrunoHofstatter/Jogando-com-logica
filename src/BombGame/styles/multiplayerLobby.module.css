@@ -1,0 +1,58 @@
+.page { min-height: 100dvh; width: 100vw; box-sizing: border-box; padding: 3vw; display: flex; align-items: center; justify-content: center; gap: 4vw; background-color: #21070b; color: #ffc83d; font-family: "Cherry Bomb One", system-ui; font-weight: 200; font-style: normal; }
+.previewColumn { width: 28%; display: flex; flex-direction: column; align-items: center; gap: 1.5vw; text-align: center; }
+.title { margin: 0; font-size: clamp(3vw, 7dvh, 5vw); line-height: 1; color: #ffc83d; -webkit-text-stroke: .16vw #090204; text-shadow: 0 .4vw 0 #090204; }
+.previewColumn p { margin: 0; font-size: clamp(1.4vw, 3dvh, 2.2vw); color: #fff0cf; -webkit-text-stroke: .07vw #090204; }
+.bombPreview { width: min(20vw, 45dvh); aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border: .5vw solid #090204; border-radius: 50%; background-color: #c3263a; box-shadow: 0 1vw 0 #090204; animation: bombFloat 3s ease-in-out infinite; }
+.bombPreview svg { width: 62%; height: 62%; color: #090204; stroke-width: 2.5; }
+.panel { width: 62%; }
+.card { width: 100%; box-sizing: border-box; padding: 1.5vw 2vw 2vw; display: flex; flex-direction: column; gap: 1vw; background-color: #3a0d15; border: .45vw solid #090204; border-radius: 3vw; box-shadow: 0 1vw 0 #090204; }
+.heading { margin: 0; text-align: center; font-size: clamp(2.4vw, 5dvh, 3.8vw); line-height: 1; color: #ffc83d; -webkit-text-stroke: .12vw #090204; text-shadow: 0 .3vw 0 #090204; }
+.description, .feedback, .error, .subcard p { margin: 0; text-align: center; font-size: clamp(1.15vw, 2.6dvh, 1.7vw); color: #fff0cf; -webkit-text-stroke: .04vw #090204; }
+.nameRow, .subcard label { display: flex; align-items: center; gap: 1vw; font-size: clamp(1.4vw, 3dvh, 2vw); }
+.nameRow input, .subcard input { flex: 1; min-width: 0; box-sizing: border-box; padding: .7vw 1vw; border: .28vw solid #090204; border-radius: 1.3vw; outline: none; background-color: #fff0cf; color: #21070b; font-family: inherit; font-size: clamp(1.2vw, 2.5dvh, 1.8vw); }
+.hintsToggle { display: flex; align-items: center; justify-content: center; gap: .7vw; font-size: clamp(1.2vw, 2.7dvh, 1.8vw); }
+.hintsToggle input { width: 1.7vw; height: 1.7vw; accent-color: #ffc83d; }
+.actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1vw; }
+.primaryButton, .secondaryButton, .leaveButton { min-height: 3.6vw; padding: .65vw 1vw .9vw; display: flex; align-items: center; justify-content: center; border: .3vw solid #090204; border-radius: 1.8vw; font-family: inherit; font-weight: 200; font-size: clamp(1.15vw, 2.7dvh, 1.8vw); line-height: 1; cursor: pointer; transition: all .1s cubic-bezier(.175,.885,.32,1.275); }
+.primaryButton { background-color: #ffc83d; color: #3a0d15; -webkit-text-stroke: .04vw #3a0d15; box-shadow: 0 .6vw 0 #8c5a00; }
+.secondaryButton { background-color: #c3263a; color: #fff0cf; -webkit-text-stroke: .05vw #090204; box-shadow: 0 .6vw 0 #090204; }
+.leaveButton { background-color: #090204; color: #ffc83d; box-shadow: 0 .6vw 0 #5e1420; }
+.primaryButton:hover, .secondaryButton:hover, .leaveButton:hover { transform: translateY(-.15vw); }
+.primaryButton:active, .secondaryButton:active, .leaveButton:active { transform: translateY(.45vw); box-shadow: 0 .1vw 0 #090204; }
+.primaryButton:disabled, .secondaryButton:disabled { filter: grayscale(1); cursor: not-allowed; transform: none; }
+.subcard { display: flex; flex-direction: column; gap: 1vw; padding: 1.3vw; background-color: #641523; border: .32vw solid #090204; border-radius: 2vw; box-shadow: 0 .65vw 0 #090204; }
+.subcard h3 { margin: 0; text-align: center; font-size: clamp(1.8vw, 4dvh, 2.6vw); color: #ffc83d; -webkit-text-stroke: .08vw #090204; }
+.classroomHeader, .openRoom { display: flex; align-items: center; justify-content: space-between; gap: 1vw; }
+.roomList { display: flex; flex-direction: column; gap: .8vw; }
+.openRoom { padding: .7vw 1vw; border: .25vw solid #090204; border-radius: 1.2vw; background-color: #fff0cf; color: #21070b; font-size: clamp(1.2vw, 2.7dvh, 1.8vw); }
+.waitingGrid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 1.2vw; align-items: center; }
+.waitingGrid > div { display: flex; flex-direction: column; gap: .8vw; }
+.codeBox { padding: .7vw; display: flex; justify-content: center; border: .3vw dashed #090204; border-radius: 1.5vw; background-color: #fff0cf; color: #21070b; font-size: clamp(3vw, 6dvh, 5vw); letter-spacing: .5vw; }
+.feedback { color: #ffc83d; }
+.error { color: #ff8f9d; }
+@keyframes bombFloat { 50% { transform: translateY(-.7vw) rotate(-2deg); } }
+@media (orientation: portrait) and (max-width: 650px) {
+  .page { min-height: 100dvh; width: 100vw; padding: min(4vw, 2.2dvh); display: grid; grid-template-rows: 24dvh 74dvh; gap: min(2vw, 1.1dvh); overflow: auto; }
+  .previewColumn { width: 100%; gap: min(2vw, 1.1dvh); }
+  .title { font-size: min(12vw, 6.5dvh); -webkit-text-stroke-width: min(.55vw, .3dvh); text-shadow: 0 min(.8vw, .45dvh) 0 #090204; }
+  .previewColumn p { font-size: min(4.5vw, 2.5dvh); -webkit-text-stroke-width: min(.15vw, .08dvh); }
+  .bombPreview { width: min(24vw, 13dvh); border-width: min(.8vw, .45dvh); box-shadow: 0 min(1.2vw, .7dvh) 0 #090204; }
+  .panel { width: 100%; height: 100%; }
+  .card { height: auto; min-height: 100%; padding: min(3.5vw, 1.9dvh) min(4vw, 2.2dvh) min(4vw, 2.3dvh); gap: min(2.4vw, 1.3dvh); border-width: min(.8vw, .45dvh); border-radius: min(5vw, 2.8dvh); box-shadow: 0 min(1.4vw, .8dvh) 0 #090204; }
+  .heading { font-size: min(8vw, 4.4dvh); -webkit-text-stroke-width: min(.3vw, .17dvh); text-shadow: 0 min(.5vw, .28dvh) 0 #090204; }
+  .description, .feedback, .error, .subcard p { font-size: min(4vw, 2.2dvh); -webkit-text-stroke-width: min(.1vw, .06dvh); }
+  .nameRow, .subcard label { gap: min(2vw, 1.1dvh); font-size: min(4.5vw, 2.5dvh); }
+  .nameRow input, .subcard input { padding: min(1.8vw, 1dvh) min(2.5vw, 1.4dvh); border-width: min(.55vw, .3dvh); border-radius: min(3vw, 1.7dvh); font-size: min(4vw, 2.2dvh); }
+  .hintsToggle { gap: min(1.5vw, .8dvh); font-size: min(4vw, 2.2dvh); }
+  .hintsToggle input { width: min(5vw, 2.8dvh); height: min(5vw, 2.8dvh); }
+  .actions { grid-template-columns: 1fr; gap: min(2vw, 1.1dvh); }
+  .primaryButton, .secondaryButton, .leaveButton { min-height: min(10vw, 5.5dvh); padding: min(1.6vw, .9dvh) min(2.5vw, 1.4dvh) min(2.2vw, 1.2dvh); border-width: min(.6vw, .33dvh); border-radius: min(4vw, 2.2dvh); font-size: min(4.5vw, 2.5dvh); box-shadow: 0 min(1vw, .55dvh) 0 #090204; }
+  .subcard { gap: min(2vw, 1.1dvh); padding: min(3vw, 1.7dvh); border-width: min(.65vw, .36dvh); border-radius: min(4vw, 2.2dvh); box-shadow: 0 min(1vw, .55dvh) 0 #090204; }
+  .subcard h3 { font-size: min(6vw, 3.3dvh); -webkit-text-stroke-width: min(.2vw, .11dvh); }
+  .classroomHeader, .openRoom { gap: min(2vw, 1.1dvh); }
+  .roomList { gap: min(1.5vw, .8dvh); }
+  .openRoom { padding: min(1.5vw, .8dvh) min(2vw, 1.1dvh); border-width: min(.5vw, .28dvh); border-radius: min(3vw, 1.7dvh); font-size: min(4vw, 2.2dvh); }
+  .waitingGrid { grid-template-columns: 1fr; gap: min(2vw, 1.1dvh); }
+  .waitingGrid > div { gap: min(1.5vw, .8dvh); }
+  .codeBox { padding: min(1.5vw, .8dvh); border-width: min(.6vw, .33dvh); border-radius: min(3vw, 1.7dvh); font-size: min(10vw, 5.5dvh); letter-spacing: min(1vw, .55dvh); }
+}

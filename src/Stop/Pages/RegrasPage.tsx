@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTutorialCompleted } from "../../Shared/Components/DynamicTutorial";
 import styles from "../styles/Regras.module.css";
-import { levels, saveLevelStars } from "../Logic/levelsConfig";
+import { getCurrentLevelId, levels, saveLevelStars } from "../Logic/levelsConfig";
 import { ROUTES } from "../../routes";
 
 
@@ -12,24 +12,13 @@ type GameMode = "random" | "levels";
  * Rules and mode selection page for Stop Matemático
  */
 function RegrasPage() {
-  useEffect(() => {
-    document.body.style.backgroundColor = "#ffbaba";
-    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (!metaThemeColor) {
-      metaThemeColor = document.createElement("meta");
-      metaThemeColor.setAttribute("name", "theme-color");
-      document.head.appendChild(metaThemeColor);
-    }
-    metaThemeColor.setAttribute("content", "#ffbaba");
-  }, []);
 
   const navigate = useNavigate();
   const [showDetailedRules, setShowDetailedRules] = useState(false);
   const [gameMode, setGameMode] = useState<GameMode>("levels");
   const [, resetTutorial] = useTutorialCompleted("stop_v1");
 
-  // Placeholder for future level system
-  const currentLevel = 1;
+  const currentLevel = getCurrentLevelId();
 
   function jogarStop() {
     if (gameMode === "random") {
@@ -162,9 +151,10 @@ function RegrasPage() {
                   Geração dos Desafios (Cálculos)
                 </h3>
                 <p className={styles.rulesText}>
-                  O jogo apresenta 10 caixas de desafio. A dificuldade e o
-                  tipo de cálculo (adição, subtração, multiplicação e/ou
-                  divisão) nas caixas dependem do nível de dificuldade.
+                  Cada rodada apresenta uma grade de caixas de desafio. A
+                  quantidade de caixas e os tipos de cálculo — adição,
+                  subtração, multiplicação e divisão — variam conforme o modo
+                  e o nível da partida.
                 </p>
 
                 <h3 className={styles.rulesTitle}>
@@ -172,42 +162,57 @@ function RegrasPage() {
                 </h3>
                 <p className={styles.rulesText}>
                   O jogador deve utilizar o "Número Mágico" sorteado como o
-                  valor inicial para resolver cada um dos 10 desafios
-                  (caixas).
+                  valor inicial para resolver cada caixa.
                   <br />
                   <br />
-                  <strong>Atenção:</strong> O valor resultante de uma caixa
-                  NÃO é utilizado como entrada para a caixa seguinte. O
-                  "Número Mágico" deve ser aplicado separadamente em cada um
-                  dos 10 cálculos.
+                  <strong>Atenção:</strong> Cada caixa começa novamente com o
+                  "Número Mágico" original. O resultado de uma caixa não é
+                  usado na caixa seguinte.
                 </p>
 
                 <h3 className={styles.rulesTitle}>Caixas Duplas</h3>
                 <p className={styles.rulesText}>
-                  Existem caixas especiais que contêm 2 cálculos distintos. O
-                  jogador deve usar o "Número Mágico" para resolver ambos os
-                  cálculos e, a partir deles, chegar a uma única resposta para
-                  a caixa dupla.
+                  Algumas caixas possuem duas operações em sequência. A
+                  primeira operação é aplicada ao "Número Mágico" e a segunda
+                  é aplicada ao resultado da primeira. Digite apenas a resposta
+                  final da caixa dupla.
+                </p>
+
+                <h3 className={styles.rulesTitle}>Modos de Jogo</h3>
+                <p className={styles.rulesText}>
+                  <strong>Modo Aleatório:</strong> Cria uma rodada rápida com
+                  dificuldade escolhida automaticamente.
+                  <br />• <strong>Modo Níveis:</strong> Possui 10 níveis com
+                  diferentes operações, quantidades de caixas e metas.
                 </p>
 
                 <h3 className={styles.rulesTitle}>Fim da Rodada</h3>
                 <p className={styles.rulesText}>
-                  Ao finalizar todos os 10 desafios, o jogador deve clicar no
-                  botão "Stop" para encerrar o seu tempo de jogo.
+                  O botão "STOP" pode ser pressionado a qualquer momento,
+                  mesmo que ainda existam caixas sem resposta. No computador,
+                  pressionar "Enter" no último campo também encerra a rodada
+                  automaticamente.
                 </p>
 
                 <h3 className={styles.rulesTitle}>
                   Pontuação e Resultado Final
                 </h3>
                 <p className={styles.rulesText}>
-                  Ao clicar em "Stop", o jogo exibe um relatório final
-                  contendo:
+                  Ao encerrar a rodada, o jogo confere as respostas e exibe:
                   <br />• <strong>Correção:</strong> Uma verificação das
                   respostas dadas pelo jogador.
-                  <br />• <strong>Pontuação:</strong> O total de acertos
-                  (cálculos resolvidos corretamente).
+                  <br />• <strong>Acertos:</strong> O total de caixas resolvidas
+                  corretamente. Uma caixa dupla vale um acerto.
                   <br />• <strong>Tempo:</strong> O tempo total decorrido para
                   a conclusão da <span onClick={unlockAllLevels} style={{ cursor: "text" }}>rodada.</span>
+                </p>
+
+                <h3 className={styles.rulesTitle}>Estrelas e Progressão</h3>
+                <p className={styles.rulesText}>
+                  No Modo Níveis, as estrelas são concedidas de acordo com o
+                  tempo e a quantidade de acertos. Uma estrela conclui o nível,
+                  mas são necessárias pelo menos duas estrelas para desbloquear
+                  o próximo.
                 </p>
               </div>
             </div>

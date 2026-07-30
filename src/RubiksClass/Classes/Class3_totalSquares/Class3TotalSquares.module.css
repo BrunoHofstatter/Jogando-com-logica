@@ -42,7 +42,7 @@
     cursor: pointer;
     box-shadow: 0 0.6vw 0 #6b21a8;
     transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
-    -webkit-text-stroke: 0.15vw #6b21a8;
+    -webkit-text-stroke: 0.1vw #6b21a8;
 }
 
 .aulasButton:hover {
@@ -73,7 +73,7 @@
     font-size: 2vw;
     color: #ffffff;
     box-shadow: 0 0.6vw 0 #013873;
-    -webkit-text-stroke: 0.15vw #013873;
+    -webkit-text-stroke: 0.1vw #013873;
     text-shadow: 0 0.3vw 0 #013873;
 }
 
@@ -96,24 +96,29 @@
     align-items: center;
     justify-content: center;
     background: #d5ebfa;
-    padding: 4dvh 4vw;
-    gap: 6dvh;
+    padding: 3dvh 2vw;
+    gap: 2.5dvh;
     position: relative;
-    overflow-y: auto;
+    overflow: hidden;
 }
 
 .title {
+    position: absolute;
+    top: 7dvh;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 44vw;
     font-family: inherit;
-    font-size: 3.3vw;
+    max-width: 44vw;
+    font-size: 2.65vw;
     color: #ffffff;
     text-align: center;
     margin: 0;
-    -webkit-text-stroke: 0.2vw #013873;
-    text-shadow: 0 0.4vw 0 #013873;
-    line-height: 1.18;
+    -webkit-text-stroke: 0.1vw #013873;
+    text-shadow: 0 0.22vw 0 #013873;
+    line-height: 1.08;
 }
 
-.hintCard,
 .successCard {
     border-radius: 1vw;
     padding: 0.8vw 1.8vw 1vw;
@@ -126,18 +131,42 @@
     max-width: 62vw;
 }
 
-.hintCard {
-    background: #ffe874;
-    border: 0.4vw solid #ca8a04;
-    box-shadow: 0 0.6vw 0 #a16207;
-    -webkit-text-stroke: 0.15vw #ca8a04;
-}
-
 .successCard {
     background: #5ee991;
     border: 0.4vw solid #16a34a;
     box-shadow: 0 0.6vw 0 #15803d;
-    -webkit-text-stroke: 0.15vw #16a34a;
+    -webkit-text-stroke: 0.1vw #16a34a;
+}
+
+.cubeHintCard {
+    position: absolute;
+    right: 1.2vw;
+    bottom: 3dvh;
+    z-index: 40;
+    width: min(19vw, 66%);
+    padding: 0.75vw 1vw 0.9vw;
+    border: 0.3vw solid #ca8a04;
+    border-radius: 1vw;
+    background: #ffe874;
+    box-shadow: 0 0.5vw 0 #a16207;
+    color: #ffffff;
+    text-align: center;
+    font-size: 1.35vw;
+    line-height: 1.12;
+    -webkit-text-stroke: 0.08vw #92400e;
+    text-shadow: 0 0.12vw 0 #92400e;
+}
+
+.cubeHintArrow {
+    position: absolute;
+    top: -0.75vw;
+    left: 24%;
+    width: 1.1vw;
+    aspect-ratio: 1;
+    background: #ffe874;
+    border-top: 0.3vw solid #ca8a04;
+    border-left: 0.3vw solid #ca8a04;
+    transform: rotate(45deg);
 }
 
 .hintIcon {
@@ -165,7 +194,7 @@
     cursor: pointer;
     box-shadow: 0 0.6vw 0 #013873;
     transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
-    -webkit-text-stroke: 0.15vw #013873;
+    -webkit-text-stroke: 0.1vw #013873;
     text-shadow: 0 0.2vw 0 #013873;
 }
 
@@ -190,12 +219,12 @@
     transform: translateY(0.4vw);
 }
 
-.calculationCard {
-    width: min(38vw, 86%);
+.calculationArea {
+    width: min(46vw, 100%);
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 1.2vw;
+    justify-content: center;
+    box-sizing: border-box;
 }
 
 .completeCard {
@@ -211,7 +240,6 @@
     padding: 1.4vw 1.8vw 1.8vw;
 }
 
-.supportingText,
 .completeText,
 .completeStats {
     margin: 0;
@@ -220,7 +248,7 @@
     font-size: 1.8vw;
     line-height: 1.15;
     color: #ffffff;
-    -webkit-text-stroke: 0.13vw #013873;
+    -webkit-text-stroke: 0.1vw #013873;
     text-shadow: 0 0.22vw 0 #013873;
 }
 
@@ -229,7 +257,7 @@
     text-align: center;
     font-size: 3.2vw;
     color: #ffffff;
-    -webkit-text-stroke: 0.2vw #013873;
+    -webkit-text-stroke: 0.1vw #013873;
     text-shadow: 0 0.4vw 0 #013873;
 }
 
@@ -242,13 +270,35 @@
     width: 100%;
     max-width: 100%;
     padding: 0;
-    gap: 1vw;
+    gap: 0;
     color: #013873;
 }
 
+.calculationWorkspace {
+    width: 100%;
+    justify-content: space-between;
+    gap: 0;
+    padding: 0 1.2vw;
+    box-sizing: border-box;
+}
+
+.calculationStage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calculationControlRail {
+    width: 11vw;
+    gap: 0.9vw;
+}
+
 .calculationGrid {
-    width: min(22vw, 100%);
-    gap: 0.45vw;
+    width: min(16vw, 100%);
+    gap: 0.35vw;
+    padding: 0;
+    background: transparent;
+    box-sizing: border-box;
 }
 
 .calculationCell {
@@ -256,17 +306,24 @@
     border-radius: 0.65vw;
     background: #ffffff;
     color: #013873;
-    font-size: 2.6vw;
+    font-size: 2.45vw;
     box-shadow: inset 0 -0.25vw 0 #bfe8fb;
-    -webkit-text-stroke: 0.06vw #013873;
+    -webkit-text-stroke: 0;
+    text-shadow: none;
 }
 
 .operandCell {
-    background: #e0f2fe;
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    font-size: 2.75vw;
 }
 
 .resultCell {
-    background: #ffe874;
+    background: #ffffff;
+    border-style: dashed;
+    border-color: #0284c7;
+    box-shadow: inset 0 -0.25vw 0 #bae6fd;
 }
 
 .carryCell {
@@ -275,12 +332,15 @@
     background: #d9f99d;
     border-color: #4d7c0f;
     color: #365314;
-    -webkit-text-stroke: 0.04vw #365314;
+    -webkit-text-stroke: 0;
 }
 
 .activeCell {
-    outline: 0.35vw solid #facc15;
+    background: #fff3a6;
+    border-style: solid;
+    outline: 0.35vw solid #f59e0b;
     outline-offset: 0.18vw;
+    animation: activeCalculationPulse 1.5s ease-in-out infinite;
 }
 
 .disabledCell {
@@ -290,7 +350,7 @@
 .calculationOperator {
     color: #ffffff;
     font-size: 2.5vw;
-    -webkit-text-stroke: 0.12vw #013873;
+    -webkit-text-stroke: 0.1vw #013873;
     text-shadow: 0 0.22vw 0 #013873;
 }
 
@@ -316,10 +376,70 @@
     text-shadow: 0 0.15vw 0 #013873;
 }
 
+.calculationCoach {
+    width: 100%;
+    min-height: 0;
+    gap: 0.35vw;
+    padding: 0.75vw 1vw 0.85vw;
+    background: #fff9d9;
+    border: 0.25vw solid #d39b13;
+    border-radius: 1vw;
+    color: #013873;
+    box-sizing: border-box;
+}
+
+.calculationCoachLeft,
+.calculationCoachRight,
+.calculationCoachBelow {
+    width: 15vw;
+}
+
+.calculationCoachArrow {
+    width: 1vw;
+    background: #fff9d9;
+    border-top-width: 0.25vw;
+    border-left-width: 0.25vw;
+}
+
+.calculationCoachBadge {
+    padding: 0.2vw 0.7vw 0.3vw;
+    background: #f59e0b;
+    font-size: 0.95vw;
+    -webkit-text-stroke: 0.08vw #92400e;
+}
+
+.calculationCoachText {
+    font-size: 1.15vw;
+    line-height: 1.12;
+    -webkit-text-stroke: 0.06vw #013873;
+}
+
+.calculationCoachEquation {
+    gap: 0.22vw;
+    font-size: 1.7vw;
+    -webkit-text-stroke: 0;
+    text-shadow: none;
+}
+
+.calculationCoachLeadingDigit,
+.calculationCoachResultDigit {
+    min-width: 1.25em;
+    padding: 0.1em;
+}
+
+.calculationHelpButton {
+    background: #fff3a6;
+    border-color: #d39b13;
+    box-shadow: 0 0.35vw 0 #a16207;
+    -webkit-text-stroke-color: #92400e;
+    text-shadow: 0 0.14vw 0 #92400e;
+}
+
 .calculationToolbar {
     display: flex;
+    flex-direction: column;
     justify-content: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 0.8vw;
     width: 100%;
 }
@@ -358,15 +478,15 @@
     background: #5ee991;
     border-color: #15803d;
     box-shadow: 0 0.55vw 0 #15803d;
-    flex-basis: 58%;
-    font-size: 1.7vw;
-    padding: 0.75vw 1vw 0.95vw;
-    -webkit-text-stroke: 0.11vw #15803d;
+    flex-basis: auto;
+    font-size: 1.35vw;
+    padding: 0.7vw 0.6vw 0.9vw;
+    -webkit-text-stroke: 0.1vw #15803d;
     text-shadow: 0 0.18vw 0 #15803d;
 }
 
 .keypad {
-    width: min(19vw, 100%);
+    width: min(11vw, 100%);
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.55vw;
@@ -376,6 +496,9 @@
     min-height: 2.6vw;
     padding-left: 0;
     padding-right: 0;
+    color: #013873;
+    -webkit-text-stroke: 0;
+    text-shadow: none;
 }
 
 @media (max-width: 650px) and (orientation: portrait) {
@@ -391,11 +514,11 @@
         border-radius: min(2vw, 1.1dvh);
         border-width: min(0.6vw, 0.33dvh);
         box-shadow: 0 min(1.2vw, 0.66dvh) 0 #6b21a8;
-        -webkit-text-stroke: min(0.25vw, 0.14dvh) #6b21a8;
+        -webkit-text-stroke: min(0.15vw, 0.08dvh) #6b21a8;
     }
 
     .leftPanel {
-        flex: 0 0 42dvh;
+        flex: 0 0 36dvh;
         border-right: none;
         border-bottom: min(0.3vw, 0.17dvh) solid #013873;
         gap: min(2vw, 1.1dvh);
@@ -411,25 +534,28 @@
         border-radius: min(2vw, 1.1dvh);
         border-width: min(0.5vw, 0.28dvh);
         box-shadow: 0 min(1vw, 0.55dvh) 0 #013873;
-        -webkit-text-stroke: min(0.25vw, 0.14dvh) #013873;
+        -webkit-text-stroke: min(0.15vw, 0.08dvh) #013873;
         text-shadow: 0 min(0.5vw, 0.28dvh) 0 #013873;
     }
 
     .feedbackOverlay {
-        top: 39dvh;
+        top: 34dvh;
     }
 
     .rightPanel {
         flex: 1;
-        padding: min(4vw, 2.2dvh);
-        gap: min(3vw, 1.7dvh);
-        overflow-y: auto;
+        padding: min(3vw, 1.65dvh);
+        gap: min(2.2vw, 1.21dvh);
+        overflow: hidden;
     }
 
     .title {
-        font-size: min(5.6vw, 3.1dvh);
-        -webkit-text-stroke: min(0.32vw, 0.18dvh) #013873;
-        text-shadow: 0 min(0.55vw, 0.3dvh) 0 #013873;
+        top: min(3vw, 1.65dvh);
+        width: 92vw;
+        max-width: 92vw;
+        font-size: min(5.2vw, 2.86dvh);
+        -webkit-text-stroke: min(0.15vw, 0.08dvh) #013873;
+        text-shadow: 0 min(0.35vw, 0.19dvh) 0 #013873;
     }
 
     .optionsGrid {
@@ -445,11 +571,10 @@
         border-width: min(0.6vw, 0.33dvh);
         border-radius: min(2vw, 1.1dvh);
         box-shadow: 0 min(1.2vw, 0.66dvh) 0 #013873;
-        -webkit-text-stroke: min(0.25vw, 0.14dvh) #013873;
+        -webkit-text-stroke: min(0.15vw, 0.08dvh) #013873;
         text-shadow: 0 min(0.4vw, 0.22dvh) 0 #013873;
     }
 
-    .hintCard,
     .successCard {
         font-size: min(3.4vw, 1.87dvh);
         padding: min(1.5vw, 0.83dvh) min(3vw, 1.65dvh) min(2vw, 1.1dvh);
@@ -458,14 +583,36 @@
         border-width: min(0.6vw, 0.33dvh);
     }
 
+    .cubeHintCard {
+        right: auto;
+        bottom: min(2vw, 1.1dvh);
+        left: 50%;
+        width: 78vw;
+        max-width: 78vw;
+        padding: min(1.2vw, 0.66dvh) min(2vw, 1.1dvh) min(1.5vw, 0.83dvh);
+        border-width: min(0.5vw, 0.28dvh);
+        border-radius: min(2vw, 1.1dvh);
+        box-shadow: 0 min(0.8vw, 0.44dvh) 0 #a16207;
+        font-size: min(3vw, 1.65dvh);
+        -webkit-text-stroke: min(0.12vw, 0.07dvh) #92400e;
+        transform: translateX(-50%);
+    }
+
+    .cubeHintArrow {
+        top: calc(-1 * min(1.3vw, 0.72dvh));
+        left: 50%;
+        width: min(2vw, 1.1dvh);
+        border-top-width: min(0.5vw, 0.28dvh);
+        border-left-width: min(0.5vw, 0.28dvh);
+    }
+
     .hintIcon {
         font-size: min(3.4vw, 1.87dvh);
         margin-right: min(0.8vw, 0.44dvh);
     }
 
-.calculationCard {
-        width: 86vw;
-        gap: min(1.4vw, 0.77dvh);
+    .calculationArea {
+        width: 94vw;
     }
 
     .completeCard {
@@ -477,27 +624,41 @@
         padding: min(2vw, 1.1dvh) min(3vw, 1.65dvh) min(2.4vw, 1.32dvh);
     }
 
-    .supportingText,
     .completeText,
     .completeStats {
         font-size: min(3.2vw, 1.76dvh);
-        -webkit-text-stroke: min(0.18vw, 0.1dvh) #013873;
+        -webkit-text-stroke: min(0.15vw, 0.08dvh) #013873;
         text-shadow: 0 min(0.25vw, 0.14dvh) 0 #013873;
     }
 
     .completeTitle {
         font-size: min(6vw, 3.3dvh);
-        -webkit-text-stroke: min(0.34vw, 0.19dvh) #013873;
+        -webkit-text-stroke: min(0.15vw, 0.08dvh) #013873;
         text-shadow: 0 min(0.55vw, 0.3dvh) 0 #013873;
     }
 
     .calculationRoot {
+        gap: 0;
+    }
+
+    .calculationWorkspace {
+        width: 94vw;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0;
+        padding: 0 min(2vw, 1.1dvh);
+    }
+
+    .calculationControlRail {
+        width: min(38vw, 21dvh);
         gap: min(1.2vw, 0.66dvh);
     }
 
     .calculationGrid {
-        width: min(42vw, 23dvh);
+        width: min(36vw, 19.8dvh);
         gap: min(0.7vw, 0.39dvh);
+        padding: 0;
     }
 
     .calculationCell {
@@ -505,12 +666,12 @@
         border-radius: min(1.3vw, 0.72dvh);
         font-size: min(5vw, 2.75dvh);
         box-shadow: inset 0 calc(-1 * min(0.45vw, 0.25dvh)) 0 #bfe8fb;
-        -webkit-text-stroke: min(0.12vw, 0.07dvh) #013873;
+        -webkit-text-stroke: 0;
     }
 
     .carryCell {
         font-size: min(3.2vw, 1.76dvh);
-        -webkit-text-stroke: min(0.08vw, 0.04dvh) #365314;
+        -webkit-text-stroke: 0;
     }
 
     .activeCell {
@@ -520,7 +681,7 @@
 
     .calculationOperator {
         font-size: min(4.8vw, 2.64dvh);
-        -webkit-text-stroke: min(0.22vw, 0.12dvh) #013873;
+        -webkit-text-stroke: min(0.15vw, 0.08dvh) #013873;
         text-shadow: 0 min(0.35vw, 0.19dvh) 0 #013873;
     }
 
@@ -539,7 +700,47 @@
         text-shadow: 0 min(0.2vw, 0.11dvh) 0 #013873;
     }
 
+    .calculationCoach {
+        width: 100%;
+        min-height: 0;
+        gap: min(0.6vw, 0.33dvh);
+        padding: min(1.2vw, 0.66dvh) min(2vw, 1.1dvh) min(1.4vw, 0.77dvh);
+        border-width: min(0.45vw, 0.25dvh);
+        border-radius: min(1.8vw, 0.99dvh);
+    }
+
+    .calculationCoachLeft,
+    .calculationCoachRight,
+    .calculationCoachBelow {
+        width: min(34vw, 18.7dvh);
+    }
+
+    .calculationCoachArrow {
+        width: min(2vw, 1.1dvh);
+        border-top-width: min(0.45vw, 0.25dvh);
+        border-left-width: min(0.45vw, 0.25dvh);
+    }
+
+    .calculationCoachBadge {
+        padding: min(0.35vw, 0.19dvh) min(1.2vw, 0.66dvh) min(0.45vw, 0.25dvh);
+        font-size: min(2.3vw, 1.27dvh);
+        -webkit-text-stroke: min(0.12vw, 0.07dvh) #92400e;
+    }
+
+    .calculationCoachText {
+        font-size: min(2.7vw, 1.49dvh);
+        -webkit-text-stroke: min(0.1vw, 0.06dvh) #013873;
+    }
+
+    .calculationCoachEquation {
+        gap: min(0.4vw, 0.22dvh);
+        font-size: min(3.5vw, 1.93dvh);
+        -webkit-text-stroke: 0;
+    }
+
     .calculationToolbar {
+        flex-direction: row;
+        flex-wrap: wrap;
         gap: min(1.4vw, 0.77dvh);
     }
 
@@ -550,21 +751,21 @@
         padding: min(0.8vw, 0.44dvh) min(1.6vw, 0.88dvh) min(1vw, 0.55dvh);
         font-size: min(2.8vw, 1.54dvh);
         box-shadow: 0 min(0.65vw, 0.36dvh) 0 #013873;
-        -webkit-text-stroke: min(0.16vw, 0.09dvh) #013873;
+        -webkit-text-stroke: min(0.12vw, 0.07dvh) #013873;
         text-shadow: 0 min(0.2vw, 0.11dvh) 0 #013873;
     }
 
     .checkButton {
         box-shadow: 0 min(0.95vw, 0.52dvh) 0 #15803d;
-        flex-basis: 58%;
+        flex-basis: 100%;
         font-size: min(3.5vw, 1.93dvh);
         padding: min(1.2vw, 0.66dvh) min(1.6vw, 0.88dvh) min(1.5vw, 0.83dvh);
-        -webkit-text-stroke: min(0.2vw, 0.11dvh) #15803d;
+        -webkit-text-stroke: min(0.15vw, 0.08dvh) #15803d;
         text-shadow: 0 min(0.2vw, 0.11dvh) 0 #15803d;
     }
 
     .keypad {
-        width: min(40vw, 22dvh);
+        width: min(36vw, 19.8dvh);
         gap: min(1vw, 0.55dvh);
     }
 
@@ -572,6 +773,8 @@
         min-height: min(5.2vw, 2.86dvh);
         padding-left: 0;
         padding-right: 0;
+        -webkit-text-stroke: 0;
+        text-shadow: none;
     }
 }
 
@@ -584,5 +787,24 @@
     100% {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+@keyframes activeCalculationPulse {
+    0%,
+    100% {
+        outline-color: #f59e0b;
+        transform: scale(1);
+    }
+
+    50% {
+        outline-color: #facc15;
+        transform: scale(1.04);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .activeCell {
+        animation: none;
     }
 }

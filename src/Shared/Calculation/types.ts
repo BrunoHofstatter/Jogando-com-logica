@@ -1,6 +1,6 @@
 export type CalculationOperation = "addition" | "subtraction" | "multiplication";
 
-export type GuidanceMode = "free" | "assisted" | "locked";
+export type GuidanceMode = "free" | "assisted" | "locked" | "adaptive";
 
 export type ProcessValidation = "ignore" | "warn" | "require";
 
@@ -21,6 +21,9 @@ export type CalculationMistakeKind =
 
 export type CalculationClassNames = {
   root?: string;
+  workspace?: string;
+  calculationStage?: string;
+  controlRail?: string;
   expression?: string;
   grid?: string;
   row?: string;
@@ -28,6 +31,7 @@ export type CalculationClassNames = {
   processRow?: string;
   answerRow?: string;
   cell?: string;
+  cellAnchor?: string;
   operandCell?: string;
   resultCell?: string;
   carryCell?: string;
@@ -44,6 +48,17 @@ export type CalculationClassNames = {
   toolbar?: string;
   message?: string;
   checkButton?: string;
+  coach?: string;
+  coachArrow?: string;
+  coachBadge?: string;
+  coachText?: string;
+  coachEquation?: string;
+  coachLeadingDigit?: string;
+  coachResultDigit?: string;
+  coachLeft?: string;
+  coachRight?: string;
+  coachBelow?: string;
+  helpButton?: string;
 };
 
 export type CalculationMessages = {
@@ -60,6 +75,18 @@ export type CalculationMessages = {
   clear: string;
   closeKeypad: string;
   openKeypad: string;
+  help: string;
+  yourTurn: string;
+  hint: string;
+};
+
+export type CalculationStepGuidance = {
+  prompt: string;
+  detail: string;
+  equationPrefix?: string;
+  leadingDigit?: string;
+  resultDigit?: string;
+  leadingDestination?: "carry" | "answer";
 };
 
 export type CalculationCell = {
@@ -77,6 +104,14 @@ export type CalculationStep = {
   expected: string;
   message: string;
   kind: CalculationMistakeKind;
+  guidance?: CalculationStepGuidance;
+};
+
+export type AdaptiveGuidanceOptions = {
+  autoHintDelayMs?: number;
+  detailedHintDelayMs?: number;
+  mistakesBeforeHint?: number;
+  mistakesBeforeDetailedHint?: number;
 };
 
 export type CalculationMistake = {
@@ -117,6 +152,9 @@ export type SharedCalculationProps = {
   className?: string;
   classNames?: CalculationClassNames;
   messages?: Partial<CalculationMessages>;
+  adaptiveGuidance?: AdaptiveGuidanceOptions;
+  showClearButton?: boolean;
   onCheck?: (result: CalculationCheckResult) => void;
   onComplete?: (result: CalculationCheckResult) => void;
+  onMistake?: () => void;
 };

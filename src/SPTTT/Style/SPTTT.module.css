@@ -747,6 +747,15 @@
     font-size: 6vw;
   }
 
+  /* Keep board pieces clear when all nine small boards are populated. */
+  .casa .Xstack {
+    transform: scale(1.845);
+  }
+
+  .casa .Ostack {
+    transform: scale(1.98);
+  }
+
   /* Preview next board tooltip */
   .small-board.previewNext::after {
     top: -5vw;

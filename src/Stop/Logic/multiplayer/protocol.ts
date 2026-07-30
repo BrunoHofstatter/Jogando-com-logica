@@ -56,6 +56,11 @@ export interface LeaveRoomPayload {
   code: StopRoomCode;
 }
 
+export interface RemovePlayerPayload {
+  code: StopRoomCode;
+  playerId: StopPlayerId;
+}
+
 export interface SubmitAnswerSnapshotPayload {
   code: StopRoomCode;
   answers: string[];
@@ -121,6 +126,11 @@ export interface RoomClosedPayload {
   message: string;
 }
 
+export interface PlayerRemovedPayload {
+  code: StopRoomCode;
+  message: string;
+}
+
 export interface MultiplayerErrorPayload {
   code: MultiplayerErrorCode;
   message: string;
@@ -134,6 +144,7 @@ export interface StopClientToServerEvents {
   submit_answer_snapshot: (payload: SubmitAnswerSnapshotPayload) => void;
   press_stop: (payload: PressStopPayload) => void;
   request_rematch: (payload: RequestRematchPayload) => void;
+  remove_player: (payload: RemovePlayerPayload) => void;
   leave_room: (payload: LeaveRoomPayload) => void;
   join_classroom: (payload: JoinClassroomPayload) => void;
   leave_classroom: (payload: LeaveClassroomPayload) => void;
@@ -144,6 +155,7 @@ export interface StopServerToClientEvents {
   room_created: (payload: RoomCreatedPayload) => void;
   room_joined: (payload: RoomJoinedPayload) => void;
   state_updated: (payload: StateUpdatedPayload) => void;
+  player_removed: (payload: PlayerRemovedPayload) => void;
   room_closed: (payload: RoomClosedPayload) => void;
   multiplayer_error: (payload: MultiplayerErrorPayload) => void;
   classroom_joined: (payload: StopClassroomRoomsPayload) => void;

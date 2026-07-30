@@ -22,16 +22,6 @@ export default function MathWarAIPage() {
   );
   const { unlockNext } = useDifficultyLock("mathwar");
 
-  useEffect(() => {
-    document.body.style.backgroundColor = "#adfad2";
-    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (!metaThemeColor) {
-      metaThemeColor = document.createElement("meta");
-      metaThemeColor.setAttribute("name", "theme-color");
-      document.head.appendChild(metaThemeColor);
-    }
-    metaThemeColor.setAttribute("content", "#adfad2");
-  }, []);
 
   useEffect(() => {
     setGameState(createInitialState({ startingPlayer: 1 }));

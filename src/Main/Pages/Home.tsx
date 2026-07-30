@@ -1,21 +1,10 @@
 //import MainMenu from "../Components/mainMenu";
-import { useEffect } from "react";
 import "../CSS/Home.css";
 import { useNavigate } from "react-router-dom";
 import RubiksCube from "../../RubiksClass/Components/RubiksCube";
 import { ROUTES } from "../../routes";
 
 function Home() {
-  useEffect(() => {
-    document.body.style.backgroundColor = "#68c2e0";
-    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (!metaThemeColor) {
-      metaThemeColor = document.createElement("meta");
-      metaThemeColor.setAttribute("name", "theme-color");
-      document.head.appendChild(metaThemeColor);
-    }
-    metaThemeColor.setAttribute("content", "#68c2e0");
-  }, []);
 
   const navigate = useNavigate();
   const mudar_pagina = (pagina: string) => {

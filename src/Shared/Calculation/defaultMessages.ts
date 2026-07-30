@@ -14,4 +14,7 @@ export const defaultCalculationMessages: CalculationMessages = {
   clear: "Limpar",
   closeKeypad: "Fechar teclado",
   openKeypad: "Abrir teclado",
+  help: "Preciso de ajuda",
+  yourTurn: "Sua vez",
+  hint: "Dica",
 };

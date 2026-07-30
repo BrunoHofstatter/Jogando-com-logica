@@ -131,13 +131,19 @@
 
 .classroomCard {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   gap: 2vw;
   padding: 1.5vw;
   border: 0.3vw solid #060e13;
   border-radius: 2vw;
   background-color: #68c2e0;
   box-shadow: 0 0.6vw 0 #060e13;
+}
+
+.classroomHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 2vw;
 }
 
 .code {
@@ -156,6 +162,146 @@
   flex-direction: column;
   justify-content: center;
   gap: 1vw;
+}
+
+.monitorToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7vw;
+  width: 100%;
+  padding: 0.7vw 1vw 0.9vw;
+  border: 0.25vw solid #060e13;
+  border-radius: 1.4vw;
+  background-color: #ffcf40;
+  box-shadow: 0 0.4vw 0 #060e13;
+  color: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: min(1.8vw, 2.8dvh);
+  -webkit-text-stroke: 0.07vw #060e13;
+}
+
+.monitorToggle:disabled {
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+.monitorArrow {
+  width: 1.7vw;
+  height: 1.7vw;
+  stroke-width: 0.3vw;
+  transition: transform 0.15s ease;
+}
+
+.monitorArrowOpen {
+  transform: rotate(180deg);
+}
+
+.monitorPanel {
+  padding: 1.3vw;
+  border: 0.25vw solid #060e13;
+  border-radius: 1.5vw;
+  background-color: #286a83;
+}
+
+.monitorMessage,
+.monitorSummary {
+  margin: 0;
+  text-align: center;
+  font-size: min(1.7vw, 2.7dvh);
+  -webkit-text-stroke: 0.05vw #060e13;
+}
+
+.monitorSummary {
+  margin-bottom: 1vw;
+  color: #ffcf40;
+}
+
+.monitorRoomList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1vw;
+}
+
+.monitorRoom {
+  padding: 1vw;
+  border: 0.22vw solid #060e13;
+  border-radius: 1.2vw;
+  background-color: #fff4d3;
+  color: #17242b;
+}
+
+.monitorRoomHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.7vw;
+}
+
+.monitorRoomHeader h2 {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  color: inherit;
+  font-size: min(1.55vw, 2.45dvh);
+  font-weight: 400;
+  line-height: 1.2;
+  text-align: left;
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+}
+
+.statusBadge {
+  flex-shrink: 0;
+  padding: 0.2vw 0.55vw 0.3vw;
+  border: 0.16vw solid #060e13;
+  border-radius: 0.8vw;
+  color: #fff;
+  font-size: min(1vw, 1.7dvh);
+  -webkit-text-stroke: 0.035vw #060e13;
+}
+
+.status_waiting {
+  background-color: #f5a623;
+}
+
+.status_playing {
+  background-color: #22a55b;
+}
+
+.status_ended {
+  background-color: #747b80;
+}
+
+.occupancy,
+.availableSeats {
+  margin: 0.5vw 0;
+  color: inherit;
+  font-size: min(1.2vw, 2dvh);
+  line-height: 1.4;
+  text-align: left;
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+}
+
+.playerList {
+  margin: 0.5vw 0;
+  padding-left: 1.8vw;
+  font-size: min(1.25vw, 2.05dvh);
+}
+
+.playerList li {
+  margin: 0.25vw 0;
+}
+
+.disconnectedLabel {
+  color: #a22626;
+  font-size: 0.85em;
+}
+
+.availableSeats {
+  color: #286a83;
 }
 
 .primaryButton,
@@ -315,10 +461,89 @@
   }
 
   .classroomCard {
-    flex-direction: column;
     padding: 4vw;
     border-width: 0.6vw;
     border-radius: 4vw;
+  }
+
+  .classroomHeader {
+    flex-direction: column;
+    gap: 3vw;
+  }
+
+  .monitorToggle {
+    gap: min(2vw, 1.4dvh);
+    padding: min(2.5vw, 1.8dvh) 3vw min(3vw, 2.2dvh);
+    border-width: min(0.6vw, 0.4dvh);
+    border-radius: min(4vw, 2.8dvh);
+    box-shadow: 0 min(0.9vw, 0.65dvh) 0 #060e13;
+    font-size: min(5vw, 3dvh);
+  }
+
+  .monitorArrow {
+    width: min(5vw, 3dvh);
+    height: min(5vw, 3dvh);
+    stroke-width: min(0.8vw, 0.5dvh);
+  }
+
+  .monitorPanel {
+    padding: 3vw;
+    border-width: 0.55vw;
+    border-radius: 3.5vw;
+  }
+
+  .monitorMessage,
+  .monitorSummary {
+    font-size: min(4.5vw, 2.8dvh);
+    -webkit-text-stroke-width: min(0.12vw, 0.08dvh);
+  }
+
+  .monitorSummary {
+    margin-bottom: 3vw;
+  }
+
+  .monitorRoomList {
+    grid-template-columns: 1fr;
+    gap: 3vw;
+  }
+
+  .monitorRoom {
+    padding: 3vw;
+    border-width: 0.5vw;
+    border-radius: 3vw;
+  }
+
+  .monitorRoomHeader {
+    flex-direction: column;
+    gap: 1.5vw;
+  }
+
+  .monitorRoomHeader h2 {
+    font-size: min(4.5vw, 2.8dvh);
+  }
+
+  .statusBadge {
+    padding: 0.6vw 1.5vw 0.8vw;
+    border-width: 0.4vw;
+    border-radius: 2vw;
+    font-size: min(3.4vw, 2.1dvh);
+  }
+
+  .occupancy,
+  .availableSeats,
+  .playerList {
+    font-size: min(4vw, 2.5dvh);
+  }
+
+  .occupancy,
+  .availableSeats,
+  .playerList {
+    margin-top: 2vw;
+    margin-bottom: 2vw;
+  }
+
+  .playerList {
+    padding-left: 6vw;
   }
 
   .code {

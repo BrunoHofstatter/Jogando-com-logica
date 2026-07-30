@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import RubiksCube from "../../Components/RubiksCube";
 import { useClass1 } from "./useClass1";
@@ -13,16 +13,6 @@ const Class1Dimensions: React.FC = () => {
     const { cubeProps, uiProps } = useClass1();
     const navigate = useNavigate();
 
-    useEffect(() => {
-        document.body.style.backgroundColor = "#e0f2fe";
-        let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-        if (!metaThemeColor) {
-            metaThemeColor = document.createElement("meta");
-            metaThemeColor.setAttribute("name", "theme-color");
-            document.head.appendChild(metaThemeColor);
-        }
-        metaThemeColor.setAttribute("content", "#e0f2fe");
-    }, []);
 
     // --- Summary phase ---
     if (uiProps.currentPhase === "summary") {

@@ -25,16 +25,6 @@ export default function CrownChaseMultiplayerGamePage() {
     leaveRoom,
   } = useCrownChaseMultiplayer();
 
-  useEffect(() => {
-    document.body.style.backgroundColor = "#d9b6fe";
-    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (!metaThemeColor) {
-      metaThemeColor = document.createElement("meta");
-      metaThemeColor.setAttribute("name", "theme-color");
-      document.head.appendChild(metaThemeColor);
-    }
-    metaThemeColor.setAttribute("content", "#d9b6fe");
-  }, []);
 
   useEffect(() => {
     if (!roomCode) {

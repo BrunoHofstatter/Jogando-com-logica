@@ -25,6 +25,10 @@ import {
   type RoomPlayer,
 } from "../rooms/roomTypes.ts";
 import type { ClassroomStore } from "../classrooms/classroomStore.ts";
+import {
+  getClassroomMonitorChannel,
+  type ClassroomMonitor,
+} from "../classrooms/classroomMonitor.ts";
 
 type CrownChaseNamespace = Namespace<
   CrownChaseClientToServerEvents,
@@ -46,10 +50,24 @@ const roomStore = createRoomStore<CrownChaseRoom>();
 export function registerRoomHandlers(
   io: CrownChaseNamespace,
   classroomStore: ClassroomStore,
+  classroomMonitor: ClassroomMonitor,
 ): void {
+  classroomMonitor.registerProvider("crown_chase", (classroomCode) =>
+    [...roomStore.getRooms().values()]
+      .filter((room) => room.visibility === "classroom" && room.classroomCode === classroomCode)
+      .map((room) => ({
+        code: room.code,
+        game: "crown_chase",
+        status: room.status,
+        players: serializePlayers(room).map(({ name, connected }) => ({ name, connected })),
+        capacity: 2,
+        createdAt: room.createdAt,
+      })),
+  );
+
   io.on("connection", (socket) => {
     socket.on("create_room", ({ playerName, classroomCode }) => {
-      leaveAnyExistingRoom(io, socket, "leave_room");
+      leaveAnyExistingRoom(io, classroomMonitor, socket, "leave_room");
 
       const normalizedName = normalizePlayerName(playerName);
       if (!normalizedName) {
@@ -90,7 +108,7 @@ export function registerRoomHandlers(
       };
 
       room.players[CREATOR_SEAT] = hostPlayer;
-      scheduleWaitingRoomExpiry(io, room);
+      scheduleWaitingRoomExpiry(io, classroomMonitor, room);
       roomStore.setRoom(room);
 
       socket.join(roomCode);
@@ -100,11 +118,11 @@ export function registerRoomHandlers(
         state: room.state,
         players: serializePlayers(room),
       });
-      broadcastClassroomRooms(io, room.classroomCode);
+      broadcastClassroomRooms(io, classroomMonitor, room.classroomCode);
     });
 
     socket.on("join_room", ({ code, playerName }) => {
-      leaveAnyExistingRoom(io, socket, "leave_room");
+      leaveAnyExistingRoom(io, classroomMonitor, socket, "leave_room");
 
       const normalizedCode = code.trim().toUpperCase();
       const normalizedName = normalizePlayerName(playerName);
@@ -157,7 +175,7 @@ export function registerRoomHandlers(
         state: room.state,
         players: serializePlayers(room),
       });
-      broadcastClassroomRooms(io, room.classroomCode);
+      broadcastClassroomRooms(io, classroomMonitor, room.classroomCode);
     });
 
     socket.on("create_classroom", () => {
@@ -185,6 +203,35 @@ export function registerRoomHandlers(
 
       classroomStore.deleteClassroom(classroom.code);
       socket.emit("classroom_deleted", { code: classroom.code });
+    });
+
+    socket.on("watch_classroom", ({ code, managementToken }) => {
+      const normalizedCode = normalizeClassroomCode(code);
+      const classroom = normalizedCode
+        ? classroomStore.getClassroom(normalizedCode)
+        : undefined;
+
+      if (!classroom || classroom.managementToken !== managementToken) {
+        emitError(socket, "unauthorized", "Não foi possível acompanhar essa turma.");
+        return;
+      }
+
+      socket.join(getClassroomMonitorChannel(classroom.code));
+      socket.emit("classroom_monitor_updated", {
+        classroomCode: classroom.code,
+        rooms: classroomMonitor.getRooms(classroom.code),
+      });
+    });
+
+    socket.on("unwatch_classroom", ({ code, managementToken }) => {
+      const normalizedCode = normalizeClassroomCode(code);
+      const classroom = normalizedCode
+        ? classroomStore.getClassroom(normalizedCode)
+        : undefined;
+
+      if (classroom?.managementToken === managementToken) {
+        socket.leave(getClassroomMonitorChannel(classroom.code));
+      }
     });
 
     socket.on("join_classroom", ({ code }) => {
@@ -264,6 +311,7 @@ export function registerRoomHandlers(
         state: room.state,
         events: result.events,
       });
+      classroomMonitor.notifyClassroomChanged(room.classroomCode);
     });
 
     socket.on("request_rematch", ({ code }) => {
@@ -313,6 +361,7 @@ export function registerRoomHandlers(
         code: room.code,
         state: room.state,
       });
+      classroomMonitor.notifyClassroomChanged(room.classroomCode);
     });
 
     socket.on("leave_room", ({ code }) => {
@@ -321,7 +370,7 @@ export function registerRoomHandlers(
         return;
       }
 
-      handlePlayerExit(io, room, socket.id, "leave_room");
+      handlePlayerExit(io, classroomMonitor, room, socket.id, "leave_room");
     });
 
     socket.on("disconnect", () => {
@@ -330,13 +379,14 @@ export function registerRoomHandlers(
         return;
       }
 
-      handlePlayerExit(io, room, socket.id, "disconnect");
+      handlePlayerExit(io, classroomMonitor, room, socket.id, "disconnect");
     });
   });
 }
 
 function handlePlayerExit(
   io: CrownChaseNamespace,
+  classroomMonitor: ClassroomMonitor,
   room: CrownChaseRoom,
   socketId: string,
   reason: "disconnect" | "leave_room",
@@ -352,7 +402,7 @@ function handlePlayerExit(
   }
 
   if (reason === "leave_room") {
-    closeRoomImmediately(io, room, player.seat, "O outro jogador saiu da sala.");
+    closeRoomImmediately(io, classroomMonitor, room, player.seat, "O outro jogador saiu da sala.");
     return;
   }
 
@@ -365,7 +415,7 @@ function handlePlayerExit(
 
   if (!remainingPlayer) {
     roomStore.deleteRoom(room.code);
-    broadcastClassroomRooms(io, room.classroomCode);
+    broadcastClassroomRooms(io, classroomMonitor, room.classroomCode);
     return;
   }
 
@@ -392,12 +442,13 @@ function handlePlayerExit(
       message: "A sala foi encerrada porque o outro jogador não voltou.",
     });
     roomStore.deleteRoom(latestRoom.code);
-    broadcastClassroomRooms(io, latestRoom.classroomCode);
+    broadcastClassroomRooms(io, classroomMonitor, latestRoom.classroomCode);
   }, DISCONNECT_GRACE_MS);
 }
 
 function closeRoomImmediately(
   io: CrownChaseNamespace,
+  classroomMonitor: ClassroomMonitor,
   room: CrownChaseRoom,
   leavingSeat: PlayerId,
   message: string,
@@ -422,11 +473,12 @@ function closeRoomImmediately(
   }
 
   roomStore.deleteRoom(room.code);
-  broadcastClassroomRooms(io, room.classroomCode);
+  broadcastClassroomRooms(io, classroomMonitor, room.classroomCode);
 }
 
 function scheduleWaitingRoomExpiry(
   io: CrownChaseNamespace,
+  classroomMonitor: ClassroomMonitor,
   room: CrownChaseRoom,
 ): void {
   if (room.waitingTimeout) {
@@ -449,12 +501,13 @@ function scheduleWaitingRoomExpiry(
     }
 
     roomStore.deleteRoom(latestRoom.code);
-    broadcastClassroomRooms(io, latestRoom.classroomCode);
+    broadcastClassroomRooms(io, classroomMonitor, latestRoom.classroomCode);
   }, WAITING_ROOM_TTL_MS);
 }
 
 function leaveAnyExistingRoom(
   io: CrownChaseNamespace,
+  classroomMonitor: ClassroomMonitor,
   socket: CrownChaseSocket,
   reason: "leave_room",
 ): void {
@@ -463,7 +516,7 @@ function leaveAnyExistingRoom(
     return;
   }
 
-  handlePlayerExit(io, currentRoom, socket.id, reason);
+  handlePlayerExit(io, classroomMonitor, currentRoom, socket.id, reason);
 }
 
 function getPlayerBySocketId(
@@ -514,6 +567,7 @@ function getOpenClassroomRooms(classroomCode: ClassroomCode): OpenRoomSummary[] 
 
 function broadcastClassroomRooms(
   io: CrownChaseNamespace,
+  classroomMonitor: ClassroomMonitor,
   classroomCode: ClassroomCode | null,
 ): void {
   if (!classroomCode) {
@@ -524,6 +578,7 @@ function broadcastClassroomRooms(
     classroomCode,
     openRooms: getOpenClassroomRooms(classroomCode),
   });
+  classroomMonitor.notifyClassroomChanged(classroomCode);
 }
 
 function emitError(

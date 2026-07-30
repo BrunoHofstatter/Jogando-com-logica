@@ -168,14 +168,14 @@
 
 .primaryButton {
   background-color: #fcd34d;
-  color: #064e3b;
+  color: #f3f4f6;
   -webkit-text-stroke: 0.1vw #064e3b;
   box-shadow: 0 0.6vw 0 #b45309;
 }
 
 .secondaryButton {
   background-color: #d1fae5;
-  color: #064e3b;
+  color: #f3f4f6;
   -webkit-text-stroke: 0.1vw #064e3b;
   box-shadow: 0 0.6vw 0 #047857;
 }

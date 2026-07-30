@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import styles from "../styles/regras.module.css";
 import { useNavigate } from "react-router-dom";
 import { useTutorialCompleted } from "../../Shared/Components/DynamicTutorial";
@@ -9,16 +9,6 @@ import { ROUTES } from "../../routes";
 type GameMode = "pvp" | "ai";
 
 function CrownChaseRegras() {
-  useEffect(() => {
-    document.body.style.backgroundColor = "#d9b6fe";
-    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (!metaThemeColor) {
-      metaThemeColor = document.createElement("meta");
-      metaThemeColor.setAttribute("name", "theme-color");
-      document.head.appendChild(metaThemeColor);
-    }
-    metaThemeColor.setAttribute("content", "#d9b6fe");
-  }, []);
 
   const navigate = useNavigate();
   const [gameMode, setGameMode] = useState<GameMode>("ai");
@@ -242,6 +232,13 @@ function CrownChaseRegras() {
                   Um jogador controla o Rei no canto inferior esquerdo. O outro
                   jogador controla o Rei no canto superior direito.
                 </p>
+                <p className={styles.rulesText}>
+                  Cada jogador começa com{" "}
+                  <span className={styles.rulesStrong}>
+                    1 Rei, 2 Assassinos e 3 Saltadores
+                  </span>
+                  . O jogador azul começa a partida.
+                </p>
 
                 <h3 className={styles.rulesTitle}>Ordem dos Turnos</h3>
                 <p className={styles.rulesText}>
@@ -255,9 +252,35 @@ function CrownChaseRegras() {
                   .
                 </p>
                 <p className={styles.rulesText}>
-                  Cada movimento conta como uma ação.
+                  Se um jogador não tiver nenhum movimento possível, sua vez é
+                  pulada automaticamente.
+                </p>
+                <p className={styles.rulesText}>
+                  Se nenhum dos dois jogadores puder se mover, a partida termina
+                  em empate.
                 </p>
 
+                <h3 className={styles.rulesTitle}>Modos de Jogo</h3>
+                <p className={styles.rulesText}>
+                  <span className={styles.rulesSpan}>Contra Computador:</span>{" "}
+                  jogue nos níveis Muito Fácil, Fácil, Médio e Difícil. Vença um
+                  nível para desbloquear o próximo.
+                </p>
+                <p className={styles.rulesText}>
+                  <span className={styles.rulesSpan}>Dois Jogadores:</span>{" "}
+                  duas pessoas jogam no mesmo dispositivo.
+                </p>
+                <p className={styles.rulesText}>
+                  <span className={styles.rulesSpan}>Online:</span> jogue à
+                  distância criando uma sala privada ou entrando com um código
+                  de sala. Também é possível entrar em uma turma com o código
+                  fornecido pelo professor e criar ou escolher uma sala aberta.
+                </p>
+                <p className={styles.rulesText}>
+                  <span className={styles.rulesSpan}>Tutorial:</span> acompanhe
+                  uma explicação interativa das peças e das informações do
+                  tabuleiro.
+                </p>
 
                 <h3 className={styles.rulesTitle}> Rei </h3>
                 <p className={styles.rulesText}>
@@ -296,13 +319,18 @@ function CrownChaseRegras() {
                 <p className={styles.rulesText}>
                   <span className={styles.rulesSpan}>Movimento Básico:</span>{" "}
                   Move <span className={styles.rulesStrong}>1 casa</span> em
-                  linha reta (horizontal ou vertical) para uma casa vazia.
+                  linha reta (para cima, para baixo ou para os lados) para uma
+                  casa vazia.
                 </p>
                 <p className={styles.rulesText}>
                   <span className={styles.rulesSpan}>Salto:</span> Pula{" "}
                   <span className={styles.rulesStrong}>exatamente 1 peça</span>{" "}
                   adjacente (aliada ou inimiga) em linha reta, aterrissando duas
                   casas adiante.
+                </p>
+                <p className={styles.rulesText}>
+                  A peça que foi pulada permanece no tabuleiro e não é
+                  capturada.
                 </p>
                 <p className={styles.rulesText}>
                   A casa de destino no salto deve estar{" "}
@@ -319,8 +347,8 @@ function CrownChaseRegras() {
                   e não podem capturar outras peças.
                 </p>
                 <p className={styles.rulesText}>
-                  <span className={styles.rulesSpan}>Restrição:</span> Não
-                  existe multi-salto em um mesmo turno.
+                  <span className={styles.rulesSpan}>Restrição:</span> Não pode
+                  saltar na diagonal nem realizar vários saltos no mesmo turno.
                 </p>
 
                 <h3 className={styles.rulesTitle}>
@@ -331,7 +359,7 @@ function CrownChaseRegras() {
                   aliada.
                 </p>
                 <p className={styles.rulesText}>
-                  Apenas os Jumpers podem saltar sobre peças.
+                  Apenas os Saltadores podem saltar sobre peças.
                 </p>
                 <p className={styles.rulesText}>
                   Um movimento termina quando a peça chega ao destino permitido.
@@ -343,6 +371,10 @@ function CrownChaseRegras() {
                 </p>
                 <p className={styles.rulesText}>
                   O jogador que capturar o Rei adversário é o <span onClick={handleCheat} style={{ cursor: 'text' }}>vencedor</span>.
+                </p>
+                <p className={styles.rulesText}>
+                  Se os dois jogadores ficarem sem movimentos possíveis, a
+                  partida termina em empate.
                 </p>
               </div>
             </div>
