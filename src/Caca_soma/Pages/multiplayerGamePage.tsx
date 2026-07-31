@@ -101,16 +101,6 @@ export default function CacaSomaMultiplayerGamePage() {
     leaveRoom,
   } = useCacaSomaMultiplayer();
 
-  useEffect(() => {
-    document.body.style.backgroundColor = "#efc9c9";
-    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (!metaThemeColor) {
-      metaThemeColor = document.createElement("meta");
-      metaThemeColor.setAttribute("name", "theme-color");
-      document.head.appendChild(metaThemeColor);
-    }
-    metaThemeColor.setAttribute("content", "#efc9c9");
-  }, []);
 
   useEffect(() => {
     if (!roomCode) {

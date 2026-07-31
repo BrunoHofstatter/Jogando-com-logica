@@ -146,6 +146,14 @@ export const isLevelUnlocked = (levelId: number): boolean => {
   return previousLevel.bestStars >= (currentLevel?.requiredStars || 2);
 };
 
+export const getCurrentLevelId = (): number => {
+  return levels.reduce((highestUnlocked, level) => {
+    return isLevelUnlocked(level.levelId)
+      ? Math.max(highestUnlocked, level.levelId)
+      : highestUnlocked;
+  }, levels[0]?.levelId ?? 1);
+};
+
 // Reset all progress (for testing/debugging)
 export const resetAllProgress = (): void => {
   localStorage.removeItem(STORAGE_KEY);

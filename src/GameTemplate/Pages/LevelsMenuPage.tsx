@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../styles/levelsMenu.module.css";
 import { GAME_TEMPLATE_CONFIG } from "../gameTemplateConfig";
@@ -6,18 +5,6 @@ import { GAME_TEMPLATE_CONFIG } from "../gameTemplateConfig";
 function LevelsMenuPage() {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    document.body.style.backgroundColor = GAME_TEMPLATE_CONFIG.themeColor;
-
-    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (!metaThemeColor) {
-      metaThemeColor = document.createElement("meta");
-      metaThemeColor.setAttribute("name", "theme-color");
-      document.head.appendChild(metaThemeColor);
-    }
-
-    metaThemeColor.setAttribute("content", GAME_TEMPLATE_CONFIG.themeColor);
-  }, []);
 
   return (
     <div className={styles.gamePageContainer}>

@@ -25,16 +25,6 @@ export default function MathWarMultiplayerGamePage() {
     leaveRoom,
   } = useMathWarMultiplayer();
 
-  useEffect(() => {
-    document.body.style.backgroundColor = "#adfad2";
-    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (!metaThemeColor) {
-      metaThemeColor = document.createElement("meta");
-      metaThemeColor.setAttribute("name", "theme-color");
-      document.head.appendChild(metaThemeColor);
-    }
-    metaThemeColor.setAttribute("content", "#adfad2");
-  }, []);
 
   useEffect(() => {
     if (!roomCode) {
@@ -92,22 +82,6 @@ export default function MathWarMultiplayerGamePage() {
 
   return (
     <>
-      <div className={styles.roomBanner}>
-        <div className={styles.roomInfo}>
-          <span className={styles.roomCode}>Sala {roomCode}</span>
-          <span className={styles.roomDetail}>
-            Você: {playerName || "Jogador"} ({playerSeat === 0 ? "vermelho" : "azul"})
-          </span>
-          <span className={styles.roomDetail}>
-            Oponente: {opponent?.name ?? "Aguardando..."}
-          </span>
-        </div>
-
-        <button className={styles.leaveButton} onClick={handleLeaveRoomRequest}>
-          Sair da Sala
-        </button>
-      </div>
-
       {isLeaveConfirmationOpen && (
         <div className={styles.confirmationOverlay}>
           <div className={styles.confirmationCard}>
@@ -132,12 +106,6 @@ export default function MathWarMultiplayerGamePage() {
         </div>
       )}
 
-      {errorMessage && (
-        <div className={styles.alertBox}>
-          {errorMessage}
-        </div>
-      )}
-
       <Board
         mode="remote"
         gameState={gameState}
@@ -149,6 +117,30 @@ export default function MathWarMultiplayerGamePage() {
         playAgainLabel={playAgainLabel}
         statusMessage={statusMessage}
         onMenu={handleLeaveRoomRequest}
+        onlineHeader={(
+          <div className={styles.onlineHeaderContent}>
+            <div className={styles.roomBanner}>
+              <span className={styles.roomCode}>Sala {roomCode}</span>
+
+              <div className={styles.roomPlayers}>
+                <span className={styles.roomDetail}>
+                  Você: {playerName || "Jogador"} ({playerSeat === 0 ? "vermelho" : "azul"})
+                </span>
+                <span className={styles.roomDetail}>
+                  Oponente: {opponent?.name ?? "Aguardando..."}
+                </span>
+              </div>
+
+              <button className={styles.leaveButton} onClick={handleLeaveRoomRequest}>
+                Sair da Sala
+              </button>
+            </div>
+
+            {errorMessage && (
+              <div className={styles.alertBox}>{errorMessage}</div>
+            )}
+          </div>
+        )}
       />
     </>
   );

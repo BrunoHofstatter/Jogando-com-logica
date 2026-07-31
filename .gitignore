@@ -25,10 +25,8 @@ dist-ssr
 
 # AI Agents
 .agent/
-.agents/
 .claude/
 .gemini/
 
 CLAUDE.md
-AGENTS.md
 

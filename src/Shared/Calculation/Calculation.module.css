@@ -9,6 +9,28 @@
   color: #263238;
 }
 
+.workspace {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: min(4vw, 3dvh);
+}
+
+.calculationStage {
+  position: relative;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.controlRail {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: min(2vw, 1.5dvh);
+}
+
 .grid {
   width: min(88vw, 62dvh);
   display: grid;
@@ -31,6 +53,19 @@
   font-family: inherit;
   font-size: min(8vw, 6dvh);
   line-height: 1;
+}
+
+.cellAnchor {
+  position: relative;
+  min-width: 0;
+  width: 100%;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+}
+
+.cellAnchor > .cell {
+  height: 100%;
 }
 
 .cell {
@@ -95,6 +130,131 @@
   text-align: center;
   font-size: min(5vw, 3.8dvh);
   line-height: 1.1;
+}
+
+.coach {
+  position: relative;
+  width: 100%;
+  min-height: min(14vw, 9dvh);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: min(1.2vw, 0.8dvh);
+  padding: min(2.5vw, 1.8dvh);
+  border: min(0.5vw, 0.35dvh) solid #d39b13;
+  border-radius: min(2.5vw, 1.8dvh);
+  background: #fff7cf;
+  color: #263238;
+  text-align: center;
+}
+
+.anchoredCoach {
+  position: absolute;
+  top: 50%;
+  z-index: 30;
+  width: min(54vw, 40dvh);
+  transform: translateY(-50%);
+}
+
+.anchoredCoachRight {
+  left: calc(100% + min(2vw, 1.4dvh));
+}
+
+.anchoredCoachLeft {
+  right: calc(100% + min(2vw, 1.4dvh));
+}
+
+.anchoredCoachBelow {
+  top: calc(100% + min(2vw, 1.4dvh));
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.anchoredCoach .coachArrow {
+  top: 50%;
+  left: auto;
+}
+
+.anchoredCoachRight .coachArrow {
+  left: calc(-1 * min(2vw, 1.4dvh));
+  transform: translateY(-50%) rotate(-45deg);
+}
+
+.anchoredCoachLeft .coachArrow {
+  right: calc(-1 * min(2vw, 1.4dvh));
+  transform: translateY(-50%) rotate(135deg);
+}
+
+.anchoredCoachBelow .coachArrow {
+  top: calc(-1 * min(2vw, 1.4dvh));
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.coachArrow {
+  position: absolute;
+  top: calc(-1 * min(3vw, 2dvh));
+  left: 50%;
+  width: min(3vw, 2dvh);
+  aspect-ratio: 1;
+  background: #fff7cf;
+  border-top: min(0.5vw, 0.35dvh) solid #d39b13;
+  border-left: min(0.5vw, 0.35dvh) solid #d39b13;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.coachBadge {
+  padding: min(0.6vw, 0.45dvh) min(1.8vw, 1.2dvh);
+  border-radius: 999vw;
+  background: #d39b13;
+  color: #ffffff;
+  font-size: min(3.8vw, 2.5dvh);
+  line-height: 1;
+}
+
+.coachText {
+  margin: 0;
+  font-size: min(4.5vw, 3dvh);
+  line-height: 1.15;
+}
+
+.coachEquation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: min(0.8vw, 0.5dvh);
+  font-size: min(6vw, 4dvh);
+  line-height: 1;
+}
+
+.coachLeadingDigit,
+.coachResultDigit {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.1em;
+  padding: 0.12em;
+  border-radius: 0.28em;
+}
+
+.coachLeadingDigit {
+  background: #d9f99d;
+  color: #365314;
+}
+
+.coachLeadingDigit:not(.coachCarryDigit) {
+  background: #ffe874;
+  color: #713f12;
+}
+
+.coachResultDigit {
+  background: #bae6fd;
+  color: #0c4a6e;
+}
+
+.helpButton {
+  background: #fff7cf;
+  border-color: #d39b13;
 }
 
 .toolbar {

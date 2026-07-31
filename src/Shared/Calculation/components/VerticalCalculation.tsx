@@ -8,6 +8,7 @@ import { normalizeDigitText } from "../logic/numberFormat";
 import { buildSubtractionPlan } from "../logic/subtraction";
 import { checkCalculationPlan } from "../logic/validation";
 import type {
+  AdaptiveGuidanceOptions,
   CalculationCell as CalculationCellData,
   CalculationCheckResult,
   CalculationClassNames,
@@ -34,8 +35,11 @@ type VerticalCalculationProps = {
   className?: string;
   classNames?: CalculationClassNames;
   messages?: Partial<CalculationMessages>;
+  adaptiveGuidance?: AdaptiveGuidanceOptions;
+  showClearButton?: boolean;
   onCheck?: (result: CalculationCheckResult) => void;
   onComplete?: (result: CalculationCheckResult) => void;
+  onMistake?: () => void;
 };
 
 const operatorByOperation = {
@@ -139,8 +143,11 @@ export function VerticalCalculation({
   className,
   classNames,
   messages: customMessages,
+  adaptiveGuidance,
+  showClearButton = true,
   onCheck,
   onComplete,
+  onMistake,
 }: VerticalCalculationProps) {
   const messages = { ...defaultCalculationMessages, ...customMessages };
   const [operandRows, setOperandRows] = useState(() =>
@@ -153,6 +160,8 @@ export function VerticalCalculation({
   const [shakingCellId, setShakingCellId] = useState<string | null>(null);
   const [usedHints, setUsedHints] = useState(0);
   const [attempts, setAttempts] = useState(0);
+  const [hintLevel, setHintLevel] = useState<0 | 1 | 2>(0);
+  const [, setStepMistakes] = useState(0);
   const [keypadOpen, setKeypadOpen] = useState(() => {
     if (keypadMode === "visible") {
       return true;
@@ -189,6 +198,11 @@ export function VerticalCalculation({
       }) ?? null,
     [answerValues, plan, processValues],
   );
+  const isAdaptive = guidanceMode === "adaptive";
+  const autoHintDelayMs = adaptiveGuidance?.autoHintDelayMs ?? 15000;
+  const detailedHintDelayMs = adaptiveGuidance?.detailedHintDelayMs ?? 30000;
+  const mistakesBeforeHint = adaptiveGuidance?.mistakesBeforeHint ?? 1;
+  const mistakesBeforeDetailedHint = adaptiveGuidance?.mistakesBeforeDetailedHint ?? 3;
 
   useEffect(() => {
     setOperandRows(getInitialOperandRows(operation, stableNumbers, editableOperands, maxDigits, maxRows));
@@ -210,10 +224,43 @@ export function VerticalCalculation({
   }, [activeCellId, nextPendingStep?.cellId, answerLength, editableOperands, operandColumnOffset]);
 
   useEffect(() => {
-    if (guidanceMode === "locked" && nextPendingStep) {
+    if ((guidanceMode === "locked" || isAdaptive) && nextPendingStep) {
       setActiveCellId(nextPendingStep.cellId);
     }
-  }, [nextPendingStep, guidanceMode]);
+  }, [nextPendingStep, guidanceMode, isAdaptive]);
+
+  useEffect(() => {
+    if (!isAdaptive || !nextPendingStep) {
+      return;
+    }
+
+    setHintLevel(0);
+    setStepMistakes(0);
+    setMessage(messages.chooseCell);
+
+    const hintTimer = window.setTimeout(() => {
+      setHintLevel(1);
+      setMessage(nextPendingStep.guidance?.prompt ?? nextPendingStep.message);
+      setUsedHints((current) => current + 1);
+    }, autoHintDelayMs);
+
+    const detailTimer = window.setTimeout(() => {
+      setHintLevel(2);
+      setMessage(nextPendingStep.guidance?.detail ?? nextPendingStep.message);
+      setUsedHints((current) => current + 1);
+    }, detailedHintDelayMs);
+
+    return () => {
+      window.clearTimeout(hintTimer);
+      window.clearTimeout(detailTimer);
+    };
+  }, [
+    autoHintDelayMs,
+    detailedHintDelayMs,
+    isAdaptive,
+    messages.chooseCell,
+    nextPendingStep,
+  ]);
 
   const showKeypadToggle = keypadMode === "toggle" || (keypadMode === "auto" && !isTouchPreferred());
   const showKeypad = keypadMode !== "hidden" && keypadOpen;
@@ -223,6 +270,48 @@ export function VerticalCalculation({
     setProcessValues({});
     setMessage(messages.chooseCell);
     setActiveCellId(editableOperands ? operandCellId(0, operandColumnOffset) : answerCellId(answerLength - 1));
+    setHintLevel(0);
+    setStepMistakes(0);
+  };
+
+  const showAdaptiveHint = (level: 1 | 2) => {
+    if (!nextPendingStep) {
+      return;
+    }
+
+    const effectiveLevel = Math.max(hintLevel, level) as 1 | 2;
+    setHintLevel(effectiveLevel);
+    setMessage(
+      effectiveLevel === 2
+        ? nextPendingStep.guidance?.detail ?? nextPendingStep.message
+        : nextPendingStep.guidance?.prompt ?? nextPendingStep.message,
+    );
+  };
+
+  const registerAdaptiveMistake = () => {
+    onMistake?.();
+    setUsedHints((current) => current + 1);
+    setStepMistakes((current) => {
+      const next = current + 1;
+
+      if (next >= mistakesBeforeDetailedHint) {
+        showAdaptiveHint(2);
+      } else if (next >= mistakesBeforeHint) {
+        showAdaptiveHint(1);
+      }
+
+      return next;
+    });
+  };
+
+  const requestAdaptiveHelp = () => {
+    if (!nextPendingStep) {
+      return;
+    }
+
+    setUsedHints((current) => current + 1);
+    showAdaptiveHint(hintLevel >= 1 ? 2 : 1);
+    setActiveCellId(nextPendingStep.cellId);
   };
 
   const getCellValue = (cellId: string) => {
@@ -275,6 +364,25 @@ export function VerticalCalculation({
   };
 
   const selectCell = (cellId: string) => {
+    if (isAdaptive && nextPendingStep && cellId !== nextPendingStep.cellId) {
+      const selectedStep = plan?.steps.find((step) => step.cellId === cellId);
+      const selectedValue = getCellValue(cellId);
+
+      if (selectedStep && selectedValue.trim() === selectedStep.expected) {
+        setActiveCellId(cellId);
+        setMessage(messages.chooseCell);
+        setHintLevel(0);
+        return;
+      }
+
+      setMessage(messages.assistedNextStep);
+      registerAdaptiveMistake();
+      setShakingCellId(cellId);
+      setActiveCellId(nextPendingStep.cellId);
+      window.setTimeout(() => setShakingCellId(null), 280);
+      return;
+    }
+
     if (guidanceMode === "locked" && nextPendingStep && cellId !== nextPendingStep.cellId) {
       setMessage(messages.lockedWrongCell);
       setUsedHints((current) => current + 1);
@@ -316,15 +424,46 @@ export function VerticalCalculation({
       return;
     }
 
-    if (guidanceMode === "locked" && nextPendingStep && activeCellId !== nextPendingStep.cellId) {
-      setMessage(messages.lockedWrongCell);
+    const activeStep = plan?.steps.find((step) => step.cellId === activeCellId);
+    const editingCompletedStep = Boolean(
+      isAdaptive &&
+      activeStep &&
+      activeCellId !== nextPendingStep?.cellId &&
+      getCellValue(activeCellId).trim() === activeStep.expected,
+    );
+
+    if (editingCompletedStep && activeStep) {
+      if (digit === activeStep.expected) {
+        setCellValue(activeCellId, digit);
+        return;
+      }
+
+      setCellValue(activeCellId, digit);
+      setMessage(messages.lockedWrongDigit);
+      registerAdaptiveMistake();
+      setShakingCellId(activeCellId);
+      window.setTimeout(() => setShakingCellId(null), 280);
       return;
     }
 
-    if (guidanceMode === "locked" && nextPendingStep && digit !== nextPendingStep.expected) {
+    if ((guidanceMode === "locked" || isAdaptive) && nextPendingStep && activeCellId !== nextPendingStep.cellId) {
+      setMessage(messages.lockedWrongCell);
+      if (isAdaptive) {
+        registerAdaptiveMistake();
+        setActiveCellId(nextPendingStep.cellId);
+      }
+      return;
+    }
+
+    if ((guidanceMode === "locked" || isAdaptive) && nextPendingStep && digit !== nextPendingStep.expected) {
       setCellValue(activeCellId, "");
-      setMessage(nextPendingStep.message || messages.lockedWrongDigit);
-      setUsedHints((current) => current + 1);
+      if (isAdaptive) {
+        setMessage(messages.lockedWrongDigit);
+        registerAdaptiveMistake();
+      } else {
+        setMessage(nextPendingStep.message || messages.lockedWrongDigit);
+        setUsedHints((current) => current + 1);
+      }
       setShakingCellId(activeCellId);
       window.setTimeout(() => setShakingCellId(null), 280);
       return;
@@ -332,8 +471,8 @@ export function VerticalCalculation({
 
     setCellValue(activeCellId, digit);
 
-    if (guidanceMode === "locked" && nextPendingStep) {
-      setMessage(nextPendingStep.message);
+    if ((guidanceMode === "locked" || isAdaptive) && nextPendingStep) {
+      setMessage(isAdaptive ? messages.chooseCell : nextPendingStep.message);
       const nextStep = plan?.steps.find((step) => {
         if (step.cellId === nextPendingStep.cellId) {
           return false;
@@ -348,7 +487,7 @@ export function VerticalCalculation({
       return;
     }
 
-    if (guidanceMode !== "locked") {
+    if (guidanceMode !== "locked" && !isAdaptive) {
       moveToNextLooseCell(activeCellId);
     }
   };
@@ -385,6 +524,10 @@ export function VerticalCalculation({
     setMessage(result.isCorrect ? messages.correct : messages.tryAgain);
     onCheck?.(result);
 
+    if (isAdaptive && !result.isCorrect) {
+      registerAdaptiveMistake();
+    }
+
     if (result.isCorrect) {
       onComplete?.(result);
     }
@@ -418,6 +561,44 @@ export function VerticalCalculation({
   const renderEmptyDisplayCell = (key: string) => (
     <span key={key} className={styles.emptyCell} aria-hidden="true" />
   );
+
+  const renderAdaptiveCoach = (cellId: string) => {
+    if (!isAdaptive || hintLevel === 0 || nextPendingStep?.cellId !== cellId) {
+      return null;
+    }
+
+    return (
+      <div className={clsx(styles.coach, classNames?.coach)} aria-live="polite">
+        <span className={clsx(styles.coachArrow, classNames?.coachArrow)} aria-hidden="true" />
+        <span className={clsx(styles.coachBadge, classNames?.coachBadge)}>{messages.hint}</span>
+        {hintLevel === 2 && nextPendingStep.guidance?.equationPrefix ? (
+          <div
+            className={clsx(styles.coachEquation, classNames?.coachEquation)}
+            aria-label={`${nextPendingStep.guidance.equationPrefix} ${nextPendingStep.guidance.leadingDigit ?? ""}${nextPendingStep.guidance.resultDigit ?? ""}`}
+          >
+            <span>{nextPendingStep.guidance.equationPrefix}</span>
+            {nextPendingStep.guidance.leadingDigit ? (
+              <span
+                className={clsx(
+                  styles.coachLeadingDigit,
+                  nextPendingStep.guidance.leadingDestination === "carry" && styles.coachCarryDigit,
+                  classNames?.coachLeadingDigit,
+                )}
+              >
+                {nextPendingStep.guidance.leadingDigit}
+              </span>
+            ) : null}
+            {nextPendingStep.guidance.resultDigit ? (
+              <span className={clsx(styles.coachResultDigit, classNames?.coachResultDigit)}>
+                {nextPendingStep.guidance.resultDigit}
+              </span>
+            ) : null}
+          </div>
+        ) : null}
+        <p className={clsx(styles.coachText, classNames?.coachText)}>{message}</p>
+      </div>
+    );
+  };
 
   const renderOperandCell = (row: number, column: number) => {
     const cellId = operandCellId(row, column);
@@ -464,6 +645,8 @@ export function VerticalCalculation({
         active={activeCellId === cell.id}
         shaking={shakingCellId === cell.id}
         label={cell.label}
+        coach={renderAdaptiveCoach(cell.id)}
+        coachPlacement="right"
         classNames={classNames}
         onSelect={selectCell}
       />
@@ -482,6 +665,8 @@ export function VerticalCalculation({
         active={activeCellId === cellId}
         shaking={shakingCellId === cellId}
         label="Resultado"
+        coach={renderAdaptiveCoach(cellId)}
+        coachPlacement="below"
         classNames={classNames}
         onSelect={selectCell}
       />
@@ -496,77 +681,96 @@ export function VerticalCalculation({
 
   return (
     <section className={clsx(styles.root, className, classNames?.root)}>
-      <div
-        className={clsx(styles.grid, classNames?.grid)}
-        style={{ gridTemplateColumns: `repeat(${gridColumns}, minmax(0, 1fr))` }}
-      >
-        {Array.from({ length: gridColumns }, (_, column) =>
-          column === 0 ? renderEmptyDisplayCell(`process-op-${column}`) : renderProcessCell(column - 1),
-        )}
+      <div className={clsx(styles.workspace, classNames?.workspace)}>
+        <div className={clsx(styles.calculationStage, classNames?.calculationStage)}>
+          <div
+            className={clsx(styles.grid, classNames?.grid)}
+            style={{ gridTemplateColumns: `repeat(${gridColumns}, minmax(0, 1fr))` }}
+          >
+            {Array.from({ length: gridColumns }, (_, column) =>
+              column === 0 ? renderEmptyDisplayCell(`process-op-${column}`) : renderProcessCell(column - 1),
+            )}
 
-        {operandRowsForDisplay.map((_, row) => (
-          <div key={`operand-row-${row}`} className={clsx(styles.row, classNames?.row, classNames?.operandRow)}>
-            {Array.from({ length: gridColumns }, (_, column) => {
-              if (column === 0) {
-                return (
-                  <span key={`operator-${row}`} className={clsx(styles.operator, classNames?.operator)}>
-                    {row === operatorRowIndex ? operatorByOperation[operation] : ""}
-                  </span>
-                );
-              }
+            {operandRowsForDisplay.map((_, row) => (
+              <div key={`operand-row-${row}`} className={clsx(styles.row, classNames?.row, classNames?.operandRow)}>
+                {Array.from({ length: gridColumns }, (_, column) => {
+                  if (column === 0) {
+                    return (
+                      <span key={`operator-${row}`} className={clsx(styles.operator, classNames?.operator)}>
+                        {row === operatorRowIndex ? operatorByOperation[operation] : ""}
+                      </span>
+                    );
+                  }
 
-              return renderOperandCell(row, column - 1);
-            })}
+                  return renderOperandCell(row, column - 1);
+                })}
+              </div>
+            ))}
+
+            <div className={clsx(styles.bar, classNames?.bar)} style={{ gridColumn: `1 / span ${gridColumns}` }} />
+
+            <div className={clsx(styles.row, classNames?.row, classNames?.answerRow)}>
+              {Array.from({ length: gridColumns }, (_, column) =>
+                column === 0 ? renderEmptyDisplayCell("answer-operator") : renderAnswerCell(column - 1),
+              )}
+            </div>
           </div>
-        ))}
+        </div>
 
-        <div className={clsx(styles.bar, classNames?.bar)} style={{ gridColumn: `1 / span ${gridColumns}` }} />
+        <div className={clsx(styles.controlRail, classNames?.controlRail)}>
+          <div className={clsx(styles.toolbar, classNames?.toolbar)}>
+            {isAdaptive && nextPendingStep ? (
+              <button
+                className={clsx(styles.actionButton, styles.helpButton, classNames?.actionButton, classNames?.helpButton)}
+                type="button"
+                onClick={requestAdaptiveHelp}
+              >
+                {messages.help}
+              </button>
+            ) : null}
+            {showKeypadToggle ? (
+              <button
+                className={clsx(styles.actionButton, classNames?.actionButton)}
+                type="button"
+                onClick={() => setKeypadOpen((current) => !current)}
+              >
+                {keypadOpen ? messages.closeKeypad : messages.openKeypad}
+              </button>
+            ) : null}
+            {showClearButton ? (
+              <button
+                className={clsx(styles.actionButton, classNames?.actionButton)}
+                type="button"
+                onClick={clearCalculation}
+              >
+                {messages.clear}
+              </button>
+            ) : null}
+            <button
+              className={clsx(styles.actionButton, classNames?.actionButton, classNames?.checkButton)}
+              type="button"
+              onClick={checkAnswer}
+            >
+              {messages.checkAnswer}
+            </button>
+          </div>
 
-        <div className={clsx(styles.row, classNames?.row, classNames?.answerRow)}>
-          {Array.from({ length: gridColumns }, (_, column) =>
-            column === 0 ? renderEmptyDisplayCell("answer-operator") : renderAnswerCell(column - 1),
-          )}
+          {showKeypad ? (
+            <CalculationKeypad
+              classNames={classNames}
+              messages={messages}
+              onDigit={enterDigit}
+              onBackspace={clearActiveCell}
+              onClose={showKeypadToggle ? () => setKeypadOpen(false) : undefined}
+            />
+          ) : null}
         </div>
       </div>
 
-      <p className={clsx(styles.message, classNames?.message)} aria-live="polite">
-        {message}
-      </p>
-
-      <div className={clsx(styles.toolbar, classNames?.toolbar)}>
-        {showKeypadToggle ? (
-          <button
-            className={clsx(styles.actionButton, classNames?.actionButton)}
-            type="button"
-            onClick={() => setKeypadOpen((current) => !current)}
-          >
-            {keypadOpen ? messages.closeKeypad : messages.openKeypad}
-          </button>
-        ) : null}
-        <button
-          className={clsx(styles.actionButton, classNames?.actionButton)}
-          type="button"
-          onClick={clearCalculation}
-        >
-          {messages.clear}
-        </button>
-        <button
-          className={clsx(styles.actionButton, classNames?.actionButton, classNames?.checkButton)}
-          type="button"
-          onClick={checkAnswer}
-        >
-          {messages.checkAnswer}
-        </button>
-      </div>
-
-      {showKeypad ? (
-        <CalculationKeypad
-          classNames={classNames}
-          messages={messages}
-          onDigit={enterDigit}
-          onBackspace={clearActiveCell}
-          onClose={showKeypadToggle ? () => setKeypadOpen(false) : undefined}
-        />
+      {!isAdaptive ? (
+        <p className={clsx(styles.message, classNames?.message)} aria-live="polite">
+          {message}
+        </p>
       ) : null}
     </section>
   );

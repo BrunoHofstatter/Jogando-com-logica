@@ -25,6 +25,7 @@ import {
   type RoomPlayer,
 } from "../rooms/roomTypes.ts";
 import type { ClassroomStore } from "../classrooms/classroomStore.ts";
+import type { ClassroomMonitor } from "../classrooms/classroomMonitor.ts";
 
 type MathWarNamespace = Namespace<
   MathWarClientToServerEvents,
@@ -42,11 +43,27 @@ type MathWarRoom = MultiplayerRoom<MathWarState> & {
 };
 
 const roomStore = createRoomStore<MathWarRoom>();
+let activeClassroomMonitor: ClassroomMonitor;
 
 export function registerMathWarRoomHandlers(
   io: MathWarNamespace,
   classroomStore: ClassroomStore,
+  classroomMonitor: ClassroomMonitor,
 ): void {
+  activeClassroomMonitor = classroomMonitor;
+  classroomMonitor.registerProvider("math_war", (classroomCode) =>
+    [...roomStore.getRooms().values()]
+      .filter((room) => room.visibility === "classroom" && room.classroomCode === classroomCode)
+      .map((room) => ({
+        code: room.code,
+        game: "math_war",
+        status: room.status,
+        players: serializePlayers(room).map(({ name, connected }) => ({ name, connected })),
+        capacity: 2,
+        createdAt: room.createdAt,
+      })),
+  );
+
   io.on("connection", (socket) => {
     socket.on("create_room", ({ playerName, classroomCode }) => {
       leaveAnyExistingRoom(io, socket, "leave_room");
@@ -237,6 +254,7 @@ export function registerMathWarRoomHandlers(
         state: room.state,
         events: result.events,
       });
+      classroomMonitor.notifyClassroomChanged(room.classroomCode);
     });
 
     socket.on("request_rematch", ({ code }) => {
@@ -286,6 +304,7 @@ export function registerMathWarRoomHandlers(
         code: room.code,
         state: room.state,
       });
+      classroomMonitor.notifyClassroomChanged(room.classroomCode);
     });
 
     socket.on("leave_room", ({ code }) => {
@@ -497,6 +516,7 @@ function broadcastClassroomRooms(
     classroomCode,
     openRooms: getOpenClassroomRooms(classroomCode),
   });
+  activeClassroomMonitor.notifyClassroomChanged(classroomCode);
 }
 
 function emitError(

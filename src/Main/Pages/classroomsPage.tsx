@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { io, type Socket } from "socket.io-client";
 
 import type {
   CrownChaseClientToServerEvents,
   CrownChaseServerToClientEvents,
+  ClassroomMonitorRoom,
   ManagedClassroom,
 } from "../../CrownChase/Logic/multiplayer/protocol";
 import { useDelayedOnlineWaitHint } from "../../Shared/Hooks/useDelayedOnlineWaitHint";
@@ -24,11 +25,14 @@ export default function ClassroomsPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [copyFeedback, setCopyFeedback] = useState("");
   const [isExplanationOpen, setIsExplanationOpen] = useState(false);
+  const [openMonitorCodes, setOpenMonitorCodes] = useState<string[]>([]);
+  const [monitorRooms, setMonitorRooms] = useState<Record<string, ClassroomMonitorRoom[]>>({});
+  const [loadingMonitorCodes, setLoadingMonitorCodes] = useState<string[]>([]);
+  const openMonitorCodesRef = useRef<string[]>([]);
   const isConnectingToServer = socket !== null && !isServerConnected;
   const showOnlineWaitHint = useDelayedOnlineWaitHint(isConnectingToServer);
 
   useEffect(() => {
-    document.body.style.backgroundColor = "#68c2e0";
 
     const serverUrl = import.meta.env.VITE_MULTIPLAYER_SERVER_URL;
     if (!serverUrl) {
@@ -56,6 +60,7 @@ export default function ClassroomsPage() {
     });
     nextSocket.on("disconnect", () => {
       setIsServerConnected(false);
+      setLoadingMonitorCodes(openMonitorCodesRef.current);
     });
     nextSocket.on("classroom_created", ({ classroom }) => {
       saveManagementTokens([...loadManagementTokens(), classroom.managementToken]);
@@ -65,12 +70,42 @@ export default function ClassroomsPage() {
     nextSocket.on("managed_classrooms", ({ classrooms: managedClassrooms }) => {
       setClassrooms(managedClassrooms);
       saveManagementTokens(managedClassrooms.map((classroom) => classroom.managementToken));
+      managedClassrooms
+        .filter((classroom) => openMonitorCodesRef.current.includes(classroom.code))
+        .forEach((classroom) => {
+          nextSocket.emit("watch_classroom", {
+            code: classroom.code,
+            managementToken: classroom.managementToken,
+          });
+        });
     });
     nextSocket.on("classroom_deleted", ({ code }) => {
       setClassrooms((current) => current.filter((classroom) => classroom.code !== code));
+      setOpenMonitorCodes((current) => current.filter((openCode) => openCode !== code));
+      openMonitorCodesRef.current = openMonitorCodesRef.current.filter(
+        (openCode) => openCode !== code,
+      );
+    });
+    nextSocket.on("classroom_monitor_updated", ({ classroomCode, rooms }) => {
+      setMonitorRooms((current) => ({ ...current, [classroomCode]: rooms }));
+      setLoadingMonitorCodes((current) =>
+        current.filter((openCode) => openCode !== classroomCode),
+      );
+    });
+    nextSocket.on("classroom_unavailable", ({ classroomCode }) => {
+      setClassrooms((current) =>
+        current.filter((classroom) => classroom.code !== classroomCode),
+      );
+      setOpenMonitorCodes((current) =>
+        current.filter((openCode) => openCode !== classroomCode),
+      );
+      openMonitorCodesRef.current = openMonitorCodesRef.current.filter(
+        (openCode) => openCode !== classroomCode,
+      );
     });
     nextSocket.on("multiplayer_error", ({ message }) => {
       setErrorMessage(message);
+      setLoadingMonitorCodes([]);
     });
     nextSocket.on("connect_error", () => {
       setIsServerConnected(false);
@@ -105,6 +140,33 @@ export default function ClassroomsPage() {
     }
 
     window.setTimeout(() => setCopyFeedback(""), 2000);
+  };
+
+  const toggleClassroomMonitor = (classroom: ManagedClassroom) => {
+    const isOpen = openMonitorCodes.includes(classroom.code);
+    const nextOpenCodes = isOpen
+      ? openMonitorCodes.filter((code) => code !== classroom.code)
+      : [...openMonitorCodes, classroom.code];
+
+    setOpenMonitorCodes(nextOpenCodes);
+    openMonitorCodesRef.current = nextOpenCodes;
+
+    if (isOpen) {
+      socket?.emit("unwatch_classroom", {
+        code: classroom.code,
+        managementToken: classroom.managementToken,
+      });
+      setLoadingMonitorCodes((current) =>
+        current.filter((code) => code !== classroom.code),
+      );
+      return;
+    }
+
+    setLoadingMonitorCodes((current) => [...new Set([...current, classroom.code])]);
+    socket?.emit("watch_classroom", {
+      code: classroom.code,
+      managementToken: classroom.managementToken,
+    });
   };
 
   return (
@@ -172,27 +234,55 @@ export default function ClassroomsPage() {
           ) : (
             classrooms.map((classroom) => (
               <article className={styles.classroomCard} key={classroom.code}>
-                <div>
-                  <div className={styles.code}>{classroom.code}</div>
-                  <p className={styles.detail}>
-                    Expira às {formatExpiry(classroom.expiresAt)}
-                  </p>
+                <div className={styles.classroomHeader}>
+                  <div>
+                    <div className={styles.code}>{classroom.code}</div>
+                    <p className={styles.detail}>
+                      Expira às {formatExpiry(classroom.expiresAt)}
+                    </p>
+                  </div>
+
+                  <div className={styles.actions}>
+                    <button
+                      className={styles.secondaryButton}
+                      onClick={() => copyClassroomCode(classroom.code)}
+                    >
+                      Copiar Código
+                    </button>
+                    <button
+                      className={styles.deleteButton}
+                      onClick={() => deleteClassroom(classroom)}
+                    >
+                      Excluir Turma
+                    </button>
+                  </div>
                 </div>
 
-                <div className={styles.actions}>
-                  <button
-                    className={styles.secondaryButton}
-                    onClick={() => copyClassroomCode(classroom.code)}
-                  >
-                    Copiar Código
-                  </button>
-                  <button
-                    className={styles.deleteButton}
-                    onClick={() => deleteClassroom(classroom)}
-                  >
-                    Excluir Turma
-                  </button>
-                </div>
+                <button
+                  className={styles.monitorToggle}
+                  onClick={() => toggleClassroomMonitor(classroom)}
+                  disabled={!isServerConnected}
+                  aria-expanded={openMonitorCodes.includes(classroom.code)}
+                  aria-controls={`classroom-monitor-${classroom.code}`}
+                >
+                  Acompanhar salas
+                  <ChevronDown
+                    className={`${styles.monitorArrow} ${
+                      openMonitorCodes.includes(classroom.code)
+                        ? styles.monitorArrowOpen
+                        : ""
+                    }`}
+                    aria-hidden="true"
+                  />
+                </button>
+
+                {openMonitorCodes.includes(classroom.code) && (
+                  <ClassroomMonitorPanel
+                    classroomCode={classroom.code}
+                    rooms={monitorRooms[classroom.code] ?? []}
+                    isLoading={loadingMonitorCodes.includes(classroom.code)}
+                  />
+                )}
               </article>
             ))
           )}
@@ -200,6 +290,89 @@ export default function ClassroomsPage() {
       </section>
     </main>
   );
+}
+
+type ClassroomMonitorPanelProps = {
+  classroomCode: string;
+  rooms: ClassroomMonitorRoom[];
+  isLoading: boolean;
+};
+
+function ClassroomMonitorPanel({
+  classroomCode,
+  rooms,
+  isLoading,
+}: ClassroomMonitorPanelProps) {
+  const playerCount = rooms.reduce((total, room) => total + room.players.length, 0);
+
+  return (
+    <section className={styles.monitorPanel} id={`classroom-monitor-${classroomCode}`}>
+      {isLoading ? (
+        <p className={styles.monitorMessage}>Atualizando salas...</p>
+      ) : rooms.length === 0 ? (
+        <p className={styles.monitorMessage}>Nenhuma sala criada nesta turma ainda.</p>
+      ) : (
+        <>
+          <p className={styles.monitorSummary}>
+            {formatCount(rooms.length, "sala", "salas")} · {formatCount(playerCount, "aluno nas salas", "alunos nas salas")}
+          </p>
+          <div className={styles.monitorRoomList}>
+            {rooms.map((room) => (
+              <article className={styles.monitorRoom} key={`${room.game}-${room.code}`}>
+                <div className={styles.monitorRoomHeader}>
+                  <h2>{GAME_NAMES[room.game]} · Sala {room.code}</h2>
+                  <span className={`${styles.statusBadge} ${styles[`status_${room.status}`]}`}>
+                    {STATUS_NAMES[room.status]}
+                  </span>
+                </div>
+                <p className={styles.occupancy}>
+                  {room.players.length}/{room.capacity} jogadores
+                </p>
+                <ul className={styles.playerList}>
+                  {room.players.map((player, index) => (
+                    <li key={`${player.name}-${index}`}>
+                      {player.name}
+                      {!player.connected && (
+                        <span className={styles.disconnectedLabel}> desconectado</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+                {room.status === "waiting" && room.players.length < room.capacity && (
+                  <p className={styles.availableSeats}>
+                    {formatCount(
+                      room.capacity - room.players.length,
+                      "vaga disponível",
+                      "vagas disponíveis",
+                    )}
+                  </p>
+                )}
+              </article>
+            ))}
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
+const GAME_NAMES: Record<ClassroomMonitorRoom["game"], string> = {
+  crown_chase: "Caça Coroa",
+  spttt: "Super Jogo da Velha",
+  math_war: "Guerra Matemática",
+  caca_soma: "Caça Soma",
+  stop: "Stop Matemático",
+  bomb_game: "Jogo da Bomba",
+};
+
+const STATUS_NAMES: Record<ClassroomMonitorRoom["status"], string> = {
+  waiting: "Aguardando jogadores",
+  playing: "Em andamento",
+  ended: "Finalizada",
+};
+
+function formatCount(count: number, singular: string, plural: string): string {
+  return `${count} ${count === 1 ? singular : plural}`;
 }
 
 function loadManagementTokens(): string[] {

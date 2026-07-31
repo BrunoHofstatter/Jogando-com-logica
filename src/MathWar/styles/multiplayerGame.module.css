@@ -1,19 +1,22 @@
-.roomBanner {
-  position: fixed;
-  top: 1.5vw;
-  left: 30%;
-  transform: translateX(-50%);
-  width: min(88vw, 110dvh);
+.onlineHeaderContent {
+  width: 100%;
   display: flex;
+  flex-direction: column;
+  gap: min(0.5vw, 0.7dvh);
+}
+
+.roomBanner {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 2vw;
-  padding: 1vw 1.4vw;
+  gap: min(1.4vw, 2dvh);
+  padding: min(0.5vw, 0.8dvh) min(1.2vw, 2dvh);
   box-sizing: border-box;
   background-color: rgba(6, 78, 59, 0.92);
   border: 0.25vw solid #f8f8f8;
   border-radius: 2vw;
-  box-shadow: 0 0.7vw 0 #064e3b;
+  box-shadow: 0 min(0.45vw, 0.7dvh) 0 #064e3b;
   z-index: 30;
   font-family: "Cherry Bomb One", system-ui;
 }
@@ -27,9 +30,28 @@
   -webkit-text-stroke: 0.06vw #064e3b;
 }
 
+.roomPlayers {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: min(1.4vw, 2dvh);
+}
+
 .roomCode,
 .roomDetail {
   font-size: clamp(1vw, 2.7dvh, 3vw);
+}
+
+.roomCode {
+  white-space: nowrap;
+}
+
+.roomDetail {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .leaveButton {
@@ -115,11 +137,7 @@
 }
 
 .alertBox {
-  position: fixed;
-  top: 8vw;
-  left: 30%;
-  transform: translateX(-50%);
-  width: min(70vw, 90dvh);
+  width: 100%;
   text-align: center;
   padding: 0.8vw 1vw;
   box-sizing: border-box;
@@ -179,12 +197,9 @@
 
 @media (orientation: portrait) and (max-width: 650px) {
   .roomBanner {
-    top: 2vw;
-    width: 92vw;
-    flex-direction: column;
-    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: min(1.8vw, 0.9dvh);
-    padding: min(2.8vw, 1.5dvh);
+    padding: min(2vw, 1dvh) min(2.8vw, 1.5dvh);
     border-width: min(0.5vw, 0.25dvh);
     border-radius: min(4vw, 2dvh);
     box-shadow: 0 min(1vw, 0.5dvh) 0 #064e3b;
@@ -192,6 +207,17 @@
 
   .roomInfo {
     gap: min(1.8vw, 0.9dvh);
+  }
+
+  .roomPlayers {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: min(2vw, 1dvh);
+  }
+
+  .roomDetail {
+    white-space: normal;
   }
 
   .roomCode,
@@ -205,14 +231,14 @@
   }
 
   .leaveButton {
+    grid-column: 1 / -1;
     border-width: min(0.5vw, 0.25dvh);
     border-radius: min(4vw, 2dvh);
     padding: min(2vw, 1dvh) min(3vw, 1.5dvh) min(2.6vw, 1.3dvh) min(3vw, 1.5dvh);
   }
 
   .alertBox {
-    top: 26vw;
-    width: 88vw;
+    width: 100%;
     border-width: min(0.5vw, 0.25dvh);
     border-radius: min(3vw, 1.6dvh);
     padding: min(2vw, 1dvh);

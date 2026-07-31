@@ -29,6 +29,7 @@ import {
 import { generateRoomCode } from "../rooms/roomCode.ts";
 import { createRoomStore } from "../rooms/roomStore.ts";
 import type { ClassroomStore } from "../classrooms/classroomStore.ts";
+import type { ClassroomMonitor } from "../classrooms/classroomMonitor.ts";
 
 type CacaSomaNamespace = Namespace<
   CacaSomaClientToServerEvents,
@@ -41,6 +42,7 @@ type CacaSomaSocket = Socket<
 >;
 
 const roomStore = createRoomStore<CacaSomaRoom>();
+let activeClassroomMonitor: ClassroomMonitor;
 
 const DEFAULT_ROOM_SETTINGS: CacaSomaRoomSettings = {
   mode: "2v2",
@@ -51,14 +53,41 @@ const DEFAULT_ROOM_SETTINGS: CacaSomaRoomSettings = {
 export function registerCacaSomaRoomHandlers(
   io: CacaSomaNamespace,
   classroomStore: ClassroomStore,
+  classroomMonitor: ClassroomMonitor,
 ): void {
+  activeClassroomMonitor = classroomMonitor;
+  classroomMonitor.registerProvider("caca_soma", (classroomCode) =>
+    [...roomStore.getRooms().values()]
+      .filter((room) => room.visibility === "classroom" && room.classroomCode === classroomCode)
+      .map((room) => ({
+        code: room.code,
+        game: "caca_soma",
+        status: room.status,
+        players: getActiveRegisteredPlayers(room).map(({ name, connected }) => ({
+          name,
+          connected,
+        })),
+        capacity: getRoomCapacity(room.settings),
+        createdAt: room.createdAt,
+      })),
+  );
+
   io.on("connection", (socket) => {
-    socket.on("create_room", ({ playerName, classroomCode }) => {
+    socket.on("create_room", ({ playerName, mode, classroomCode }) => {
       leaveAnyExistingRoom(io, socket);
 
       const normalizedName = normalizePlayerName(playerName);
       if (!normalizedName) {
         emitError(socket, "invalid_name", "Digite um nome com pelo menos 2 letras.");
+        return;
+      }
+
+      const initialSettings: CacaSomaRoomSettings = {
+        ...DEFAULT_ROOM_SETTINGS,
+        mode: mode ?? DEFAULT_ROOM_SETTINGS.mode,
+      };
+      if (!isValidSettings(initialSettings)) {
+        emitError(socket, "invalid_settings", "A modalidade escolhida é inválida.");
         return;
       }
 
@@ -79,10 +108,10 @@ export function registerCacaSomaRoomHandlers(
         code: roomCode,
         visibility: normalizedClassroomCode ? "classroom" : "private",
         classroomCode: normalizedClassroomCode,
-        settings: DEFAULT_ROOM_SETTINGS,
+        settings: initialSettings,
         state: null,
         status: "waiting",
-        players: [createPlayer(socket.id, normalizedName, 0, true, DEFAULT_ROOM_SETTINGS), null, null, null],
+        players: [createPlayer(socket.id, normalizedName, 0, true, initialSettings), null, null, null],
         createdAt: now,
         updatedAt: now,
         rematchVotes: new Set(),
@@ -330,6 +359,7 @@ export function registerCacaSomaRoomHandlers(
         events: result.events,
         serverNowMs: Date.now(),
       });
+      classroomMonitor.notifyClassroomChanged(room.classroomCode);
     });
 
     socket.on("request_rematch", ({ code }) => {
@@ -383,6 +413,56 @@ export function registerCacaSomaRoomHandlers(
         state: room.state,
         serverNowMs: Date.now(),
       });
+      classroomMonitor.notifyClassroomChanged(room.classroomCode);
+    });
+
+    socket.on("remove_player", ({ code, seat }) => {
+      const room = roomStore.getRoom(code.trim().toUpperCase());
+      if (!room) {
+        emitError(socket, "room_not_found", "Sala não encontrada.");
+        return;
+      }
+
+      const hostPlayer = getPlayerBySocketId(room, socket.id);
+      if (!hostPlayer) {
+        emitError(socket, "unauthorized", "Você não pertence a esta sala.");
+        return;
+      }
+
+      if (!hostPlayer.isHost) {
+        emitError(socket, "host_only", "Só o anfitrião pode remover jogadores.");
+        return;
+      }
+
+      if (room.status !== "waiting") {
+        emitError(socket, "room_not_joinable", "Não é possível remover jogadores depois que a partida começa.");
+        return;
+      }
+
+      if (!Number.isInteger(seat) || seat < 0 || seat >= room.players.length) {
+        emitError(socket, "unauthorized", "Esse jogador não pode ser removido.");
+        return;
+      }
+
+      const targetPlayer = room.players[seat];
+      if (!targetPlayer || targetPlayer.isHost) {
+        emitError(socket, "unauthorized", "Esse jogador não pode ser removido.");
+        return;
+      }
+
+      io.to(targetPlayer.socketId).emit("player_removed", {
+        code: room.code,
+        message: "Você foi removido da sala pelo anfitrião.",
+      });
+      io.sockets.get(targetPlayer.socketId)?.leave(room.code);
+
+      room.players[seat] = null;
+      room.rematchVotes.delete(seat);
+      room.updatedAt = Date.now();
+
+      emitRoomUpdated(io, room);
+      scheduleWaitingRoomExpiry(io, room);
+      broadcastClassroomRooms(io, room.classroomCode);
     });
 
     socket.on("leave_room", ({ code }) => {
@@ -575,6 +655,7 @@ function syncRoundTimeout(
         events: phaseResult.events,
         serverNowMs: Date.now(),
       });
+      activeClassroomMonitor.notifyClassroomChanged(latestRoom.classroomCode);
       return;
     }
 
@@ -596,6 +677,7 @@ function syncRoundTimeout(
       events: result.events,
       serverNowMs: Date.now(),
     });
+    activeClassroomMonitor.notifyClassroomChanged(latestRoom.classroomCode);
   }, delayMs);
 }
 
@@ -636,6 +718,7 @@ function emitRoomUpdated(io: CacaSomaNamespace, room: CacaSomaRoom): void {
     players: serializePlayers(room),
     serverNowMs: Date.now(),
   });
+  activeClassroomMonitor.notifyClassroomChanged(room.classroomCode);
 }
 
 function normalizeClassroomCode(code: string): ClassroomCode | null {
@@ -680,6 +763,7 @@ function broadcastClassroomRooms(
     classroomCode,
     openRooms: getOpenClassroomRooms(classroomCode),
   });
+  activeClassroomMonitor.notifyClassroomChanged(classroomCode);
 }
 
 function getPlayerBySocketId(

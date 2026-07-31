@@ -335,6 +335,18 @@ function ensureSocket(): Socket<
       });
     });
 
+    socket.on("player_removed", (payload) => {
+      updateSnapshot({
+        roomCode: payload.code,
+        playerSeat: null,
+        players: [],
+        gameState: null,
+        connectionStatus: "disconnected",
+        errorMessage: payload.message,
+        roomInterrupted: true,
+      });
+    });
+
     socket.on("room_closed", (payload) => {
       updateSnapshot({
         connectionStatus: "disconnected",
@@ -455,7 +467,11 @@ export function useCacaSomaMultiplayer() {
     };
   }, []);
 
-  const createRoom = (playerName: string, classroomCode?: string) => {
+  const createRoom = (
+    playerName: string,
+    mode: CacaSomaRoomSettings["mode"],
+    classroomCode?: string,
+  ) => {
     const normalizedName = normalizePlayerName(playerName);
     if (normalizedName.length < 2) {
       updateSnapshot({
@@ -469,7 +485,10 @@ export function useCacaSomaMultiplayer() {
       playerName: normalizedName,
       roomCode: null,
       playerSeat: null,
-      settings: DEFAULT_SETTINGS,
+      settings: {
+        ...DEFAULT_SETTINGS,
+        mode,
+      },
       players: [],
       gameState: null,
       connectionStatus: "connecting",
@@ -483,6 +502,7 @@ export function useCacaSomaMultiplayer() {
     const activeSocket = ensureSocket();
     activeSocket?.emit("create_room", {
       playerName: normalizedName,
+      mode,
       classroomCode,
     });
   };
@@ -562,6 +582,18 @@ export function useCacaSomaMultiplayer() {
     });
   };
 
+  const removePlayer = (seat: CacaSomaRoomSeat) => {
+    if (!sharedSnapshot.roomCode) {
+      return;
+    }
+
+    const activeSocket = ensureSocket();
+    activeSocket?.emit("remove_player", {
+      code: sharedSnapshot.roomCode,
+      seat,
+    });
+  };
+
   const requestRematch = () => {
     if (!sharedSnapshot.roomCode) {
       return;
@@ -615,6 +647,7 @@ export function useCacaSomaMultiplayer() {
     joinRoom,
     updateRoomSettings,
     startMatch,
+    removePlayer,
     submitAction,
     requestRematch,
     joinClassroom,

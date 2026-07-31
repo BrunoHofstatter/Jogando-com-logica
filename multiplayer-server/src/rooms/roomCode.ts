@@ -1,4 +1,5 @@
 import { ROOM_CODE_LENGTH } from "./roomTypes.ts";
+import { isSafeGeneratedCode } from "./codeSafety.ts";
 
 const ROOM_CODE_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 
@@ -9,7 +10,7 @@ export function generateRoomCode(existingCodes: Set<string>): string {
     nextCode = Array.from({ length: ROOM_CODE_LENGTH }, () =>
       ROOM_CODE_CHARS[Math.floor(Math.random() * ROOM_CODE_CHARS.length)],
     ).join("");
-  } while (existingCodes.has(nextCode));
+  } while (existingCodes.has(nextCode) || !isSafeGeneratedCode(nextCode));
 
   return nextCode;
 }

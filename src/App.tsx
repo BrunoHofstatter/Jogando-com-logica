@@ -50,6 +50,7 @@ import StopMultiplayerLobbyPage from "./Stop/Pages/multiplayerLobbyPage";
 import BombGameRulesPage from "./BombGame/Pages/RegrasPage";
 import BombGameLevelsMenuPage from "./BombGame/Pages/LevelsMenuPage";
 import BombGamePage from "./BombGame/Pages/BombGamePage";
+import BombGameMultiplayerLobbyPage from "./BombGame/Pages/multiplayerLobbyPage";
 import PuzzleWireRulesPage from "./PuzzleWire/Pages/RegrasPage";
 import PuzzleWireLevelsMenuPage from "./PuzzleWire/Pages/LevelsMenuPage";
 import PuzzleWirePage from "./PuzzleWire/Pages/PuzzleWirePage";
@@ -76,6 +77,10 @@ import {
   hasActiveSPTTTMultiplayerSession,
   leaveSPTTTMultiplayerRoom,
 } from "./SPTTT/Hooks/useSPTTTMultiplayer";
+import {
+  hasActiveBombGameSession,
+  leaveBombGameRoom,
+} from "./BombGame/Hooks/useBombGameMultiplayer";
 import { ROUTES } from "./routes";
 
 const HIDDEN_RETURN_ROUTES = new Set([
@@ -91,6 +96,27 @@ const HIDDEN_RETURN_ROUTES = new Set([
 
 const SHOW_UNIVERSAL_RETURN_BUTTON = true;
 
+const DEFAULT_CHROME_COLOR = "#68c2e0";
+
+function getChromeColor(pathname: string): string {
+  if (pathname.startsWith("/bombgame")) return "#21070b";
+  if (pathname.startsWith("/caca-soma")) return "#efc9c9";
+  if (pathname.startsWith("/caca-coroa")) return "#d9b6fe";
+  if (pathname.startsWith("/guerra-matematica")) return "#adfad2";
+  if (pathname.startsWith("/super-jogo-da-velha")) return "#c2e4fa";
+  if (
+    pathname.startsWith("/stop") ||
+    pathname.startsWith("/puzzle-wire") ||
+    pathname.startsWith("/houses")
+  ) {
+    return "#ffbaba";
+  }
+  if (pathname === ROUTES.CLASS_MENU) return "#d8b4ff";
+  if (pathname.startsWith("/aulas/")) return "#e0f2fe";
+
+  return DEFAULT_CHROME_COLOR;
+}
+
 const RETURN_ROUTE_MAP: Record<string, string> = {
   [ROUTES.TEST]: ROUTES.HOME,
   [ROUTES.CLASSROOMS]: ROUTES.MANUAL,
@@ -100,7 +126,8 @@ const RETURN_ROUTE_MAP: Record<string, string> = {
   [ROUTES.STOP_MP_LOBBY]: ROUTES.STOP_RULES,
   [ROUTES.STOP_MP_GAME]: ROUTES.STOP_MP_LOBBY,
   [ROUTES.BOMB_GAME_RULES]: ROUTES.GAMES,
-  [ROUTES.BOMB_GAME_GAME]: ROUTES.BOMB_GAME_RULES,
+  [ROUTES.BOMB_GAME_MP_LOBBY]: ROUTES.BOMB_GAME_RULES,
+  [ROUTES.BOMB_GAME_MP_GAME]: ROUTES.BOMB_GAME_MP_LOBBY,
   [ROUTES.BOMB_GAME_LEVELS]: ROUTES.BOMB_GAME_RULES,
   [ROUTES.PUZZLE_WIRE_RULES]: ROUTES.GAMES,
   [ROUTES.PUZZLE_WIRE_GAME]: ROUTES.PUZZLE_WIRE_RULES,
@@ -117,7 +144,7 @@ const RETURN_ROUTE_MAP: Record<string, string> = {
   [ROUTES.CACA_SOMA_GAME]: ROUTES.CACA_SOMA_RULES,
   [ROUTES.CACA_SOMA_MP_LOBBY]: ROUTES.CACA_SOMA_RULES,
   [ROUTES.CACA_SOMA_MP_GAME]: ROUTES.CACA_SOMA_MP_LOBBY,
-  [ROUTES.CACA_SOMA_LEVELS]: ROUTES.CACA_SOMA_RULES,
+  [ROUTES.CACA_SOMA_LEVELS]: ROUTES.CACA_SOMA_RULES, 
   [ROUTES.DAMAS_RULES_BASE]: ROUTES.GAMES,
   [ROUTES.BASE_GAME]: ROUTES.DAMAS_RULES_BASE,
   [ROUTES.CROWN_CHASE_RULES]: ROUTES.GAMES,
@@ -165,7 +192,7 @@ function getReturnRoute(pathname: string): string | null {
   }
 
   if (pathname.startsWith(`${ROUTES.CACA_SOMA_LEVELS}/`)) {
-    return ROUTES.CACA_SOMA_LEVELS;
+    return ROUTES.CACA_SOMA_RULES;
   }
 
   return RETURN_ROUTE_MAP[pathname] ?? ROUTES.GAMES;
@@ -230,6 +257,21 @@ function App() {
   const location = useLocation();
 
   useEffect(() => {
+    const chromeColor = getChromeColor(location.pathname);
+    document.body.style.backgroundColor = chromeColor;
+
+    let metaThemeColor = document.querySelector<HTMLMetaElement>(
+      'meta[name="theme-color"]',
+    );
+    if (!metaThemeColor) {
+      metaThemeColor = document.createElement("meta");
+      metaThemeColor.name = "theme-color";
+      document.head.appendChild(metaThemeColor);
+    }
+    metaThemeColor.content = chromeColor;
+  }, [location.pathname]);
+
+  useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === "hidden") {
         trackGameTime();
@@ -255,6 +297,7 @@ function App() {
     const isStopOnlineRoute = location.pathname.startsWith(ROUTES.STOP_MP_LOBBY);
     const isSPTTTOnlineRoute = location.pathname.startsWith(ROUTES.SPTTT_MP_LOBBY);
     const isCacaSomaOnlineRoute = location.pathname.startsWith(ROUTES.CACA_SOMA_MP_LOBBY);
+    const isBombGameRoute = location.pathname.startsWith(ROUTES.BOMB_GAME_MP_LOBBY);
 
     if (!isCrownChaseOnlineRoute && hasActiveCrownChaseMultiplayerSession()) {
       leaveCrownChaseMultiplayerRoom({ preserveName: true });
@@ -275,6 +318,10 @@ function App() {
     if (!isCacaSomaOnlineRoute && hasActiveCacaSomaMultiplayerSession()) {
       leaveCacaSomaMultiplayerRoom({ preserveName: true });
     }
+
+    if (!isBombGameRoute && hasActiveBombGameSession()) {
+      leaveBombGameRoom();
+    }
   }, [location.pathname]);
 
   return (
@@ -293,7 +340,8 @@ function App() {
         <Route path={ROUTES.STOP_MP_LOBBY} element={<StopMultiplayerLobbyPage />} />
         <Route path={ROUTES.STOP_MP_GAME} element={<StopMultiplayerGamePage />} />
         <Route path={ROUTES.BOMB_GAME_RULES} element={<BombGameRulesPage />} />
-        <Route path={ROUTES.BOMB_GAME_GAME} element={<BombGamePage />} />
+        <Route path={ROUTES.BOMB_GAME_MP_LOBBY} element={<BombGameMultiplayerLobbyPage />} />
+        <Route path={ROUTES.BOMB_GAME_MP_GAME} element={<BombGamePage />} />
         <Route path={ROUTES.BOMB_GAME_LEVELS} element={<BombGameLevelsMenuPage />} />
         <Route path={ROUTES.PUZZLE_WIRE_RULES} element={<PuzzleWireRulesPage />} />
         <Route path={ROUTES.PUZZLE_WIRE_GAME} element={<PuzzleWirePage />} />

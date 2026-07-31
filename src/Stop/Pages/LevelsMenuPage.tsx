@@ -1,20 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../styles/levelsMenu.module.css";
 import { levels, getLevelStars, isLevelUnlocked, resetAllProgress } from "../Logic/levelsConfig";
 import { ROUTES } from "../../routes";
 
 function LevelsMenuPage() {
-    useEffect(() => {
-        document.body.style.backgroundColor = "#ffbaba";
-        let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-        if (!metaThemeColor) {
-            metaThemeColor = document.createElement("meta");
-            metaThemeColor.setAttribute("name", "theme-color");
-            document.head.appendChild(metaThemeColor);
-        }
-        metaThemeColor.setAttribute("content", "#ffbaba");
-    }, []);
     const navigate = useNavigate();
 
     const [selectedLevelId, setSelectedLevelId] = useState<number | null>(null);

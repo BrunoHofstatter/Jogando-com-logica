@@ -5,6 +5,7 @@ export type { VerticalMultiplicationProps } from "./components/VerticalMultiplic
 export { VerticalSubtraction } from "./components/VerticalSubtraction";
 export type { VerticalSubtractionProps } from "./components/VerticalSubtraction";
 export type {
+  AdaptiveGuidanceOptions,
   CalculationCheckResult,
   CalculationClassNames,
   CalculationMessages,

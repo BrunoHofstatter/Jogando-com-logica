@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import styles from "../styles/regras.module.css";
 import { useNavigate } from "react-router-dom";
 import { useTutorialCompleted } from "../../Shared/Components/DynamicTutorial";
@@ -9,16 +9,6 @@ import { ROUTES } from "../../routes";
 type GameMode = "pvp" | "ai";
 
 function MathWarRegras() {
-  useEffect(() => {
-    document.body.style.backgroundColor = "#adfad2";
-    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (!metaThemeColor) {
-      metaThemeColor = document.createElement("meta");
-      metaThemeColor.setAttribute("name", "theme-color");
-      document.head.appendChild(metaThemeColor);
-    }
-    metaThemeColor.setAttribute("content", "#adfad2");
-  }, []);
 
   const navigate = useNavigate();
   const [gameMode, setGameMode] = useState<GameMode>("ai");

@@ -15,16 +15,6 @@ export default function MathWarPage() {
     createInitialState(),
   );
 
-  useEffect(() => {
-    document.body.style.backgroundColor = "#adfad2";
-    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (!metaThemeColor) {
-      metaThemeColor = document.createElement("meta");
-      metaThemeColor.setAttribute("name", "theme-color");
-      document.head.appendChild(metaThemeColor);
-    }
-    metaThemeColor.setAttribute("content", "#adfad2");
-  }, []);
 
   useEffect(() => {
     const completed = localStorage.getItem("tutorial_mathwar_v1_completed");

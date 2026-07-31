@@ -15,16 +15,6 @@ import { ROUTES } from "../../routes";
 
 
 function LevelGamePage() {
-  useEffect(() => {
-    document.body.style.backgroundColor = "#efc9c9";
-    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (!metaThemeColor) {
-      metaThemeColor = document.createElement("meta");
-      metaThemeColor.setAttribute("name", "theme-color");
-      document.head.appendChild(metaThemeColor);
-    }
-    metaThemeColor.setAttribute("content", "#efc9c9");
-  }, []);
 
   const { levelId } = useParams<{ levelId: string }>();
   const navigate = useNavigate();
@@ -45,6 +35,8 @@ function LevelGamePage() {
   const [liveTime, setLiveTime] = useState(0);
   const [okayFunction, setOkayFunction] = useState<(() => void) | null>(null);
   const [gameOver, setGameOver] = useState(false);
+  const [nextRoundCountdown, setNextRoundCountdown] = useState<number | null>(null);
+  const [lastRoundWasCorrect, setLastRoundWasCorrect] = useState<boolean | null>(null);
 
   // Additional state for logic and reset
   const [gameKey, setGameKey] = useState(0);
@@ -63,7 +55,8 @@ function LevelGamePage() {
       body: (
         <div className={tutorialStyles.stepBody}>
           <span>- O <span className={tutorialStyles.highlight}>Número Mágico</span> vai ser sorteado</span>
-          <span>- Clique em <span className={tutorialStyles.highlight}>Começar</span> para iniciar</span>
+          <span>- Clique em <span className={tutorialStyles.highlight}>Começar</span> para iniciar o nível</span>
+          <span>- As próximas rodadas começam <span className={tutorialStyles.highlight}>automaticamente</span></span>
         </div>
       )
     },
@@ -178,6 +171,24 @@ function LevelGamePage() {
     mudarClicar(); // This triggers Girar effect
   };
 
+  // Automatically start every round after the first one.
+  useEffect(() => {
+    if (nextRoundCountdown === null) return;
+
+    const timeout = window.setTimeout(() => {
+      if (nextRoundCountdown === 1) {
+        setNextRoundCountdown(null);
+        setLastRoundWasCorrect(null);
+        setClicar(false); // This triggers the Magic Number rolling animation.
+        return;
+      }
+
+      setNextRoundCountdown(nextRoundCountdown - 1);
+    }, 1000);
+
+    return () => window.clearTimeout(timeout);
+  }, [nextRoundCountdown]);
+
   // Handle time updates from timer
   const onTimeUpdate = useCallback((tempo: number) => {
     setLiveTime(tempo);
@@ -206,6 +217,8 @@ function LevelGamePage() {
 
     // Move to next round or finish
     if (levelConfig && currentRound < levelConfig.rounds) {
+      setLastRoundWasCorrect(isCorrect);
+      setNextRoundCountdown(5);
       setCurrentRound(prev => prev + 1);
       setSorteado(0);
       setSoma(0);
@@ -252,6 +265,8 @@ function LevelGamePage() {
     setTotalTime(0);
     setLiveTime(0);
     setGameOver(false);
+    setNextRoundCountdown(null);
+    setLastRoundWasCorrect(null);
     // Reset board and used numbers
     setGameKey(prev => prev + 1);
     setUsedIndices(new Set());
@@ -272,6 +287,8 @@ function LevelGamePage() {
       setTotalTime(0);
       setLiveTime(0);
       setGameOver(false);
+      setNextRoundCountdown(null);
+      setLastRoundWasCorrect(null);
       // Reset board and used numbers
       setGameKey(prev => prev + 1);
       setUsedIndices(new Set());
@@ -405,6 +422,17 @@ function LevelGamePage() {
           onNextLevel={handleNextLevel}
           onMenu={handleMenu}
         />
+      )}
+      {nextRoundCountdown !== null && (
+        <div className={styles.roundTransitionOverlay} aria-live="polite">
+          <div className={styles.roundTransitionCard}>
+            <span className={styles.roundTransitionResult}>
+              {lastRoundWasCorrect ? 'Acertou!' : 'Não foi dessa vez'}
+            </span>
+            <span className={styles.roundTransitionLabel}>Próxima rodada em</span>
+            <span className={styles.roundTransitionCountdown}>{nextRoundCountdown}</span>
+          </div>
+        </div>
       )}
       {showTutorial && (
         <DynamicTutorial

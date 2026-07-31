@@ -347,7 +347,12 @@ export const isLevelUnlocked = (levelId: number): boolean => {
     // Level is unlocked if previous level has at least 2 stars
     const prevStars = getLevelStars(levelId - 1);
     return prevStars >= 2;
-    return prevStars >= 2;
+};
+
+export const getCurrentLevelId = (): number => {
+    return levels.reduce((highestUnlocked, level) => {
+        return isLevelUnlocked(level.id) ? Math.max(highestUnlocked, level.id) : highestUnlocked;
+    }, levels[0]?.id ?? 1);
 };
 
 export const resetAllProgress = () => {

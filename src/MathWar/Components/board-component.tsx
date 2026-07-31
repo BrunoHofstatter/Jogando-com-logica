@@ -67,6 +67,7 @@ interface BoardProps {
   onMenu?: () => void;
   onNextLevel?: () => void;
   showNextLevel?: boolean;
+  onlineHeader?: React.ReactNode;
 }
 
 const Board: React.FC<BoardProps> = ({
@@ -85,6 +86,7 @@ const Board: React.FC<BoardProps> = ({
   onMenu,
   onNextLevel,
   showNextLevel,
+  onlineHeader,
 }) => {
   const [internalGameState, setInternalGameState] = useState<MathWarState>(() =>
     createInitialState(),
@@ -381,7 +383,13 @@ const Board: React.FC<BoardProps> = ({
 
   return (
     <div className={styles.gamePage}>
-      <div className={styles.gameContainer}>
+      <div
+        className={`${styles.gameContainer} ${onlineHeader ? styles.gameContainerOnline : ""}`}
+      >
+        {onlineHeader && (
+          <div className={styles.onlineHeaderSlot}>{onlineHeader}</div>
+        )}
+
         <div className={styles.gameInfo}>
           {isAIMode && difficulty && (
             <div className={styles.difficultyBox}>
@@ -393,7 +401,13 @@ const Board: React.FC<BoardProps> = ({
             <div className={styles.turnText}>
               Turno {gameState.turnCount + 1}
             </div>
-            <div className={styles.playerText}>
+            <div
+              className={`${styles.playerText} ${
+                mode === "remote" && gameState.currentPlayer !== playerSeat
+                  ? styles.opponentTurnText
+                  : ""
+              }`}
+            >
               {playerLabel}
               <span
                 className={`${styles.playerIndicator} ${gameState.currentPlayer === 0 ? styles.playerRed : styles.playerBlue}`}

@@ -371,6 +371,45 @@
   min-width: 0;
 }
 
+.playerControls {
+  display: flex;
+  align-items: center;
+  gap: 0.45vw;
+  flex: 0 0 auto;
+}
+
+.removePlayerButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: min(8vw, 4.5dvh);
+  height: min(8vw, 4.5dvh);
+  padding: 0;
+  border: 0.15vw solid #7f1d1d;
+  border-radius: 50%;
+  background-color: #ffffff;
+  color: #a11425;
+  font-family: inherit;
+  font-size: min(4vw, 2.7dvh);
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 0.18vw 0 #ff6b6b;
+}
+
+.removePlayerButton:hover {
+  background-color: #ffe0e0;
+}
+
+.removePlayerButton:focus-visible {
+  outline: 0.2vw solid #1f5fbf;
+  outline-offset: 0.15vw;
+}
+
+.removePlayerButton:active {
+  transform: translateY(0.12vw);
+  box-shadow: none;
+}
+
 .connectionDot {
   width: 0.7vw;
   height: 0.7vw;

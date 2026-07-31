@@ -14,6 +14,7 @@ import type {
   PlayerId,
   Position,
 } from "../Logic/v2";
+import { toLogicalBoardPosition } from "./boardOrientation";
 import PieceComponent from "./piece";
 import styles from "../styles/board.module.css";
 import { VictoryScreen } from "./VictoryScreen";
@@ -58,6 +59,9 @@ const Board: React.FC<BoardProps> = ({
   );
   const [selectedSquare, setSelectedSquare] = useState<Position | null>(null);
   const gameState = externalGameState ?? internalGameState;
+  const boardHeight = gameState.board.length;
+  const boardWidth = gameState.board[0]?.length ?? 0;
+  const isBoardRotated = mode === "remote" && playerSeat === 0;
   const selectedPiece = selectedSquare
     ? gameState.board[selectedSquare.row]?.[selectedSquare.col] ?? null
     : null;
@@ -239,17 +243,26 @@ const Board: React.FC<BoardProps> = ({
             className={styles.board}
             style={
               {
-                "--board-cols": gameState.board[0]?.length ?? 0,
-                "--board-rows": gameState.board.length,
+                "--board-cols": boardWidth,
+                "--board-rows": boardHeight,
               } as CSSProperties
             }
           >
-            {gameState.board.map((row, rowIndex) =>
-              row.map((piece, colIndex) => {
+            {Array.from({ length: boardHeight }, (_, displayRowIndex) =>
+              Array.from({ length: boardWidth }, (_, displayColIndex) => {
+                const { row: rowIndex, col: colIndex } = toLogicalBoardPosition(
+                  { row: displayRowIndex, col: displayColIndex },
+                  boardHeight,
+                  boardWidth,
+                  isBoardRotated,
+                );
+                const piece = gameState.board[rowIndex][colIndex];
                 const isSelected = isSquareSelected(rowIndex, colIndex);
                 const isHighlighted = isSquareHighlighted(rowIndex, colIndex);
                 const squareType =
-                  (rowIndex + colIndex) % 2 === 0 ? styles.lightSquare : styles.darkSquare;
+                  (displayRowIndex + displayColIndex) % 2 === 0
+                    ? styles.lightSquare
+                    : styles.darkSquare;
 
                 return (
                   <div

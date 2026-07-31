@@ -1,26 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import styles from "../styles/regras.module.css";
 import { useNavigate } from "react-router-dom";
 import { useTutorialCompleted } from "../../Shared/Components/DynamicTutorial";
 
-import { levels } from "../Logic/levelConfigs";
-import { isLevelUnlocked, unlockAllLevelProgress } from "../Logic/levelProgress";
+import { getCurrentLevelId, unlockAllLevelProgress } from "../Logic/levelProgress";
 import { ROUTES } from "../../routes";
 
 
 type GameMode = "versus" | "levels";
 
 function CacaSomaRegras() {
-  useEffect(() => {
-    document.body.style.backgroundColor = "#efc9c9";
-    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (!metaThemeColor) {
-      metaThemeColor = document.createElement("meta");
-      metaThemeColor.setAttribute("name", "theme-color");
-      document.head.appendChild(metaThemeColor);
-    }
-    metaThemeColor.setAttribute("content", "#efc9c9");
-  }, []);
 
   const navigate = useNavigate();
 
@@ -28,23 +17,11 @@ function CacaSomaRegras() {
   const [gameMode, setGameMode] = useState<GameMode>("levels");
 
   const [, resetTutorial] = useTutorialCompleted("cacasoma_v1");
+  const currentLevel = getCurrentLevelId();
 
   function jogar() {
     if (gameMode === "levels") {
-      // Find the highest unlocked level
-      let maxUnlockedLevel = 1;
-
-      // We iterate through all levels to find the highest unlocked one
-      // Since levels are ordered, we could optimize, but checking all is safe
-      for (const level of levels) {
-        if (isLevelUnlocked(level.levelId)) {
-          if (level.levelId > maxUnlockedLevel) {
-            maxUnlockedLevel = level.levelId;
-          }
-        }
-      }
-
-      navigate(`${ROUTES.CACA_SOMA_LEVEL_BASE}/${maxUnlockedLevel}`);
+      navigate(`${ROUTES.CACA_SOMA_LEVEL_BASE}/${currentLevel}`);
     } else {
       navigate(ROUTES.CACA_SOMA_GAME); // Versus/Random mode
     }
@@ -108,7 +85,7 @@ function CacaSomaRegras() {
             </label>
             {gameMode === "levels" && (
               <button className={styles.levelsButton} onClick={goToLevelsMenu}>
-                Níveis ≡
+                Nível {currentLevel} ≡
               </button>
             )}
           </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../styles/levelsMenu.module.css";
 import { levels, getLevelById } from "../Logic/levelConfigs";
@@ -7,16 +7,6 @@ import { ROUTES } from "../../routes";
 
 
 function LevelSelectionPage() {
-  useEffect(() => {
-    document.body.style.backgroundColor = "#efc9c9";
-    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (!metaThemeColor) {
-      metaThemeColor = document.createElement("meta");
-      metaThemeColor.setAttribute("name", "theme-color");
-      document.head.appendChild(metaThemeColor);
-    }
-    metaThemeColor.setAttribute("content", "#efc9c9");
-  }, []);
 
   const navigate = useNavigate();
 

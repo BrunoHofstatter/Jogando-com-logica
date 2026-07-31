@@ -32,16 +32,6 @@ function Manual() {
   const jogosSection = useRef<HTMLElement | null>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  useEffect(() => {
-    document.body.style.backgroundColor = "#68c2e0";
-    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (!metaThemeColor) {
-      metaThemeColor = document.createElement("meta");
-      metaThemeColor.setAttribute("name", "theme-color");
-      document.head.appendChild(metaThemeColor);
-    }
-    metaThemeColor.setAttribute("content", "#68c2e0");
-  }, []);
 
   useEffect(() => {
     const handleScroll = () => {

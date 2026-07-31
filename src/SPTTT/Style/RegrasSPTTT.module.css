@@ -372,7 +372,9 @@
   -webkit-text-stroke: 0.2vw #0c4a6e;
   text-shadow: 0 0.3vw 0 #075985;
   text-align: center;
-  margin-bottom: 2.5vw;
+  line-height: 1.05;
+  max-width: 55%;
+  margin: 0 auto 2.5vw;
 }
 
 .detailedRules h4 {
@@ -779,7 +781,8 @@
 
   .detailedRules h2 {
     font-size: min(8vw, 5dvh);
-    margin-bottom: min(4vw, 2dvh);
+    max-width: 58%;
+    margin: 0 auto min(4vw, 2dvh);
     -webkit-text-stroke-width: min(0.4vw, 0.2dvh);
   }
 
