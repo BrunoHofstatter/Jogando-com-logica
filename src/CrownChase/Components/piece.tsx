@@ -1,7 +1,13 @@
 import React from "react";
 
-import type { CrownChasePiece } from "../Logic/v2";
+import type { CrownChasePiece, PieceType } from "../Logic/v2";
 import styles from "../styles/piece.module.css";
+
+const PIECE_SYMBOLS: Record<PieceType, string> = {
+  king: "crownchaseKingSymbol.png",
+  killer: "crownchaseAssassinSymbol.png",
+  jumper: "crownchaseJumperSymbol.png",
+};
 
 interface PieceProps {
   piece: CrownChasePiece;
@@ -9,86 +15,67 @@ interface PieceProps {
   onPieceClick: () => void;
 }
 
-const PieceComponent: React.FC<PieceProps> = ({
+interface PieceVisualProps {
+  piece: CrownChasePiece;
+  isSelected?: boolean;
+  fillContainer?: boolean;
+  onPieceClick?: () => void;
+}
+
+export const CrownChasePieceVisual: React.FC<PieceVisualProps> = ({
   piece,
-  isSelected,
+  isSelected = false,
+  fillContainer = false,
   onPieceClick,
 }) => {
-  const display = getPieceDisplay(piece);
+  const symbolSrc = `${import.meta.env.BASE_URL}${PIECE_SYMBOLS[piece.type]}`;
+
   return (
     <div
-      className={`${styles.piece} ${piece.owner === 0 ? styles.pieceRed : styles.pieceBlue} ${styles[piece.type] || ""} ${
-        display.shape === styles.pieceCircle
-      } ${isSelected ? styles.pieceSelected : ""}`}
+      className={`${styles.piece} ${piece.owner === 0 ? styles.pieceRed : styles.pieceBlue} ${styles[piece.type]} ${
+        isSelected ? styles.pieceSelected : ""
+      } ${fillContainer ? styles.pieceFillContainer : ""}`}
       style={{
-        width: "75%",
-        height: "75%",
-        background: display.background,
-        color: display.textColor,
+        width: fillContainer ? "100%" : "75%",
+        height: fillContainer ? "100%" : "75%",
+        background: getPlayerColor(piece.owner),
       }}
-      onClick={(event) => {
-        event.stopPropagation();
-        onPieceClick();
-      }}
+      onClick={
+        onPieceClick
+          ? (event) => {
+              event.stopPropagation();
+              onPieceClick();
+            }
+          : undefined
+      }
     >
-      <div className={styles.pieceContent}>{display.symbol}</div>
-      {piece.type === "king" && (
-        <div className={styles.pieceKingCrown}>👑</div>
-      )}
+      <img
+        src={symbolSrc}
+        className={styles.pieceSymbol}
+        alt=""
+        aria-hidden="true"
+        draggable={false}
+      />
     </div>
   );
 };
 
-function getPieceDisplay(piece: CrownChasePiece) {
-  switch (piece.type) {
-    case "king":
-      return {
-        symbol: "●",
-        background: getPlayerColor(piece.owner),
-        textColor: "#fbbf24",
-        shape: "circle" as const,
-      };
-    case "killer":
-      return {
-        symbol: "⚔",
-        background: getPlayerColor(piece.owner),
-        textColor: "#fbbf24",
-        shape: "circle" as const,
-      };
-    case "jumper":
-      return {
-        symbol: "↑",
-        background: getPlayerColor(piece.owner),
-        textColor: "#fbbf24",
-        shape: "circle" as const,
-      };
-    default:
-      return {
-        symbol: "●",
-        background: getPlayerColor(piece.owner),
-        textColor: "white",
-        shape: "circle" as const,
-      };
-  }
-}
+const PieceComponent: React.FC<PieceProps> = ({
+  piece,
+  isSelected,
+  onPieceClick,
+}) => (
+  <CrownChasePieceVisual
+    piece={piece}
+    isSelected={isSelected}
+    onPieceClick={onPieceClick}
+  />
+);
 
 function getPlayerColor(owner: number): string {
   return owner === 0
     ? "radial-gradient(circle, #e74c3c, #c0392b)"
     : "radial-gradient(circle, #5dade2, #2980b9)";
-}
-
-function getPieceName(pieceType: CrownChasePiece["type"]): string {
-  switch (pieceType) {
-    case "king":
-      return "Rei";
-    case "killer":
-      return "Assassino";
-    case "jumper":
-      return "Saltador";
-    default:
-      return "Peça";
-  }
 }
 
 export default PieceComponent;
