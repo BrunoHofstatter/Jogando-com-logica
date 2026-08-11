@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getLevelById, getTotalLevels } from '../Logic/levelConfigs';
 import { calculateStars, updateLevelProgress, isLevelUnlocked } from '../Logic/levelProgress';
@@ -12,7 +12,17 @@ import styles from '../styles/levelGame.module.css';
 import DynamicTutorial, { TutorialStep } from '../../Shared/Components/DynamicTutorial';
 import tutorialStyles from '../styles/DynamicTutorial.module.css';
 import { ROUTES } from "../../routes";
+import { analytics, formatLevelId } from "../../analytics/events";
+import { useLevelAttemptAnalytics } from "../../analytics/useLevelAttemptAnalytics";
 
+const LEVEL_TUTORIAL_ID = "caca_soma_levels_v1";
+const LEVEL_TUTORIAL_STEP_IDS = [
+  "step1",
+  "step2",
+  "step3",
+  "step4",
+  "step5",
+] as const;
 
 function LevelGamePage() {
 
@@ -45,6 +55,9 @@ function LevelGamePage() {
 
   // Tutorial state
   const [showTutorial, setShowTutorial] = useState(false);
+  const tutorialStartedRef = useRef(false);
+  const tutorialFinishedRef = useRef(false);
+  const tutorialStepIdRef = useRef<string>(LEVEL_TUTORIAL_STEP_IDS[0]);
   const tutorialSteps: TutorialStep[] = [
     {
       id: 'step1',
@@ -112,6 +125,19 @@ function LevelGamePage() {
     }
   ];
 
+  const { completeAttempt, recordRound, startAttempt } =
+    useLevelAttemptAnalytics(
+      levelConfig
+        ? {
+            gameId: "caca_soma",
+            levelId: formatLevelId(levelConfig.levelId),
+            gameMode: "solo",
+            usageContext: "standard",
+            participantCount: 1,
+          }
+        : null,
+    );
+
   // Load level config on mount
   useEffect(() => {
     if (levelId) {
@@ -132,6 +158,52 @@ function LevelGamePage() {
       const timer = setTimeout(() => setShowTutorial(true), 500);
       return () => clearTimeout(timer);
     }
+  }, []);
+
+  useEffect(() => {
+    if (jogar) {
+      startAttempt();
+    }
+  }, [jogar, startAttempt]);
+
+  const handleTutorialStart = useCallback(() => {
+    if (tutorialStartedRef.current) {
+      return;
+    }
+
+    tutorialStartedRef.current = true;
+    analytics.tutorialBegan({
+      gameId: "caca_soma",
+      tutorialId: LEVEL_TUTORIAL_ID,
+    });
+  }, []);
+
+  const handleTutorialStepChange = useCallback((index: number) => {
+    tutorialStepIdRef.current =
+      LEVEL_TUTORIAL_STEP_IDS[index] ?? LEVEL_TUTORIAL_STEP_IDS[0];
+  }, []);
+
+  const handleTutorialFinish = useCallback((skipped: boolean) => {
+    if (tutorialFinishedRef.current) {
+      return;
+    }
+
+    tutorialFinishedRef.current = true;
+
+    if (skipped) {
+      analytics.tutorialSkipped({
+        gameId: "caca_soma",
+        tutorialId: LEVEL_TUTORIAL_ID,
+        stepId: tutorialStepIdRef.current,
+      });
+    } else {
+      analytics.tutorialCompleted({
+        gameId: "caca_soma",
+        tutorialId: LEVEL_TUTORIAL_ID,
+      });
+    }
+
+    setShowTutorial(false);
   }, []);
 
   // Toggle functions
@@ -197,6 +269,30 @@ function LevelGamePage() {
   // Handle round submission
   const noOp = useCallback(() => { }, []);
 
+  const finishLevel = useCallback((results: RoundResult[], finalTime: number) => {
+    if (!levelConfig) return;
+
+    const correctCount = results.filter(r => r.correct).length;
+    const stars = calculateStars(correctCount, finalTime, levelConfig.levelId);
+    setStarsEarned(stars);
+
+    updateLevelProgress({
+      levelId: levelConfig.levelId,
+      rounds: results,
+      totalCorrect: correctCount,
+      totalTime: finalTime,
+      starsEarned: stars,
+      passed: stars >= 2
+    });
+
+    completeAttempt({
+      success: stars >= 2,
+      outcome: stars >= 2 ? "passed" : "failed",
+      starsEarned: stars,
+    });
+    setShowResultModal(true);
+  }, [completeAttempt, levelConfig]);
+
   const addTempo = useCallback((tempo: number, currentSoma?: number) => {
     const actualSoma = currentSoma !== undefined ? currentSoma : soma;
     const isCorrect = sorteado === actualSoma;
@@ -214,6 +310,7 @@ function LevelGamePage() {
     setRoundResults(prev => [...prev, result]);
     setTotalTime(prev => prev + tempo);
     setLiveTime(0);
+    recordRound(isCorrect);
 
     // Move to next round or finish
     if (levelConfig && currentRound < levelConfig.rounds) {
@@ -231,27 +328,7 @@ function LevelGamePage() {
       setGameOver(true);
       finishLevel([...roundResults, result], totalTime + tempo);
     }
-  }, [currentRound, sorteado, soma, roundResults, totalTime, selectedNumbers]);
-
-  const finishLevel = (results: RoundResult[], finalTime: number) => {
-    if (!levelConfig) return;
-
-    const correctCount = results.filter(r => r.correct).length;
-    const stars = calculateStars(correctCount, finalTime, levelConfig.levelId);
-    setStarsEarned(stars);
-
-    // Save progress immediately
-    updateLevelProgress({
-      levelId: levelConfig.levelId,
-      rounds: results,
-      totalCorrect: correctCount,
-      totalTime: finalTime,
-      starsEarned: stars,
-      passed: stars >= 2
-    });
-
-    setShowResultModal(true);
-  };
+  }, [currentRound, finishLevel, levelConfig, recordRound, roundResults, selectedNumbers, soma, sorteado, totalTime]);
 
   const handleRetry = () => {
     setShowResultModal(false);
@@ -437,7 +514,9 @@ function LevelGamePage() {
       {showTutorial && (
         <DynamicTutorial
           steps={tutorialSteps}
-          onFinish={() => setShowTutorial(false)}
+          onStart={handleTutorialStart}
+          onStepChange={handleTutorialStepChange}
+          onFinish={handleTutorialFinish}
           storageKey="cacasoma_levels_v1"
           locale="pt"
           styles={tutorialStyles}
