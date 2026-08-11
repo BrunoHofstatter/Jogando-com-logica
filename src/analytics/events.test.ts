@@ -164,6 +164,67 @@ describe("typed analytics events", () => {
     );
   });
 
+  it("maps multiplayer join results as participant attempts", () => {
+    analytics.multiplayerJoinResult({
+      gameId: "guerra_matematica",
+      joinType: "private_code",
+      success: true,
+      waitMs: 320,
+    });
+    expect(mockedSendAnalyticsEvent).toHaveBeenLastCalledWith(
+      "multiplayer_join_result",
+      {
+        game_id: "guerra_matematica",
+        game_mode: "online_private",
+        usage_context: "standard",
+        join_type: "private_code",
+        success: true,
+        wait_ms: 320,
+        error_code: undefined,
+      },
+    );
+
+    analytics.multiplayerJoinResult({
+      gameId: "bomb_game",
+      joinType: "classroom_room",
+      success: false,
+      waitMs: 825,
+      errorCode: "room_full",
+    });
+    expect(mockedSendAnalyticsEvent).toHaveBeenLastCalledWith(
+      "multiplayer_join_result",
+      {
+        game_id: "bomb_game",
+        game_mode: "classroom",
+        usage_context: "classroom",
+        join_type: "classroom_room",
+        success: false,
+        wait_ms: 825,
+        error_code: "room_full",
+      },
+    );
+  });
+
+  it("maps unexpected multiplayer disconnects without room identity", () => {
+    analytics.multiplayerDisconnected({
+      gameId: "caca_soma",
+      joinType: "classroom_room",
+      connectionStage: "playing",
+      errorCode: "timeout",
+    });
+
+    expect(mockedSendAnalyticsEvent).toHaveBeenLastCalledWith(
+      "multiplayer_disconnect",
+      {
+        game_id: "caca_soma",
+        game_mode: "classroom",
+        usage_context: "classroom",
+        connection_stage: "playing",
+        error_code: "timeout",
+      },
+    );
+  });
+
   it("maps tutorial skip with only the controlled current step ID", () => {
     analytics.tutorialSkipped({
       gameId: "caca_soma",

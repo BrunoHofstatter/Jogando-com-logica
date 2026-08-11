@@ -378,7 +378,9 @@ export default function CacaSomaMultiplayerLobbyPage() {
                           </div>
                           <button
                             className={styles.secondaryButton}
-                            onClick={() => joinRoom(room.code, nameInput)}
+                            onClick={() =>
+                              joinRoom(room.code, nameInput, "classroom_room")
+                            }
                           >
                             Entrar
                           </button>

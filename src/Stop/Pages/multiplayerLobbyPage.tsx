@@ -333,7 +333,9 @@ export default function StopMultiplayerLobbyPage() {
                       </div>
                       <button
                         className={styles.primaryButton}
-                        onClick={() => joinRoom(room.code, nameInput)}
+                        onClick={() =>
+                          joinRoom(room.code, nameInput, "classroom_room")
+                        }
                         disabled={isBusy}
                       >
                         Entrar

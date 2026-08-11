@@ -231,7 +231,9 @@ export default function MathWarMultiplayerLobbyPage() {
                       <span>Sala de {room.hostName}</span>
                       <button
                         className={styles.secondaryButton}
-                        onClick={() => joinRoom(room.code, nameInput)}
+                        onClick={() =>
+                          joinRoom(room.code, nameInput, "classroom_room")
+                        }
                       >
                         Entrar
                       </button>

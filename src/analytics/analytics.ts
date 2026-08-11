@@ -24,9 +24,11 @@ const FORBIDDEN_PARAMETER_KEYS = new Set([
   "player_name",
   "raw_error",
   "room_code",
+  "room_id",
   "school",
   "school_name",
   "student_name",
+  "socket_id",
   "teacher_name",
   "user_id",
 ]);
@@ -42,6 +44,8 @@ export type AnalyticsEventName =
   | "level_end"
   | "level_start"
   | "local_progress_reset"
+  | "multiplayer_disconnect"
+  | "multiplayer_join_result"
   | "page_view"
   | "select_content"
   | "tutorial_begin"

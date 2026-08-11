@@ -27,6 +27,22 @@ export type GameMode =
 export type UsageContext = "standard" | "classroom";
 export type FeedbackEntryPoint = "contact_page" | "teacher_manual";
 export type ClassroomCreateErrorCode = "server_error";
+export type MultiplayerJoinType = "classroom_room" | "private_code";
+export type MultiplayerJoinErrorCode =
+  | "classroom_not_found"
+  | "invalid_name"
+  | "network_error"
+  | "room_full"
+  | "room_not_found"
+  | "room_not_joinable"
+  | "server_error"
+  | "server_unavailable";
+export type MultiplayerDisconnectErrorCode =
+  | "network_error"
+  | "server_disconnect"
+  | "timeout"
+  | "transport_error";
+export type MultiplayerConnectionStage = "playing" | "waiting";
 export type ActivityEndReason =
   | "completed"
   | "abandoned"
@@ -121,6 +137,21 @@ interface LocalProgressResetParameters {
   reason: "player_switch";
 }
 
+export interface MultiplayerJoinResultParameters {
+  gameId: GameId;
+  joinType: MultiplayerJoinType;
+  success: boolean;
+  waitMs: number;
+  errorCode?: MultiplayerJoinErrorCode;
+}
+
+export interface MultiplayerDisconnectParameters {
+  gameId: GameId;
+  joinType: MultiplayerJoinType;
+  connectionStage: MultiplayerConnectionStage;
+  errorCode: MultiplayerDisconnectErrorCode;
+}
+
 const SAFE_CAMPAIGN_PARAMETERS = [
   "utm_source",
   "utm_medium",
@@ -185,6 +216,43 @@ export const analytics = {
 
   localProgressReset({ reason }: LocalProgressResetParameters): boolean {
     return sendAnalyticsEvent("local_progress_reset", { reason });
+  },
+
+  multiplayerJoinResult({
+    gameId,
+    joinType,
+    success,
+    waitMs,
+    errorCode,
+  }: MultiplayerJoinResultParameters): boolean {
+    const isClassroomJoin = joinType === "classroom_room";
+
+    return sendAnalyticsEvent("multiplayer_join_result", {
+      game_id: gameId,
+      game_mode: isClassroomJoin ? "classroom" : "online_private",
+      usage_context: isClassroomJoin ? "classroom" : "standard",
+      join_type: joinType,
+      success,
+      wait_ms: waitMs,
+      error_code: success ? undefined : errorCode,
+    });
+  },
+
+  multiplayerDisconnected({
+    gameId,
+    joinType,
+    connectionStage,
+    errorCode,
+  }: MultiplayerDisconnectParameters): boolean {
+    const isClassroomRoom = joinType === "classroom_room";
+
+    return sendAnalyticsEvent("multiplayer_disconnect", {
+      game_id: gameId,
+      game_mode: isClassroomRoom ? "classroom" : "online_private",
+      usage_context: isClassroomRoom ? "classroom" : "standard",
+      connection_stage: connectionStage,
+      error_code: errorCode,
+    });
   },
 
   gameStarted({

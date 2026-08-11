@@ -109,6 +109,8 @@ describe("analytics payload safeguards", () => {
         PlayerName: "Ana",
         player_name: "Ana",
         classroom_code: "ABC123",
+        room_id: "room-123",
+        socket_id: "socket-456",
         management_token: "secret-token",
         teacher_name: "Professora Ana",
         raw_error: "private error details",

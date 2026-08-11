@@ -30,15 +30,18 @@ Required reporting rules:
 - GA4 cannot establish learning outcomes. Use teacher feedback or a structured
   educational evaluation for that question.
 
-## Current implementation: Phases 1 through 4
+## Current implementation: Phases 1 through 5
 
 Phase 1 provides the collection foundation. Phase 2 connects that foundation
 to the solo Caça Soma level lifecycle as the pilot. Phase 3 extends guarded,
 foreground-only activity attempts to Stop, Rubik's activities, and the local
 and AI modes of the three public board games. Phase 4 adds teacher-manual
 selections, feedback opening, confirmed classroom-creation results, outreach
-guidance, and a shared-device player progress reset. Online match lifecycles
-and multiplayer reliability remain deferred.
+guidance, and a shared-device player progress reset. Phase 5 adds
+participant-side multiplayer join reliability and unexpected disconnect
+measurement across every shipped online game. Online match start/end
+lifecycles remain deferred because one match can involve several client
+devices.
 
 ### Code structure
 
@@ -50,6 +53,7 @@ src/analytics/
 ├── ActivityTimer.ts      # foreground timer with one guarded finalization
 ├── GameAttemptTracker.ts # reusable game/activity start/end lifecycle
 ├── ClassroomCreationTracker.ts # pending request/result correlation
+├── MultiplayerReliabilityTracker.ts # join/result and disconnect correlation
 ├── useGameAttemptAnalytics.ts # React visibility/page-exit integration
 ├── useBoardGameAnalytics.ts # shared local/AI board-game lifecycle
 ├── LevelAttemptTracker.ts # framework-independent level attempt lifecycle
@@ -108,6 +112,8 @@ All event names, parameter names, IDs, and controlled values use lowercase
 | `classroom_create_result` | A pending teacher create request receives `classroom_created` or `classroom_create_failed` | `success`; controlled `error_code` on failure only |
 | `feedback_open` | The external teacher feedback form is opened from the manual or contact page | `entry_point: "teacher_manual"` or `"contact_page"` |
 | `local_progress_reset` | The confirmed “Trocar jogador” action finishes clearing allowlisted local player state | `reason: "player_switch"` |
+| `multiplayer_join_result` | An explicit, locally valid room-join request receives `room_joined`, a controlled server failure, or a connection failure | `game_id`, `game_mode`, `usage_context`, `join_type`, `success`, `wait_ms`; controlled `error_code` on failure |
+| `multiplayer_disconnect` | A participant in a server-confirmed waiting/playing room loses the socket unexpectedly | `game_id`, `game_mode`, `usage_context`, `connection_stage`, controlled `error_code` |
 
 `page_location` keeps the origin and pathname. It drops fragments and every
 query parameter except these campaign fields:
@@ -284,24 +290,26 @@ human side and `success` is present only for a win/loss result.
 | Activity | Start/end coverage | Current event unit | Notes |
 | --- | --- | --- | --- |
 | Caça Soma solo levels | Yes | `level_start` / `level_end` | Phase 2 pilot |
-| Caça Soma legacy local-versus and online | No | — | Needs separate lifecycle/online design |
+| Caça Soma legacy local-versus | No | — | Needs a separate local lifecycle design |
+| Caça Soma online | No | `multiplayer_join_result` / `multiplayer_disconnect` | Reliability covered; match lifecycle deferred |
 | Stop level, random, tutorial-fixed | Yes | `game_start` / `game_end` | One event pair per round |
-| Stop online | No | — | Deferred with multiplayer measurement |
+| Stop online | No | `multiplayer_join_result` / `multiplayer_disconnect` | Reliability covered; round/match lifecycle deferred |
 | Cubo Mágico classes 1–2 learn/review | Yes | `game_start` / `game_end` | `activity_variant` separates lesson/review |
 | Cubo Mágico class 3 lesson | Yes | `game_start` / `game_end` | No review mode currently exposed |
 | Caça Coroa local/AI | Yes | `game_start` / `game_end` | Shared board integration |
 | Super Jogo da Velha local/AI | Yes | `game_start` / `game_end` | Shared board integration |
 | Guerra Matemática local/AI | Yes | `game_start` / `game_end` | Starts after opening dice animation |
-| Board-game online modes | No | — | Avoid counting one match once per client/device |
-| Bomb Game | No | — | Online-only; reserved ID, not catalog-ready |
+| Board-game online modes | No | `multiplayer_join_result` / `multiplayer_disconnect` | Reliability covered; avoid counting one match once per client/device |
+| Bomb Game | No | `multiplayer_join_result` / `multiplayer_disconnect` | Online reliability covered; match lifecycle deferred; not catalog-ready |
 | Puzzle Wire / Houses | No | — | Gameplay pages are empty; reserved IDs only |
 | Damas and test/base routes | No | — | Intentionally excluded from product reports |
 
 Online match events are deliberately deferred. Sending a client event from
-both players would make one match look like two attempts. The multiplayer
-phase must first choose and document either one canonical emitter, server-side
-measurement, or an explicitly participant-activity-based report. Room codes,
-names, and persistent identifiers remain forbidden in every option.
+both players would make one match look like two attempts. Phase 5 explicitly
+uses participant-side joins and connection losses only; it does not redefine
+them as matches. A future match lifecycle still needs one canonical emitter
+or a separately named participant-activity unit. Room codes, names, and
+persistent identifiers remain forbidden in every option.
 
 ### Phase 4 teacher, outreach, classroom, and shared-device actions
 
@@ -370,6 +378,96 @@ keeps only `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, and
 `utm_term`; GA4 session campaign dimensions should be used to compare manual
 views, selections, classroom creation results, and feedback opens.
 
+### Phase 5 multiplayer reliability
+
+Phase 5 measures participant-side connection attempts. It does not claim to
+count matches, rooms, devices, or students. A two-device match can legitimately
+produce two participant-side operational records, for example one successful
+join for the guest and one unexpected disconnect for either participant.
+
+Current coverage:
+
+```text
+caca_coroa
+super_jogo_da_velha
+guerra_matematica
+caca_soma
+stop_matematico
+bomb_game
+```
+
+#### Join result lifecycle
+
+1. An invalid name or room-code length is rejected locally and sends no event.
+2. A valid explicit join begins one in-memory timer. No room code, player name,
+   socket ID, or attempt ID is stored in analytics state or sent.
+3. Joining through a classroom room card uses `join_type: "classroom_room"`,
+   `game_mode: "classroom"`, and `usage_context: "classroom"`. Typing a private
+   room code uses `join_type: "private_code"`, `game_mode: "online_private"`,
+   and `usage_context: "standard"`.
+4. The server's `room_joined` response sends one successful
+   `multiplayer_join_result`. Creating/hosting a room does not count as a join.
+5. A join-related `multiplayer_error`, missing server configuration,
+   `connect_error`, or socket disconnect while the join is pending sends one
+   failed result.
+6. `wait_ms` is elapsed request-to-result wall-clock time. It includes backend
+   cold-start/network wait because that delay is part of the participant's
+   lobby experience.
+7. Restored `sessionStorage` state, automatic classroom validation, room state
+   updates, rematches, and gameplay errors do not create join results.
+
+Controlled join failure codes:
+
+```text
+room_not_found
+room_not_joinable
+room_full
+invalid_name
+classroom_not_found
+network_error
+server_unavailable
+server_error
+```
+
+An unrecognized server code is reduced to `server_error`. A
+`classroom_not_found` response from automatic classroom validation is ignored
+when a private-code join or private-room creation is pending, so it cannot be
+misattributed to that room operation.
+
+#### Unexpected disconnect lifecycle
+
+Room creation and room joining establish in-memory connection context only
+after the server sends `room_created` or `room_joined`. An unexpected Socket.IO
+disconnect from that confirmed room sends one `multiplayer_disconnect` while
+the participant is waiting or playing.
+
+The tracker ignores:
+
+- `io client disconnect`, used by the intentional leave/reset functions;
+- disconnects after the local game status is already `ended`;
+- connection failures before a room is confirmed (these are join failures when
+  a join is pending, not post-join disconnects);
+- raw Socket.IO descriptions.
+
+Controlled disconnect error codes:
+
+```text
+server_disconnect
+timeout
+transport_error
+network_error
+```
+
+`connection_stage` is only `waiting` or `playing`. This is operational client
+telemetry and is best effort: closing a tab or losing a device connection may
+prevent the affected browser from delivering its final event. It is not a
+replacement for backend observability.
+
+Online `game_start` and `game_end` are still deferred. Phase 5 deliberately
+does not turn one server match into multiple client-side match attempts. A
+future match-lifecycle integration must choose a canonical server emitter or
+explicitly define a participant-activity unit before adding those events.
+
 ### Removed legacy behavior
 
 Phase 1 removed:
@@ -393,8 +491,8 @@ forbidden fields. The current forbidden list includes:
 ```text
 answer, answer_text, attempt_id, classroom_code, classroom_management_token,
 client_id, error, error_message, free_text, host_name, management_token,
-message, name, player_name, raw_error, room_code, school, school_name,
-student_name, teacher_name, user_id
+message, name, player_name, raw_error, room_code, room_id, school, school_name,
+socket_id, student_name, teacher_name, user_id
 ```
 
 Never send:
@@ -407,9 +505,9 @@ Never send:
 - raw error messages or stack traces;
 - values read from local progress storage.
 
-Failures may send a controlled low-cardinality code such as `server_error` or,
-in a later multiplayer phase, `room_not_found`. They must never send the raw
-server or UI message.
+Failures may send a controlled low-cardinality code such as `server_error` or
+`room_not_found`. They must never send the raw server, Socket.IO, or UI
+message.
 
 ## Required GA4 administration action
 
@@ -458,23 +556,118 @@ After deployment, use DebugView/Tag Assistant to verify:
 18. “Trocar jogador” requires confirmation, clears the documented player keys,
     and preserves both classroom keys and unrelated storage;
 19. a direct manual URL with the standard UTM convention retains only safe
-    campaign parameters in `page_location`.
+    campaign parameters in `page_location`;
+20. invalid name/code input sends no multiplayer event, while a valid join
+    sends exactly one result after success, controlled server failure, or
+    connection failure;
+21. private-code and classroom-room joins use the documented mode/context and
+    never include the entered room code, classroom code, name, or socket ID;
+22. room hosting sends no join result, but both a confirmed host room and a
+    confirmed joined room can report an unexpected waiting/playing disconnect;
+23. intentional leave and post-completion disconnects send no
+    `multiplayer_disconnect`;
+24. all six online games listed in Phase 5 send the same controlled reliability
+    payload shape.
 
-For Phase 2–3 Explorations, register only the parameters that will be used. A
+For Explorations, register only the parameters that will be used. A
 reasonable initial set is:
 
 | Type | Parameters |
 | --- | --- |
-| Event-scoped dimensions | `game_id`, `level_id`, `game_mode`, `activity_variant`, `difficulty`, `usage_context`, `end_reason`, `outcome`, `success`, `tutorial_id`, `step_id`, `entry_point`, `error_code`, `reason` |
-| Event-scoped custom metrics | `duration_seconds`, `participant_count`, `completed_round_count`, `completed_step_count`, `correct_count`, `incorrect_count`, `assistance_count`, `stars_earned` |
+| Event-scoped dimensions | `game_id`, `level_id`, `game_mode`, `activity_variant`, `difficulty`, `usage_context`, `end_reason`, `outcome`, `success`, `tutorial_id`, `step_id`, `entry_point`, `error_code`, `reason`, `join_type`, `connection_stage` |
+| Event-scoped custom metrics | `duration_seconds`, `participant_count`, `completed_round_count`, `completed_step_count`, `correct_count`, `incorrect_count`, `assistance_count`, `stars_earned`, `wait_ms` |
 
 Do not register browser/client IDs, attempt IDs, timestamps, room codes, or any
 other high-cardinality or identifying value.
+
+Custom definitions affect reporting after they are created; they do not make
+earlier unregistered parameters retroactively available as custom dimensions
+or metrics. Confirm collection in Realtime/DebugView first, create the
+definitions, and allow GA processing time before treating a blank Exploration
+as an implementation failure.
+
+### GA4 Exploration definitions
+
+These are manual GA4 property configurations. The repository defines the
+events and the report contract but cannot create or verify Explorations inside
+the property.
+
+Every Exploration must use **Event count** as the activity count. Do not use
+Users, Active users, New users, Returning users, or user-scoped funnel steps as
+student measures.
+
+#### 1. Game engagement
+
+Create a free-form table:
+
+| Setting | Value |
+| --- | --- |
+| Rows | `game_id`, then `game_mode` |
+| Columns | Event name |
+| Values | Event count; `duration_seconds` where applicable |
+| Filter | Event name matches `select_content`, `game_start`, `game_end`, `level_start`, or `level_end` |
+
+Use a second tab filtered to `game_end`/`level_end` with `end_reason` and
+`outcome` as nested rows. Compute start/completion ratios from event counts for
+the same game, mode, and date range. Do not join selection and completion by
+GA user.
+
+#### 2. Level difficulty
+
+Create a free-form table filtered to `level_end`:
+
+| Setting | Value |
+| --- | --- |
+| Rows | `game_id`, `level_id` |
+| Columns | `success` or `outcome` |
+| Values | Event count, `duration_seconds`, `incorrect_count`, `assistance_count`, `stars_earned` |
+
+Interpret averages and totals as activity-level signals. They are not
+longitudinal student progress, even when a browser repeats a level.
+
+#### 3. Teacher and classroom activity
+
+Create a free-form table using Event name as rows and session campaign/source
+dimensions as columns. Include `/manual` page views, teacher-manual
+`select_content`, `classroom_create_result`, and `feedback_open`. Keep success
+as a breakdown for classroom creation. Report actions and campaigns, not
+teachers or schools.
+
+#### 4. Multiplayer reliability
+
+Create two free-form tabs:
+
+| Tab | Rows | Columns | Values | Filter |
+| --- | --- | --- | --- | --- |
+| Join results | `game_id`, `join_type`, `error_code` | `success` | Event count, `wait_ms` | Event name exactly `multiplayer_join_result` |
+| Disconnects | `game_id`, `game_mode`, `connection_stage`, `error_code` | — | Event count | Event name exactly `multiplayer_disconnect` |
+
+For each game/join type/date range:
+
+```text
+join success rate = successful multiplayer_join_result event count
+                    / all multiplayer_join_result event count
+```
+
+Use `wait_ms` to compare the same join path and hosting period. Free-tier cold
+starts can make private and classroom attempts slow; do not compare tiny
+samples or treat one outlier as a trend. Disconnect counts are affected-client
+events and best effort, not canonical server room failures.
+
+GA4 calculated metrics may combine existing metrics, but a filtered numerator
+and denominator are not automatically created by this repository. If the
+property UI cannot express the filtered rate safely, export the two event
+counts and calculate the ratio outside GA rather than substituting a
+user-based conversion rate.
 
 References:
 
 - [Google: manual page views and disabling automatic measurement](https://developers.google.com/analytics/devguides/collection/ga4/views)
 - [Google: tag privacy settings](https://developers.google.com/tag-platform/security/guides/privacy)
+- [Google: event-scoped custom dimensions](https://support.google.com/analytics/answer/14239696)
+- [Google: custom metrics](https://support.google.com/analytics/answer/14239619)
+- [Google: free-form Explorations](https://support.google.com/analytics/answer/9327972)
+- [Google: calculated metrics](https://support.google.com/analytics/answer/14166471)
 
 ## Rules for extending analytics
 
@@ -493,21 +686,18 @@ When adding an event:
 Do not send every move, click, or incorrect answer. Prefer aggregate counts on
 the end event for an attempt or level.
 
-## Remaining planned event contract
+## Remaining planned lifecycle contract
 
-The following events remain targets for later phases. Phase 1–4 events
-described above are implemented and are not merely planned.
-
-| Event | Intended fire point | Important parameters |
-| --- | --- | --- |
-| `multiplayer_join_result` | Server confirms join result | game/mode, `success`, `wait_ms`, controlled failure code |
+All named Phase 1–5 events above are implemented in code. No additional event
+name is committed for the next phase.
 
 Suggested shared parameters:
 
 ```text
 game_id, game_mode, entry_point, level_id, difficulty, participant_count,
 usage_context, duration_seconds, success, outcome, end_reason,
-incorrect_count, hint_count, assistance_count, error_code, wait_ms
+incorrect_count, hint_count, assistance_count, error_code, wait_ms,
+join_type, connection_stage
 ```
 
 Use controlled enums such as:
@@ -531,9 +721,9 @@ their own true start and end points.
 | 2 | Implemented in code; deployed DebugView validation pending | Pilot Caça Soma level lifecycle, active timing, aggregate outcomes, and tutorial events |
 | 3 | Implemented in code; deployed DebugView validation pending | Stop, Rubik's activities, and local/AI board-game coverage; explicit online/reserved-route exclusions |
 | 4 | Implemented in code; deployed DebugView validation pending | Teacher-manual selections, feedback opening, confirmed classroom creation results, outreach convention, and allowlisted local player reset |
-| 5 | Planned | Multiplayer reliability and GA4 reports/explorations |
+| 5 | Implemented in code; GA admin/DebugView validation pending | Participant-side multiplayer join results and unexpected disconnects across six games; GA4 custom-definition and Exploration contract |
 
-### Phase 2–4 verification status
+### Phase 2–5 verification status
 
 - Automated tests cover one start/end, completion, retry, route cleanup,
   pagehide, hidden/resumed timing, and direct starts without selection state.
@@ -548,3 +738,7 @@ their own true start and end points.
 - Automated Phase 4 tests cover typed payloads, guarded classroom results, the
   complete player-progress key inventory, and preservation of classroom and
   unrelated local state.
+- Automated Phase 5 tests cover exactly-once join results, controlled failure
+  reduction, automatic-classroom-error isolation, confirmed-room disconnects,
+  intentional leave/completed-room exclusions, and connection loss during a
+  pending join.
