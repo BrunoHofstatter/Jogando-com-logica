@@ -2,8 +2,8 @@ import { useState } from "react";
 import "../CSS/Jogos.css";
 import GameButton from "../Components/GameButton";
 import { useNavigate } from "react-router-dom";
-import ReactGA from "react-ga4";
 import { ROUTES } from "../../routes";
+import { analytics, type GameId } from "../../analytics/events";
 
 
 function Jogos() {
@@ -11,24 +11,17 @@ function Jogos() {
   const [currentPage, setCurrentPage] = useState(0);
   const gamesPerPage = 6;
 
-  const handleGameClick = (gameLabel: string, navigatePath: string) => {
-    ReactGA.event({
-      category: "Game_Selection",
-      action: "Click_Game",
-      label: gameLabel
-    });
-    localStorage.setItem('activeGameSession', JSON.stringify({ game: gameLabel, startTime: Date.now() }));
+  const handleGameClick = (gameId: GameId, navigatePath: string) => {
+    analytics.gameSelected({ gameId, entryPoint: "game_catalog" });
     // navigatePath already contains the leading slash from the ROUTES constant
     navigate(navigatePath);
   };
 
   const handleRubiksClick = () => {
-    ReactGA.event({
-      category: "Game_Selection",
-      action: "Click_Game",
-      label: "Cubo Mágico"
+    analytics.gameSelected({
+      gameId: "cubo_magico",
+      entryPoint: "game_catalog",
     });
-    localStorage.setItem('activeGameSession', JSON.stringify({ game: "Cubo Mágico", startTime: Date.now() }));
 
     const hasSeen = localStorage.getItem("hasSeenRubiksClass1");
     if (!hasSeen) {
@@ -44,13 +37,13 @@ function Jogos() {
       pagina: "jogoStop",
       label: "Stop Matemático",
       imageSrc: `${import.meta.env.BASE_URL}iconStop.png`,
-      onClick: () => handleGameClick("Stop Matemático", ROUTES.STOP_RULES)
+      onClick: () => handleGameClick("stop_matematico", ROUTES.STOP_RULES)
     },
     {
       pagina: "cacasomaRg",
       label: "Caça Soma",
       imageSrc: `${import.meta.env.BASE_URL}cacasomaLogo.png`,
-      onClick: () => handleGameClick("Caça Soma", ROUTES.CACA_SOMA_RULES)
+      onClick: () => handleGameClick("caca_soma", ROUTES.CACA_SOMA_RULES)
     },
     {
       pagina: "classMenu",
@@ -62,19 +55,19 @@ function Jogos() {
       pagina: "crownchaseRg",
       label: "Caça Coroa",
       imageSrc: `${import.meta.env.BASE_URL}cacacoroaLogo.png`,
-      onClick: () => handleGameClick("Caça Coroa", ROUTES.CROWN_CHASE_RULES)
+      onClick: () => handleGameClick("caca_coroa", ROUTES.CROWN_CHASE_RULES)
     },
     {
       pagina: "spttt",
       label: "Super Jogo da Velha",
       imageSrc: `${import.meta.env.BASE_URL}sptttLogo.png`,
-      onClick: () => handleGameClick("Super Jogo da Velha", ROUTES.SPTTT_RULES)
+      onClick: () => handleGameClick("super_jogo_da_velha", ROUTES.SPTTT_RULES)
     },
     {
       pagina: "mathwarRg",
       label: "Guerra Matemática",
       imageSrc: `${import.meta.env.BASE_URL}mathwarLogo.png`,
-      onClick: () => handleGameClick("Guerra Matemática", ROUTES.MATH_WAR_RULES)
+      onClick: () => handleGameClick("guerra_matematica", ROUTES.MATH_WAR_RULES)
     }
   ];
 

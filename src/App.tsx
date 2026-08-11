@@ -20,7 +20,6 @@ import "./App.css";
 import BaseGame from "./AA_baseGame/Pages/baseGamePage";
 import RotateDeviceOverlay from "./Main/Components/RotateDeviceOverlay";
 import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
-import ReactGA from "react-ga4";
 import { useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import DamasRegras from "./AA_baseGame/Pages/regrasPage";
@@ -82,6 +81,7 @@ import {
   leaveBombGameRoom,
 } from "./BombGame/Hooks/useBombGameMultiplayer";
 import { ROUTES } from "./routes";
+import PageViewTracker from "./analytics/PageViewTracker";
 
 const HIDDEN_RETURN_ROUTES = new Set([
   ROUTES.HOME,
@@ -166,26 +166,6 @@ const RETURN_ROUTE_MAP: Record<string, string> = {
   [ROUTES.MATH_WAR_MP_GAME]: ROUTES.MATH_WAR_MP_LOBBY,
 };
 
-function trackGameTime() {
-  const sessionData = localStorage.getItem("activeGameSession");
-  if (sessionData) {
-    try {
-      const { game, startTime } = JSON.parse(sessionData);
-      const timeSpentSeconds = Math.floor((Date.now() - startTime) / 1000);
-
-      ReactGA.event({
-        category: "Game_Engagement",
-        action: "Time_Spent_In_Game",
-        label: game,
-        value: timeSpentSeconds,
-      });
-    } catch (e) {
-      console.error("Error tracking game time:", e);
-    }
-    localStorage.removeItem("activeGameSession");
-  }
-}
-
 function getReturnRoute(pathname: string): string | null {
   if (HIDDEN_RETURN_ROUTES.has(pathname)) {
     return null;
@@ -209,7 +189,6 @@ function HomeButton() {
     <button
       className="back-button"
       onClick={() => {
-        trackGameTime();
         navigate(ROUTES.HOME);
       }}
       aria-label="Ir para a página inicial"
@@ -242,7 +221,6 @@ function ReturnButton() {
     <button
       className="universal-return-button"
       onClick={() => {
-        trackGameTime();
         navigate(returnRoute);
       }}
       aria-label="Voltar"
@@ -270,26 +248,6 @@ function App() {
     }
     metaThemeColor.content = chromeColor;
   }, [location.pathname]);
-
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "hidden") {
-        trackGameTime();
-      }
-    };
-
-    const handleBeforeUnload = () => {
-      trackGameTime();
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, []);
 
   useEffect(() => {
     const isCrownChaseOnlineRoute = location.pathname.startsWith(ROUTES.CROWN_CHASE_MP_LOBBY);
@@ -326,6 +284,7 @@ function App() {
 
   return (
     <main>
+      <PageViewTracker />
       <RotateDeviceOverlay />
       <ReturnButton />
       <HomeButton />

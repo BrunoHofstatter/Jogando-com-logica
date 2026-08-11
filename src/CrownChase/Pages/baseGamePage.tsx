@@ -1,19 +1,31 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import DynamicTutorial, { TutorialStep } from "../../Shared/Components/DynamicTutorial";
 import Board from "../Components/board-component";
 import tutorialStyles from "../styles/DynamicTutorial.module.css";
+import { createInitialState } from "../Logic/v2";
+import type { CrownChaseState } from "../Logic/v2";
+import { useBoardGameAnalytics } from "../../analytics/useBoardGameAnalytics";
 
 export default function CrownChasePage() {
-  const [showTutorial, setShowTutorial] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(
+    () => localStorage.getItem("tutorial_crownchase_v1_completed") !== "true",
+  );
+  const [gameState, setGameState] = useState<CrownChaseState>(() =>
+    createInitialState(),
+  );
 
-
-  useEffect(() => {
-    const completed = localStorage.getItem("tutorial_crownchase_v1_completed");
-    if (completed !== "true") {
-      setShowTutorial(true);
-    }
-  }, []);
+  useBoardGameAnalytics({
+    context: {
+      gameId: "caca_coroa",
+      gameMode: "local_multiplayer",
+      usageContext: "standard",
+      participantCount: 2,
+    },
+    isReady: !showTutorial,
+    status: gameState.status,
+    winner: gameState.winner,
+  });
 
   const tutorialSteps: TutorialStep[] = [
     {
@@ -65,7 +77,7 @@ export default function CrownChasePage() {
 
   return (
     <>
-      <Board />
+      <Board gameState={gameState} onGameStateChange={setGameState} />
 
       {showTutorial && (
         <DynamicTutorial

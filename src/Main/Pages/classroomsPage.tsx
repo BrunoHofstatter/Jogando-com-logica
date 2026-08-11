@@ -9,6 +9,7 @@ import type {
   ManagedClassroom,
 } from "../../CrownChase/Logic/multiplayer/protocol";
 import { useDelayedOnlineWaitHint } from "../../Shared/Hooks/useDelayedOnlineWaitHint";
+import { ClassroomCreationTracker } from "../../analytics/ClassroomCreationTracker";
 import styles from "../CSS/classrooms.module.css";
 
 const STORAGE_KEY = "managed_classroom_tokens_v1";
@@ -28,12 +29,14 @@ export default function ClassroomsPage() {
   const [openMonitorCodes, setOpenMonitorCodes] = useState<string[]>([]);
   const [monitorRooms, setMonitorRooms] = useState<Record<string, ClassroomMonitorRoom[]>>({});
   const [loadingMonitorCodes, setLoadingMonitorCodes] = useState<string[]>([]);
+  const [isCreatingClassroom, setIsCreatingClassroom] = useState(false);
   const openMonitorCodesRef = useRef<string[]>([]);
+  const creationTrackerRef = useRef(new ClassroomCreationTracker());
   const isConnectingToServer = socket !== null && !isServerConnected;
   const showOnlineWaitHint = useDelayedOnlineWaitHint(isConnectingToServer);
 
   useEffect(() => {
-
+    const creationTracker = creationTrackerRef.current;
     const serverUrl = import.meta.env.VITE_MULTIPLAYER_SERVER_URL;
     if (!serverUrl) {
       setErrorMessage("O servidor online ainda não foi configurado.");
@@ -60,12 +63,21 @@ export default function ClassroomsPage() {
     });
     nextSocket.on("disconnect", () => {
       setIsServerConnected(false);
+      setIsCreatingClassroom(false);
+      creationTracker.cancel();
       setLoadingMonitorCodes(openMonitorCodesRef.current);
     });
     nextSocket.on("classroom_created", ({ classroom }) => {
+      creationTracker.succeed();
+      setIsCreatingClassroom(false);
       saveManagementTokens([...loadManagementTokens(), classroom.managementToken]);
       setClassrooms((current) => [...current, classroom]);
       setErrorMessage(null);
+    });
+    nextSocket.on("classroom_create_failed", ({ code, message }) => {
+      creationTracker.fail(code);
+      setIsCreatingClassroom(false);
+      setErrorMessage(message);
     });
     nextSocket.on("managed_classrooms", ({ classrooms: managedClassrooms }) => {
       setClassrooms(managedClassrooms);
@@ -109,6 +121,8 @@ export default function ClassroomsPage() {
     });
     nextSocket.on("connect_error", () => {
       setIsServerConnected(false);
+      setIsCreatingClassroom(false);
+      creationTracker.cancel();
     });
 
     const refreshInterval = window.setInterval(refreshClassrooms, 60 * 1000);
@@ -116,12 +130,18 @@ export default function ClassroomsPage() {
 
     return () => {
       window.clearInterval(refreshInterval);
+      creationTracker.cancel();
       nextSocket.disconnect();
     };
   }, []);
 
   const createClassroom = () => {
-    socket?.emit("create_classroom");
+    if (!socket || !isServerConnected || !creationTrackerRef.current.start()) {
+      return;
+    }
+
+    setIsCreatingClassroom(true);
+    socket.emit("create_classroom");
   };
 
   const deleteClassroom = (classroom: ManagedClassroom) => {
@@ -213,9 +233,13 @@ export default function ClassroomsPage() {
         <button
           className={styles.primaryButton}
           onClick={createClassroom}
-          disabled={!socket || !isServerConnected}
+          disabled={!socket || !isServerConnected || isCreatingClassroom}
         >
-          {isConnectingToServer ? "Conectando..." : "Criar Nova Turma"}
+          {isConnectingToServer
+            ? "Conectando..."
+            : isCreatingClassroom
+              ? "Criando turma..."
+              : "Criar Nova Turma"}
         </button>
 
         {showOnlineWaitHint && (

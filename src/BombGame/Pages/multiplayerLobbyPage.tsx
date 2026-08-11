@@ -75,7 +75,7 @@ export default function BombGameMultiplayerLobbyPage() {
         <div className={styles.classroomHeader}><h3>Turma {game.classroomCode}</h3><button className={styles.leaveButton} onClick={game.leaveClassroom}>Trocar turma</button></div>
         <label className={styles.hintsToggle}><input type="checkbox" checked={hintsEnabled} onChange={(event) => setHintsEnabled(event.target.checked)} /><span>Dicas ativadas</span></label>
         <button className={styles.primaryButton} onClick={() => game.createRoom(name, hintsEnabled, game.classroomCode ?? undefined)}>Criar Sala para a Turma</button>
-        <div className={styles.roomList}>{game.openClassroomRooms.length === 0 ? <p>Nenhuma sala aberta. Crie a primeira!</p> : game.openClassroomRooms.map((room) => <article key={room.code} className={styles.openRoom}><span>Sala de {room.hostName}</span><button className={styles.secondaryButton} onClick={() => game.joinRoom(room.code, name)}>Entrar</button></article>)}</div>
+        <div className={styles.roomList}>{game.openClassroomRooms.length === 0 ? <p>Nenhuma sala aberta. Crie a primeira!</p> : game.openClassroomRooms.map((room) => <article key={room.code} className={styles.openRoom}><span>Sala de {room.hostName}</span><button className={styles.secondaryButton} onClick={() => game.joinRoom(room.code, name, "classroom_room")}>Entrar</button></article>)}</div>
         <button className={styles.secondaryButton} onClick={game.leaveClassroom}>Jogar sem turma</button>
       </div>}
 

@@ -9,30 +9,44 @@ import { DiceAnimation } from "../Components/DiceAnimation";
 import { applyAction, createInitialState, getAIMove } from "../Logic/v2";
 import type { MathWarState } from "../Logic/v2";
 import tutorialStyles from "../styles/DynamicTutorial.module.css";
+import { formatAiDifficulty } from "../../analytics/events";
+import { useBoardGameAnalytics } from "../../analytics/useBoardGameAnalytics";
 
 export default function MathWarAIPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const difficulty = location.state?.difficulty || 1;
-  const [showTutorial, setShowTutorial] = useState(false);
-  const [showDiceAnim, setShowDiceAnim] = useState(false);
-  const [diceTarget, setDiceTarget] = useState<number[]>([]);
+  const [showTutorial, setShowTutorial] = useState(
+    () => localStorage.getItem("tutorial_mathwar_v1_completed") !== "true",
+  );
   const [gameState, setGameState] = useState<MathWarState>(() =>
     createInitialState({ startingPlayer: 1 }),
+  );
+  const [showDiceAnim, setShowDiceAnim] = useState(true);
+  const [diceTarget, setDiceTarget] = useState<number[]>(
+    () => gameState.diceRoll,
   );
   const { unlockNext } = useDifficultyLock("mathwar");
 
 
   useEffect(() => {
+    setShowDiceAnim(true);
     setGameState(createInitialState({ startingPlayer: 1 }));
   }, [difficulty]);
 
-  useEffect(() => {
-    const completed = localStorage.getItem("tutorial_mathwar_v1_completed");
-    if (completed !== "true") {
-      setShowTutorial(true);
-    }
-  }, []);
+  useBoardGameAnalytics({
+    context: {
+      gameId: "guerra_matematica",
+      gameMode: "ai",
+      usageContext: "standard",
+      participantCount: 1,
+      difficulty: formatAiDifficulty(difficulty),
+    },
+    isReady: !showTutorial && !showDiceAnim,
+    status: gameState.status,
+    winner: gameState.winner,
+    perspective: 1,
+  });
 
   useEffect(() => {
     if (gameState.turnCount % 3 === 0) {
@@ -78,6 +92,9 @@ export default function MathWarAIPage() {
   }, [difficulty, gameState, showDiceAnim]);
 
   const handleGameStateChange = (newState: MathWarState) => {
+    if (gameState.status === "ended" && newState.turnCount === 0) {
+      setShowDiceAnim(true);
+    }
     setGameState(newState);
 
     if (newState.status === "ended" && newState.winner === 1) {

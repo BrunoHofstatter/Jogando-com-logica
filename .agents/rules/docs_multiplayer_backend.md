@@ -300,6 +300,29 @@ Current behavior:
 
 This is good enough for Phase 1 and should not be treated as a bug unless reconnection work is explicitly in scope.
 
+## Client Reliability Analytics
+
+The frontend now uses `src/analytics/MultiplayerReliabilityTracker.ts` in all
+six multiplayer hooks. It measures participant-side lobby/connection
+reliability without sending names, room/classroom codes, socket IDs, or raw
+server messages.
+
+Current signals:
+
+- `multiplayer_join_result` begins after local input validation and finishes
+  on `room_joined`, a controlled join error, or a network/configuration failure;
+- `wait_ms` includes server cold-start and network delay;
+- private-code and classroom-room joins use separate controlled context;
+- `multiplayer_disconnect` fires after a server-confirmed created/joined room
+  loses its socket unexpectedly while waiting or playing;
+- intentional `io client disconnect` leaves and ended-room disconnects are
+  excluded.
+
+These are affected-participant events, not canonical room or match counts.
+Online game start/end events remain deferred until a canonical match emitter
+or an explicitly participant-scoped lifecycle is designed. See
+`.agents/rules/googleanalytics.md` for the payload and reporting contract.
+
 ## How To Add Multiplayer To Another Game
 
 Use this order:
@@ -467,7 +490,7 @@ Not implemented yet:
 - spectators
 - public matchmaking
 - persistence across backend restarts
-- analytics or monitoring specific to multiplayer rooms
+- server-side room/match monitoring and canonical match analytics
 - cross-game shared multiplayer framework
 
 These are all optional future improvements, not missing parts of the current core architecture.

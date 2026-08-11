@@ -1,19 +1,31 @@
 import SPTTT from "../Components/SPTTT";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import DynamicTutorial, { TutorialStep } from "../../Shared/Components/DynamicTutorial";
 import tutorialStyles from "../Style/DynamicTutorial.module.css";
+import { createInitialState } from "../Logic/v2";
+import type { SptttState } from "../Logic/v2";
+import { useBoardGameAnalytics } from "../../analytics/useBoardGameAnalytics";
 
 export default function SPTTTPage() {
-  const [showTutorial, setShowTutorial] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(
+    () => localStorage.getItem("tutorial_spttt_v1_completed") !== "true",
+  );
+  const [gameState, setGameState] = useState<SptttState>(() =>
+    createInitialState(),
+  );
 
-
-  // Auto-show on first visit
-  useEffect(() => {
-    const completed = localStorage.getItem("tutorial_spttt_v1_completed");
-    if (completed !== "true") {
-      setTimeout(() => setShowTutorial(true), 500); // Delay for DOM
-    }
-  }, []);
+  useBoardGameAnalytics({
+    context: {
+      gameId: "super_jogo_da_velha",
+      gameMode: "local_multiplayer",
+      usageContext: "standard",
+      participantCount: 2,
+    },
+    isReady: !showTutorial,
+    status: gameState.status,
+    winner: gameState.winner,
+    isDraw: gameState.winner === "tie",
+  });
   const tutorialSteps: TutorialStep[] = [
     {
       id: "player",
@@ -145,7 +157,7 @@ export default function SPTTTPage() {
 
   return (
     <div className="spttt-page">
-      <SPTTT />
+      <SPTTT gameState={gameState} onGameStateChange={setGameState} />
       {showTutorial && (
         <DynamicTutorial
           steps={tutorialSteps}

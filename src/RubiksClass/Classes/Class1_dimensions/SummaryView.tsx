@@ -7,11 +7,12 @@ import { ROUTES } from "../../../routes";
 
 interface SummaryViewProps {
     totalFlags: number;
+    onComplete: (mistakes: number) => boolean;
 }
 
 const ITEMS = [2, 3, 4, 5, 6];
 
-const SummaryView: React.FC<SummaryViewProps> = ({ totalFlags }) => {
+const SummaryView: React.FC<SummaryViewProps> = ({ totalFlags, onComplete }) => {
     const navigate = useNavigate();
 
     // --- State ---
@@ -60,6 +61,12 @@ const SummaryView: React.FC<SummaryViewProps> = ({ totalFlags }) => {
     }, [selectedId, matchedIds]);
 
     const isComplete = matchedIds.length === ITEMS.length;
+
+    useEffect(() => {
+        if (isComplete) {
+            onComplete(mistakes);
+        }
+    }, [isComplete, mistakes, onComplete]);
 
     // --- Render ---
     return (

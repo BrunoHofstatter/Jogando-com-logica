@@ -5,19 +5,16 @@ import DynamicTutorial, { TutorialStep } from "../../Shared/Components/DynamicTu
 import tutorialStyles from "../Style/DynamicTutorial.module.css";
 import { useDifficultyLock } from "../../Shared/Hooks/useDifficultyLock";
 import { ROUTES } from "../../routes";
+import { createInitialState } from "../Logic/v2";
+import type { SptttState } from "../Logic/v2";
+import { formatAiDifficulty } from "../../analytics/events";
+import { useBoardGameAnalytics } from "../../analytics/useBoardGameAnalytics";
 
 
 export default function SPTTTAIPage() {
-  const [showTutorial, setShowTutorial] = useState(false);
-
-
-  // Auto-show on first visit
-  useEffect(() => {
-    const completed = localStorage.getItem("tutorial_spttt_v1_completed");
-    if (completed !== "true") {
-      setTimeout(() => setShowTutorial(true), 500); // Delay for DOM
-    }
-  }, []);
+  const [showTutorial, setShowTutorial] = useState(
+    () => localStorage.getItem("tutorial_spttt_v1_completed") !== "true",
+  );
   const tutorialSteps: TutorialStep[] = [
     {
       id: "player",
@@ -152,12 +149,28 @@ export default function SPTTTAIPage() {
   const difficulty = Number(location.state?.difficulty || 1);
   const { unlockNext } = useDifficultyLock("spttt");
 
-  // Key reset for forcing recreation when difficulty changes
-  const [gameKey, setGameKey] = useState(0);
+  const [gameState, setGameState] = useState<SptttState>(() =>
+    createInitialState(),
+  );
 
   useEffect(() => {
-    setGameKey(prev => prev + 1);
+    setGameState(createInitialState());
   }, [difficulty]);
+
+  useBoardGameAnalytics({
+    context: {
+      gameId: "super_jogo_da_velha",
+      gameMode: "ai",
+      usageContext: "standard",
+      participantCount: 1,
+      difficulty: formatAiDifficulty(difficulty),
+    },
+    isReady: !showTutorial,
+    status: gameState.status,
+    winner: gameState.winner,
+    perspective: "X",
+    isDraw: gameState.winner === "tie",
+  });
 
 
   const handleUnlock = () => {
@@ -178,7 +191,8 @@ export default function SPTTTAIPage() {
   return (
     <div className="spttt-page">
       <SPTTT
-        key={gameKey}
+        gameState={gameState}
+        onGameStateChange={setGameState}
         isAiMode={true}
         difficulty={difficulty as 1 | 2 | 3 | 4}
         onUnlockNext={handleUnlock}

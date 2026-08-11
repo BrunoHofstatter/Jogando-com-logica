@@ -22,6 +22,8 @@ import {
   normalizePlayerName,
   setActivePlayerName,
 } from "../../Shared/PlayerName/activePlayerName";
+import { MultiplayerReliabilityTracker } from "../../analytics/MultiplayerReliabilityTracker";
+import type { MultiplayerJoinType } from "../../analytics/events";
 
 type MultiplayerSnapshot = {
   connectionStatus: MultiplayerConnectionStatus;
@@ -75,6 +77,7 @@ let socket: Socket<
   CacaSomaServerToClientEvents,
   CacaSomaClientToServerEvents
 > | null = null;
+const reliabilityTracker = new MultiplayerReliabilityTracker();
 let sharedSnapshot = loadSnapshot();
 const subscribers = new Set<(snapshot: MultiplayerSnapshot) => void>();
 
@@ -213,13 +216,15 @@ function ensureSocket(): Socket<
       }
     });
 
-    socket.on("disconnect", () => {
+    socket.on("disconnect", (reason) => {
+      reliabilityTracker.disconnected(reason, sharedSnapshot.connectionStatus);
       updateSnapshot({
         connectionStatus: sharedSnapshot.roomCode ? "disconnected" : "idle",
       });
     });
 
     socket.on("connect_error", (error) => {
+      reliabilityTracker.failConnection("network_error");
       const message = error.message === "Invalid namespace"
         ? "O servidor online ainda não foi atualizado para o Caça Soma."
         : "Não foi possível conectar ao servidor online.";
@@ -231,6 +236,7 @@ function ensureSocket(): Socket<
     });
 
     socket.on("room_created", (payload) => {
+      reliabilityTracker.roomCreated();
       updateSnapshot({
         ...getServerTimePatch(payload.serverNowMs),
         roomCode: payload.code,
@@ -248,6 +254,7 @@ function ensureSocket(): Socket<
     });
 
     socket.on("room_joined", (payload) => {
+      reliabilityTracker.joinSucceeded();
       updateSnapshot({
         ...getServerTimePatch(payload.serverNowMs),
         roomCode: payload.code,
@@ -356,6 +363,7 @@ function ensureSocket(): Socket<
     });
 
     socket.on("multiplayer_error", (payload) => {
+      reliabilityTracker.failServer(payload.code);
       if (payload.code === "classroom_not_found") {
         clearActiveClassroomSession();
         updateSnapshot({ classroomCode: null, openClassroomRooms: [] });
@@ -425,6 +433,7 @@ export function leaveCacaSomaMultiplayerRoom(
   options: LeaveRoomOptions = {},
 ): void {
   const { preserveName = true } = options;
+  reliabilityTracker.reset();
 
   if (socket && sharedSnapshot.roomCode) {
     socket.emit("leave_room", { code: sharedSnapshot.roomCode });
@@ -479,6 +488,10 @@ export function useCacaSomaMultiplayer() {
       });
       return;
     }
+    reliabilityTracker.startRoomCreation(
+      "caca_soma",
+      classroomCode ? "classroom_room" : "private_code",
+    );
     setActivePlayerName(normalizedName);
 
     updateSnapshot({
@@ -507,7 +520,11 @@ export function useCacaSomaMultiplayer() {
     });
   };
 
-  const joinRoom = (code: string, playerName: string) => {
+  const joinRoom = (
+    code: string,
+    playerName: string,
+    joinType: MultiplayerJoinType = "private_code",
+  ) => {
     const normalizedName = normalizePlayerName(playerName);
     const normalizedCode = code.trim().toUpperCase();
 
@@ -525,6 +542,7 @@ export function useCacaSomaMultiplayer() {
       return;
     }
     setActivePlayerName(normalizedName);
+    reliabilityTracker.startJoin("caca_soma", joinType);
 
     updateSnapshot({
       playerName: normalizedName,
@@ -541,7 +559,11 @@ export function useCacaSomaMultiplayer() {
     });
 
     const activeSocket = ensureSocket();
-    activeSocket?.emit("join_room", {
+    if (!activeSocket) {
+      reliabilityTracker.failConnection("server_unavailable");
+      return;
+    }
+    activeSocket.emit("join_room", {
       code: normalizedCode,
       playerName: normalizedName,
     });

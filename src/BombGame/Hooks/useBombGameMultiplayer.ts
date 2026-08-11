@@ -11,6 +11,8 @@ import {
   normalizePlayerName,
   setActivePlayerName,
 } from "../../Shared/PlayerName/activePlayerName";
+import { MultiplayerReliabilityTracker } from "../../analytics/MultiplayerReliabilityTracker";
+import type { MultiplayerJoinType } from "../../analytics/events";
 import type { Level1Intent } from "../Logic/level1";
 import type {
   BombGameClientToServerEvents,
@@ -52,6 +54,7 @@ const DEFAULT_SNAPSHOT: Snapshot = {
 
 let sharedSnapshot = DEFAULT_SNAPSHOT;
 let socket: Socket<BombGameServerToClientEvents, BombGameClientToServerEvents> | null = null;
+const reliabilityTracker = new MultiplayerReliabilityTracker();
 let actionSequence = 0;
 const subscribers = new Set<(value: Snapshot) => void>();
 
@@ -79,27 +82,39 @@ function ensureSocket(): typeof socket {
     const classroom = getActiveClassroomSession();
     if (classroom) socket?.emit("join_classroom", { code: classroom.code });
   });
-  socket.on("disconnect", () => updateSnapshot({ connectionStatus: sharedSnapshot.roomCode ? "disconnected" : "idle" }));
-  socket.on("connect_error", () => updateSnapshot({ connectionStatus: "disconnected", errorMessage: "Não foi possível conectar ao servidor online." }));
+  socket.on("disconnect", (reason) => {
+    reliabilityTracker.disconnected(reason, sharedSnapshot.connectionStatus);
+    updateSnapshot({ connectionStatus: sharedSnapshot.roomCode ? "disconnected" : "idle" });
+  });
+  socket.on("connect_error", () => {
+    reliabilityTracker.failConnection("network_error");
+    updateSnapshot({ connectionStatus: "disconnected", errorMessage: "Não foi possível conectar ao servidor online." });
+  });
 
-  socket.on("room_created", (payload) => updateSnapshot({
-    roomCode: payload.code,
-    playerSeat: payload.seat,
-    players: payload.players,
-    gameState: payload.state,
-    connectionStatus: "waiting",
-    errorMessage: null,
-    opponentDisconnected: false,
-  }));
-  socket.on("room_joined", (payload) => updateSnapshot({
-    roomCode: payload.code,
-    playerSeat: payload.seat,
-    players: payload.players,
-    gameState: payload.state,
-    connectionStatus: "room",
-    errorMessage: null,
-    opponentDisconnected: false,
-  }));
+  socket.on("room_created", (payload) => {
+    reliabilityTracker.roomCreated();
+    updateSnapshot({
+      roomCode: payload.code,
+      playerSeat: payload.seat,
+      players: payload.players,
+      gameState: payload.state,
+      connectionStatus: "waiting",
+      errorMessage: null,
+      opponentDisconnected: false,
+    });
+  });
+  socket.on("room_joined", (payload) => {
+    reliabilityTracker.joinSucceeded();
+    updateSnapshot({
+      roomCode: payload.code,
+      playerSeat: payload.seat,
+      players: payload.players,
+      gameState: payload.state,
+      connectionStatus: "room",
+      errorMessage: null,
+      opponentDisconnected: false,
+    });
+  });
   socket.on("state_updated", ({ players, state }) => updateSnapshot({
     players,
     gameState: state,
@@ -113,7 +128,10 @@ function ensureSocket(): typeof socket {
     socket = null;
     updateSnapshot({ ...DEFAULT_SNAPSHOT, playerName: getActivePlayerName(), classroomCode: getActiveClassroomSession()?.code ?? null, errorMessage: message });
   });
-  socket.on("multiplayer_error", ({ message }) => updateSnapshot({ errorMessage: message }));
+  socket.on("multiplayer_error", ({ code, message }) => {
+    reliabilityTracker.failServer(code);
+    updateSnapshot({ errorMessage: message });
+  });
   socket.on("classroom_joined", ({ classroomCode, expiresAt, openRooms }) => {
     setActiveClassroomSession({ code: classroomCode, expiresAt });
     updateSnapshot({ classroomCode, openClassroomRooms: openRooms, errorMessage: null });
@@ -152,19 +170,33 @@ export function useBombGameMultiplayer() {
   const createRoom = (playerName: string, hintsEnabled: boolean, classroomCode?: string) => {
     const name = normalizePlayerName(playerName);
     if (name.length < 2) return updateSnapshot({ errorMessage: "Digite um nome com pelo menos 2 letras." });
+    reliabilityTracker.startRoomCreation(
+      "bomb_game",
+      classroomCode ? "classroom_room" : "private_code",
+    );
     setActivePlayerName(name);
     updateSnapshot({ playerName: name, roomCode: null, playerSeat: null, players: [], gameState: null, connectionStatus: "connecting", errorMessage: null, opponentDisconnected: false });
     ensureSocket()?.emit("create_room", { playerName: name, hintsEnabled, classroomCode });
   };
 
-  const joinRoom = (code: string, playerName: string) => {
+  const joinRoom = (
+    code: string,
+    playerName: string,
+    joinType: MultiplayerJoinType = "private_code",
+  ) => {
     const name = normalizePlayerName(playerName);
     const normalizedCode = code.trim().toUpperCase();
     if (name.length < 2) return updateSnapshot({ errorMessage: "Digite um nome com pelo menos 2 letras." });
     if (normalizedCode.length !== 4) return updateSnapshot({ errorMessage: "Digite um código de sala com 4 caracteres." });
+    reliabilityTracker.startJoin("bomb_game", joinType);
     setActivePlayerName(name);
     updateSnapshot({ playerName: name, roomCode: null, playerSeat: null, players: [], gameState: null, connectionStatus: "connecting", errorMessage: null, opponentDisconnected: false });
-    ensureSocket()?.emit("join_room", { code: normalizedCode, playerName: name });
+    const activeSocket = ensureSocket();
+    if (!activeSocket) {
+      reliabilityTracker.failConnection("server_unavailable");
+      return;
+    }
+    activeSocket.emit("join_room", { code: normalizedCode, playerName: name });
   };
 
   const joinClassroom = (code: string) => {
@@ -197,6 +229,7 @@ export function useBombGameMultiplayer() {
 export function hasActiveBombGameSession(): boolean { return Boolean(sharedSnapshot.roomCode); }
 
 export function leaveBombGameRoom(): void {
+  reliabilityTracker.reset();
   if (sharedSnapshot.roomCode) socket?.emit("leave_room", { code: sharedSnapshot.roomCode });
   socket?.disconnect();
   socket = null;
