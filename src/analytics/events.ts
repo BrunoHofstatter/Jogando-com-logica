@@ -25,6 +25,8 @@ export type GameMode =
   | "online_private"
   | "classroom";
 export type UsageContext = "standard" | "classroom";
+export type FeedbackEntryPoint = "contact_page" | "teacher_manual";
+export type ClassroomCreateErrorCode = "server_error";
 export type ActivityEndReason =
   | "completed"
   | "abandoned"
@@ -106,6 +108,19 @@ interface TutorialSkippedParameters extends TutorialParameters {
   stepId?: string;
 }
 
+interface ClassroomCreateResultParameters {
+  success: boolean;
+  errorCode?: ClassroomCreateErrorCode;
+}
+
+interface FeedbackOpenedParameters {
+  entryPoint: FeedbackEntryPoint;
+}
+
+interface LocalProgressResetParameters {
+  reason: "player_switch";
+}
+
 const SAFE_CAMPAIGN_PARAMETERS = [
   "utm_source",
   "utm_medium",
@@ -150,6 +165,26 @@ export const analytics = {
       content_id: gameId,
       entry_point: entryPoint,
     });
+  },
+
+  classroomCreateResult({
+    success,
+    errorCode,
+  }: ClassroomCreateResultParameters): boolean {
+    return sendAnalyticsEvent("classroom_create_result", {
+      success,
+      error_code: success ? undefined : errorCode,
+    });
+  },
+
+  feedbackOpened({ entryPoint }: FeedbackOpenedParameters): boolean {
+    return sendAnalyticsEvent("feedback_open", {
+      entry_point: entryPoint,
+    });
+  },
+
+  localProgressReset({ reason }: LocalProgressResetParameters): boolean {
+    return sendAnalyticsEvent("local_progress_reset", { reason });
   },
 
   gameStarted({

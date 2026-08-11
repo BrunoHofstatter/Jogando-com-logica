@@ -179,9 +179,16 @@ export function registerRoomHandlers(
     });
 
     socket.on("create_classroom", () => {
-      socket.emit("classroom_created", {
-        classroom: classroomStore.createClassroom(),
-      });
+      try {
+        socket.emit("classroom_created", {
+          classroom: classroomStore.createClassroom(),
+        });
+      } catch {
+        socket.emit("classroom_create_failed", {
+          code: "server_error",
+          message: "Não foi possível criar a turma. Tente novamente.",
+        });
+      }
     });
 
     socket.on("list_managed_classrooms", ({ managementTokens }) => {

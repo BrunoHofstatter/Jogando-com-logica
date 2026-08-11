@@ -109,6 +109,8 @@ describe("analytics payload safeguards", () => {
         PlayerName: "Ana",
         player_name: "Ana",
         classroom_code: "ABC123",
+        management_token: "secret-token",
+        teacher_name: "Professora Ana",
         raw_error: "private error details",
       }),
     ).toEqual({

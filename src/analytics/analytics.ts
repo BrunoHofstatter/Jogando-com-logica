@@ -12,12 +12,14 @@ const FORBIDDEN_PARAMETER_KEYS = new Set([
   "answer_text",
   "attempt_id",
   "classroom_code",
+  "classroom_management_token",
   "client_id",
   "error",
   "error_message",
   "free_text",
   "host_name",
   "message",
+  "management_token",
   "name",
   "player_name",
   "raw_error",
@@ -25,6 +27,7 @@ const FORBIDDEN_PARAMETER_KEYS = new Set([
   "school",
   "school_name",
   "student_name",
+  "teacher_name",
   "user_id",
 ]);
 
@@ -32,10 +35,13 @@ const EVENT_NAME_PATTERN = /^[a-z][a-z0-9_]*$/;
 const PARAMETER_NAME_PATTERN = /^[a-z][a-z0-9_]*$/;
 
 export type AnalyticsEventName =
+  | "classroom_create_result"
+  | "feedback_open"
   | "game_end"
   | "game_start"
   | "level_end"
   | "level_start"
+  | "local_progress_reset"
   | "page_view"
   | "select_content"
   | "tutorial_begin"

@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import styles from '../CSS/manual.module.css';
+import { analytics, type GameId as AnalyticsGameId } from '../../analytics/events';
 import { ROUTES } from "../../routes";
 
 type GameId =
@@ -12,6 +13,7 @@ type GameId =
 
 type GameGuide = {
   id: GameId;
+  analyticsId: AnalyticsGameId;
   name: string;
   shortUse: string;
   grades: string;
@@ -56,13 +58,18 @@ function Manual() {
     gameSections.current[index]?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const navigateToRules = (route: string) => {
-    window.location.href = route;
+  const navigateToRules = (game: GameGuide) => {
+    analytics.gameSelected({
+      gameId: game.analyticsId,
+      entryPoint: 'teacher_manual',
+    });
+    window.location.href = game.rulesRoute;
   };
 
   const games: GameGuide[] = [
     {
       id: 'stop-matematico',
+      analyticsId: 'stop_matematico',
       name: 'Stop Matemático',
       shortUse: 'Cálculo mental rápido com pressão de tempo.',
       grades: '3º ao 7º ano',
@@ -94,6 +101,7 @@ function Manual() {
     },
     {
       id: 'caca-soma',
+      analyticsId: 'caca_soma',
       name: 'Caça Soma',
       shortUse: 'Encontrar combinações de números que formam uma soma.',
       grades: '4º ao 7º ano',
@@ -127,6 +135,7 @@ function Manual() {
     },
     {
       id: 'cubo-magico',
+      analyticsId: 'cubo_magico',
       name: 'Cubo Mágico',
       shortUse: 'Aulas interativas de matemática com cubos.',
       grades: '3º ao 6º ano',
@@ -159,6 +168,7 @@ function Manual() {
     },
     {
       id: 'super-velha',
+      analyticsId: 'super_jogo_da_velha',
       name: 'Super Jogo da Velha',
       shortUse: 'Estratégia com objetivos locais e globais.',
       grades: '5º ao 7º ano',
@@ -191,6 +201,7 @@ function Manual() {
     },
     {
       id: 'caca-coroa',
+      analyticsId: 'caca_coroa',
       name: 'Caça Coroa',
       shortUse: 'Estratégia de tabuleiro simples e rápida.',
       grades: '3º ao 7º ano',
@@ -222,6 +233,7 @@ function Manual() {
     },
     {
       id: 'guerra-matematica',
+      analyticsId: 'guerra_matematica',
       name: 'Guerra Matemática',
       shortUse: 'Estratégia de tabuleiro com energia calculada.',
       grades: '6º ao 7º ano',
@@ -359,7 +371,7 @@ function Manual() {
         >
           <button
             className={styles.rulesButton}
-            onClick={() => navigateToRules(game.rulesRoute)}
+            onClick={() => navigateToRules(game)}
           >
             Ver regras completas
           </button>
@@ -420,12 +432,13 @@ function Manual() {
           </div>
           <button
             className={styles.feedbackButton}
-            onClick={() =>
+            onClick={() => {
+              analytics.feedbackOpened({ entryPoint: 'teacher_manual' });
               window.open(
                 'https://docs.google.com/forms/d/e/1FAIpQLSc6W0uOiy5uYFGhjVjqzS3Iw6mp_VzHSi5qNkfnTuqS0dffOQ/viewform?embedded=true',
                 '_blank'
-              )
-            }
+              );
+            }}
           >
             Formulário de feedback
           </button>

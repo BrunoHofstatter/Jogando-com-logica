@@ -30,14 +30,15 @@ Required reporting rules:
 - GA4 cannot establish learning outcomes. Use teacher feedback or a structured
   educational evaluation for that question.
 
-## Current implementation: Phases 1 through 3
+## Current implementation: Phases 1 through 4
 
 Phase 1 provides the collection foundation. Phase 2 connects that foundation
 to the solo Caça Soma level lifecycle as the pilot. Phase 3 extends guarded,
 foreground-only activity attempts to Stop, Rubik's activities, and the local
-and AI modes of the three public board games. Classroom actions, online match
-lifecycles, teacher actions, and multiplayer reliability are not instrumented
-yet.
+and AI modes of the three public board games. Phase 4 adds teacher-manual
+selections, feedback opening, confirmed classroom-creation results, outreach
+guidance, and a shared-device player progress reset. Online match lifecycles
+and multiplayer reliability remain deferred.
 
 ### Code structure
 
@@ -48,6 +49,7 @@ src/analytics/
 ├── PageViewTracker.tsx   # manual React Router page views
 ├── ActivityTimer.ts      # foreground timer with one guarded finalization
 ├── GameAttemptTracker.ts # reusable game/activity start/end lifecycle
+├── ClassroomCreationTracker.ts # pending request/result correlation
 ├── useGameAttemptAnalytics.ts # React visibility/page-exit integration
 ├── useBoardGameAnalytics.ts # shared local/AI board-game lifecycle
 ├── LevelAttemptTracker.ts # framework-independent level attempt lifecycle
@@ -58,6 +60,10 @@ src/analytics/
 
 Components must call functions from `events.ts`. They must not import
 `react-ga4` directly or invent event payloads.
+
+The shared-device reset lives in
+`src/Shared/PlayerProgress/localPlayerProgress.ts`; its tests define the exact
+player-key inventory and the classroom/unrelated keys that must be preserved.
 
 ### Initialization and collection guard
 
@@ -91,7 +97,7 @@ All event names, parameter names, IDs, and controlled values use lowercase
 | Event | Fire point | Parameters |
 | --- | --- | --- |
 | `page_view` | Initial React route and each pathname/query change | `page_title`, sanitized `page_location` |
-| `select_content` | One of the six game cards is selected in `/jogos` | `content_type: "game"`, `content_id`, `entry_point: "game_catalog"` |
+| `select_content` | A game is selected in `/jogos` or through a manual game section's “Ver regras completas” button | `content_type: "game"`, `content_id`, `entry_point: "game_catalog"` or `"teacher_manual"` |
 | `game_start` | A Phase 3 Stop round, Rubik's activity, or local/AI board match becomes usable | `game_id`, `game_mode`, `usage_context`, `participant_count`; applicable `level_id`, `difficulty`, `activity_variant` |
 | `game_end` | A started Phase 3 activity completes or is abandoned by route exit/browser `pagehide` | start context, active `duration_seconds`, `end_reason`; controlled outcome and aggregates when known |
 | `level_start` | A solo Caça Soma level first becomes playable after the Magic Number finishes rolling; retries start a new attempt | `game_id`, `level_id`, `game_mode`, `usage_context`, `participant_count` |
@@ -99,6 +105,9 @@ All event names, parameter names, IDs, and controlled values use lowercase
 | `tutorial_begin` | The Caça Soma levels tutorial overlay mounts | `game_id`, `tutorial_id` |
 | `tutorial_complete` | The final tutorial step is completed | `game_id`, `tutorial_id` |
 | `tutorial_skip` | The tutorial is explicitly skipped or closed with Escape | `game_id`, `tutorial_id`, `step_id` |
+| `classroom_create_result` | A pending teacher create request receives `classroom_created` or `classroom_create_failed` | `success`; controlled `error_code` on failure only |
+| `feedback_open` | The external teacher feedback form is opened from the manual or contact page | `entry_point: "teacher_manual"` or `"contact_page"` |
+| `local_progress_reset` | The confirmed “Trocar jogador” action finishes clearing allowlisted local player state | `reason: "player_switch"` |
 
 `page_location` keeps the origin and pathname. It drops fragments and every
 query parameter except these campaign fields:
@@ -294,6 +303,73 @@ phase must first choose and document either one canonical emitter, server-side
 measurement, or an explicitly participant-activity-based report. Room codes,
 names, and persistent identifiers remain forbidden in every option.
 
+### Phase 4 teacher, outreach, classroom, and shared-device actions
+
+#### Teacher manual and feedback
+
+The existing manual route is measured through the normal `page_view`. Clicking
+“Ver regras completas” in a game section also sends `select_content` with
+`entry_point: "teacher_manual"` before opening the rules route. Scrolling to a
+game's details does not claim a selection.
+
+Opening the external Google feedback form sends `feedback_open`. The manual and
+contact page use distinct controlled entry points. The repository does not
+claim a feedback submission from this event; form completion occurs outside
+the application and is not reliably confirmed by this integration.
+
+#### Confirmed classroom creation
+
+Clicking “Criar Nova Turma” starts only an in-memory pending request. No event
+is sent for the click. `classroom_create_result` is sent once when that request
+receives either:
+
+- `classroom_created`, with `success: true`; or
+- `classroom_create_failed`, with `success: false` and the controlled
+  `error_code: "server_error"`.
+
+Restoring a managed classroom list does not look like a new creation. Socket
+disconnect or component cleanup cancels the pending tracker without inventing
+a server result. Classroom codes, management tokens, teacher names, server
+messages, and raw errors are never included.
+
+#### Shared-device player reset
+
+The home page exposes “Trocar jogador.” After a Portuguese confirmation, it
+clears only this player-specific local state:
+
+```text
+active_player_name_v1
+cacasoma_level_progress
+hasSeenRubiksClass1
+tutorial_*_completed
+game_progress_*
+stop_level_stars_*
+```
+
+The reset deliberately preserves `active_classroom_session_v1`,
+`managed_classroom_tokens_v1`, analytics/browser identifiers, and unrelated
+browser data. It uses an allowlisted reset function and never calls
+`localStorage.clear()`. The event reports only `reason: "player_switch"`; it
+does not report the removed keys or use the action as a count of students.
+
+Progress is device-local convenience state. Even after adding this reset, GA4
+cannot show an individual student's longitudinal history or learning outcome.
+
+#### Outreach attribution
+
+Outreach links should land directly on the manual with standardized,
+non-identifying UTMs, for example:
+
+```text
+https://jogandocomlogica.com/manual?utm_source=direct_email&utm_medium=email&utm_campaign=school_outreach_2026_s2&utm_content=teacher_manual
+```
+
+Campaign values describe a channel or outreach batch, never a teacher,
+student, school, classroom, or recipient. The safe page-location function
+keeps only `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, and
+`utm_term`; GA4 session campaign dimensions should be used to compare manual
+views, selections, classroom creation results, and feedback opens.
+
 ### Removed legacy behavior
 
 Phase 1 removed:
@@ -315,9 +391,10 @@ The shared sender removes undefined values, malformed parameter names, and
 forbidden fields. The current forbidden list includes:
 
 ```text
-answer, answer_text, attempt_id, classroom_code, client_id, error,
-error_message, free_text, host_name, message, name, player_name, raw_error,
-room_code, school, school_name, student_name, user_id
+answer, answer_text, attempt_id, classroom_code, classroom_management_token,
+client_id, error, error_message, free_text, host_name, management_token,
+message, name, player_name, raw_error, room_code, school, school_name,
+student_name, teacher_name, user_id
 ```
 
 Never send:
@@ -330,8 +407,9 @@ Never send:
 - raw error messages or stack traces;
 - values read from local progress storage.
 
-For failures, a later phase may send a controlled low-cardinality code such as
-`room_not_found`; it must never send the raw server or UI message.
+Failures may send a controlled low-cardinality code such as `server_error` or,
+in a later multiplayer phase, `room_not_found`. They must never send the raw
+server or UI message.
 
 ## Required GA4 administration action
 
@@ -369,14 +447,25 @@ After deployment, use DebugView/Tag Assistant to verify:
 13. local board matches use `participant_count: 2`, AI uses `1`, and AI outcome
     is relative to the human;
 14. online routes, Bomb Game, Puzzle Wire, Houses, Damas, and test routes send
-    no lifecycle events while the matrix marks them uncovered.
+    no lifecycle events while the matrix marks them uncovered;
+15. manual rules links send `select_content` with `teacher_manual`, while
+    scrolling to details sends nothing;
+16. feedback buttons send one `feedback_open` with the correct entry point and
+    do not claim a form submission;
+17. a classroom create button click sends nothing until the server result,
+    restored classroom lists send nothing, and success/failure includes no
+    code, token, name, or raw message;
+18. “Trocar jogador” requires confirmation, clears the documented player keys,
+    and preserves both classroom keys and unrelated storage;
+19. a direct manual URL with the standard UTM convention retains only safe
+    campaign parameters in `page_location`.
 
 For Phase 2–3 Explorations, register only the parameters that will be used. A
 reasonable initial set is:
 
 | Type | Parameters |
 | --- | --- |
-| Event-scoped dimensions | `game_id`, `level_id`, `game_mode`, `activity_variant`, `difficulty`, `usage_context`, `end_reason`, `outcome`, `success`, `tutorial_id`, `step_id`, `entry_point` |
+| Event-scoped dimensions | `game_id`, `level_id`, `game_mode`, `activity_variant`, `difficulty`, `usage_context`, `end_reason`, `outcome`, `success`, `tutorial_id`, `step_id`, `entry_point`, `error_code`, `reason` |
 | Event-scoped custom metrics | `duration_seconds`, `participant_count`, `completed_round_count`, `completed_step_count`, `correct_count`, `incorrect_count`, `assistance_count`, `stars_earned` |
 
 Do not register browser/client IDs, attempt IDs, timestamps, room codes, or any
@@ -406,16 +495,12 @@ the end event for an attempt or level.
 
 ## Remaining planned event contract
 
-The following events remain targets for later phases. The Caça Soma level and
-tutorial events plus the Phase 3 matrix rows marked Yes are already
-implemented and are not merely planned.
+The following events remain targets for later phases. Phase 1–4 events
+described above are implemented and are not merely planned.
 
 | Event | Intended fire point | Important parameters |
 | --- | --- | --- |
-| `classroom_create_result` | Server confirms creation result | `success`, controlled `error_code` on failure |
 | `multiplayer_join_result` | Server confirms join result | game/mode, `success`, `wait_ms`, controlled failure code |
-| `feedback_open` | Teacher opens feedback form | `entry_point` |
-| `local_progress_reset` | Shared-device reset is confirmed | `reason: "player_switch"` |
 
 Suggested shared parameters:
 
@@ -445,10 +530,10 @@ their own true start and end points.
 | 1 | Implemented in code; GA admin/DebugView validation pending | Reliable initialization, manual page views, typed selection event, privacy guard, timer removal |
 | 2 | Implemented in code; deployed DebugView validation pending | Pilot Caça Soma level lifecycle, active timing, aggregate outcomes, and tutorial events |
 | 3 | Implemented in code; deployed DebugView validation pending | Stop, Rubik's activities, and local/AI board-game coverage; explicit online/reserved-route exclusions |
-| 4 | Planned | Teacher, classroom, outreach, and local shared-device reset |
+| 4 | Implemented in code; deployed DebugView validation pending | Teacher-manual selections, feedback opening, confirmed classroom creation results, outreach convention, and allowlisted local player reset |
 | 5 | Planned | Multiplayer reliability and GA4 reports/explorations |
 
-### Phase 2–3 verification status
+### Phase 2–4 verification status
 
 - Automated tests cover one start/end, completion, retry, route cleanup,
   pagehide, hidden/resumed timing, and direct starts without selection state.
@@ -460,3 +545,6 @@ their own true start and end points.
   retry, `pagehide`, cleanup, and hidden/resumed duration.
 - The instrumentation matrix is the source of truth for which routes may be
   included in lifecycle reports.
+- Automated Phase 4 tests cover typed payloads, guarded classroom results, the
+  complete player-progress key inventory, and preservation of classroom and
+  unrelated local state.

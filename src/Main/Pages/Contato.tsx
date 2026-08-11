@@ -1,5 +1,6 @@
 import "../CSS/Contato.css";
 import Form from "../Components/form";
+import { analytics } from "../../analytics/events";
 
 function Contato() {
 
@@ -19,12 +20,13 @@ function Contato() {
     <div className="feedbackButtonContainer">
       <button
         className="feedbackButton"
-        onClick={() =>
+        onClick={() => {
+          analytics.feedbackOpened({ entryPoint: "contact_page" });
           window.open(
             'https://docs.google.com/forms/d/e/1FAIpQLSc6W0uOiy5uYFGhjVjqzS3Iw6mp_VzHSi5qNkfnTuqS0dffOQ/viewform?embedded=true',
             '_blank'
-          )
-        }
+          );
+        }}
       >
         Formulário de feedback para professores
       </button>

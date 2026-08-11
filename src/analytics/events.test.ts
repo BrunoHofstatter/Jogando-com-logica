@@ -124,6 +124,46 @@ describe("typed analytics events", () => {
     });
   });
 
+  it("maps teacher and shared-device actions without identifying values", () => {
+    analytics.gameSelected({
+      gameId: "caca_coroa",
+      entryPoint: "teacher_manual",
+    });
+    expect(mockedSendAnalyticsEvent).toHaveBeenLastCalledWith("select_content", {
+      content_type: "game",
+      content_id: "caca_coroa",
+      entry_point: "teacher_manual",
+    });
+
+    analytics.feedbackOpened({ entryPoint: "contact_page" });
+    expect(mockedSendAnalyticsEvent).toHaveBeenLastCalledWith("feedback_open", {
+      entry_point: "contact_page",
+    });
+
+    analytics.localProgressReset({ reason: "player_switch" });
+    expect(mockedSendAnalyticsEvent).toHaveBeenLastCalledWith(
+      "local_progress_reset",
+      { reason: "player_switch" },
+    );
+  });
+
+  it("maps only the confirmed classroom creation result", () => {
+    analytics.classroomCreateResult({ success: true });
+    expect(mockedSendAnalyticsEvent).toHaveBeenLastCalledWith(
+      "classroom_create_result",
+      { success: true, error_code: undefined },
+    );
+
+    analytics.classroomCreateResult({
+      success: false,
+      errorCode: "server_error",
+    });
+    expect(mockedSendAnalyticsEvent).toHaveBeenLastCalledWith(
+      "classroom_create_result",
+      { success: false, error_code: "server_error" },
+    );
+  });
+
   it("maps tutorial skip with only the controlled current step ID", () => {
     analytics.tutorialSkipped({
       gameId: "caca_soma",
