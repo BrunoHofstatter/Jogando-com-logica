@@ -32,6 +32,8 @@ const EVENT_NAME_PATTERN = /^[a-z][a-z0-9_]*$/;
 const PARAMETER_NAME_PATTERN = /^[a-z][a-z0-9_]*$/;
 
 export type AnalyticsEventName =
+  | "game_end"
+  | "game_start"
   | "level_end"
   | "level_start"
   | "page_view"

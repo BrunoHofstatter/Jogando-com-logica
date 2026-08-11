@@ -7,6 +7,9 @@ export const GAME_IDS = [
   "caca_coroa",
   "super_jogo_da_velha",
   "guerra_matematica",
+  "bomb_game",
+  "puzzle_wire",
+  "houses",
 ] as const;
 
 export type GameId = (typeof GAME_IDS)[number];
@@ -27,7 +30,19 @@ export type ActivityEndReason =
   | "abandoned"
   | "error"
   | "disconnected";
-export type ActivityOutcome = "passed" | "failed";
+export type ActivityOutcome =
+  | "completed"
+  | "draw"
+  | "failed"
+  | "loss"
+  | "passed"
+  | "win";
+export type ActivityVariant =
+  | "lesson"
+  | "level"
+  | "random"
+  | "review"
+  | "tutorial";
 
 interface PageViewedParameters {
   pageTitle: string;
@@ -37,6 +52,30 @@ interface PageViewedParameters {
 interface GameSelectedParameters {
   gameId: GameId;
   entryPoint: EntryPoint;
+}
+
+export interface GameStartedParameters {
+  gameId: GameId;
+  gameMode: GameMode;
+  usageContext: UsageContext;
+  participantCount?: number;
+  entryPoint?: EntryPoint;
+  levelId?: string;
+  difficulty?: string;
+  activityVariant?: ActivityVariant;
+}
+
+export interface GameEndedParameters extends GameStartedParameters {
+  durationSeconds: number;
+  endReason: ActivityEndReason;
+  success?: boolean;
+  outcome?: ActivityOutcome;
+  completedStepCount?: number;
+  correctCount?: number;
+  incorrectCount?: number;
+  hintCount?: number;
+  assistanceCount?: number;
+  starsEarned?: number;
 }
 
 export interface LevelStartedParameters {
@@ -92,6 +131,11 @@ export function formatLevelId(levelNumber: number): string {
   return `level_${String(levelNumber).padStart(2, "0")}`;
 }
 
+export function formatAiDifficulty(difficulty: number): string {
+  return ["very_easy", "easy", "medium", "hard"][difficulty - 1] ??
+    "unknown";
+}
+
 export const analytics = {
   pageViewed({ pageTitle, pageLocation }: PageViewedParameters): boolean {
     return sendAnalyticsEvent("page_view", {
@@ -105,6 +149,70 @@ export const analytics = {
       content_type: "game",
       content_id: gameId,
       entry_point: entryPoint,
+    });
+  },
+
+  gameStarted({
+    gameId,
+    gameMode,
+    usageContext,
+    participantCount,
+    entryPoint,
+    levelId,
+    difficulty,
+    activityVariant,
+  }: GameStartedParameters): boolean {
+    return sendAnalyticsEvent("game_start", {
+      game_id: gameId,
+      game_mode: gameMode,
+      usage_context: usageContext,
+      participant_count: participantCount,
+      entry_point: entryPoint,
+      level_id: levelId,
+      difficulty,
+      activity_variant: activityVariant,
+    });
+  },
+
+  gameEnded({
+    gameId,
+    gameMode,
+    usageContext,
+    participantCount,
+    entryPoint,
+    levelId,
+    difficulty,
+    activityVariant,
+    durationSeconds,
+    endReason,
+    success,
+    outcome,
+    completedStepCount,
+    correctCount,
+    incorrectCount,
+    hintCount,
+    assistanceCount,
+    starsEarned,
+  }: GameEndedParameters): boolean {
+    return sendAnalyticsEvent("game_end", {
+      game_id: gameId,
+      game_mode: gameMode,
+      usage_context: usageContext,
+      participant_count: participantCount,
+      entry_point: entryPoint,
+      level_id: levelId,
+      difficulty,
+      activity_variant: activityVariant,
+      duration_seconds: durationSeconds,
+      end_reason: endReason,
+      success,
+      outcome,
+      completed_step_count: completedStepCount,
+      correct_count: correctCount,
+      incorrect_count: incorrectCount,
+      hint_count: hintCount,
+      assistance_count: assistanceCount,
+      stars_earned: starsEarned,
     });
   },
 

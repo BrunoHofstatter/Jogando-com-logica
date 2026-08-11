@@ -1,20 +1,48 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useMemo } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import RubiksCube from "../../Components/RubiksCube";
 import { useClass2 } from "./useClass2";
 import Class2SummaryView from "./Class2SummaryView";
 import styles from "./Class2FaceArea.module.css";
 import { ROUTES } from "../../../routes";
+import { useGameAttemptAnalytics } from "../../../analytics/useGameAttemptAnalytics";
 
 
 const Class2FaceArea: React.FC = () => {
     const { cubeProps, uiProps } = useClass2();
     const navigate = useNavigate();
+    const location = useLocation();
+    const isReview =
+        location.state?.mode === "game" ||
+        new URLSearchParams(location.search).get("mode") === "game";
+    const analyticsContext = useMemo(() => ({
+        gameId: "cubo_magico" as const,
+        gameMode: "solo" as const,
+        usageContext: "standard" as const,
+        participantCount: 1,
+        levelId: "class_02",
+        activityVariant: isReview ? "review" as const : "lesson" as const,
+    }), [isReview]);
+    const { completeAttempt, startAttempt } = useGameAttemptAnalytics(analyticsContext);
+
+    useEffect(() => {
+        startAttempt();
+    }, [startAttempt]);
 
 
     // --- Summary phase ---
     if (uiProps.currentPhase === "summary") {
-        return <Class2SummaryView totalFlags={uiProps.totalFlags} />;
+        return (
+            <Class2SummaryView
+                totalFlags={uiProps.totalFlags}
+                onComplete={(summaryMistakes) => completeAttempt({
+                    assistanceCount: uiProps.totalFlags,
+                    incorrectCount: summaryMistakes,
+                    outcome: "completed",
+                    success: true,
+                })}
+            />
+        );
     }
 
     const isTransition = uiProps.currentPhase === "transition";

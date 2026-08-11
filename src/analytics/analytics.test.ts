@@ -5,7 +5,11 @@ import {
   sanitizeAnalyticsParameters,
   shouldCollectAnalytics,
 } from "./analytics";
-import { formatLevelId, getSafePageLocation } from "./events";
+import {
+  formatAiDifficulty,
+  formatLevelId,
+  getSafePageLocation,
+} from "./events";
 import { ActivityTimer } from "./ActivityTimer";
 
 function createAdapter() {
@@ -126,6 +130,12 @@ describe("analytics payload safeguards", () => {
   it("formats stable, zero-padded level IDs", () => {
     expect(formatLevelId(1)).toBe("level_01");
     expect(formatLevelId(10)).toBe("level_10");
+  });
+
+  it("formats controlled AI difficulty values", () => {
+    expect(formatAiDifficulty(1)).toBe("very_easy");
+    expect(formatAiDifficulty(4)).toBe("hard");
+    expect(formatAiDifficulty(9)).toBe("unknown");
   });
 });
 

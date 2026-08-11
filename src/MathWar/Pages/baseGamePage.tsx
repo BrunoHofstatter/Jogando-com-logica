@@ -6,22 +6,31 @@ import { DiceAnimation } from "../Components/DiceAnimation";
 import { createInitialState } from "../Logic/v2";
 import type { MathWarState } from "../Logic/v2";
 import tutorialStyles from "../styles/DynamicTutorial.module.css";
+import { useBoardGameAnalytics } from "../../analytics/useBoardGameAnalytics";
 
 export default function MathWarPage() {
-  const [showTutorial, setShowTutorial] = useState(false);
-  const [showDiceAnim, setShowDiceAnim] = useState(false);
-  const [diceTarget, setDiceTarget] = useState<number[]>([]);
+  const [showTutorial, setShowTutorial] = useState(
+    () => localStorage.getItem("tutorial_mathwar_v1_completed") !== "true",
+  );
   const [gameState, setGameState] = useState<MathWarState>(() =>
     createInitialState(),
   );
+  const [showDiceAnim, setShowDiceAnim] = useState(true);
+  const [diceTarget, setDiceTarget] = useState<number[]>(
+    () => gameState.diceRoll,
+  );
 
-
-  useEffect(() => {
-    const completed = localStorage.getItem("tutorial_mathwar_v1_completed");
-    if (completed !== "true") {
-      setShowTutorial(true);
-    }
-  }, []);
+  useBoardGameAnalytics({
+    context: {
+      gameId: "guerra_matematica",
+      gameMode: "local_multiplayer",
+      usageContext: "standard",
+      participantCount: 2,
+    },
+    isReady: !showTutorial && !showDiceAnim,
+    status: gameState.status,
+    winner: gameState.winner,
+  });
 
   useEffect(() => {
     if (gameState.turnCount % 3 === 0) {
@@ -29,6 +38,13 @@ export default function MathWarPage() {
       setShowDiceAnim(true);
     }
   }, [gameState.diceRoll, gameState.turnCount]);
+
+  const handleGameStateChange = (nextState: MathWarState) => {
+    if (gameState.status === "ended" && nextState.turnCount === 0) {
+      setShowDiceAnim(true);
+    }
+    setGameState(nextState);
+  };
 
   const tutorialSteps: TutorialStep[] = [
     {
@@ -91,7 +107,7 @@ export default function MathWarPage() {
   return <>
     <Board
       gameState={gameState}
-      onGameStateChange={setGameState}
+      onGameStateChange={handleGameStateChange}
     />
 
     {showTutorial && (

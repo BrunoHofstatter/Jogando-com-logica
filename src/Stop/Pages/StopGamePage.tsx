@@ -14,6 +14,8 @@ import {
   createStopRoundTemplateFromLevel,
   type StopRound,
 } from "../Logic/stopRound";
+import { formatLevelId, type ActivityVariant } from "../../analytics/events";
+import { useGameAttemptAnalytics } from "../../analytics/useGameAttemptAnalytics";
 
 /**
  * Main Stop game page
@@ -47,6 +49,7 @@ function StopGamePage() {
   });
 
   const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialCheckComplete, setTutorialCheckComplete] = useState(false);
   const [currentRound, setCurrentRound] = useState<StopRound | null>(null);
   const [showNumber, setShowNumber] = useState(true);
   const [showGame, setShowGame] = useState(false);
@@ -54,12 +57,39 @@ function StopGamePage() {
 
   const tutorialActiveRef = useRef(false);
 
+  const activityVariant: ActivityVariant =
+    mode === "level"
+      ? "level"
+      : mode === "tutorial_fixed"
+        ? "tutorial"
+        : "random";
+  const analyticsContext = useMemo(
+    () => ({
+      gameId: "stop_matematico" as const,
+      gameMode: "solo" as const,
+      usageContext: "standard" as const,
+      participantCount: 1,
+      levelId: mode === "level" ? formatLevelId(levelId) : undefined,
+      difficulty: mode === "level" ? undefined : difficulty,
+      activityVariant,
+    }),
+    [activityVariant, difficulty, levelId, mode],
+  );
+  const { completeAttempt, startAttempt } =
+    useGameAttemptAnalytics(analyticsContext);
+
   // Auto-show tutorial on first visit or if explicitly requested
   useEffect(() => {
     const completed = localStorage.getItem("tutorial_stop_v1_completed");
     if (mode === "tutorial_fixed" || completed !== "true") {
-      setTimeout(() => setShowTutorial(true), 500);
+      const timeout = window.setTimeout(() => {
+        setShowTutorial(true);
+        setTutorialCheckComplete(true);
+      }, 500);
+      return () => window.clearTimeout(timeout);
     }
+
+    setTutorialCheckComplete(true);
   }, [mode]);
 
   useEffect(() => {
@@ -163,6 +193,9 @@ function StopGamePage() {
           round={currentRound}
           levelConfig={levelConfig}
           onReset={handleReset}
+          analyticsReady={tutorialCheckComplete && !showTutorial}
+          onRoundPlayable={startAttempt}
+          onRoundComplete={completeAttempt}
         />
       )}
       {/* Tutorial overlay */}

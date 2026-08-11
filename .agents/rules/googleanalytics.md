@@ -30,11 +30,14 @@ Required reporting rules:
 - GA4 cannot establish learning outcomes. Use teacher feedback or a structured
   educational evaluation for that question.
 
-## Current implementation: Phases 1 and 2
+## Current implementation: Phases 1 through 3
 
 Phase 1 provides the collection foundation. Phase 2 connects that foundation
-to the solo Caça Soma level lifecycle as the pilot. Other games, classrooms,
-teacher actions, and multiplayer reliability are not instrumented yet.
+to the solo Caça Soma level lifecycle as the pilot. Phase 3 extends guarded,
+foreground-only activity attempts to Stop, Rubik's activities, and the local
+and AI modes of the three public board games. Classroom actions, online match
+lifecycles, teacher actions, and multiplayer reliability are not instrumented
+yet.
 
 ### Code structure
 
@@ -44,6 +47,9 @@ src/analytics/
 ├── events.ts             # typed public event functions and stable game IDs
 ├── PageViewTracker.tsx   # manual React Router page views
 ├── ActivityTimer.ts      # foreground timer with one guarded finalization
+├── GameAttemptTracker.ts # reusable game/activity start/end lifecycle
+├── useGameAttemptAnalytics.ts # React visibility/page-exit integration
+├── useBoardGameAnalytics.ts # shared local/AI board-game lifecycle
 ├── LevelAttemptTracker.ts # framework-independent level attempt lifecycle
 ├── useLevelAttemptAnalytics.ts # React visibility/page-exit integration
 ├── LevelAttemptTracker.test.ts # completion, retry, exit, and timing tests
@@ -86,6 +92,8 @@ All event names, parameter names, IDs, and controlled values use lowercase
 | --- | --- | --- |
 | `page_view` | Initial React route and each pathname/query change | `page_title`, sanitized `page_location` |
 | `select_content` | One of the six game cards is selected in `/jogos` | `content_type: "game"`, `content_id`, `entry_point: "game_catalog"` |
+| `game_start` | A Phase 3 Stop round, Rubik's activity, or local/AI board match becomes usable | `game_id`, `game_mode`, `usage_context`, `participant_count`; applicable `level_id`, `difficulty`, `activity_variant` |
+| `game_end` | A started Phase 3 activity completes or is abandoned by route exit/browser `pagehide` | start context, active `duration_seconds`, `end_reason`; controlled outcome and aggregates when known |
 | `level_start` | A solo Caça Soma level first becomes playable after the Magic Number finishes rolling; retries start a new attempt | `game_id`, `level_id`, `game_mode`, `usage_context`, `participant_count` |
 | `level_end` | A started Caça Soma level reaches its result or is abandoned by route exit/browser `pagehide` | start context, active `duration_seconds`, `end_reason`, aggregate round counts; completion outcome and stars when known |
 | `tutorial_begin` | The Caça Soma levels tutorial overlay mounts | `game_id`, `tutorial_id` |
@@ -116,6 +124,20 @@ caca_coroa
 super_jogo_da_velha
 guerra_matematica
 ```
+
+Reserved before future catalog exposure:
+
+```text
+bomb_game
+puzzle_wire
+houses
+```
+
+Reserved IDs do not mean those games emit lifecycle events. Bomb Game is
+online-only and remains deferred with the online measurement design. Puzzle
+Wire and Houses have empty gameplay pages, so sending a start from those
+routes would be false telemetry. None of the three is ready to be added to the
+public catalog on analytics coverage alone.
 
 Game IDs are permanent analytics identifiers. Portuguese display labels may
 change without changing the IDs.
@@ -177,6 +199,101 @@ No `game_start` or `game_end` is sent for the levels menu. There is currently
 no distinct multi-level activity boundary, so adding those events would count
 the same lifecycle twice without providing a clear new unit.
 
+### Phase 3 activity lifecycle
+
+Phase 3 reuses one `GameAttemptTracker` for different activity shapes. Attempt
+state stays in memory. Route cleanup and `pagehide` share one finalizer, and
+`visibilitychange` pauses active time without ending the attempt. Completion,
+abandonment, and retry therefore follow the same exactly-once rule as the Caça
+Soma pilot.
+
+True start points:
+
+- Stop starts after the Magic Number reveal, once the board is visible and any
+  tutorial overlay has been dismissed.
+- A Rubik's activity starts when the selected lesson or review activity is
+  mounted and interactive.
+- Caça Coroa and Super Jogo da Velha start when the local/AI board is usable
+  after the tutorial.
+- Guerra Matemática also waits for the opening dice animation to finish.
+
+True completion points:
+
+- Stop completes when the round is evaluated by `STOP` or the final Enter
+  action. It sends aggregate correct/incorrect counts only.
+- Rubik's classes complete only at the final lesson/review result, not when the
+  class route opens.
+- Board games complete only when their rules state changes to `ended`.
+
+#### Phase 3 controlled values
+
+Stop:
+
+```text
+game_id: stop_matematico
+game_mode: solo
+participant_count: 1
+activity_variant: level | random | tutorial
+level_id: level_01 ... level_10     # level variant only
+difficulty: d1 ... d6               # non-level variants when known
+```
+
+Level-mode `success` uses Stop's shipped rule: at least one star passes the
+level. `outcome` is `passed` or `failed`. Random/tutorial rounds use
+`outcome: completed` and do not invent a pass/fail result.
+
+Rubik's activities:
+
+```text
+game_id: cubo_magico
+game_mode: solo
+participant_count: 1
+level_id: class_01 | class_02 | class_03
+activity_variant: lesson | review
+```
+
+Class 3 currently supports `lesson` only. `assistance_count` preserves the
+meaning of each module's existing aggregate help/flag counter; it is not a
+count of students or a standardized learning score. Summary mistakes are sent
+only as an aggregate `incorrect_count`.
+
+Board games:
+
+```text
+game_mode: local_multiplayer | ai
+participant_count: 2                # local two-person match
+participant_count: 1                # one person versus AI
+difficulty: very_easy | easy | medium | hard   # AI only
+```
+
+For local matches, `outcome` is `completed` or `draw`; no individual winner is
+identified. For AI matches, `outcome` is `win`, `loss`, or `draw` from the
+human side and `success` is present only for a win/loss result.
+
+#### Instrumentation matrix
+
+| Activity | Start/end coverage | Current event unit | Notes |
+| --- | --- | --- | --- |
+| Caça Soma solo levels | Yes | `level_start` / `level_end` | Phase 2 pilot |
+| Caça Soma legacy local-versus and online | No | — | Needs separate lifecycle/online design |
+| Stop level, random, tutorial-fixed | Yes | `game_start` / `game_end` | One event pair per round |
+| Stop online | No | — | Deferred with multiplayer measurement |
+| Cubo Mágico classes 1–2 learn/review | Yes | `game_start` / `game_end` | `activity_variant` separates lesson/review |
+| Cubo Mágico class 3 lesson | Yes | `game_start` / `game_end` | No review mode currently exposed |
+| Caça Coroa local/AI | Yes | `game_start` / `game_end` | Shared board integration |
+| Super Jogo da Velha local/AI | Yes | `game_start` / `game_end` | Shared board integration |
+| Guerra Matemática local/AI | Yes | `game_start` / `game_end` | Starts after opening dice animation |
+| Board-game online modes | No | — | Avoid counting one match once per client/device |
+| Bomb Game | No | — | Online-only; reserved ID, not catalog-ready |
+| Puzzle Wire / Houses | No | — | Gameplay pages are empty; reserved IDs only |
+| Damas and test/base routes | No | — | Intentionally excluded from product reports |
+
+Online match events are deliberately deferred. Sending a client event from
+both players would make one match look like two attempts. The multiplayer
+phase must first choose and document either one canonical emitter, server-side
+measurement, or an explicitly participant-activity-based report. Room codes,
+names, and persistent identifiers remain forbidden in every option.
+
 ### Removed legacy behavior
 
 Phase 1 removed:
@@ -189,8 +306,8 @@ Phase 1 removed:
 
 That timer mixed rules/menu reading with gameplay, ended on the first tab
 switch, missed direct links, and could carry state between different people on
-one device. Phase 2 replaces it only for Caça Soma levels with an in-memory,
-foreground-only attempt timer.
+one device. Phases 2–3 replace it for covered activities with in-memory,
+foreground-only attempt timers.
 
 ### Payload safeguards
 
@@ -244,15 +361,23 @@ After deployment, use DebugView/Tag Assistant to verify:
 8. refresh/pagehide abandonment reaches GA when the browser allows delivery;
 9. no events from localhost or preview hosts;
 10. no classroom codes, names, answers, selected numbers, or raw errors in
-    payloads.
+    payloads;
+11. Stop starts only after reveal/tutorial gating and sends one aggregate end
+    for completion, retry, or route exit;
+12. Rubik's `activity_variant` distinguishes lesson/review and completion does
+    not fire merely on route entry;
+13. local board matches use `participant_count: 2`, AI uses `1`, and AI outcome
+    is relative to the human;
+14. online routes, Bomb Game, Puzzle Wire, Houses, Damas, and test routes send
+    no lifecycle events while the matrix marks them uncovered.
 
-For Phase 2 Explorations, register only the parameters that will be used. A
+For Phase 2–3 Explorations, register only the parameters that will be used. A
 reasonable initial set is:
 
 | Type | Parameters |
 | --- | --- |
-| Event-scoped dimensions | `game_id`, `level_id`, `game_mode`, `usage_context`, `end_reason`, `outcome`, `success`, `tutorial_id`, `step_id`, `entry_point` |
-| Event-scoped custom metrics | `duration_seconds`, `participant_count`, `completed_round_count`, `correct_count`, `incorrect_count`, `stars_earned` |
+| Event-scoped dimensions | `game_id`, `level_id`, `game_mode`, `activity_variant`, `difficulty`, `usage_context`, `end_reason`, `outcome`, `success`, `tutorial_id`, `step_id`, `entry_point` |
+| Event-scoped custom metrics | `duration_seconds`, `participant_count`, `completed_round_count`, `completed_step_count`, `correct_count`, `incorrect_count`, `assistance_count`, `stars_earned` |
 
 Do not register browser/client IDs, attempt IDs, timestamps, room codes, or any
 other high-cardinality or identifying value.
@@ -281,14 +406,12 @@ the end event for an attempt or level.
 
 ## Remaining planned event contract
 
-The following events remain targets for later phases. The Caça Soma
-`level_start`, `level_end`, and tutorial events described above are already
+The following events remain targets for later phases. The Caça Soma level and
+tutorial events plus the Phase 3 matrix rows marked Yes are already
 implemented and are not merely planned.
 
 | Event | Intended fire point | Important parameters |
 | --- | --- | --- |
-| `game_start` | Board/round becomes playable | `game_id`, `game_mode`, `entry_point`, `usage_context`; difficulty/participants when known |
-| `game_end` | Completion, route abandonment, error, or disconnect | start context, `duration_seconds`, `end_reason`, optional `outcome` and `success` |
 | `classroom_create_result` | Server confirms creation result | `success`, controlled `error_code` on failure |
 | `multiplayer_join_result` | Server confirms join result | game/mode, `success`, `wait_ms`, controlled failure code |
 | `feedback_open` | Teacher opens feedback form | `entry_point` |
@@ -299,7 +422,7 @@ Suggested shared parameters:
 ```text
 game_id, game_mode, entry_point, level_id, difficulty, participant_count,
 usage_context, duration_seconds, success, outcome, end_reason,
-incorrect_count, hint_count, error_code, wait_ms
+incorrect_count, hint_count, assistance_count, error_code, wait_ms
 ```
 
 Use controlled enums such as:
@@ -310,9 +433,10 @@ usage_context: standard | classroom
 end_reason: completed | abandoned | error | disconnected
 ```
 
-`ActivityTimer` now powers the Caça Soma level pilot. Later game integrations
-should reuse the guarded lifecycle pattern while choosing their own true start
-and end points.
+`game_start` and `game_end` are now implemented for the Phase 3 matrix rows
+marked Yes. They remain planned for online and not-yet-playable activities.
+Later integrations must reuse the guarded lifecycle pattern while choosing
+their own true start and end points.
 
 ## Rollout status
 
@@ -320,11 +444,11 @@ and end points.
 | --- | --- | --- |
 | 1 | Implemented in code; GA admin/DebugView validation pending | Reliable initialization, manual page views, typed selection event, privacy guard, timer removal |
 | 2 | Implemented in code; deployed DebugView validation pending | Pilot Caça Soma level lifecycle, active timing, aggregate outcomes, and tutorial events |
-| 3 | Planned | Remaining public games |
+| 3 | Implemented in code; deployed DebugView validation pending | Stop, Rubik's activities, and local/AI board-game coverage; explicit online/reserved-route exclusions |
 | 4 | Planned | Teacher, classroom, outreach, and local shared-device reset |
 | 5 | Planned | Multiplayer reliability and GA4 reports/explorations |
 
-### Phase 2 pilot verification status
+### Phase 2–3 verification status
 
 - Automated tests cover one start/end, completion, retry, route cleanup,
   pagehide, hidden/resumed timing, and direct starts without selection state.
@@ -332,3 +456,7 @@ and end points.
 - Deployed DebugView validation is still required because localhost collection
   is intentionally disabled.
 - Reports must use event-count ratios, not GA user counts as student counts.
+- Automated Phase 3 tests cover the reusable attempt timer, exactly-once end,
+  retry, `pagehide`, cleanup, and hidden/resumed duration.
+- The instrumentation matrix is the source of truth for which routes may be
+  included in lifecycle reports.

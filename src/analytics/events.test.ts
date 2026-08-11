@@ -65,6 +65,65 @@ describe("typed analytics events", () => {
     });
   });
 
+  it("maps a game lifecycle with controlled activity context", () => {
+    analytics.gameStarted({
+      gameId: "stop_matematico",
+      gameMode: "solo",
+      usageContext: "standard",
+      participantCount: 1,
+      levelId: "level_03",
+      activityVariant: "level",
+    });
+
+    expect(mockedSendAnalyticsEvent).toHaveBeenLastCalledWith("game_start", {
+      game_id: "stop_matematico",
+      game_mode: "solo",
+      usage_context: "standard",
+      participant_count: 1,
+      entry_point: undefined,
+      level_id: "level_03",
+      difficulty: undefined,
+      activity_variant: "level",
+    });
+
+    analytics.gameEnded({
+      gameId: "stop_matematico",
+      gameMode: "solo",
+      usageContext: "standard",
+      participantCount: 1,
+      levelId: "level_03",
+      activityVariant: "level",
+      durationSeconds: 31,
+      endReason: "completed",
+      success: true,
+      outcome: "passed",
+      correctCount: 7,
+      incorrectCount: 1,
+      starsEarned: 2,
+    });
+
+    expect(mockedSendAnalyticsEvent).toHaveBeenLastCalledWith("game_end", {
+      game_id: "stop_matematico",
+      game_mode: "solo",
+      usage_context: "standard",
+      participant_count: 1,
+      entry_point: undefined,
+      level_id: "level_03",
+      difficulty: undefined,
+      activity_variant: "level",
+      duration_seconds: 31,
+      end_reason: "completed",
+      success: true,
+      outcome: "passed",
+      completed_step_count: undefined,
+      correct_count: 7,
+      incorrect_count: 1,
+      hint_count: undefined,
+      assistance_count: undefined,
+      stars_earned: 2,
+    });
+  });
+
   it("maps tutorial skip with only the controlled current step ID", () => {
     analytics.tutorialSkipped({
       gameId: "caca_soma",

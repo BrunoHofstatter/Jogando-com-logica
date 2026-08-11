@@ -7,6 +7,7 @@ import { ROUTES } from "../../../routes";
 
 interface Class2SummaryViewProps {
     totalFlags: number;
+    onComplete: (mistakes: number) => boolean;
 }
 
 interface FallingBox {
@@ -26,7 +27,7 @@ const DISTRACTORS = [6, 8, 10, 12, 14, 15, 20, 24, 30, 35, 42];
 
 const MAX_BOXES = 6;
 
-const Class2SummaryView: React.FC<Class2SummaryViewProps> = ({ totalFlags }) => {
+const Class2SummaryView: React.FC<Class2SummaryViewProps> = ({ totalFlags, onComplete }) => {
     const navigate = useNavigate();
 
     // --- State ---
@@ -185,6 +186,12 @@ const Class2SummaryView: React.FC<Class2SummaryViewProps> = ({ totalFlags }) => 
 
     const isComplete = matchedSizes.length === TARGETS.length;
 
+    useEffect(() => {
+        if (isComplete) {
+            onComplete(mistakes);
+        }
+    }, [isComplete, mistakes, onComplete]);
+
     // --- Render helpers ---
     const renderCube = (size: number, isLeft: boolean) => {
         const isMatched = matchedSizes.includes(size);
@@ -248,12 +255,12 @@ const Class2SummaryView: React.FC<Class2SummaryViewProps> = ({ totalFlags }) => 
 
             {/* Left Cubes (2, 3, 4) */}
             <div className={`${styles.sidePanel} ${styles.leftPanel}`}>
-                {React.useMemo(() => CUBES_LEFT.map((size) => renderCube(size, true)), [matchedSizes, shakingCube, selectedBoxId])}
+                {CUBES_LEFT.map((size) => renderCube(size, true))}
             </div>
 
             {/* Right Cubes (5, 6) */}
             <div className={`${styles.sidePanel} ${styles.rightPanel}`}>
-                {React.useMemo(() => CUBES_RIGHT.map((size) => renderCube(size, false)), [matchedSizes, shakingCube, selectedBoxId])}
+                {CUBES_RIGHT.map((size) => renderCube(size, false))}
             </div>
 
             {/* Falling Area */}
