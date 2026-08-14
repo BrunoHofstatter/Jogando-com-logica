@@ -88,6 +88,8 @@ Deeper project context lives in `.agents/rules/`. Read these when relevant:
 | `docs_classroom_system.md` | Working on classroom codes, classroom room browsers, or adding classroom support to another online game |
 | `docs_teacher_manual.md` | Working on the `/manual` page or teacher-facing content |
 | `googleanalytics.md` | Adding or modifying GA4 event tracking |
+| `tutorial_system/overall_plan.md` | Planning or implementing the playable tutorial rollout for any game |
+| `tutorial_system/core_system_plan.md` | Designing or implementing the shared playable tutorial core or a game integration |
 
 ## Optional Skills
 
