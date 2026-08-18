@@ -1,36 +1,18 @@
 //import MainMenu from "../Components/mainMenu";
 import "../CSS/Home.css";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import RubiksCube from "../../RubiksClass/Components/RubiksCube";
-import { resetLocalPlayerProgress } from "../../Shared/PlayerProgress/localPlayerProgress";
-import { analytics } from "../../analytics/events";
 import { ROUTES } from "../../routes";
 
 function Home() {
   const navigate = useNavigate();
-  const [resetFeedback, setResetFeedback] = useState("");
   const mudar_pagina = (pagina: string) => {
     navigate(pagina);
-  };
-
-  const switchPlayer = () => {
-    const confirmed = window.confirm(
-      "Trocar de jogador? O progresso dos jogos, tutoriais concluídos e o nome lembrado neste dispositivo serão apagados. As turmas online serão mantidas.",
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    resetLocalPlayerProgress(window.localStorage);
-    analytics.localProgressReset({ reason: "player_switch" });
-    setResetFeedback("Pronto! O próximo jogador começará com um progresso novo.");
   };
   return (
     <div className="homePage">
       <div className="imagens">
-        <img src={`${import.meta.env.BASE_URL}imagemXadrez.png`} className="imagemXadrez" />
+        <img src={`${import.meta.env.BASE_URL}crown_chase_physicalBoard.png`} className="imagemXadrez" />
         <div className="imagemCuboWrapper">
           <RubiksCube size={3} cubeSize={15} />
         </div>
@@ -76,14 +58,6 @@ function Home() {
         {" "}
         Para Professores
       </button>
-      <button className="buttonSwitchPlayer" onClick={switchPlayer} type="button">
-        Trocar jogador
-      </button>
-      {resetFeedback && (
-        <p className="switchPlayerFeedback" role="status">
-          {resetFeedback}
-        </p>
-      )}
     </div>
   );
 }
