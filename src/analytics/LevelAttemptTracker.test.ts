@@ -7,7 +7,7 @@ const ATTEMPT_CONTEXT = {
   levelId: "level_01",
   gameMode: "solo" as const,
   usageContext: "standard" as const,
-  participantCount: 1,
+  playerSlotCount: 1,
 };
 
 function createEvents() {

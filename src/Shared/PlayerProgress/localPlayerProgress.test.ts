@@ -32,6 +32,7 @@ class MemoryStorage {
 describe("local player progress reset", () => {
   it("recognizes the complete player-specific key inventory", () => {
     expect(isLocalPlayerProgressKey("active_player_name_v1")).toBe(true);
+    expect(isLocalPlayerProgressKey("activeGameSession")).toBe(true);
     expect(isLocalPlayerProgressKey("cacasoma_level_progress")).toBe(true);
     expect(isLocalPlayerProgressKey("hasSeenRubiksClass1")).toBe(true);
     expect(isLocalPlayerProgressKey("tutorial_stop_v1_completed")).toBe(true);
@@ -43,6 +44,7 @@ describe("local player progress reset", () => {
     const storage = new MemoryStorage();
     const playerKeys = [
       "active_player_name_v1",
+      "activeGameSession",
       "cacasoma_level_progress",
       "hasSeenRubiksClass1",
       "tutorial_crownchase_v1_completed",

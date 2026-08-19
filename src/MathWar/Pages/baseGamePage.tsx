@@ -25,7 +25,7 @@ export default function MathWarPage() {
       gameId: "guerra_matematica",
       gameMode: "local_multiplayer",
       usageContext: "standard",
-      participantCount: 2,
+      playerSlotCount: 2,
     },
     isReady: !showTutorial && !showDiceAnim,
     status: gameState.status,

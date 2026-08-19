@@ -20,7 +20,7 @@ export default function CrownChasePage() {
       gameId: "caca_coroa",
       gameMode: "local_multiplayer",
       usageContext: "standard",
-      participantCount: 2,
+      playerSlotCount: 2,
     },
     isReady: !showTutorial,
     status: gameState.status,

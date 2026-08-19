@@ -1,4 +1,9 @@
 import ReactGA from "react-ga4";
+import {
+  getBrowserSafePageContext,
+  getSafePageContext,
+  type SafePageContext,
+} from "./locationPrivacy";
 
 export const GA_MEASUREMENT_ID = "G-BXWR3NBDQL";
 
@@ -60,12 +65,14 @@ export type AnalyticsParameters = Record<
 export interface AnalyticsEnvironment {
   hostname: string;
   isProductionBuild: boolean;
+  pageLocation?: string;
+  pageReferrer?: string;
 }
 
 interface AnalyticsAdapter {
   initialize: (
     measurementId: string,
-    options?: { gtagOptions?: Record<string, boolean> },
+    options?: { gtagOptions?: Record<string, AnalyticsParameterValue> },
   ) => void;
   event: (name: string, parameters?: Record<string, AnalyticsParameterValue>) => void;
 }
@@ -98,7 +105,11 @@ export class AnalyticsClient {
   private enabled = false;
   private initialized = false;
 
-  constructor(private readonly adapter: AnalyticsAdapter) {}
+  constructor(
+    private readonly adapter: AnalyticsAdapter,
+    private readonly getPageContext: () => SafePageContext =
+      getBrowserSafePageContext,
+  ) {}
 
   initialize(environment: AnalyticsEnvironment): boolean {
     if (this.initialized) {
@@ -112,13 +123,21 @@ export class AnalyticsClient {
       return false;
     }
 
-    this.adapter.initialize(GA_MEASUREMENT_ID, {
-      gtagOptions: {
-        allow_ad_personalization_signals: false,
-        allow_google_signals: false,
-        send_page_view: false,
-      },
-    });
+    const safePageContext = getSafePageContext(environment);
+
+    try {
+      this.adapter.initialize(GA_MEASUREMENT_ID, {
+        gtagOptions: {
+          allow_ad_personalization_signals: false,
+          allow_google_signals: false,
+          send_page_view: false,
+          ...safePageContext,
+        },
+      });
+    } catch {
+      this.enabled = false;
+      return false;
+    }
 
     return true;
   }
@@ -135,11 +154,16 @@ export class AnalyticsClient {
       return false;
     }
 
-    this.adapter.event(
-      eventName,
-      sanitizeAnalyticsParameters(parameters),
-    );
-    return true;
+    try {
+      this.adapter.event(eventName, {
+        ...sanitizeAnalyticsParameters(parameters),
+        ...this.getPageContext(),
+      });
+      return true;
+    } catch {
+      this.enabled = false;
+      return false;
+    }
   }
 }
 
@@ -149,6 +173,8 @@ function getBrowserEnvironment(): AnalyticsEnvironment {
   return {
     hostname: typeof window === "undefined" ? "" : window.location.hostname,
     isProductionBuild: import.meta.env.PROD,
+    pageLocation: typeof window === "undefined" ? undefined : window.location.href,
+    pageReferrer: typeof document === "undefined" ? undefined : document.referrer,
   };
 }
 

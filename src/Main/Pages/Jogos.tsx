@@ -4,11 +4,13 @@ import GameButton from "../Components/GameButton";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../routes";
 import { analytics, type GameId } from "../../analytics/events";
+import { resetLocalPlayerProgress } from "../../Shared/PlayerProgress/localPlayerProgress";
 
 
 function Jogos() {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(0);
+  const [progressFeedback, setProgressFeedback] = useState("");
   const gamesPerPage = 6;
 
   const handleGameClick = (gameId: GameId, navigatePath: string) => {
@@ -82,6 +84,28 @@ function Jogos() {
     setCurrentPage((prev) => Math.min(totalPages - 1, prev + 1));
   };
 
+  const deleteProgress = () => {
+    const confirmed = window.confirm(
+      "Deletar o progresso salvo neste dispositivo? As estrelas, dificuldades liberadas, tutoriais concluídos e o nome lembrado serão apagados. As turmas online serão mantidas.",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      const deletedCount = resetLocalPlayerProgress(window.localStorage);
+      analytics.localProgressReset({ reason: "manual_delete" });
+      setProgressFeedback(
+        deletedCount > 0
+          ? "Progresso deletado."
+          : "Não havia progresso salvo neste dispositivo.",
+      );
+    } catch {
+      setProgressFeedback("Não foi possível deletar o progresso.");
+    }
+  };
+
   return (
     <div className="jogosPg">
       <div className="jogosHeader">
@@ -112,6 +136,17 @@ function Jogos() {
           onClick={nextPage}
           disabled={currentPage >= totalPages - 1}
         />
+      </div>
+
+      <div className="progressActions">
+        {progressFeedback && (
+          <p className="progressFeedback" role="status">
+            {progressFeedback}
+          </p>
+        )}
+        <button className="deleteProgressButton" onClick={deleteProgress} type="button">
+          Deletar progresso
+        </button>
       </div>
     </div>
   );

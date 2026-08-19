@@ -21,11 +21,14 @@ function Contato() {
       <button
         className="feedbackButton"
         onClick={() => {
-          analytics.feedbackOpened({ entryPoint: "contact_page" });
-          window.open(
+          const feedbackWindow = window.open(
             'https://docs.google.com/forms/d/e/1FAIpQLSc6W0uOiy5uYFGhjVjqzS3Iw6mp_VzHSi5qNkfnTuqS0dffOQ/viewform?embedded=true',
             '_blank'
           );
+          if (feedbackWindow) {
+            feedbackWindow.opener = null;
+            analytics.feedbackOpened({ entryPoint: "contact_page" });
+          }
         }}
       >
         Formulário de feedback para professores

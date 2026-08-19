@@ -12,9 +12,22 @@ import { useBoardGameAnalytics } from "../../analytics/useBoardGameAnalytics";
 
 
 export default function SPTTTAIPage() {
-  const [showTutorial, setShowTutorial] = useState(
-    () => localStorage.getItem("tutorial_spttt_v1_completed") !== "true",
-  );
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialCheckComplete, setTutorialCheckComplete] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem("tutorial_spttt_v1_completed") === "true") {
+      setTutorialCheckComplete(true);
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      setShowTutorial(true);
+      setTutorialCheckComplete(true);
+    }, 500);
+
+    return () => window.clearTimeout(timeout);
+  }, []);
   const tutorialSteps: TutorialStep[] = [
     {
       id: "player",
@@ -162,10 +175,10 @@ export default function SPTTTAIPage() {
       gameId: "super_jogo_da_velha",
       gameMode: "ai",
       usageContext: "standard",
-      participantCount: 1,
+      playerSlotCount: 1,
       difficulty: formatAiDifficulty(difficulty),
     },
-    isReady: !showTutorial,
+    isReady: tutorialCheckComplete && !showTutorial,
     status: gameState.status,
     winner: gameState.winner,
     perspective: "X",

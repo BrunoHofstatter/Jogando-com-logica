@@ -11,40 +11,40 @@ interface ClassroomCreationEvents {
 }
 
 export class ClassroomCreationTracker {
-  private pending = false;
+  private pendingRequestId: string | null = null;
 
   constructor(private readonly events: ClassroomCreationEvents = analytics) {}
 
-  start(): boolean {
-    if (this.pending) {
+  start(requestId: string): boolean {
+    if (this.pendingRequestId !== null) {
       return false;
     }
 
-    this.pending = true;
+    this.pendingRequestId = requestId;
     return true;
   }
 
-  succeed(): boolean {
-    if (!this.pending) {
+  succeed(requestId: string): boolean {
+    if (this.pendingRequestId !== requestId) {
       return false;
     }
 
-    this.pending = false;
+    this.pendingRequestId = null;
     this.events.classroomCreateResult({ success: true });
     return true;
   }
 
-  fail(errorCode: ClassroomCreateErrorCode): boolean {
-    if (!this.pending) {
+  fail(requestId: string, errorCode: ClassroomCreateErrorCode): boolean {
+    if (this.pendingRequestId !== requestId) {
       return false;
     }
 
-    this.pending = false;
+    this.pendingRequestId = null;
     this.events.classroomCreateResult({ success: false, errorCode });
     return true;
   }
 
   cancel(): void {
-    this.pending = false;
+    this.pendingRequestId = null;
   }
 }

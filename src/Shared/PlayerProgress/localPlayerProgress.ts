@@ -5,6 +5,7 @@ interface StorageLike {
 }
 
 const PLAYER_PROGRESS_KEYS = new Set([
+  "activeGameSession",
   "active_player_name_v1",
   "cacasoma_level_progress",
   "hasSeenRubiksClass1",

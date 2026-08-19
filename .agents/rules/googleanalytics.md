@@ -5,7 +5,7 @@ description: When creating, reviewing, or modifying Google Analytics tracking.
 
 # Google Analytics (GA4)
 
-Last code update: 2026-08-11
+Last code update: 2026-08-18
 Measurement ID: `G-BXWR3NBDQL`
 
 This document separates the analytics that the repository currently sends from
@@ -24,7 +24,7 @@ Required reporting rules:
 - Do not set GA `user_id` or create a persistent analytics identifier for a
   student.
 - Use activity counts and ratios: selections, game attempts, level attempts,
-  completions, active duration, and participant counts when known.
+  completions, active duration, and configured player-slot counts.
 - Do not build the main catalog-to-completion report as a user-scoped funnel.
   Different students on one device could contribute different stages.
 - GA4 cannot establish learning outcomes. Use teacher feedback or a structured
@@ -48,6 +48,7 @@ devices.
 ```text
 src/analytics/
 ├── analytics.ts          # host/build guard, one GA initializer, safe sender
+├── locationPrivacy.ts    # sanitized current URL/referrer context for all events
 ├── events.ts             # typed public event functions and stable game IDs
 ├── PageViewTracker.tsx   # manual React Router page views
 ├── ActivityTimer.ts      # foreground timer with one guarded finalization
@@ -80,6 +81,10 @@ player-key inventory and the classroom/unrelated keys that must be preserved.
     `www.jogandocomlogica.com`.
 - Localhost, tests, GitHub Pages, and preview deployments are no-ops for the
   production property.
+- Initialization and event delivery are fail-open: a tag failure disables
+  collection without preventing the React application or user action.
+- Initialization and every custom event override GA's automatic URL context
+  with a sanitized `page_location` and `page_referrer`.
 - Initialization sets:
 
 ```text
@@ -102,21 +107,23 @@ All event names, parameter names, IDs, and controlled values use lowercase
 | --- | --- | --- |
 | `page_view` | Initial React route and each pathname/query change | `page_title`, sanitized `page_location` |
 | `select_content` | A game is selected in `/jogos` or through a manual game section's “Ver regras completas” button | `content_type: "game"`, `content_id`, `entry_point: "game_catalog"` or `"teacher_manual"` |
-| `game_start` | A Phase 3 Stop round, Rubik's activity, or local/AI board match becomes usable | `game_id`, `game_mode`, `usage_context`, `participant_count`; applicable `level_id`, `difficulty`, `activity_variant` |
+| `game_start` | A Phase 3 Stop round, Rubik's activity, or local/AI board match becomes usable | `game_id`, `game_mode`, `usage_context`, `player_slot_count`; applicable `level_id`, `difficulty`, `activity_variant` |
 | `game_end` | A started Phase 3 activity completes or is abandoned by route exit/browser `pagehide` | start context, active `duration_seconds`, `end_reason`; controlled outcome and aggregates when known |
-| `level_start` | A solo Caça Soma level first becomes playable after the Magic Number finishes rolling; retries start a new attempt | `game_id`, `level_id`, `game_mode`, `usage_context`, `participant_count` |
+| `level_start` | A solo Caça Soma level first becomes playable after the Magic Number finishes rolling; retries start a new attempt | `game_id`, `level_id`, `game_mode`, `usage_context`, `player_slot_count` |
 | `level_end` | A started Caça Soma level reaches its result or is abandoned by route exit/browser `pagehide` | start context, active `duration_seconds`, `end_reason`, aggregate round counts; completion outcome and stars when known |
 | `tutorial_begin` | The Caça Soma levels tutorial overlay mounts | `game_id`, `tutorial_id` |
 | `tutorial_complete` | The final tutorial step is completed | `game_id`, `tutorial_id` |
 | `tutorial_skip` | The tutorial is explicitly skipped or closed with Escape | `game_id`, `tutorial_id`, `step_id` |
-| `classroom_create_result` | A pending teacher create request receives `classroom_created` or `classroom_create_failed` | `success`; controlled `error_code` on failure only |
+| `classroom_create_result` | A correlated teacher create request receives a server result or reaches the client timeout | `success`; controlled `error_code: "server_error"` or `"timeout"` on failure only |
 | `feedback_open` | The external teacher feedback form is opened from the manual or contact page | `entry_point: "teacher_manual"` or `"contact_page"` |
-| `local_progress_reset` | The confirmed “Trocar jogador” action finishes clearing allowlisted local player state | `reason: "player_switch"` |
+| `local_progress_reset` | The confirmed “Deletar progresso” action in `/jogos` finishes clearing allowlisted local player state | `reason: "manual_delete"` |
 | `multiplayer_join_result` | An explicit, locally valid room-join request receives `room_joined`, a controlled server failure, or a connection failure | `game_id`, `game_mode`, `usage_context`, `join_type`, `success`, `wait_ms`; controlled `error_code` on failure |
 | `multiplayer_disconnect` | A participant in a server-confirmed waiting/playing room loses the socket unexpectedly | `game_id`, `game_mode`, `usage_context`, `connection_stage`, controlled `error_code` |
 
-`page_location` keeps the origin and pathname. It drops fragments and every
-query parameter except these campaign fields:
+`page_location` keeps the origin and pathname. `page_referrer` keeps same-site
+paths but reduces external referrers to their origin. Both drop fragments and
+all query parameters; `page_location` restores at most one syntactically safe,
+80-character value for each of these campaign fields:
 
 ```text
 utm_source
@@ -170,7 +177,7 @@ game_id: caca_soma
 level_id: level_01 ... level_10
 game_mode: solo
 usage_context: standard
-participant_count: 1
+player_slot_count: 1
 tutorial_id: caca_soma_levels_v1
 ```
 
@@ -247,7 +254,7 @@ Stop:
 ```text
 game_id: stop_matematico
 game_mode: solo
-participant_count: 1
+player_slot_count: 1
 activity_variant: level | random | tutorial
 level_id: level_01 ... level_10     # level variant only
 difficulty: d1 ... d6               # non-level variants when known
@@ -262,7 +269,7 @@ Rubik's activities:
 ```text
 game_id: cubo_magico
 game_mode: solo
-participant_count: 1
+player_slot_count: 1
 level_id: class_01 | class_02 | class_03
 activity_variant: lesson | review
 ```
@@ -276,10 +283,13 @@ Board games:
 
 ```text
 game_mode: local_multiplayer | ai
-participant_count: 2                # local two-person match
-participant_count: 1                # one person versus AI
+player_slot_count: 2                # two configured local player sides
+player_slot_count: 1                # one configured human side versus AI
 difficulty: very_easy | easy | medium | hard   # AI only
 ```
+
+`player_slot_count` describes the configured activity shape. It does not claim
+that the application observed that many distinct people.
 
 For local matches, `outcome` is `completed` or `draw`; no individual winner is
 identified. For AI matches, `outcome` is `win`, `loss`, or `draw` from the
@@ -320,32 +330,39 @@ The existing manual route is measured through the normal `page_view`. Clicking
 `entry_point: "teacher_manual"` before opening the rules route. Scrolling to a
 game's details does not claim a selection.
 
-Opening the external Google feedback form sends `feedback_open`. The manual and
-contact page use distinct controlled entry points. The repository does not
+Successfully opening the external Google feedback form window sends
+`feedback_open`; a blocked popup sends nothing. The manual and contact page use
+distinct controlled entry points. The repository does not
 claim a feedback submission from this event; form completion occurs outside
 the application and is not reliably confirmed by this integration.
 
 #### Confirmed classroom creation
 
-Clicking “Criar Nova Turma” starts only an in-memory pending request. No event
-is sent for the click. `classroom_create_result` is sent once when that request
-receives either:
+Clicking “Criar Nova Turma” starts only an in-memory request identified by an
+ephemeral correlation ID that is never sent to GA. No event is sent for the
+click. `classroom_create_result` is sent once when that exact request receives:
 
 - `classroom_created`, with `success: true`; or
 - `classroom_create_failed`, with `success: false` and the controlled
   `error_code: "server_error"`.
+
+If the server stays connected without answering for 35 seconds, the client
+re-enables the button and sends one controlled `error_code: "timeout"` result.
+Late responses cannot finish a newer retry because server responses echo the
+ephemeral request ID.
 
 Restoring a managed classroom list does not look like a new creation. Socket
 disconnect or component cleanup cancels the pending tracker without inventing
 a server result. Classroom codes, management tokens, teacher names, server
 messages, and raw errors are never included.
 
-#### Shared-device player reset
+#### Shared-device progress deletion
 
-The home page exposes “Trocar jogador.” After a Portuguese confirmation, it
-clears only this player-specific local state:
+The games page exposes the secondary action “Deletar progresso.” After a
+Portuguese confirmation, it clears only this player-specific local state:
 
 ```text
+activeGameSession
 active_player_name_v1
 cacasoma_level_progress
 hasSeenRubiksClass1
@@ -357,7 +374,7 @@ stop_level_stars_*
 The reset deliberately preserves `active_classroom_session_v1`,
 `managed_classroom_tokens_v1`, analytics/browser identifiers, and unrelated
 browser data. It uses an allowlisted reset function and never calls
-`localStorage.clear()`. The event reports only `reason: "player_switch"`; it
+`localStorage.clear()`. The event reports only `reason: "manual_delete"`; it
 does not report the removed keys or use the action as a count of students.
 
 Progress is device-local convenience state. Even after adding this reset, GA4
@@ -474,7 +491,7 @@ Phase 1 removed:
 
 - `Game_Selection` / `Click_Game` category-action-label events;
 - `Game_Engagement` / `Time_Spent_In_Game` events;
-- the `activeGameSession` value in `localStorage`;
+- creating or using the legacy `activeGameSession` value in `localStorage`;
 - timing from game-card selection until tab hide, unload, or a navigation
   button.
 
@@ -495,7 +512,7 @@ message, name, player_name, raw_error, room_code, room_id, school, school_name,
 socket_id, student_name, teacher_name, user_id
 ```
 
-Never send:
+Never send as application-defined event parameters:
 
 - player/student/teacher names;
 - classroom, lobby, or room codes;
@@ -505,11 +522,21 @@ Never send:
 - raw error messages or stack traces;
 - values read from local progress storage.
 
+GA itself may still create its standard browser client identifier when
+analytics storage is allowed. The application never reads, copies, or treats
+that identifier as a student identity.
+
 Failures may send a controlled low-cardinality code such as `server_error` or
 `room_not_found`. They must never send the raw server, Socket.IO, or UI
 message.
 
 ## Required GA4 administration action
+
+Before treating collection as approved for the project's child audience,
+document the consent/legal basis, data retention, and regional/device-data
+settings. Disabling Google Signals and advertising personalization does not by
+itself disable standard analytics storage. This governance decision is outside
+the repository and remains required.
 
 The repository disables the page view sent by the GA `config` command. GA4
 Enhanced Measurement can separately listen to browser history changes. In the
@@ -542,19 +569,21 @@ After deployment, use DebugView/Tag Assistant to verify:
     for completion, retry, or route exit;
 12. Rubik's `activity_variant` distinguishes lesson/review and completion does
     not fire merely on route entry;
-13. local board matches use `participant_count: 2`, AI uses `1`, and AI outcome
-    is relative to the human;
+13. local board matches use `player_slot_count: 2`, AI uses `1`, and AI outcome
+    is relative to the human without claiming a count of distinct people;
 14. online routes, Bomb Game, Puzzle Wire, Houses, Damas, and test routes send
     no lifecycle events while the matrix marks them uncovered;
 15. manual rules links send `select_content` with `teacher_manual`, while
     scrolling to details sends nothing;
-16. feedback buttons send one `feedback_open` with the correct entry point and
-    do not claim a form submission;
-17. a classroom create button click sends nothing until the server result,
-    restored classroom lists send nothing, and success/failure includes no
-    code, token, name, or raw message;
-18. “Trocar jogador” requires confirmation, clears the documented player keys,
-    and preserves both classroom keys and unrelated storage;
+16. feedback buttons send one `feedback_open` only after a window opens, with
+    the correct entry point, and do not claim a form submission;
+17. a classroom create button click sends nothing until its correlated server
+    result or 35-second timeout, late results cannot complete a newer retry,
+    restored classroom lists send nothing, and analytics includes no classroom
+    code, token, name, request ID, or raw message;
+18. “Deletar progresso” on `/jogos` requires confirmation, clears the
+    documented player keys, and preserves both classroom keys and unrelated
+    storage;
 19. a direct manual URL with the standard UTM convention retains only safe
     campaign parameters in `page_location`;
 20. invalid name/code input sends no multiplayer event, while a valid join
@@ -575,7 +604,7 @@ reasonable initial set is:
 | Type | Parameters |
 | --- | --- |
 | Event-scoped dimensions | `game_id`, `level_id`, `game_mode`, `activity_variant`, `difficulty`, `usage_context`, `end_reason`, `outcome`, `success`, `tutorial_id`, `step_id`, `entry_point`, `error_code`, `reason`, `join_type`, `connection_stage` |
-| Event-scoped custom metrics | `duration_seconds`, `participant_count`, `completed_round_count`, `completed_step_count`, `correct_count`, `incorrect_count`, `assistance_count`, `stars_earned`, `wait_ms` |
+| Event-scoped custom metrics | `duration_seconds`, `player_slot_count`, `completed_round_count`, `completed_step_count`, `correct_count`, `incorrect_count`, `assistance_count`, `stars_earned`, `wait_ms` |
 
 Do not register browser/client IDs, attempt IDs, timestamps, room codes, or any
 other high-cardinality or identifying value.
@@ -694,7 +723,7 @@ name is committed for the next phase.
 Suggested shared parameters:
 
 ```text
-game_id, game_mode, entry_point, level_id, difficulty, participant_count,
+game_id, game_mode, entry_point, level_id, difficulty, player_slot_count,
 usage_context, duration_seconds, success, outcome, end_reason,
 incorrect_count, hint_count, assistance_count, error_code, wait_ms,
 join_type, connection_stage

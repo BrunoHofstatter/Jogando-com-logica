@@ -11,6 +11,10 @@ import {
   getSafePageLocation,
 } from "./events";
 import { ActivityTimer } from "./ActivityTimer";
+import {
+  getSafePageContext,
+  getSafePageReferrer,
+} from "./locationPrivacy";
 
 function createAdapter() {
   return {
@@ -75,9 +79,35 @@ describe("analytics collection guard", () => {
     });
   });
 
-  it("sends the GA4-native event name and sanitized parameters", () => {
+  it("uses sanitized location context during initialization", () => {
     const adapter = createAdapter();
     const client = new AnalyticsClient(adapter);
+
+    expect(client.initialize({
+      hostname: "jogandocomlogica.com",
+      isProductionBuild: true,
+      pageLocation:
+        "https://jogandocomlogica.com/manual?room_code=ABCD&utm_source=direct_email",
+      pageReferrer: "https://example.com/private?student_name=Ana",
+    })).toBe(true);
+
+    expect(adapter.initialize).toHaveBeenCalledWith(GA_MEASUREMENT_ID, {
+      gtagOptions: {
+        allow_ad_personalization_signals: false,
+        allow_google_signals: false,
+        send_page_view: false,
+        page_location:
+          "https://jogandocomlogica.com/manual?utm_source=direct_email",
+        page_referrer: "https://example.com/",
+      },
+    });
+  });
+
+  it("sends the GA4-native event name and sanitized parameters", () => {
+    const adapter = createAdapter();
+    const client = new AnalyticsClient(adapter, () => ({
+      page_location: "https://jogandocomlogica.com/jogos",
+    }));
 
     client.initialize({
       hostname: "jogandocomlogica.com",
@@ -95,7 +125,37 @@ describe("analytics collection guard", () => {
     expect(adapter.event).toHaveBeenCalledWith("select_content", {
       content_type: "game",
       content_id: "caca_soma",
+      page_location: "https://jogandocomlogica.com/jogos",
     });
+  });
+
+  it("disables collection without throwing when the adapter fails", () => {
+    const initializationAdapter = createAdapter();
+    initializationAdapter.initialize.mockImplementation(() => {
+      throw new Error("blocked");
+    });
+    const initializationClient = new AnalyticsClient(initializationAdapter);
+
+    expect(initializationClient.initialize({
+      hostname: "jogandocomlogica.com",
+      isProductionBuild: true,
+    })).toBe(false);
+
+    const eventAdapter = createAdapter();
+    eventAdapter.event.mockImplementation(() => {
+      throw new Error("blocked");
+    });
+    const eventClient = new AnalyticsClient(eventAdapter);
+    eventClient.initialize({
+      hostname: "jogandocomlogica.com",
+      isProductionBuild: true,
+    });
+
+    expect(eventClient.send("select_content", { content_id: "caca_soma" }))
+      .toBe(false);
+    expect(eventClient.send("select_content", { content_id: "caca_soma" }))
+      .toBe(false);
+    expect(eventAdapter.event).toHaveBeenCalledOnce();
   });
 });
 
@@ -129,6 +189,26 @@ describe("analytics payload safeguards", () => {
     ).toBe(
       "https://jogandocomlogica.com/aulas/1?utm_source=email&utm_campaign=school_outreach",
     );
+  });
+
+  it("drops malformed campaign values and all referrer query parameters", () => {
+    expect(
+      getSafePageLocation(
+        "https://jogandocomlogica.com/manual?utm_source=direct%20email&utm_campaign=school_outreach_2026_s2",
+      ),
+    ).toBe(
+      "https://jogandocomlogica.com/manual?utm_campaign=school_outreach_2026_s2",
+    );
+    expect(
+      getSafePageReferrer("https://example.com/path?teacher_name=Ana#private"),
+    ).toBe("https://example.com/");
+    expect(
+      getSafePageReferrer(
+        "https://jogandocomlogica.com/manual?classroom_code=ABCD",
+        "https://jogandocomlogica.com/jogos",
+      ),
+    ).toBe("https://jogandocomlogica.com/manual");
+    expect(getSafePageContext({ pageLocation: "not a URL" })).toEqual({});
   });
 
   it("formats stable, zero-padded level IDs", () => {

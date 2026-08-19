@@ -19,7 +19,7 @@ describe("typed analytics events", () => {
       levelId: "level_01",
       gameMode: "solo",
       usageContext: "standard",
-      participantCount: 1,
+      playerSlotCount: 1,
     });
 
     expect(mockedSendAnalyticsEvent).toHaveBeenCalledWith("level_start", {
@@ -27,7 +27,7 @@ describe("typed analytics events", () => {
       level_id: "level_01",
       game_mode: "solo",
       usage_context: "standard",
-      participant_count: 1,
+      player_slot_count: 1,
     });
   });
 
@@ -37,7 +37,7 @@ describe("typed analytics events", () => {
       levelId: "level_01",
       gameMode: "solo",
       usageContext: "standard",
-      participantCount: 1,
+      playerSlotCount: 1,
       durationSeconds: 42,
       endReason: "completed",
       completedRoundCount: 5,
@@ -53,7 +53,7 @@ describe("typed analytics events", () => {
       level_id: "level_01",
       game_mode: "solo",
       usage_context: "standard",
-      participant_count: 1,
+      player_slot_count: 1,
       duration_seconds: 42,
       end_reason: "completed",
       completed_round_count: 5,
@@ -70,7 +70,7 @@ describe("typed analytics events", () => {
       gameId: "stop_matematico",
       gameMode: "solo",
       usageContext: "standard",
-      participantCount: 1,
+      playerSlotCount: 1,
       levelId: "level_03",
       activityVariant: "level",
     });
@@ -79,7 +79,7 @@ describe("typed analytics events", () => {
       game_id: "stop_matematico",
       game_mode: "solo",
       usage_context: "standard",
-      participant_count: 1,
+      player_slot_count: 1,
       entry_point: undefined,
       level_id: "level_03",
       difficulty: undefined,
@@ -90,7 +90,7 @@ describe("typed analytics events", () => {
       gameId: "stop_matematico",
       gameMode: "solo",
       usageContext: "standard",
-      participantCount: 1,
+      playerSlotCount: 1,
       levelId: "level_03",
       activityVariant: "level",
       durationSeconds: 31,
@@ -106,7 +106,7 @@ describe("typed analytics events", () => {
       game_id: "stop_matematico",
       game_mode: "solo",
       usage_context: "standard",
-      participant_count: 1,
+      player_slot_count: 1,
       entry_point: undefined,
       level_id: "level_03",
       difficulty: undefined,
@@ -140,10 +140,10 @@ describe("typed analytics events", () => {
       entry_point: "contact_page",
     });
 
-    analytics.localProgressReset({ reason: "player_switch" });
+    analytics.localProgressReset({ reason: "manual_delete" });
     expect(mockedSendAnalyticsEvent).toHaveBeenLastCalledWith(
       "local_progress_reset",
-      { reason: "player_switch" },
+      { reason: "manual_delete" },
     );
   });
 

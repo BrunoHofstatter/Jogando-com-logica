@@ -126,12 +126,18 @@ export interface ListOpenRoomsPayload {
 }
 
 export interface ClassroomCreatedPayload {
+  requestId?: string;
   classroom: ManagedClassroom;
 }
 
 export interface ClassroomCreateFailedPayload {
+  requestId?: string;
   code: "server_error";
   message: string;
+}
+
+export interface CreateClassroomPayload {
+  requestId?: string;
 }
 
 export interface ManagedClassroomsPayload {
@@ -218,7 +224,7 @@ export interface CrownChaseClientToServerEvents {
   submit_move: (payload: SubmitMovePayload) => void;
   request_rematch: (payload: RequestRematchPayload) => void;
   leave_room: (payload: LeaveRoomPayload) => void;
-  create_classroom: () => void;
+  create_classroom: (payload: CreateClassroomPayload) => void;
   list_managed_classrooms: (payload: ListManagedClassroomsPayload) => void;
   delete_classroom: (payload: DeleteClassroomPayload) => void;
   watch_classroom: (payload: WatchClassroomPayload) => void;

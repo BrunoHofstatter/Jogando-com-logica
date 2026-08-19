@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { io, type Socket } from "socket.io-client";
 
@@ -13,6 +13,8 @@ import { ClassroomCreationTracker } from "../../analytics/ClassroomCreationTrack
 import styles from "../CSS/classrooms.module.css";
 
 const STORAGE_KEY = "managed_classroom_tokens_v1";
+const CLASSROOM_CREATION_TIMEOUT_MS = 35_000;
+let classroomCreationSequence = 0;
 
 type ClassroomSocket = Socket<
   CrownChaseServerToClientEvents,
@@ -32,8 +34,24 @@ export default function ClassroomsPage() {
   const [isCreatingClassroom, setIsCreatingClassroom] = useState(false);
   const openMonitorCodesRef = useRef<string[]>([]);
   const creationTrackerRef = useRef(new ClassroomCreationTracker());
+  const creationTimeoutRef = useRef<number | null>(null);
+  const activeCreationRequestIdRef = useRef<string | null>(null);
   const isConnectingToServer = socket !== null && !isServerConnected;
   const showOnlineWaitHint = useDelayedOnlineWaitHint(isConnectingToServer);
+
+  const clearCreationTimeout = useCallback(() => {
+    if (creationTimeoutRef.current !== null) {
+      window.clearTimeout(creationTimeoutRef.current);
+      creationTimeoutRef.current = null;
+    }
+  }, []);
+
+  const cancelPendingCreation = useCallback(() => {
+    clearCreationTimeout();
+    creationTrackerRef.current.cancel();
+    activeCreationRequestIdRef.current = null;
+    setIsCreatingClassroom(false);
+  }, [clearCreationTimeout]);
 
   useEffect(() => {
     const creationTracker = creationTrackerRef.current;
@@ -63,19 +81,27 @@ export default function ClassroomsPage() {
     });
     nextSocket.on("disconnect", () => {
       setIsServerConnected(false);
-      setIsCreatingClassroom(false);
-      creationTracker.cancel();
+      cancelPendingCreation();
       setLoadingMonitorCodes(openMonitorCodesRef.current);
     });
-    nextSocket.on("classroom_created", ({ classroom }) => {
-      creationTracker.succeed();
-      setIsCreatingClassroom(false);
+    nextSocket.on("classroom_created", ({ requestId, classroom }) => {
+      const correlatedRequestId = requestId ?? activeCreationRequestIdRef.current;
+      if (correlatedRequestId && creationTracker.succeed(correlatedRequestId)) {
+        clearCreationTimeout();
+        activeCreationRequestIdRef.current = null;
+        setIsCreatingClassroom(false);
+      }
       saveManagementTokens([...loadManagementTokens(), classroom.managementToken]);
       setClassrooms((current) => [...current, classroom]);
       setErrorMessage(null);
     });
-    nextSocket.on("classroom_create_failed", ({ code, message }) => {
-      creationTracker.fail(code);
+    nextSocket.on("classroom_create_failed", ({ requestId, code, message }) => {
+      const correlatedRequestId = requestId ?? activeCreationRequestIdRef.current;
+      if (!correlatedRequestId || !creationTracker.fail(correlatedRequestId, code)) {
+        return;
+      }
+      clearCreationTimeout();
+      activeCreationRequestIdRef.current = null;
       setIsCreatingClassroom(false);
       setErrorMessage(message);
     });
@@ -121,8 +147,7 @@ export default function ClassroomsPage() {
     });
     nextSocket.on("connect_error", () => {
       setIsServerConnected(false);
-      setIsCreatingClassroom(false);
-      creationTracker.cancel();
+      cancelPendingCreation();
     });
 
     const refreshInterval = window.setInterval(refreshClassrooms, 60 * 1000);
@@ -130,18 +155,40 @@ export default function ClassroomsPage() {
 
     return () => {
       window.clearInterval(refreshInterval);
+      clearCreationTimeout();
       creationTracker.cancel();
       nextSocket.disconnect();
     };
-  }, []);
+  }, [cancelPendingCreation, clearCreationTimeout]);
 
   const createClassroom = () => {
-    if (!socket || !isServerConnected || !creationTrackerRef.current.start()) {
+    if (!socket || !isServerConnected) {
       return;
     }
 
+    classroomCreationSequence += 1;
+    const requestId = `${Date.now()}-${classroomCreationSequence}`;
+    if (!creationTrackerRef.current.start(requestId)) {
+      return;
+    }
+    activeCreationRequestIdRef.current = requestId;
+
+    setErrorMessage(null);
     setIsCreatingClassroom(true);
-    socket.emit("create_classroom");
+    clearCreationTimeout();
+    creationTimeoutRef.current = window.setTimeout(() => {
+      if (!creationTrackerRef.current.fail(requestId, "timeout")) {
+        return;
+      }
+
+      creationTimeoutRef.current = null;
+      if (activeCreationRequestIdRef.current === requestId) {
+        activeCreationRequestIdRef.current = null;
+      }
+      setIsCreatingClassroom(false);
+      setErrorMessage("A criação da turma demorou demais. Tente novamente.");
+    }, CLASSROOM_CREATION_TIMEOUT_MS);
+    socket.emit("create_classroom", { requestId });
   };
 
   const deleteClassroom = (classroom: ManagedClassroom) => {

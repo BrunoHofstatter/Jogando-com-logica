@@ -19,16 +19,24 @@ import {
 import { isTouchDevice } from "../Logic/domUtils";
 import { ROUTES } from "../../routes";
 import styles from "../styles/StopGame.module.css";
-import type { GameAttemptCompletion } from "../../analytics/GameAttemptTracker";
+
+interface RoundCompletion {
+  completedStepCount: number;
+  correctCount: number;
+  incorrectCount: number;
+  success?: boolean;
+  outcome: "completed" | "passed" | "failed";
+  starsEarned?: number;
+}
 
 interface GameBoardProps {
   round: StopRound;
   levelConfig?: LevelConfig | null;
   onReset?: () => void;
   requireFilledBoardToStop?: boolean;
-  analyticsReady?: boolean;
-  onRoundPlayable?: () => boolean;
-  onRoundComplete?: (completion: GameAttemptCompletion) => boolean;
+  interactionReady?: boolean;
+  onPlayable?: () => void;
+  onComplete?: (completion: RoundCompletion) => void;
 }
 
 /**
@@ -40,9 +48,9 @@ function GameBoard({
   levelConfig,
   onReset,
   requireFilledBoardToStop = false,
-  analyticsReady = true,
-  onRoundPlayable,
-  onRoundComplete,
+  interactionReady = true,
+  onPlayable,
+  onComplete,
 }: GameBoardProps) {
   const navigate = useNavigate();
   const [count, setCount] = useState(0);
@@ -85,10 +93,10 @@ function GameBoard({
   }, [round]);
 
   useEffect(() => {
-    if (analyticsReady && !roundEnded) {
-      onRoundPlayable?.();
+    if (interactionReady && !roundEnded) {
+      onPlayable?.();
     }
-  }, [analyticsReady, onRoundPlayable, round, roundEnded]);
+  }, [interactionReady, onPlayable, round, roundEnded]);
 
   useEffect(() => {
     if (roundEnded) {
@@ -111,7 +119,7 @@ function GameBoard({
       ? calculateStars(levelConfig, count, correctCount)
       : undefined;
 
-    onRoundComplete?.({
+    onComplete?.({
       completedStepCount: round.boxes.length,
       correctCount,
       incorrectCount: round.boxes.length - correctCount,
@@ -133,7 +141,7 @@ function GameBoard({
     }, 500);
 
     return () => window.clearTimeout(timeout);
-  }, [count, correctCount, levelConfig, onRoundComplete, round, roundResult]);
+  }, [count, correctCount, levelConfig, onComplete, round, roundResult]);
 
   const handleInputFocus = useCallback((index: number, element: HTMLInputElement) => {
     if (!isTouch || roundEnded) {

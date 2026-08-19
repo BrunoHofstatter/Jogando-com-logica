@@ -133,7 +133,7 @@ function LevelGamePage() {
             levelId: formatLevelId(levelConfig.levelId),
             gameMode: "solo",
             usageContext: "standard",
-            participantCount: 1,
+            playerSlotCount: 1,
           }
         : null,
     );

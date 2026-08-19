@@ -52,7 +52,7 @@ export function useLevelAttemptAnalytics(
   const gameId = context?.gameId;
   const gameMode = context?.gameMode;
   const levelId = context?.levelId;
-  const participantCount = context?.participantCount;
+  const playerSlotCount = context?.playerSlotCount;
   const usageContext = context?.usageContext;
 
   useEffect(() => {
@@ -65,7 +65,7 @@ export function useLevelAttemptAnalytics(
       gameId,
       gameMode,
       levelId,
-      participantCount,
+      playerSlotCount,
       usageContext,
     });
     trackerRef.current = tracker;
@@ -85,7 +85,7 @@ export function useLevelAttemptAnalytics(
     gameId,
     gameMode,
     levelId,
-    participantCount,
+    playerSlotCount,
     usageContext,
   ]);
 

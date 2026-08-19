@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import RubiksCube from "../../Components/RubiksCube";
 import { useClass2 } from "./useClass2";
@@ -19,7 +19,7 @@ const Class2FaceArea: React.FC = () => {
         gameId: "cubo_magico" as const,
         gameMode: "solo" as const,
         usageContext: "standard" as const,
-        participantCount: 1,
+        playerSlotCount: 1,
         levelId: "class_02",
         activityVariant: isReview ? "review" as const : "lesson" as const,
     }), [isReview]);
@@ -29,18 +29,22 @@ const Class2FaceArea: React.FC = () => {
         startAttempt();
     }, [startAttempt]);
 
+    const handleSummaryComplete = useCallback((summaryMistakes: number) => {
+        return completeAttempt({
+            assistanceCount: uiProps.totalFlags,
+            incorrectCount: summaryMistakes,
+            outcome: "completed",
+            success: true,
+        });
+    }, [completeAttempt, uiProps.totalFlags]);
+
 
     // --- Summary phase ---
     if (uiProps.currentPhase === "summary") {
         return (
             <Class2SummaryView
                 totalFlags={uiProps.totalFlags}
-                onComplete={(summaryMistakes) => completeAttempt({
-                    assistanceCount: uiProps.totalFlags,
-                    incorrectCount: summaryMistakes,
-                    outcome: "completed",
-                    success: true,
-                })}
+                onComplete={handleSummaryComplete}
             />
         );
     }

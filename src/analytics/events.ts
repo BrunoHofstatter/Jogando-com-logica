@@ -1,4 +1,7 @@
 import { sendAnalyticsEvent } from "./analytics";
+import { getSafePageLocation } from "./locationPrivacy";
+
+export { getSafePageLocation } from "./locationPrivacy";
 
 export const GAME_IDS = [
   "stop_matematico",
@@ -26,7 +29,7 @@ export type GameMode =
   | "classroom";
 export type UsageContext = "standard" | "classroom";
 export type FeedbackEntryPoint = "contact_page" | "teacher_manual";
-export type ClassroomCreateErrorCode = "server_error";
+export type ClassroomCreateErrorCode = "server_error" | "timeout";
 export type MultiplayerJoinType = "classroom_room" | "private_code";
 export type MultiplayerJoinErrorCode =
   | "classroom_not_found"
@@ -76,7 +79,7 @@ export interface GameStartedParameters {
   gameId: GameId;
   gameMode: GameMode;
   usageContext: UsageContext;
-  participantCount?: number;
+  playerSlotCount?: number;
   entryPoint?: EntryPoint;
   levelId?: string;
   difficulty?: string;
@@ -101,7 +104,7 @@ export interface LevelStartedParameters {
   levelId: string;
   gameMode: GameMode;
   usageContext: UsageContext;
-  participantCount?: number;
+  playerSlotCount?: number;
 }
 
 export interface LevelEndedParameters extends LevelStartedParameters {
@@ -134,7 +137,7 @@ interface FeedbackOpenedParameters {
 }
 
 interface LocalProgressResetParameters {
-  reason: "player_switch";
+  reason: "manual_delete";
 }
 
 export interface MultiplayerJoinResultParameters {
@@ -150,27 +153,6 @@ export interface MultiplayerDisconnectParameters {
   joinType: MultiplayerJoinType;
   connectionStage: MultiplayerConnectionStage;
   errorCode: MultiplayerDisconnectErrorCode;
-}
-
-const SAFE_CAMPAIGN_PARAMETERS = [
-  "utm_source",
-  "utm_medium",
-  "utm_campaign",
-  "utm_content",
-  "utm_term",
-] as const;
-
-export function getSafePageLocation(rawLocation: string): string {
-  const source = new URL(rawLocation);
-  const safeLocation = new URL(source.pathname, source.origin);
-
-  for (const parameter of SAFE_CAMPAIGN_PARAMETERS) {
-    for (const value of source.searchParams.getAll(parameter)) {
-      safeLocation.searchParams.append(parameter, value);
-    }
-  }
-
-  return safeLocation.toString();
 }
 
 export function formatLevelId(levelNumber: number): string {
@@ -259,7 +241,7 @@ export const analytics = {
     gameId,
     gameMode,
     usageContext,
-    participantCount,
+    playerSlotCount,
     entryPoint,
     levelId,
     difficulty,
@@ -269,7 +251,7 @@ export const analytics = {
       game_id: gameId,
       game_mode: gameMode,
       usage_context: usageContext,
-      participant_count: participantCount,
+      player_slot_count: playerSlotCount,
       entry_point: entryPoint,
       level_id: levelId,
       difficulty,
@@ -281,7 +263,7 @@ export const analytics = {
     gameId,
     gameMode,
     usageContext,
-    participantCount,
+    playerSlotCount,
     entryPoint,
     levelId,
     difficulty,
@@ -301,7 +283,7 @@ export const analytics = {
       game_id: gameId,
       game_mode: gameMode,
       usage_context: usageContext,
-      participant_count: participantCount,
+      player_slot_count: playerSlotCount,
       entry_point: entryPoint,
       level_id: levelId,
       difficulty,
@@ -324,14 +306,14 @@ export const analytics = {
     levelId,
     gameMode,
     usageContext,
-    participantCount,
+    playerSlotCount,
   }: LevelStartedParameters): boolean {
     return sendAnalyticsEvent("level_start", {
       game_id: gameId,
       level_id: levelId,
       game_mode: gameMode,
       usage_context: usageContext,
-      participant_count: participantCount,
+      player_slot_count: playerSlotCount,
     });
   },
 
@@ -340,7 +322,7 @@ export const analytics = {
     levelId,
     gameMode,
     usageContext,
-    participantCount,
+    playerSlotCount,
     durationSeconds,
     endReason,
     completedRoundCount,
@@ -355,7 +337,7 @@ export const analytics = {
       level_id: levelId,
       game_mode: gameMode,
       usage_context: usageContext,
-      participant_count: participantCount,
+      player_slot_count: playerSlotCount,
       duration_seconds: durationSeconds,
       end_reason: endReason,
       completed_round_count: completedRoundCount,

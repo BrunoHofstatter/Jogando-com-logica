@@ -52,7 +52,7 @@ const Class3TotalSquares: React.FC = () => {
         gameId: "cubo_magico",
         gameMode: "solo",
         usageContext: "standard",
-        participantCount: 1,
+        playerSlotCount: 1,
         levelId: "class_03",
         activityVariant: "lesson",
     });
@@ -64,7 +64,7 @@ const Class3TotalSquares: React.FC = () => {
     useEffect(() => {
         if (uiProps.currentPhase === "complete") {
             completeAttempt({
-                incorrectCount: uiProps.totalFlags,
+                assistanceCount: uiProps.totalFlags,
                 outcome: "completed",
                 success: true,
             });

@@ -7,11 +7,11 @@ describe("ClassroomCreationTracker", () => {
     const classroomCreateResult = vi.fn(() => true);
     const tracker = new ClassroomCreationTracker({ classroomCreateResult });
 
-    expect(tracker.succeed()).toBe(false);
-    expect(tracker.start()).toBe(true);
-    expect(tracker.start()).toBe(false);
-    expect(tracker.succeed()).toBe(true);
-    expect(tracker.succeed()).toBe(false);
+    expect(tracker.succeed("request-1")).toBe(false);
+    expect(tracker.start("request-1")).toBe(true);
+    expect(tracker.start("request-2")).toBe(false);
+    expect(tracker.succeed("request-1")).toBe(true);
+    expect(tracker.succeed("request-1")).toBe(false);
     expect(classroomCreateResult).toHaveBeenCalledOnce();
     expect(classroomCreateResult).toHaveBeenCalledWith({ success: true });
   });
@@ -20,8 +20,8 @@ describe("ClassroomCreationTracker", () => {
     const classroomCreateResult = vi.fn(() => true);
     const tracker = new ClassroomCreationTracker({ classroomCreateResult });
 
-    tracker.start();
-    expect(tracker.fail("server_error")).toBe(true);
+    tracker.start("request-1");
+    expect(tracker.fail("request-1", "server_error")).toBe(true);
     expect(classroomCreateResult).toHaveBeenCalledWith({
       success: false,
       errorCode: "server_error",
@@ -32,10 +32,27 @@ describe("ClassroomCreationTracker", () => {
     const classroomCreateResult = vi.fn(() => true);
     const tracker = new ClassroomCreationTracker({ classroomCreateResult });
 
-    tracker.start();
+    tracker.start("request-1");
     tracker.cancel();
 
-    expect(tracker.fail("server_error")).toBe(false);
+    expect(tracker.fail("request-1", "server_error")).toBe(false);
     expect(classroomCreateResult).not.toHaveBeenCalled();
+  });
+
+  it("ignores late results from an older request", () => {
+    const classroomCreateResult = vi.fn(() => true);
+    const tracker = new ClassroomCreationTracker({ classroomCreateResult });
+
+    tracker.start("request-1");
+    tracker.cancel();
+    tracker.start("request-2");
+
+    expect(tracker.succeed("request-1")).toBe(false);
+    expect(tracker.fail("request-2", "timeout")).toBe(true);
+    expect(classroomCreateResult).toHaveBeenCalledOnce();
+    expect(classroomCreateResult).toHaveBeenCalledWith({
+      success: false,
+      errorCode: "timeout",
+    });
   });
 });

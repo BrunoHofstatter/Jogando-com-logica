@@ -39,7 +39,7 @@ export default function MathWarAIPage() {
       gameId: "guerra_matematica",
       gameMode: "ai",
       usageContext: "standard",
-      participantCount: 1,
+      playerSlotCount: 1,
       difficulty: formatAiDifficulty(difficulty),
     },
     isReady: !showTutorial && !showDiceAnim,

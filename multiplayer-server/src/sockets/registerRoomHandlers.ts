@@ -178,13 +178,16 @@ export function registerRoomHandlers(
       broadcastClassroomRooms(io, classroomMonitor, room.classroomCode);
     });
 
-    socket.on("create_classroom", () => {
+    socket.on("create_classroom", (payload) => {
+      const requestId = payload?.requestId;
       try {
         socket.emit("classroom_created", {
+          requestId,
           classroom: classroomStore.createClassroom(),
         });
       } catch {
         socket.emit("classroom_create_failed", {
+          requestId,
           code: "server_error",
           message: "Não foi possível criar a turma. Tente novamente.",
         });

@@ -34,7 +34,7 @@ export default function CrownChaseAIPage() {
       gameId: "caca_coroa",
       gameMode: "ai",
       usageContext: "standard",
-      participantCount: 1,
+      playerSlotCount: 1,
       difficulty: formatAiDifficulty(difficulty),
     },
     isReady: !showTutorial,

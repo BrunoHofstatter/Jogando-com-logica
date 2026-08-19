@@ -433,11 +433,14 @@ function Manual() {
           <button
             className={styles.feedbackButton}
             onClick={() => {
-              analytics.feedbackOpened({ entryPoint: 'teacher_manual' });
-              window.open(
+              const feedbackWindow = window.open(
                 'https://docs.google.com/forms/d/e/1FAIpQLSc6W0uOiy5uYFGhjVjqzS3Iw6mp_VzHSi5qNkfnTuqS0dffOQ/viewform?embedded=true',
                 '_blank'
               );
+              if (feedbackWindow) {
+                feedbackWindow.opener = null;
+                analytics.feedbackOpened({ entryPoint: 'teacher_manual' });
+              }
             }}
           >
             Formulário de feedback

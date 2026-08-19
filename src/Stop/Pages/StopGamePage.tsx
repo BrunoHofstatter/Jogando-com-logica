@@ -68,7 +68,7 @@ function StopGamePage() {
       gameId: "stop_matematico" as const,
       gameMode: "solo" as const,
       usageContext: "standard" as const,
-      participantCount: 1,
+      playerSlotCount: 1,
       levelId: mode === "level" ? formatLevelId(levelId) : undefined,
       difficulty: mode === "level" ? undefined : difficulty,
       activityVariant,
@@ -193,9 +193,9 @@ function StopGamePage() {
           round={currentRound}
           levelConfig={levelConfig}
           onReset={handleReset}
-          analyticsReady={tutorialCheckComplete && !showTutorial}
-          onRoundPlayable={startAttempt}
-          onRoundComplete={completeAttempt}
+          interactionReady={tutorialCheckComplete && !showTutorial}
+          onPlayable={startAttempt}
+          onComplete={completeAttempt}
         />
       )}
       {/* Tutorial overlay */}
