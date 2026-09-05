@@ -11,6 +11,8 @@
 .nameRow, .subcard label { display: flex; align-items: center; gap: 1vw; font-size: clamp(1.4vw, 3dvh, 2vw); }
 .nameRow input, .subcard input { flex: 1; min-width: 0; box-sizing: border-box; padding: .7vw 1vw; border: .28vw solid #090204; border-radius: 1.3vw; outline: none; background-color: #fff0cf; color: #21070b; font-family: inherit; font-size: clamp(1.2vw, 2.5dvh, 1.8vw); }
 .hintsToggle { display: flex; align-items: center; justify-content: center; gap: .7vw; font-size: clamp(1.2vw, 2.7dvh, 1.8vw); }
+.levelRow { display: flex; align-items: center; gap: 1vw; font-size: min(1.5vw, 2.8dvh); }
+.levelRow select { flex: 1; min-width: 0; padding: .65vw; border: .2vw solid #090204; border-radius: .8vw; font: inherit; color: #21070b; background: #fff0cf; }
 .hintsToggle input { width: 1.7vw; height: 1.7vw; accent-color: #ffc83d; }
 .actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1vw; }
 .primaryButton, .secondaryButton, .leaveButton { min-height: 3.6vw; padding: .65vw 1vw .9vw; display: flex; align-items: center; justify-content: center; border: .3vw solid #090204; border-radius: 1.8vw; font-family: inherit; font-weight: 200; font-size: clamp(1.15vw, 2.7dvh, 1.8vw); line-height: 1; cursor: pointer; transition: all .1s cubic-bezier(.175,.885,.32,1.275); }
@@ -32,6 +34,8 @@
 .error { color: #ff8f9d; }
 @keyframes bombFloat { 50% { transform: translateY(-.7vw) rotate(-2deg); } }
 @media (orientation: portrait) and (max-width: 650px) {
+  .levelRow { font-size: 3.8vw; gap: 2vw; }
+  .levelRow select { padding: 1.8vw; border-width: .5vw; border-radius: 2vw; }
   .page { min-height: 100dvh; width: 100vw; padding: min(4vw, 2.2dvh); display: grid; grid-template-rows: 24dvh 74dvh; gap: min(2vw, 1.1dvh); overflow: auto; }
   .previewColumn { width: 100%; gap: min(2vw, 1.1dvh); }
   .title { font-size: min(12vw, 6.5dvh); -webkit-text-stroke-width: min(.55vw, .3dvh); text-shadow: 0 min(.8vw, .45dvh) 0 #090204; }

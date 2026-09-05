@@ -1,11 +1,10 @@
 import type { Namespace, Socket } from "socket.io";
+import { randomUUID } from "node:crypto";
 
-import {
-  applyLevel1Intent,
-  createLevel1State,
-  type BombRole,
-  type Level1State,
-} from "../../../src/BombGame/Logic/level1.ts";
+import type { BombRole } from "../../../src/BombGame/Logic/level1.ts";
+import { applyBombLevelIntent, createBombLevel, type BombLevelState } from "../../../src/BombGame/Logic/levels.ts";
+import { getBombLevel, isBombLevelId } from "../../../src/BombGame/Logic/levelCatalog.ts";
+import { projectBombLevel } from "../../../src/BombGame/Logic/levelViews.ts";
 import type {
   BombGameClientToServerEvents,
   BombGameServerToClientEvents,
@@ -43,7 +42,8 @@ interface Room {
   hintsEnabled: boolean;
   phase: "role_selection" | "countdown" | "playing" | "won" | "lost" | "replay_countdown";
   lives: number;
-  level: Level1State;
+  level: BombLevelState;
+  roundId: string;
   countdownEndsAt: number | null;
   timerEndsAt: number | null;
   replayCountdownEndsAt: number | null;
@@ -62,7 +62,6 @@ const rooms = new Map<string, Room>();
 let activeClassroomMonitor: ClassroomMonitor;
 const COUNTDOWN_MS = 3_000;
 const REPLAY_COUNTDOWN_MS = 3_000;
-const LEVEL_DURATION_MS = 3 * 60_000;
 
 export function registerBombGameRoomHandlers(
   io: BombNamespace,
@@ -88,7 +87,8 @@ export function registerBombGameRoomHandlers(
   );
 
   io.on("connection", (socket) => {
-    socket.on("create_room", ({ playerName, hintsEnabled, classroomCode }) => {
+    socket.on("create_room", ({ playerName, hintsEnabled, classroomCode, levelId = 1 }) => {
+      if (!isBombLevelId(levelId)) return emitError(socket, "invalid_level", "Esse nível ainda não está disponível.");
       leaveExistingRoom(io, socket);
       const name = normalizeName(playerName);
       if (!name) return emitError(socket, "invalid_name", "Digite um nome com pelo menos 2 letras.");
@@ -105,8 +105,9 @@ export function registerBombGameRoomHandlers(
         classroomCode: normalizedClassroomCode,
         hintsEnabled: Boolean(hintsEnabled),
         phase: "role_selection",
-        lives: 3,
-        level: createLevel1State(),
+        lives: getBombLevel(levelId).lives,
+        level: createBombLevel(levelId),
+        roundId: randomUUID(),
         countdownEndsAt: null,
         timerEndsAt: null,
         replayCountdownEndsAt: null,
@@ -180,14 +181,21 @@ export function registerBombGameRoomHandlers(
       else broadcast(io, found.room);
     });
 
-    socket.on("submit_action", ({ code, actionId, intent }) => {
+    socket.on("submit_action", ({ code, actionId, roundId, intent }) => {
       const found = authorizedRoom(socket, code);
-      if (!found || found.room.phase !== "playing" || found.player.role !== "bomb") return;
+      if (!found || found.room.phase !== "playing" || !found.player.role) return;
+      if (found.room.timerEndsAt !== null && Date.now() >= found.room.timerEndsAt) {
+        endRound(io, found.room, "lost", "time");
+        return;
+      }
+      // Old Level 1 clients can still play; navigation always carries a round token.
+      if ((roundId !== undefined || found.room.level.id === 3) && roundId !== found.room.roundId) return;
+      if (typeof actionId !== "string" || !actionId || actionId.length > 100) return;
       const actionKey = `${found.player.seat}:${actionId}`;
-      if (!actionId || found.room.processedActionIds.has(actionKey)) return;
-      found.room.processedActionIds.add(actionKey);
-      const result = applyLevel1Intent(found.room.level, intent);
+      if (found.room.processedActionIds.has(actionKey)) return;
+      const result = applyBombLevelIntent(found.room.level, found.player.role, intent);
       if (!result.accepted) return;
+      found.room.processedActionIds.add(actionKey);
       if (result.mistake) {
         found.room.lives -= 1;
         if (found.room.lives === 0) endRound(io, found.room, "lost", "lives");
@@ -231,9 +239,10 @@ function startRoleCountdown(io: BombNamespace, room: Room): void {
     if (!rooms.has(room.code) || room.phase !== "countdown") return;
     room.phase = "playing";
     room.countdownEndsAt = null;
-    room.timerEndsAt = Date.now() + LEVEL_DURATION_MS;
+    const duration = getBombLevel(room.level.id).durationSeconds * 1000;
+    room.timerEndsAt = Date.now() + duration;
     broadcast(io, room);
-    room.roundTimeout = setTimeout(() => endRound(io, room, "lost", "time"), LEVEL_DURATION_MS);
+    room.roundTimeout = setTimeout(() => endRound(io, room, "lost", "time"), duration);
   }, COUNTDOWN_MS);
 }
 
@@ -244,8 +253,9 @@ function startReplayCountdown(io: BombNamespace, room: Room): void {
   room.replayTimeout = setTimeout(() => {
     if (!rooms.has(room.code) || room.phase !== "replay_countdown") return;
     room.phase = "role_selection";
-    room.lives = 3;
-    room.level = createLevel1State();
+    room.lives = getBombLevel(room.level.id).lives;
+    room.level = createBombLevel(room.level.id);
+    room.roundId = randomUUID();
     room.countdownEndsAt = null;
     room.timerEndsAt = null;
     room.replayCountdownEndsAt = null;
@@ -284,6 +294,7 @@ function viewFor(room: Room, seat: PlayerSeat): BombGameViewState | null {
   const role = room.players[seat]?.role;
   if (!role) return null;
   const shared = {
+    roundId: room.roundId,
     phase: room.phase,
     lives: room.lives,
     hintsEnabled: room.hintsEnabled,
@@ -291,26 +302,12 @@ function viewFor(room: Room, seat: PlayerSeat): BombGameViewState | null {
     timerEndsAt: room.timerEndsAt,
     replayCountdownEndsAt: room.replayCountdownEndsAt,
     replayVotes: [...room.replayVotes],
-    completedSections: room.level.completedSections,
-    eventId: room.level.lastEventId,
-    mistake: room.level.lastMistake,
+    completedSections: room.level.state.completedSections,
+    eventId: room.level.state.lastEventId,
+    mistake: room.level.state.lastMistake,
     resultReason: room.resultReason,
   };
-  if (role === "manual") return { ...shared, role, calculations: room.level.manualCalculations };
-  return {
-    ...shared,
-    role,
-    orderingNumbers: room.level.orderingNumbers,
-    orderingProgress: room.level.orderingProgress,
-    numericAnswers: room.level.numericAnswers,
-    operatorAnswers: room.level.operatorAnswers,
-    numericTargets: ["A + B", "B − C", "C + A"],
-    operatorEquations: [
-      { left: "5", right: "A", result: room.level.values.A + 5 },
-      { left: "8", right: "C", result: 8 - room.level.values.C },
-      { left: "D", right: "3", result: room.level.values.D - 3 },
-    ],
-  };
+  return projectBombLevel(room.level, role, shared);
 }
 
 function getOpenClassroomRooms(classroomCode: ClassroomCode): OpenRoomSummary[] {
@@ -326,8 +323,8 @@ function broadcastClassroomRooms(io: BombNamespace, classroomCode: ClassroomCode
   activeClassroomMonitor.notifyClassroomChanged(classroomCode);
 }
 
-function roomPayload(room: Room, seat: PlayerSeat) { return { code: room.code, seat, players: playersFor(room), state: viewFor(room, seat) }; }
-function statePayload(room: Room, seat: PlayerSeat) { return { code: room.code, players: playersFor(room), state: viewFor(room, seat) }; }
+function roomPayload(room: Room, seat: PlayerSeat) { return { code: room.code, levelId: room.level.id, seat, players: playersFor(room), state: viewFor(room, seat) }; }
+function statePayload(room: Room, seat: PlayerSeat) { return { code: room.code, levelId: room.level.id, players: playersFor(room), state: viewFor(room, seat) }; }
 function playersFor(room: Room): RoomPlayerInfo[] { return room.players.filter((player): player is Player => Boolean(player)).map(({ seat, name, connected, preference, role, ready }) => ({ seat, name, connected, preference, role, ready })); }
 function createPlayer(socketId: string, seat: PlayerSeat, name: string): Player { return { socketId, seat, name, connected: true, preference: "either", role: null, ready: false }; }
 function normalizeName(value: string): string | null { const name = value.trim().slice(0, 20); return name.length >= 2 ? name : null; }

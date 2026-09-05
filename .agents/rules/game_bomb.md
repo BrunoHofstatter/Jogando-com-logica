@@ -19,7 +19,7 @@ This file documents the current design direction. It should help future work sta
 
 ## Current Reality
 
-- Bomb Game Level 1 has an implemented private-room frontend and authoritative backend flow.
+- Bomb Game Levels 1 (Numbers) and 3 (Navigation) have implemented role-specific frontends and authoritative backend flows. Level 2 remains reserved for the planned Language level.
 - Bomb Game uses the shared online lobby conventions, cached player name, and temporary classroom browser used by the other online games.
 - The game should be designed as an online-only two-player cooperative game.
 - The project already has a separate multiplayer backend in `multiplayer-server/`.
@@ -425,6 +425,43 @@ Do not implement a large generic Bomb Game framework before at least one templat
 - Replay votes are authoritative, visible to both players, and cancellable until both players agree.
 - After both replay votes, a three-second replay countdown returns the same room to role selection with a newly generated puzzle.
 - The result screen also allows a player to leave for the online lobby.
+- Hosts can select Numbers or Navigation in the level menu or lobby. Joining uses the hosted level; replay preserves it and regenerates both puzzles.
+
+## Implemented Level 3: Navigation (Phases 1–3)
+
+- Duration: 4 minutes 12 seconds; three shared lives; two independent modules with no required completion order.
+- Reuses the existing landscape/portrait bomb-case images. Geometric marks, defusal probes, fictional component icons, and danger plates are lightweight SVG/HTML, not temporary asset placeholders.
+- Landscape: two columns, with slightly more width for energy routes. Portrait phones: circuit above energy routes, both inside the case safe area. The manual stacks map cards and equations on narrow screens.
+- Both modules accept individual adjacent/next-tile clicks. The grid also supports arrow keys. Completed modules lock, with a checkmark and border treatment; meaning never relies on color alone.
+
+### Circuito oculto
+
+- Bomb view: 3×3 question-mark cells, a probe at an external middle-left entrance, and an external right-side exit in the top, middle, or bottom row.
+- Three distinct marks (circle, triangle, square) occupy three of six frame positions: above/below each column. They are outside the cell contents and do not sit at ambiguous shared corners.
+- Manual view: three candidate maps with those marks and three short-circuit danger cells each. Safe cells are neutral; the route is not highlighted. A manual player can locally mark a candidate without revealing whether it is correct.
+- Candidates are built from a base arrangement, a two-mark swap, and one adjacent frame-position move. The matching candidate is chosen uniformly AFTER generating all candidates, so identifying the apparent original layout is not a shortcut. Consequently, distractors are not always exactly one operation away from the chosen matching map.
+- All candidate maps are solvable, with shortest routes crossing four to six internal cells. Their combined hazards block any universal route, so map matching matters. Any safe orthogonal route is accepted; safe revisits and returning to the entrance are allowed.
+- Entering a danger costs one shared heart, resets only the circuit probe and visited cells, and shows short-circuit text. The map remains unchanged for another attempt.
+
+### Rotas de energia
+
+- Bomb view: three cables labeled A/B/C, each containing two to four component tiles and a final destination. Components are described visually as a spiral, zigzag, or two bars; technical component names are not needed.
+- A probe shows remaining energy. Players advance one component at a time; starting commits to that cable until arrival or failure. They cannot skip tiles or switch cables mid-route.
+- Three distinct positive component costs range from 1–9. The first manual equation adds two constants from 1–4. Each later equation uses the previous result plus/minus a constant from 1–4; exactly one of these two equations subtracts.
+- Manual answers use explicit confirmation. Correct results automatically replace references in the next equation. Wrong answers stay editable and never cost hearts. Answer entry does not gate bomb movement.
+- All three route totals are different and within three energy units. Initial energy equals the unique cheapest total, but the arrival rule allows any nonnegative remainder; exact zero is not required.
+- Generation excludes component-count dominance between routes, preventing a route from winning merely because it has all the same components with fewer copies. All three component types occur somewhere in the puzzle.
+- Unaffordable routes have affordable prefixes and run out on their final component. Failure costs one heart, restores full energy, and returns the probe to the source. Grid progress and confirmed manual calculations are preserved.
+
+### Boundaries, Defaults, And Deferred Work
+
+- The catalog in `src/BombGame/Logic/levelCatalog.ts` owns duration/lives/module count. Level-specific generation and validation remain in `navigation.ts`; the room handler owns time, lives, final results, and replay.
+- Role payloads explicitly whitelist information: the bomb never receives candidate hazards or component costs/equations; the manual never receives the correct-map index, live probe positions, cable compositions, or remaining energy.
+- Navigation actions carry a round identifier plus module-specific revisions. Repeated, stale, malformed, wrong-role, nonadjacent, or out-of-order actions are ignored without losing hearts. The server checks the deadline when an action arrives.
+- Current retry feedback is immediate text/status/reset; electrical sparks, module blackout, probe movement animation, and additional visual/audio polish are deferred.
+- The manual drawing area is also deferred: one shared scratchpad with a `Limpar` button, not three separate route pads. No drawing configuration is planned.
+- Vehicle/terrain tables, extra hint behavior, later-level progression, and next-level voting are not part of Navigation phases 1–3. The room hint setting remains stored but does not change this level yet.
+- Automated checks cover 600 seeded puzzles, both module completion orders, role-data separation, action validation, failure resets, and leftover-energy arrival. A real Socket.IO lifecycle test covers default/selected levels, wrong-role and duplicate actions, deadline expiry, replay tokens, and the three-heart limit.
 
 ## Level 1 Interface Details
 

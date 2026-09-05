@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { Bomb } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { ROUTES } from "../../routes";
 import { useDelayedOnlineWaitHint } from "../../Shared/Hooks/useDelayedOnlineWaitHint";
 import { useBombGameMultiplayer } from "../Hooks/useBombGameMultiplayer";
+import { BOMB_LEVELS, getBombLevel, isBombLevelId } from "../Logic/levelCatalog";
 import styles from "../styles/multiplayerLobby.module.css";
 
 type LobbyMode = "home" | "join" | "classroom";
@@ -12,6 +13,10 @@ type LobbyMode = "home" | "join" | "classroom";
 export default function BombGameMultiplayerLobbyPage() {
   const navigate = useNavigate();
   const game = useBombGameMultiplayer();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedLevel = Number(searchParams.get("level"));
+  const selectedLevel = isBombLevelId(requestedLevel) ? requestedLevel : 1;
+  const displayedLevel = getBombLevel(game.roomCode ? game.levelId : selectedLevel);
   const [mode, setMode] = useState<LobbyMode>("home");
   const [name, setName] = useState(game.playerName);
   const [roomCode, setRoomCode] = useState("");
@@ -49,7 +54,7 @@ export default function BombGameMultiplayerLobbyPage() {
     <section className={styles.previewColumn}>
       <h1 className={styles.title}>Bomb Game Online</h1>
       <div className={styles.bombPreview}><Bomb aria-hidden="true" /></div>
-      <p>Nível 1 · Números</p>
+      <p>Nível {displayedLevel.id} · {displayedLevel.title}</p>
     </section>
 
     <section className={styles.panel}><div className={styles.card}>
@@ -57,11 +62,12 @@ export default function BombGameMultiplayerLobbyPage() {
       <p className={styles.description}>Jogue com sua turma ou compartilhe um código com seu parceiro.</p>
 
       <label className={styles.nameRow} htmlFor="bomb-online-name"><span>Seu nome</span><input id="bomb-online-name" value={name} maxLength={20} onChange={(event) => setName(event.target.value)} placeholder="Digite seu nome" /></label>
+      {!waiting && !disconnected && <label className={styles.levelRow} htmlFor="bomb-level"><span>Nível para criar sala</span><select id="bomb-level" value={selectedLevel} disabled={busy} onChange={(event) => setSearchParams({ level: event.target.value })}>{BOMB_LEVELS.map((level) => <option key={level.id} value={level.id}>{level.id} · {level.title}</option>)}</select></label>}
 
       {!waiting && !disconnected && !game.classroomCode && <>
         <label className={styles.hintsToggle}><input type="checkbox" checked={hintsEnabled} onChange={(event) => setHintsEnabled(event.target.checked)} /><span>Dicas ativadas</span></label>
         <div className={styles.actions}>
-          <button className={styles.primaryButton} disabled={busy} onClick={() => game.createRoom(name, hintsEnabled)}>{busy && mode === "home" ? "Conectando..." : "Criar Sala Privada"}</button>
+          <button className={styles.primaryButton} disabled={busy} onClick={() => game.createRoom(name, hintsEnabled, undefined, selectedLevel)}>{busy && mode === "home" ? "Conectando..." : "Criar Sala Privada"}</button>
           <button className={styles.secondaryButton} disabled={busy} onClick={() => setMode((current) => current === "join" ? "home" : "join")}>{mode === "join" ? "Voltar" : "Entrar em Sala"}</button>
           <button className={styles.secondaryButton} disabled={busy} onClick={() => setMode((current) => current === "classroom" ? "home" : "classroom")}>{mode === "classroom" ? "Voltar" : "Entrar em Turma"}</button>
         </div>
@@ -74,7 +80,7 @@ export default function BombGameMultiplayerLobbyPage() {
       {game.classroomCode && !waiting && !disconnected && <div className={styles.subcard}>
         <div className={styles.classroomHeader}><h3>Turma {game.classroomCode}</h3><button className={styles.leaveButton} onClick={game.leaveClassroom}>Trocar turma</button></div>
         <label className={styles.hintsToggle}><input type="checkbox" checked={hintsEnabled} onChange={(event) => setHintsEnabled(event.target.checked)} /><span>Dicas ativadas</span></label>
-        <button className={styles.primaryButton} onClick={() => game.createRoom(name, hintsEnabled, game.classroomCode ?? undefined)}>Criar Sala para a Turma</button>
+        <button className={styles.primaryButton} disabled={busy} onClick={() => game.createRoom(name, hintsEnabled, game.classroomCode ?? undefined, selectedLevel)}>Criar Sala para a Turma</button>
         <div className={styles.roomList}>{game.openClassroomRooms.length === 0 ? <p>Nenhuma sala aberta. Crie a primeira!</p> : game.openClassroomRooms.map((room) => <article key={room.code} className={styles.openRoom}><span>Sala de {room.hostName}</span><button className={styles.secondaryButton} onClick={() => game.joinRoom(room.code, name, "classroom_room")}>Entrar</button></article>)}</div>
         <button className={styles.secondaryButton} onClick={game.leaveClassroom}>Jogar sem turma</button>
       </div>}
