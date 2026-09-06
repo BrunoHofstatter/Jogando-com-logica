@@ -801,3 +801,41 @@
     height: 3vw;
   }
 }
+
+/* Room controls occupy their own space, separate from playable cells. */
+.onlineGame {
+  gap: 3vw;
+}
+.onlineGame .statWrap {
+  flex: 1;
+  min-width: 0;
+  gap: 2vw;
+}
+.onlineGame .turn-indicator {
+  margin: 1vw 0;
+  flex-wrap: wrap;
+}
+.onlineGame .board-wrap {
+  flex: 0 0 auto;
+}
+.onlineGame .big-board {
+  width: min(60vw, 90dvh);
+  height: min(60vw, 90dvh);
+}
+@media (orientation: portrait) {
+  .onlineGame {
+    flex-direction: column;
+    padding-top: 12vw;
+  }
+  .onlineGame .statWrap {
+    flex: 0 0 auto;
+    width: 100%;
+    height: auto;
+    padding: 0;
+    gap: 3vw;
+  }
+  .onlineGame .big-board {
+    width: min(95vw, 55dvh);
+    height: min(95vw, 55dvh);
+  }
+}

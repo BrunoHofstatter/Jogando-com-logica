@@ -1,9 +1,12 @@
+.onlineHeaderContent {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5vw;
+}
+
 .roomBanner {
-  position: fixed;
-  top: 1.5vw;
-  left: 30%;
-  transform: translateX(-50%);
-  width: min(88vw, 110dvh);
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -19,6 +22,8 @@
 }
 
 .roomInfo {
+  min-width: 0;
+  overflow-wrap: anywhere;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -33,6 +38,7 @@
 }
 
 .leaveButton {
+  flex-shrink: 0;
   border: 0.25vw solid #7f1d1d;
   border-radius: 1.6vw;
   background-color: #ef4444;
@@ -117,11 +123,8 @@
 }
 
 .alertBox {
-  position: fixed;
-  top: 8vw;
-  left: 30%;
-  transform: translateX(-50%);
-  width: min(70vw, 90dvh);
+  width: 100%;
+  overflow-wrap: anywhere;
   text-align: center;
   padding: 0.8vw 1vw;
   box-sizing: border-box;
@@ -182,7 +185,7 @@
 @media (orientation: portrait) and (max-width: 650px) {
   .roomBanner {
     top: 2vw;
-    width: 92vw;
+    width: 100%;
     flex-direction: column;
     align-items: stretch;
     gap: min(1.8vw, 0.9dvh);
@@ -214,7 +217,7 @@
 
   .alertBox {
     top: 26vw;
-    width: 88vw;
+    width: 100%;
     border-width: min(0.5vw, 0.25dvh);
     border-radius: min(3vw, 1.6dvh);
     padding: min(2vw, 1dvh);

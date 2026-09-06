@@ -28,7 +28,8 @@ The intended teaching approach is:
 
 - activity first
 - hints only when needed
-- explanation only if the student is struggling
+- explanation after a useful discovery or if the student is struggling
+- when possible, clarify the visual before adding explanation text
 
 This is one of the most important things to remember about RubiksClass.
 
@@ -42,15 +43,15 @@ The goal is:
 - let the student interact first
 - let them try to figure things out
 - if they struggle, reveal progressive hints
-- only teach more directly if needed
+- connect successful discoveries to new notation through short, child-paced reveals
 
 This makes the class feel more fun, dynamic, and discovery-based.
 
 ## Current Reality
 
 - RubiksClass is a module system, not a single game loop
-- Only the first 2 modules are currently implemented and available in the class menu
-- The menu already includes the `Aprender` and `Jogar` distinction for implemented classes
+- The first 3 modules have lessons available in the class menu
+- Classes 1 and 2 include `Aprender` and `Jogar`; Class 3 currently offers only `Aprender`
 - The summary or review parts are designed to be more game-like and interactive
 - More modules are already planned and should be easy to document later in the same structure
 
@@ -61,10 +62,11 @@ This makes the class feel more fun, dynamic, and discovery-based.
 The class menu currently exposes:
 
 - Aula 1: Dimensões
-- Aula 2: Área das Faces
+- Aula 2: Multiplicação no Cubo
+- Aula 3: Cubo Inteiro
 - more classes marked as `Em Breve`
 
-For implemented classes, the menu offers:
+For Classes 1 and 2, the menu offers:
 
 - `Aprender`
 - `Jogar`
@@ -129,7 +131,7 @@ The player:
 
 This summary is already more game-like than the teaching phase and fits the general idea that summary reviews should be fun, interactive, and dynamic.
 
-## Module 2 - Face Squares / Multiplication
+## Module 2 - Multiplicação no Cubo
 
 ### Teaching Goal
 
@@ -150,36 +152,40 @@ Using the cube makes this very concrete.
 
 ### Current Learning Content
 
-The current implemented lesson uses cube sizes:
+The lesson now has 13 questions, with one child-paced concept reveal:
 
-- 2x2
-- 3x3
-- 4x4
-- 5x5
-- 6x6
+1. 3×3: count squares in one row, then count rows.
+2. Choose repeated addition with a visual preview matching terms to rows.
+3. Reveal `3 + 3 + 3` as `3 × 3`, with labeled factors, `Continuar`, and replay.
+4. Ask for the 3×3 face total (9), without giving that total in the reveal.
+5. 4×4: choose the full-face multiplication, then its total (16).
+6. On that same 4×4, highlight only two rows: choose `2 × 4`, then answer 8.
+7. 2×2: choose the full-face multiplication.
+8. 5×5: choose the full-face multiplication, then count four highlighted rows (20).
+9. 6×6: choose the full-face multiplication on an ordinary face, then count five highlighted rows (30).
 
-The student is asked:
+Colored stripes and row outlines expose equal groups. The face stays fixed during
+questions. A short initial color sweep introduces the stripes; this is an
+educational appearance change, not a simulated Rubik's layer turn. The ordinary
+6×6 question removes stripes until help is used. The cube heading does not give
+away the size as multiplication notation. Student-facing copy uses `face`,
+`linhas`, and `quadradinhos`, rather than formal area terminology.
 
-- `Quantos quadradinhos tem em um lado do cubo?`
-
-Important note:
-
-- for children, the teaching emphasis is on `quadradinhos em um lado`
-- not on formal terminology like `área`
+The first factor consistently means number of rows; the second means squares
+per row. Equivalent products are not offered as incorrect distractors.
 
 ### Hint Structure
 
-Current hints are progressive and very aligned with the intended pedagogy:
+- The `Dica` button offers visual help immediately; wrong answers also escalate help.
+- After 45 foreground seconds, the button is emphasized; time alone is not an error.
+- First focus a row; next label the equal groups and connect them to addition and multiplication.
+- The final support shows running totals by row. Excluded rows stay muted through every hint.
+- Row-count and row-size questions use counting cues appropriate to their specific question.
+- Help usage and incorrect answers are separate counters. The existing review receives only lesson incorrect answers as its lesson-error count.
 
-- first hint: notice how many squares are in one row
-- second hint: notice how many rows the face has
-- third hint: multiply rows by squares per row
-
-This supports the intended learning jump:
-
-- from counting one by one
-- to seeing repeated structure
-- to understanding multiplication visually
+The cube renderer accepts optional named-face colors, row-major sticker overrides,
+muted stickers, and row outlines/labels. Default callers retain the original
+appearance. These capabilities can support custom faces in later modules.
 
 ### Current Summary / Review Activity
 
@@ -198,21 +204,32 @@ Examples:
 
 This review is clearly more game-like than Module 1's summary and shows the intended direction: summary reviews should become increasingly fun, interactive, and dynamic.
 
+The Class 2 learning rework deliberately leaves this summary game unchanged.
+Partial-row targets and replacement cubes are proposals for a separate rework,
+not implemented behavior.
+
+## Module 3 - Cubo Inteiro (Current)
+
+Class 3 is implemented and reachable through `Aprender`. It uses face counting,
+scripted whole-cube rotation, and calculations across all six faces. It currently
+has no summary game. Its existing lesson has not been changed by the Class 2 rework.
+
 ## Planned Modules
 
 These modules are planned ideas. They should not be described as already implemented.
 
-## Planned Module 3 - Total Squares of a Cube
+## Planned Class 3 Rework - Equal Faces
 
 Main idea:
 
-- calculate how many small squares exist across all faces of a cube
+- extend equal rows to equal faces, using selected blue faces before the whole cube
 
 Example concept:
 
-- if one face has a certain number of squares, multiply by the number of sides
+- four blue faces with 16 squares each become `4 × 16`
+- eventually use all six faces, with the number of faces as the first factor
 
-This extends the face-counting idea from Module 2 into the whole cube.
+This redesign is a planned direction, separate from the current Class 3 implementation.
 
 ## Planned Module 4 - Total Squares of Multiple Cubes and Different-Shaped Puzzles
 
@@ -309,13 +326,18 @@ Best current fit is around 3rd to 6th grade, depending on the module and the amo
 
 - `src/RubiksClass/Classes/Class2_faceArea/Class2FaceArea.tsx`
 - `src/RubiksClass/Classes/Class2_faceArea/useClass2.ts`
+- `src/RubiksClass/Classes/Class2_faceArea/class2Lesson.ts`: sequence, state transitions, and visual/hint data
 - `src/RubiksClass/Classes/Class2_faceArea/Class2SummaryView.tsx`
+
+### Module 3 Files
+
+- `src/RubiksClass/Classes/Class3_totalSquares/Class3TotalSquares.tsx`
+- `src/RubiksClass/Classes/Class3_totalSquares/useClass3.ts`
 
 ### Future Module Structure
 
 There are already placeholder folders for future modules, including:
 
-- `Class3_totalSquares`
 - `Class4_totalSquares2`
 - `Class5_fractions`
 - `Class7_geometry`

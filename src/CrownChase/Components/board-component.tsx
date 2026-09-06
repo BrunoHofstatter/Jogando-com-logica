@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { useEffect, useState } from "react";
 
 import {
@@ -20,6 +20,7 @@ import styles from "../styles/board.module.css";
 import { VictoryScreen } from "./VictoryScreen";
 
 interface BoardProps {
+  onlineHeader?: ReactNode;
   mode?: "local" | "remote";
   gameState?: CrownChaseState;
   onGameStateChange?: (newState: CrownChaseState) => void;
@@ -38,6 +39,7 @@ interface BoardProps {
 }
 
 const Board: React.FC<BoardProps> = ({
+  onlineHeader,
   mode = "local",
   gameState: externalGameState,
   onGameStateChange,
@@ -207,7 +209,10 @@ const Board: React.FC<BoardProps> = ({
 
   return (
     <div className={styles.gamePage}>
-      <div className={styles.gameContainer}>
+      <div className={`${styles.gameContainer} ${onlineHeader ? styles.gameContainerOnline : ""}`}>
+        {onlineHeader && (
+          <div className={styles.onlineHeaderSlot}>{onlineHeader}</div>
+        )}
         <div className={styles.gameInfo} data-target="gameInfo">
           {isAIMode && difficulty && (
             <div className={styles.difficultyBox}>

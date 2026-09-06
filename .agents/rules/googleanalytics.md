@@ -266,6 +266,12 @@ level. `outcome` is `passed` or `failed`. Random/tutorial rounds use
 
 Rubik's activities:
 
+Class 2 now records hint escalations (manual or following an incorrect answer)
+as `assistance_count`, and lesson incorrect answers plus review mistakes as
+`incorrect_count`. Inactivity prompts and the successful-discovery reveal do not
+increment either counter. Its lifecycle, `class_02` identifier, and lesson/review
+variants are unchanged; lesson completion still includes the existing review.
+
 ```text
 game_id: cubo_magico
 game_mode: solo

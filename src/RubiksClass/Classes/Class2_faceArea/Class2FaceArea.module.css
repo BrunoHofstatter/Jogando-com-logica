@@ -108,10 +108,78 @@
     background: #d5ebfa;
     /* Slightly darker soft blue */
     padding: 4dvh 4vw;
-    gap: 6dvh;
+    gap: 3dvh;
     position: relative;
     overflow-y: auto;
 }
+
+.grouping {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1dvh;
+    color: #013873;
+    font-size: min(2.2vw, 4dvh);
+}
+
+.sumStrip, .equation, .revealEquation, .lessonActions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8vw;
+}
+
+.sumTerm {
+    border: 0.15vw solid #013873;
+    background: var(--row-color, #fff);
+    border-radius: 0.5vw;
+    padding: 0.1vw 0.6vw;
+    animation: fadeSlideIn 0.35s both;
+    animation-delay: calc(var(--term) * 0.2s);
+}
+
+.equation > span, .revealEquation > span {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.equation strong, .revealEquation strong { font-size: min(3vw, 5dvh); }
+.equation small, .revealEquation small { font-size: min(1.25vw, 2.5dvh); line-height: 1.15; }
+.revealEquation { animation: fadeSlideIn 0.5s 0.9s both; }
+.runningTotals span { display: inline-block; animation: fadeSlideIn 0.4s both; animation-delay: calc(var(--term) * 0.5s); }
+
+.hintButton {
+    font-family: inherit;
+    color: #013873;
+    background: #fff5b1;
+    border: 0.15vw solid #ca8a04;
+    border-radius: 0.7vw;
+    padding: 0.35vw 1vw;
+    font-size: min(1.5vw, 3dvh);
+    cursor: pointer;
+}
+.hintButton:disabled { opacity: 0.6; cursor: default; }
+.offeredHint { outline: 0.25vw solid #ca8a04; outline-offset: 0.2vw; }
+.helpPrompt { font-size: min(1.25vw, 2.5dvh); color: #013873; }
+.continueButton { padding-inline: 1.5vw; }
+.selectedOption { background: #ffe874; outline: 0.2vw solid #ca8a04; }
+.additionOptions { grid-template-columns: 1fr; gap: 1dvh; }
+.additionOptions .optionButton { padding-block: 0.35vw; }
+.additionPreview { display: flex; align-items: center; gap: 2vw; }
+.previewRows { display: flex; flex-direction: column; gap: 0.4dvh; color: #013873; font-size: min(1.5vw, 3dvh); }
+.previewRow { display: flex; align-items: center; gap: 1vw; }
+.miniRow { display: flex; gap: 0.15vw; width: 5vw; justify-content: center; }
+.miniRow i { width: 1.2vw; height: 1.2vw; border: 0.1vw solid #013873; border-radius: 0.15vw; background: var(--row-color, #98defc); }
+.grouping [data-row-color="blue"], .previewRows [data-row-color="blue"] { --row-color: #86b3ff; }
+.grouping [data-row-color="yellow"], .previewRows [data-row-color="yellow"] { --row-color: #ffe874; }
+.grouping [data-row-color="red"], .previewRows [data-row-color="red"] { --row-color: #ff9393; }
+.grouping [data-row-color="green"], .previewRows [data-row-color="green"] { --row-color: #78e998; }
+.grouping [data-row-color="orange"], .previewRows [data-row-color="orange"] { --row-color: #ffbd79; }
+.grouping [data-row-color="white"], .previewRows [data-row-color="white"] { --row-color: #fff; }
+.miniRow > span { font-size: min(1vw, 2dvh); }
+.optionButton:focus-visible, .hintButton:focus-visible { outline: 0.3vw solid #a855f7; outline-offset: 0.3vw; }
 
 /* --- Lesson progress ----------------------------------------- */
 .progress {
@@ -157,7 +225,9 @@
     /* Soft yellow bg */
     border: 0.4vw solid #ca8a04;
     box-shadow: 0 0.6vw 0 #a16207;
-    -webkit-text-stroke: 0.15vw #ca8a04;
+    color: #713f12;
+    -webkit-text-stroke: 0;
+    text-shadow: none;
 }
 
 .successCard {
@@ -222,6 +292,19 @@
 
 /* --- Mobile Layout ------------------------------------------- */
 @media (max-width: 650px) and (orientation: portrait) {
+    .grouping { font-size: min(4.5vw, 2.5dvh); gap: 0.7dvh; }
+    .equation strong, .revealEquation strong { font-size: min(6vw, 3.5dvh); }
+    .equation small, .revealEquation small { font-size: min(3vw, 1.7dvh); }
+    .sumStrip, .equation, .revealEquation, .lessonActions { gap: 2vw; }
+    .sumTerm { padding: 0.2vw 1.2vw; border-radius: 1vw; }
+    .hintButton { font-size: min(4vw, 2.2dvh); padding: 1vw 3vw; border-width: 0.4vw; border-radius: 1.5vw; }
+    .helpPrompt { font-size: min(3vw, 1.7dvh); }
+    .continueButton { padding-inline: 3vw; }
+    .additionPreview { gap: 4vw; }
+    .previewRows { font-size: min(4vw, 2.2dvh); }
+    .miniRow { width: 12vw; gap: 0.4vw; }
+    .miniRow i { width: 3vw; height: 3vw; border-width: 0.25vw; border-radius: 0.4vw; }
+    .miniRow > span { font-size: min(2.5vw, 1.5dvh); }
     .container {
         flex-direction: column;
     }
@@ -321,4 +404,8 @@
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sumTerm, .revealEquation, .runningTotals span, .hintCard, .successCard { animation: none; }
 }

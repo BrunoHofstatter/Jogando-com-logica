@@ -99,8 +99,9 @@
   display: grid;
   grid-template-columns: repeat(var(--grid-size), 1fr);
   grid-template-rows: repeat(var(--grid-size), 1fr);
-  gap: clamp(2px, 0.4vw, 5px);
-  padding: clamp(2px, 0.4vw, 5px);
+  --face-gap: clamp(2px, 0.4vw, 5px);
+  gap: var(--face-gap);
+  padding: var(--face-gap);
   box-sizing: border-box;
   backface-visibility: visible;
   /* Scale radius with sticker size, not viewport — fixes small cube instances */
@@ -159,6 +160,7 @@
 
 /* --- Stickers ------------------------------------------------ */
 .sticker {
+  position: relative;
   /* Scale radius with sticker size, not viewport — fixes small cube instances */
   border-radius: calc(var(--cube-size) / var(--grid-size) * 0.07);
   width: 100%;
@@ -297,4 +299,61 @@
   100% {
     transform: rotateX(var(--auto-x, -25deg)) rotateY(360deg);
   }
+}
+
+/* Educational patterns are opt-in; normal cubes keep their face colors. */
+.sticker.excludedSticker {
+  opacity: 0.18;
+  filter: grayscale(1);
+}
+
+.rowGuide {
+  position: absolute;
+  left: var(--face-gap);
+  right: var(--face-gap);
+  --row-height: calc((var(--cube-size) - var(--face-gap) * (var(--grid-size) + 1)) / var(--grid-size));
+  top: calc(var(--face-gap) + var(--row) * (var(--row-height) + var(--face-gap)));
+  height: var(--row-height);
+  border: calc(var(--ss) * 0.035) solid #172554;
+  border-radius: calc(var(--ss) * 0.09);
+  box-sizing: border-box;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.rowLabel {
+  position: absolute;
+  left: calc(100% + var(--face-gap) * 2);
+  top: 50%;
+  transform: translateY(-50%);
+  min-width: calc(var(--ss) * 0.6);
+  padding: calc(var(--ss) * 0.04) calc(var(--ss) * 0.1);
+  border-radius: calc(var(--ss) * 0.12);
+  background: #fff;
+  color: #172554;
+  text-align: center;
+  font-size: calc(var(--ss) * 0.48);
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.patternCover {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  animation: revealPattern 0.45s ease both;
+  animation-delay: calc(0.25s + var(--row) * 0.18s);
+}
+
+@keyframes revealPattern {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .patternCover { display: none; }
+  .rowLabel, .stickerIndex { animation: none; }
+  .highlighted { animation: none !important; }
+  .locked { transition: none; }
 }

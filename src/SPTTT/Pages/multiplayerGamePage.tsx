@@ -83,23 +83,6 @@ export default function SPTTTMultiplayerGamePage() {
 
   return (
     <>
-      <div className={styles.roomBanner}>
-        <div className={styles.roomInfo}>
-          <span className={styles.roomCode}>Sala {roomCode}</span>
-          <span className={styles.roomDetail}>
-            Voce: {playerName || "Jogador"} ({playerMark})
-          </span>
-          <span className={styles.roomDetail}>
-            Oponente: {opponent?.name ?? "Aguardando..."}
-            {opponent?.mark ? ` (${opponent.mark})` : ""}
-          </span>
-        </div>
-
-        <button className={styles.leaveButton} onClick={handleLeaveRoomRequest}>
-          Sair da Sala
-        </button>
-      </div>
-
       {isLeaveConfirmationOpen && (
         <div className={styles.confirmationOverlay}>
           <div className={styles.confirmationCard}>
@@ -124,9 +107,28 @@ export default function SPTTTMultiplayerGamePage() {
         </div>
       )}
 
-      {errorMessage && <div className={styles.alertBox}>{errorMessage}</div>}
+<SPTTT
+        roomControls={
+          <>
+            <div className={styles.roomBanner}>
+              <div className={styles.roomInfo}>
+                <span className={styles.roomCode}>Sala {roomCode}</span>
+                <span className={styles.roomDetail}>
+                  Voce: {playerName || "Jogador"} ({playerMark})
+                </span>
+                <span className={styles.roomDetail}>
+                  Oponente: {opponent?.name ?? "Aguardando..."}
+                  {opponent?.mark ? ` (${opponent.mark})` : ""}
+                </span>
+              </div>
 
-      <SPTTT
+              <button className={styles.leaveButton} onClick={handleLeaveRoomRequest}>
+                Sair da Sala
+              </button>
+            </div>
+            {errorMessage && <div className={styles.alertBox}>{errorMessage}</div>}
+          </>
+        }
         mode="remote"
         gameState={gameState}
         onMoveIntent={submitMove}

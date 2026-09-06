@@ -19,7 +19,7 @@ const ClassMenu: React.FC = () => {
         />
         <ClassIcon
           pagina={ROUTES.CLASS_2}
-          label="Aula 2: Área das Faces"
+          label="Aula 2: Multiplicação no Cubo"
           imageSrc={`${import.meta.env.BASE_URL}3x3.png`}
         />
         <ClassIcon
