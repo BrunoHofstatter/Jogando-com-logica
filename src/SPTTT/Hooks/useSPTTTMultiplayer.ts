@@ -20,6 +20,8 @@ import {
   normalizePlayerName,
   setActivePlayerName,
 } from "../../Shared/PlayerName/activePlayerName";
+import { MultiplayerReliabilityTracker } from "../../analytics/MultiplayerReliabilityTracker";
+import type { MultiplayerJoinType } from "../../analytics/events";
 
 type MultiplayerSnapshot = {
   connectionStatus: MultiplayerConnectionStatus;
@@ -63,6 +65,7 @@ let socket: Socket<
   SptttServerToClientEvents,
   SptttClientToServerEvents
 > | null = null;
+const reliabilityTracker = new MultiplayerReliabilityTracker();
 let sharedSnapshot = loadSnapshot();
 const subscribers = new Set<(snapshot: MultiplayerSnapshot) => void>();
 
@@ -186,13 +189,15 @@ function ensureSocket(): Socket<
       }
     });
 
-    socket.on("disconnect", () => {
+    socket.on("disconnect", (reason) => {
+      reliabilityTracker.disconnected(reason, sharedSnapshot.connectionStatus);
       updateSnapshot({
         connectionStatus: sharedSnapshot.roomCode ? "disconnected" : "idle",
       });
     });
 
     socket.on("connect_error", (error) => {
+      reliabilityTracker.failConnection("network_error");
       const message =
         error.message === "Invalid namespace"
           ? "O servidor online ainda não foi atualizado para o Super Jogo da Velha."
@@ -205,6 +210,7 @@ function ensureSocket(): Socket<
     });
 
     socket.on("room_created", (payload) => {
+      reliabilityTracker.roomCreated();
       updateSnapshot({
         roomCode: payload.code,
         playerSeat: payload.seat,
@@ -220,6 +226,7 @@ function ensureSocket(): Socket<
     });
 
     socket.on("room_joined", (payload) => {
+      reliabilityTracker.joinSucceeded();
       updateSnapshot({
         roomCode: payload.code,
         playerSeat: payload.seat,
@@ -294,6 +301,7 @@ function ensureSocket(): Socket<
     });
 
     socket.on("multiplayer_error", (payload) => {
+      reliabilityTracker.failServer(payload.code);
       if (payload.code === "classroom_not_found") {
         clearActiveClassroomSession();
         updateSnapshot({ classroomCode: null, openClassroomRooms: [] });
@@ -361,6 +369,7 @@ export function leaveSPTTTMultiplayerRoom(
   options: LeaveRoomOptions = {},
 ): void {
   const { preserveName = true } = options;
+  reliabilityTracker.reset();
 
   if (socket && sharedSnapshot.roomCode) {
     socket.emit("leave_room", { code: sharedSnapshot.roomCode });
@@ -411,6 +420,10 @@ export function useSPTTTMultiplayer() {
       });
       return;
     }
+    reliabilityTracker.startRoomCreation(
+      "super_jogo_da_velha",
+      classroomCode ? "classroom_room" : "private_code",
+    );
     setActivePlayerName(normalizedName);
 
     updateSnapshot({
@@ -433,7 +446,11 @@ export function useSPTTTMultiplayer() {
     });
   };
 
-  const joinRoom = (code: string, playerName: string) => {
+  const joinRoom = (
+    code: string,
+    playerName: string,
+    joinType: MultiplayerJoinType = "private_code",
+  ) => {
     const normalizedName = normalizePlayerName(playerName);
     const normalizedCode = code.trim().toUpperCase();
 
@@ -451,6 +468,7 @@ export function useSPTTTMultiplayer() {
       return;
     }
     setActivePlayerName(normalizedName);
+    reliabilityTracker.startJoin("super_jogo_da_velha", joinType);
 
     updateSnapshot({
       playerName: normalizedName,
@@ -467,7 +485,11 @@ export function useSPTTTMultiplayer() {
     });
 
     const activeSocket = ensureSocket();
-    activeSocket?.emit("join_room", {
+    if (!activeSocket) {
+      reliabilityTracker.failConnection("server_unavailable");
+      return;
+    }
+    activeSocket.emit("join_room", {
       code: normalizedCode,
       playerName: normalizedName,
     });

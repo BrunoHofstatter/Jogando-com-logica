@@ -401,16 +401,13 @@
 
 .pieceImage {
   width: 3vw;
-  margin-bottom: 0.6vw;
-  vertical-align: middle;
+  height: 3vw;
+  flex: 0 0 auto;
 }
 
 .boardImage {
   width: 40vw;
-  border: 0.4vw solid #7e22ce;
-  border-radius: 2vw;
-  box-shadow: 0 0.6vw 0 #581c87;
-  background-color: #a855f7;
+  display: block;
 }
 
 .boardDiv {
@@ -847,14 +844,11 @@
 
   .pieceImage {
     width: min(8vw, 4dvh);
-    margin-bottom: min(1vw, 0.5dvh);
+    height: min(8vw, 4dvh);
   }
 
   .boardImage {
     width: min(80vw, 40dvh);
-    border-width: min(0.6vw, 0.3dvh);
-    border-radius: min(4vw, 2dvh);
-    box-shadow: 0 min(1vw, 0.5dvh) 0 #581c87;
   }
 
   .boardDiv {

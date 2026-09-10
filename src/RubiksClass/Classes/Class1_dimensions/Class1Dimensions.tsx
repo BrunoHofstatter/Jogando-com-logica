@@ -1,22 +1,52 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useCallback, useEffect, useMemo } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import RubiksCube from "../../Components/RubiksCube";
 import { useClass1 } from "./useClass1";
 import SummaryView from "./SummaryView";
 import styles from "./Class1Dimensions.module.css";
 import { ROUTES } from "../../../routes";
+import { useGameAttemptAnalytics } from "../../../analytics/useGameAttemptAnalytics";
 
-
-const LEVELS = [2, 3, 4, 5, 6];
 
 const Class1Dimensions: React.FC = () => {
     const { cubeProps, uiProps } = useClass1();
     const navigate = useNavigate();
+    const location = useLocation();
+    const isReview =
+        location.state?.mode === "game" ||
+        new URLSearchParams(location.search).get("mode") === "game";
+    const analyticsContext = useMemo(() => ({
+        gameId: "cubo_magico" as const,
+        gameMode: "solo" as const,
+        usageContext: "standard" as const,
+        playerSlotCount: 1,
+        levelId: "class_01",
+        activityVariant: isReview ? "review" as const : "lesson" as const,
+    }), [isReview]);
+    const { completeAttempt, startAttempt } = useGameAttemptAnalytics(analyticsContext);
+
+    useEffect(() => {
+        startAttempt();
+    }, [startAttempt]);
+
+    const handleSummaryComplete = useCallback((summaryMistakes: number) => {
+        return completeAttempt({
+            assistanceCount: uiProps.totalFlags,
+            incorrectCount: summaryMistakes,
+            outcome: "completed",
+            success: true,
+        });
+    }, [completeAttempt, uiProps.totalFlags]);
 
 
     // --- Summary phase ---
     if (uiProps.currentPhase === "summary") {
-        return <SummaryView totalFlags={uiProps.totalFlags} />;
+        return (
+            <SummaryView
+                totalFlags={uiProps.totalFlags}
+                onComplete={handleSummaryComplete}
+            />
+        );
     }
 
     const isTransition = uiProps.currentPhase === "transition";

@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 
 import { ROUTES } from "../../routes";
 import BombCaseLayout from "../Components/BombCaseLayout";
+import { NavigationBombPanel, NavigationManualPanel } from "../Components/NavigationLevel";
+import { getBombLevel } from "../Logic/levelCatalog";
 import { useBombGameMultiplayer } from "../Hooks/useBombGameMultiplayer";
 import type { Operator } from "../Logic/level1";
 import type { BombViewState, ManualViewState, RolePreference } from "../Logic/multiplayer/protocol";
@@ -46,8 +48,8 @@ function MatchBar({ game, seconds, onLeave }: { game: GameApi; seconds: number; 
   const partner = game.players.find((player) => player.seat !== game.playerSeat);
   return <header className={styles.matchBar}>
     <div className={styles.matchRoom}><strong>Sala {game.roomCode}</strong><span>{partner ? `Parceiro: ${partner.name}` : "Aguardando parceiro"}</span></div>
-    <div className={styles.hearts}>{[0, 1, 2].map((index) => <Heart key={index} fill={index < state.lives ? "currentColor" : "none"} />)}</div>
-    <div className={styles.matchCenter}>{state.role === "bomb" ? "Nível 1" : formatTime(seconds)}</div>
+    <div className={styles.hearts} role="img" aria-label={state.lives === 1 ? "1 coração restante" : `${state.lives} corações restantes`}>{[0, 1, 2].map((index) => <Heart key={index} fill={index < state.lives ? "currentColor" : "none"} />)}</div>
+    <div className={styles.matchCenter}>{state.role === "bomb" ? `Nível ${game.levelId}` : formatTime(seconds)}</div>
     <div className={styles.assignedRole}>{state.role === "bomb" ? "Bomba" : "Manual"}</div>
     <button className={styles.matchLeave} onClick={onLeave}><span className={styles.leaveLong}>Sair da Sala</span><span className={styles.leaveShort}>Sair</span></button>
   </header>;
@@ -57,7 +59,7 @@ function RoleSelection({ game }: { game: GameApi }) {
   const me = game.players.find((player) => player.seat === game.playerSeat);
   const options: { value: RolePreference; label: string }[] = [{ value: "bomb", label: "Bomba" }, { value: "manual", label: "Manual" }, { value: "either", label: "Tanto faz" }];
   return <main className={styles.rolePage}><section className={styles.roleCard}>
-    <h1>Escolha seu papel</h1><p>Se os dois escolherem o mesmo papel, o sorteio será automático.</p>
+    <h1>Escolha seu papel</h1><p>Nível {game.levelId} · {getBombLevel(game.levelId).title}</p><p>Se os dois escolherem o mesmo papel, o sorteio será automático.</p>
     <div className={styles.playerCards}>{game.players.map((player) => <article key={player.seat} className={player.ready ? styles.playerReady : ""}><strong>{player.name}</strong><span>{preferenceLabel(player.preference)}</span>{player.ready && <span className={styles.readyMark}>✓</span>}</article>)}</div>
     <div className={styles.roleButtons}>{options.map((option) => <button key={option.value} className={me?.preference === option.value ? styles.selectedButton : ""} onClick={() => game.setPreference(option.value)} disabled={Boolean(me?.ready)}>{option.label}</button>)}</div>
     <button className={styles.readyButton} onClick={() => game.setReady(!me?.ready)}>{me?.ready ? "Cancelar pronto" : "Pronto"}</button>
@@ -90,7 +92,12 @@ function ActiveMatch({ game, onLeave }: { game: GameApi; onLeave: () => void }) 
   return <div className={`${styles.activeMatch} ${state.role === "bomb" ? styles.bombMatch : ""}`}>
     <MatchBar game={game} seconds={seconds} onLeave={onLeave} />
     {heartLost && <div className={styles.heartNotice}>Coração perdido!</div>}
-    {state.role === "bomb" ? <BombPanel state={state} seconds={seconds} submit={game.submit} /> : <ManualPanel state={state} />}
+    {game.connectionStatus === "disconnected" && <p role="alert" className={styles.connectionWarning}>Conexão interrompida. Os controles estão indisponíveis.</p>}
+    {state.levelId === 3
+      ? state.role === "bomb"
+        ? <NavigationBombPanel key={state.roundId} state={state} seconds={seconds} submit={game.submit} disconnected={game.connectionStatus === "disconnected"} />
+        : <NavigationManualPanel key={state.roundId} state={state} submit={game.submit} disconnected={game.connectionStatus === "disconnected"} />
+      : state.role === "bomb" ? <BombPanel state={state} seconds={seconds} submit={game.submit} /> : <ManualPanel state={state} />}
   </div>;
 }
 

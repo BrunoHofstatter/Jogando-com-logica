@@ -4,9 +4,17 @@ import { useNavigate } from "react-router-dom";
 import { useTutorialCompleted } from "../../Shared/Components/DynamicTutorial";
 import { useDifficultyLock } from "../../Shared/Hooks/useDifficultyLock";
 import { ROUTES } from "../../routes";
+import { CrownChasePieceVisual } from "../Components/piece";
+import type { PieceType } from "../Logic/v2";
 
 
 type GameMode = "pvp" | "ai";
+
+const RULE_PIECES: ReadonlyArray<{ type: PieceType; label: string }> = [
+  { type: "jumper", label: "Saltador" },
+  { type: "killer", label: "Assassino" },
+  { type: "king", label: "Rei" },
+];
 
 function CrownChaseRegras() {
 
@@ -15,8 +23,7 @@ function CrownChaseRegras() {
   const [aiDifficulty, setAiDifficulty] = useState<1 | 2 | 3 | 4>(1);
   const [showDetailedRules, setShowDetailedRules] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [tutorialCompleted, resetTutorial] =
-    useTutorialCompleted("crownchase_v1");
+  const [, resetTutorial] = useTutorialCompleted("crownchase_v1");
 
   const { isUnlocked, unlockAll, resetProgress } =
     useDifficultyLock("crownchase");
@@ -200,27 +207,17 @@ function CrownChaseRegras() {
                     className={styles.boardImage}
                   />
                   <ul className={styles.legend}>
-                    <li>
-                      <img
-                        src={`${import.meta.env.BASE_URL}crownchaseJumper.png`}
-                        className={styles.pieceImage}
-                      />{" "}
-                      -{">"} Saltador
-                    </li>
-                    <li>
-                      <img
-                        src={`${import.meta.env.BASE_URL}crownchaseAssassin.png`}
-                        className={styles.pieceImage}
-                      />{" "}
-                      -{">"} Assassino
-                    </li>
-                    <li>
-                      <img
-                        src={`${import.meta.env.BASE_URL}crownchaseKing.png`}
-                        className={styles.pieceImage}
-                      />{" "}
-                      -{">"} Rei
-                    </li>
+                    {RULE_PIECES.map(({ type, label }) => (
+                      <li key={type}>
+                        <div className={styles.pieceImage}>
+                          <CrownChasePieceVisual
+                            piece={{ type, owner: 0 }}
+                            fillContainer
+                          />
+                        </div>
+                        -{">"} {label}
+                      </li>
+                    ))}
                   </ul>
                 </div>
 

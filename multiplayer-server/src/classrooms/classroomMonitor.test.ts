@@ -31,8 +31,9 @@ describe("classroom monitor", () => {
       const joiner = await connect(url);
 
       const classroomCreated = once<ClassroomCreatedPayload>(teacher, "classroom_created");
-      teacher.emit("create_classroom");
-      const { classroom } = await classroomCreated;
+      teacher.emit("create_classroom", { requestId: "request-1" });
+      const { classroom, requestId } = await classroomCreated;
+      expect(requestId).toBe("request-1");
 
       const unauthorized = once<MultiplayerErrorPayload>(teacher, "multiplayer_error");
       teacher.emit("watch_classroom", {

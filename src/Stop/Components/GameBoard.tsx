@@ -20,11 +20,23 @@ import { isTouchDevice } from "../Logic/domUtils";
 import { ROUTES } from "../../routes";
 import styles from "../styles/StopGame.module.css";
 
+interface RoundCompletion {
+  completedStepCount: number;
+  correctCount: number;
+  incorrectCount: number;
+  success?: boolean;
+  outcome: "completed" | "passed" | "failed";
+  starsEarned?: number;
+}
+
 interface GameBoardProps {
   round: StopRound;
   levelConfig?: LevelConfig | null;
   onReset?: () => void;
   requireFilledBoardToStop?: boolean;
+  interactionReady?: boolean;
+  onPlayable?: () => void;
+  onComplete?: (completion: RoundCompletion) => void;
 }
 
 /**
@@ -36,6 +48,9 @@ function GameBoard({
   levelConfig,
   onReset,
   requireFilledBoardToStop = false,
+  interactionReady = true,
+  onPlayable,
+  onComplete,
 }: GameBoardProps) {
   const navigate = useNavigate();
   const [count, setCount] = useState(0);
@@ -78,6 +93,12 @@ function GameBoard({
   }, [round]);
 
   useEffect(() => {
+    if (interactionReady && !roundEnded) {
+      onPlayable?.();
+    }
+  }, [interactionReady, onPlayable, round, roundEnded]);
+
+  useEffect(() => {
     if (roundEnded) {
       return;
     }
@@ -90,27 +111,26 @@ function GameBoard({
   }, [roundEnded]);
 
   useEffect(() => {
-    if (!roundEnded || !levelConfig) {
+    if (!roundResult) {
       return;
     }
 
-    let stars = 0;
+    const stars = levelConfig
+      ? calculateStars(levelConfig, count, correctCount)
+      : undefined;
 
-    if (
-      count <= levelConfig.stars[3].maxTime &&
-      correctCount >= levelConfig.stars[3].minCorrect
-    ) {
-      stars = 3;
-    } else if (
-      count <= levelConfig.stars[2].maxTime &&
-      correctCount >= levelConfig.stars[2].minCorrect
-    ) {
-      stars = 2;
-    } else if (
-      count <= levelConfig.stars[1].maxTime &&
-      correctCount >= levelConfig.stars[1].minCorrect
-    ) {
-      stars = 1;
+    onComplete?.({
+      completedStepCount: round.boxes.length,
+      correctCount,
+      incorrectCount: round.boxes.length - correctCount,
+      success: stars === undefined ? undefined : stars >= 1,
+      outcome:
+        stars === undefined ? "completed" : stars >= 1 ? "passed" : "failed",
+      starsEarned: stars,
+    });
+
+    if (!levelConfig || stars === undefined) {
+      return;
     }
 
     setStarsEarned(stars);
@@ -121,7 +141,7 @@ function GameBoard({
     }, 500);
 
     return () => window.clearTimeout(timeout);
-  }, [count, correctCount, levelConfig, roundEnded]);
+  }, [count, correctCount, levelConfig, onComplete, round, roundResult]);
 
   const handleInputFocus = useCallback((index: number, element: HTMLInputElement) => {
     if (!isTouch || roundEnded) {
@@ -375,3 +395,32 @@ function GameBoard({
 }
 
 export default GameBoard;
+
+function calculateStars(
+  levelConfig: LevelConfig,
+  elapsedSeconds: number,
+  correctCount: number,
+): number {
+  if (
+    elapsedSeconds <= levelConfig.stars[3].maxTime &&
+    correctCount >= levelConfig.stars[3].minCorrect
+  ) {
+    return 3;
+  }
+
+  if (
+    elapsedSeconds <= levelConfig.stars[2].maxTime &&
+    correctCount >= levelConfig.stars[2].minCorrect
+  ) {
+    return 2;
+  }
+
+  if (
+    elapsedSeconds <= levelConfig.stars[1].maxTime &&
+    correctCount >= levelConfig.stars[1].minCorrect
+  ) {
+    return 1;
+  }
+
+  return 0;
+}

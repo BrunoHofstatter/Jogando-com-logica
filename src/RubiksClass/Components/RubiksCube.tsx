@@ -11,7 +11,26 @@ export interface HighlightRegion {
   index: number;
 }
 
-interface RubiksCubeProps {
+export type CubeFace = "front" | "back" | "right" | "left" | "top" | "bottom";
+export type StickerColor = "green" | "blue" | "red" | "orange" | "white" | "yellow";
+
+export interface StickerAppearance {
+  color?: StickerColor;
+  /** Keep an excluded sticker muted even when the lesson changes its hints. */
+  muted?: boolean;
+}
+
+export interface FaceAppearance extends StickerAppearance {
+  /** Row-major overrides. Missing entries inherit the face appearance. */
+  stickers?: readonly (StickerAppearance | undefined)[];
+}
+
+export interface RowGuide {
+  row: number;
+  label?: string;
+}
+
+export interface RubiksCubeProps {
   /** Grid dimension: 2 = 2×2, 3 = 3×3, etc. */
   size: number;
   /** Total visual cube size in vw units (default 25). */
@@ -34,12 +53,18 @@ interface RubiksCubeProps {
   scriptedRotation?: CubeRotation | null;
   /** Prevent pointer dragging while a lesson owns the cube motion. */
   disableInteraction?: boolean;
+  /** Optional educational colors; omitted faces retain the original cube colors. */
+  faceAppearances?: Partial<Record<CubeFace, FaceAppearance>>;
+  /** Non-color grouping cues, with optional labels beside the face. */
+  rowGuides?: Partial<Record<CubeFace, readonly RowGuide[]>>;
+  /** One short reveal from the original face colors to an educational pattern. */
+  animatePattern?: boolean;
 }
 
 // --- Face config -------------------------------------------------------------
 
 interface FaceConfig {
-  name: string;
+  name: CubeFace;
   className: string;
   colorClass: string;
   /** Whether text on this face color should be dark (for light stickers). */
@@ -54,6 +79,15 @@ const FACES: FaceConfig[] = [
   { name: "top", className: styles.top, colorClass: styles.colorWhite, darkText: true },
   { name: "bottom", className: styles.bottom, colorClass: styles.colorYellow, darkText: true },
 ];
+
+const STICKER_COLORS: Record<StickerColor, { className: string; darkText: boolean }> = {
+  green: { className: styles.colorGreen, darkText: false },
+  blue: { className: styles.colorBlue, darkText: false },
+  red: { className: styles.colorRed, darkText: false },
+  orange: { className: styles.colorOrange, darkText: false },
+  white: { className: styles.colorWhite, darkText: true },
+  yellow: { className: styles.colorYellow, darkText: true },
+};
 
 // --- Constants ---------------------------------------------------------------
 
@@ -177,6 +211,9 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
   focusedFaceLabel = null,
   scriptedRotation = null,
   disableInteraction = false,
+  faceAppearances,
+  rowGuides,
+  animatePattern = false,
 }) => {
   const cubeRef = useRef<HTMLDivElement>(null);
   const [mode, setMode] = useState<RotationMode>("auto");
@@ -432,6 +469,11 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
     stickerIdx: number,
     isFrontFace: boolean
   ) => {
+    const appearance = faceAppearances?.[face.name];
+    const sticker = appearance?.stickers?.[stickerIdx];
+    const customColor = sticker?.color ?? appearance?.color;
+    const color = customColor ? STICKER_COLORS[customColor] : null;
+    const muted = sticker?.muted ?? appearance?.muted ?? false;
     // Normalize to array
     const regions = Array.isArray(highlightRegion)
       ? highlightRegion
@@ -450,9 +492,10 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
 
     const stickerClasses = [
       styles.sticker,
-      face.colorClass,
+      color?.className ?? face.colorClass,
       isHighlighted ? styles.highlighted : "",
       isDimmed ? styles.dimmed : "",
+      muted ? styles.excludedSticker : "",
     ]
       .filter(Boolean)
       .join(" ");
@@ -467,9 +510,16 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
 
     return (
       <div key={stickerIdx} className={stickerClasses}>
+        {animatePattern && customColor && (
+          <span
+            aria-hidden="true"
+            className={`${styles.patternCover} ${face.colorClass}`}
+            style={{ "--row": Math.floor(stickerIdx / size) } as React.CSSProperties}
+          />
+        )}
         {shouldShowNumber && (
           <span
-            className={`${styles.stickerIndex} ${face.darkText ? styles.darkText : ""}`}
+            className={`${styles.stickerIndex} ${(color?.darkText ?? face.darkText) ? styles.darkText : ""}`}
             style={{ "--i": displayNum - 1 } as React.CSSProperties}
           >
             {displayNum}
@@ -490,6 +540,11 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
   } as React.CSSProperties;
 
   const stickerCount = size * size;
+
+  const faceUsesDarkText = (face: FaceConfig) => {
+    const color = faceAppearances?.[face.name]?.color;
+    return color ? STICKER_COLORS[color].darkText : face.darkText;
+  };
 
   return (
     <div className={styles.scene} style={cssVars}>
@@ -519,8 +574,18 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
             {Array.from({ length: stickerCount }, (_, i) =>
               renderSticker(face, i, face.name === "front")
             )}
+            {rowGuides?.[face.name]?.filter(({ row }) => row >= 0 && row < size).map(({ row, label }) => (
+              <div
+                key={row}
+                className={styles.rowGuide}
+                style={{ "--row": row } as React.CSSProperties}
+                aria-hidden="true"
+              >
+                {label && <span className={styles.rowLabel}>{label}</span>}
+              </div>
+            ))}
             {focusedFaceLabel && face.name === FACES[focusedFaceIndex ?? -1]?.name && (
-              <div className={`${styles.faceLabel} ${face.darkText ? styles.darkText : ""}`}>
+              <div className={`${styles.faceLabel} ${faceUsesDarkText(face) ? styles.darkText : ""}`}>
                 {focusedFaceLabel}
               </div>
             )}

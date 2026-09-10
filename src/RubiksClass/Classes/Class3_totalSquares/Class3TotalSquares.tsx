@@ -5,6 +5,7 @@ import { VerticalMultiplication } from "../../../Shared/Calculation";
 import { useClass3 } from "./useClass3";
 import styles from "./Class3TotalSquares.module.css";
 import { ROUTES } from "../../../routes";
+import { useGameAttemptAnalytics } from "../../../analytics/useGameAttemptAnalytics";
 
 const calculationClassNames = {
     root: styles.calculationRoot,
@@ -47,6 +48,28 @@ const Class3TotalSquares: React.FC = () => {
         window.matchMedia("(pointer: coarse)").matches ||
         window.matchMedia("(max-width: 650px) and (orientation: portrait)").matches
     );
+    const { completeAttempt, startAttempt } = useGameAttemptAnalytics({
+        gameId: "cubo_magico",
+        gameMode: "solo",
+        usageContext: "standard",
+        playerSlotCount: 1,
+        levelId: "class_03",
+        activityVariant: "lesson",
+    });
+
+    useEffect(() => {
+        startAttempt();
+    }, [startAttempt]);
+
+    useEffect(() => {
+        if (uiProps.currentPhase === "complete") {
+            completeAttempt({
+                assistanceCount: uiProps.totalFlags,
+                outcome: "completed",
+                success: true,
+            });
+        }
+    }, [completeAttempt, uiProps.currentPhase, uiProps.totalFlags]);
 
 
     useEffect(() => {

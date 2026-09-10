@@ -8,6 +8,9 @@ interface BombCaseLayoutProps {
   completedSections: SectionId[];
   time: string;
   urgent: boolean;
+  levelId?: number;
+  sectionCount?: number;
+  moduleClassName?: string;
 }
 
 const landscapeArtwork = `${import.meta.env.BASE_URL}bombGameCaseComicLandscape.webp`;
@@ -18,15 +21,18 @@ export default function BombCaseLayout({
   completedSections,
   time,
   urgent,
+  levelId = 1,
+  sectionCount = 3,
+  moduleClassName = "",
 }: BombCaseLayoutProps) {
-  const disarmed = completedSections.length === 3;
+  const disarmed = completedSections.length === sectionCount;
   const wireClass = (section: SectionId, colorClass: string) =>
     `${styles.wire} ${colorClass} ${
       completedSections.includes(section) ? styles.wireComplete : ""
     }`;
 
   return (
-    <main className={styles.stage} aria-label="Maleta de módulos do nível 1">
+    <main className={styles.stage} aria-label={`Maleta de módulos do nível ${levelId}`}>
       <picture className={styles.artwork} aria-hidden="true">
         <source
           media="(orientation: portrait) and (max-width: 650px)"
@@ -58,9 +64,9 @@ export default function BombCaseLayout({
             className={wireClass(2, styles.yellowWire)}
             d="M100 50 H51 V68 H47"
           />
-          <path className={wireClass(3, styles.blueWire)} d="M100 82 H94" />
+          {sectionCount === 3 && <path className={wireClass(3, styles.blueWire)} d="M100 82 H94" />}
         </svg>
-        <div className={styles.moduleGrid}>{children}</div>
+        <div className={`${styles.moduleGrid} ${moduleClassName}`}>{children}</div>
       </div>
     </main>
   );

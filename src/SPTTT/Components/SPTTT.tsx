@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import styles from "../Style/SPTTT.module.css";
 import { getAIMove } from "../Logic/aiPlayer";
@@ -13,6 +13,7 @@ import { Piece } from "./Piece";
 import { WinnerOverlay } from "./WinnerBox";
 
 interface SPTTTProps {
+  roomControls?: ReactNode;
   mode?: "local" | "remote";
   gameState?: SptttState;
   onGameStateChange?: (state: SptttState) => void;
@@ -32,6 +33,7 @@ interface SPTTTProps {
 }
 
 export default function SPTTT({
+  roomControls,
   mode = "local",
   gameState: externalGameState,
   onGameStateChange,
@@ -239,9 +241,10 @@ export default function SPTTT({
 
   return (
     <div
-      className={`${styles["jogo-SPTTT"]} ${displayedWinner ? styles["game-over"] : ""}`}
+      className={`${styles["jogo-SPTTT"]} ${roomControls ? styles.onlineGame : ""} ${displayedWinner ? styles["game-over"] : ""}`}
     >
       <div className={styles.statWrap}>
+        {roomControls}
         <div className={styles["turn-indicator"]} data-target="player">
           <span>{turnLabel}</span>
           <div className={styles["current-player-symbol"]}>

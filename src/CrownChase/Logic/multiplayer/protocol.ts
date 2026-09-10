@@ -126,7 +126,18 @@ export interface ListOpenRoomsPayload {
 }
 
 export interface ClassroomCreatedPayload {
+  requestId?: string;
   classroom: ManagedClassroom;
+}
+
+export interface ClassroomCreateFailedPayload {
+  requestId?: string;
+  code: "server_error";
+  message: string;
+}
+
+export interface CreateClassroomPayload {
+  requestId?: string;
 }
 
 export interface ManagedClassroomsPayload {
@@ -213,7 +224,7 @@ export interface CrownChaseClientToServerEvents {
   submit_move: (payload: SubmitMovePayload) => void;
   request_rematch: (payload: RequestRematchPayload) => void;
   leave_room: (payload: LeaveRoomPayload) => void;
-  create_classroom: () => void;
+  create_classroom: (payload: CreateClassroomPayload) => void;
   list_managed_classrooms: (payload: ListManagedClassroomsPayload) => void;
   delete_classroom: (payload: DeleteClassroomPayload) => void;
   watch_classroom: (payload: WatchClassroomPayload) => void;
@@ -234,6 +245,7 @@ export interface CrownChaseServerToClientEvents {
   room_closed: (payload: RoomClosedPayload) => void;
   multiplayer_error: (payload: MultiplayerErrorPayload) => void;
   classroom_created: (payload: ClassroomCreatedPayload) => void;
+  classroom_create_failed: (payload: ClassroomCreateFailedPayload) => void;
   managed_classrooms: (payload: ManagedClassroomsPayload) => void;
   classroom_deleted: (payload: ClassroomDeletedPayload) => void;
   classroom_monitor_updated: (payload: ClassroomMonitorUpdatedPayload) => void;

@@ -9,12 +9,16 @@ import { getAIMove } from "../Logic/aiPlayer";
 import { applyAction, createInitialState } from "../Logic/v2";
 import type { CrownChaseState } from "../Logic/v2";
 import tutorialStyles from "../styles/DynamicTutorial.module.css";
+import { formatAiDifficulty } from "../../analytics/events";
+import { useBoardGameAnalytics } from "../../analytics/useBoardGameAnalytics";
 
 export default function CrownChaseAIPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const difficulty = Number(location.state?.difficulty || 1);
-  const [showTutorial, setShowTutorial] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(
+    () => localStorage.getItem("tutorial_crownchase_v1_completed") !== "true",
+  );
   const [gameState, setGameState] = useState<CrownChaseState>(() =>
     createInitialState(),
   );
@@ -25,12 +29,19 @@ export default function CrownChaseAIPage() {
     setGameState(createInitialState());
   }, [difficulty]);
 
-  useEffect(() => {
-    const completed = localStorage.getItem("tutorial_crownchase_v1_completed");
-    if (completed !== "true") {
-      setShowTutorial(true);
-    }
-  }, []);
+  useBoardGameAnalytics({
+    context: {
+      gameId: "caca_coroa",
+      gameMode: "ai",
+      usageContext: "standard",
+      playerSlotCount: 1,
+      difficulty: formatAiDifficulty(difficulty),
+    },
+    isReady: !showTutorial,
+    status: gameState.status,
+    winner: gameState.winner,
+    perspective: 1,
+  });
 
   useEffect(() => {
     if (gameState.currentPlayer !== 0 || gameState.status !== "playing") {

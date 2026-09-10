@@ -1,9 +1,6 @@
 .roomBanner {
-  position: fixed;
-  top: 1.5vw;
-  left: 30%;
-  transform: translateX(-50%);
-  width: min(88vw, 110dvh);
+  width: 100%;
+  flex-direction: column;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -14,11 +11,13 @@
   border: 0.25vw solid #bae6fd;
   border-radius: 2vw;
   box-shadow: 0 0.7vw 0 #075985;
-  z-index: 30;
+
   font-family: "Cherry Bomb One", system-ui;
 }
 
 .roomInfo {
+  min-width: 0;
+  overflow-wrap: anywhere;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -116,11 +115,8 @@
 }
 
 .alertBox {
-  position: fixed;
-  top: 8vw;
-  left: 30%;
-  transform: translateX(-50%);
-  width: min(70vw, 90dvh);
+  width: 100%;
+  overflow-wrap: anywhere;
   text-align: center;
   padding: 0.8vw 1vw;
   box-sizing: border-box;
@@ -131,7 +127,7 @@
   box-shadow: 0 0.6vw 0 #fca5a5;
   font-family: "Cherry Bomb One", system-ui;
   font-size: clamp(1vw, 3dvh, 1.8vw);
-  z-index: 29;
+
 }
 
 .loadingPage {
@@ -180,8 +176,8 @@
 
 @media (orientation: portrait) and (max-width: 650px) {
   .roomBanner {
-    top: 2vw;
-    width: 92vw;
+
+    width: 100%;
     flex-direction: column;
     align-items: stretch;
     gap: min(1.8vw, 0.9dvh);
@@ -212,8 +208,8 @@
   }
 
   .alertBox {
-    top: 26vw;
-    width: 88vw;
+
+    width: 100%;
     border-width: min(0.5vw, 0.25dvh);
     border-radius: min(3vw, 1.6dvh);
     padding: min(2vw, 1dvh);

@@ -5,7 +5,6 @@ import RubiksCube from "../../RubiksClass/Components/RubiksCube";
 import { ROUTES } from "../../routes";
 
 function Home() {
-
   const navigate = useNavigate();
   const mudar_pagina = (pagina: string) => {
     navigate(pagina);
@@ -13,7 +12,7 @@ function Home() {
   return (
     <div className="homePage">
       <div className="imagens">
-        <img src={`${import.meta.env.BASE_URL}imagemXadrez.png`} className="imagemXadrez" />
+        <img src={`${import.meta.env.BASE_URL}crown_chase_physicalBoard.png`} className="imagemXadrez" />
         <div className="imagemCuboWrapper">
           <RubiksCube size={3} cubeSize={15} />
         </div>

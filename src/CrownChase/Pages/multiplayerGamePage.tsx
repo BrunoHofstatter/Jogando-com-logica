@@ -82,22 +82,6 @@ export default function CrownChaseMultiplayerGamePage() {
 
   return (
     <>
-      <div className={styles.roomBanner}>
-        <div className={styles.roomInfo}>
-          <span className={styles.roomCode}>Sala {roomCode}</span>
-          <span className={styles.roomDetail}>
-            Você: {playerName || "Jogador"} ({playerSeat === 0 ? "vermelho" : "azul"})
-          </span>
-          <span className={styles.roomDetail}>
-            Oponente: {opponent?.name ?? "Aguardando..."}
-          </span>
-        </div>
-
-        <button className={styles.leaveButton} onClick={handleLeaveRoomRequest}>
-          Sair da Sala
-        </button>
-      </div>
-
       {isLeaveConfirmationOpen && (
         <div className={styles.confirmationOverlay}>
           <div className={styles.confirmationCard}>
@@ -122,13 +106,27 @@ export default function CrownChaseMultiplayerGamePage() {
         </div>
       )}
 
-      {errorMessage && (
-        <div className={styles.alertBox}>
-          {errorMessage}
-        </div>
-      )}
-
       <Board
+        onlineHeader={
+          <div className={styles.onlineHeaderContent}>
+            <div className={styles.roomBanner}>
+              <div className={styles.roomInfo}>
+                <span className={styles.roomCode}>Sala {roomCode}</span>
+                <span className={styles.roomDetail}>
+                  Você: {playerName || "Jogador"} ({playerSeat === 0 ? "vermelho" : "azul"})
+                </span>
+                <span className={styles.roomDetail}>
+                  Oponente: {opponent?.name ?? "Aguardando..."}
+                </span>
+              </div>
+
+              <button className={styles.leaveButton} onClick={handleLeaveRoomRequest}>
+                Sair da Sala
+              </button>
+            </div>
+            {errorMessage && <div className={styles.alertBox}>{errorMessage}</div>}
+          </div>
+        }
         mode="remote"
         gameState={gameState}
         onMoveIntent={submitMove}
