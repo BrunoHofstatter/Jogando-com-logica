@@ -43,6 +43,41 @@ Do not use `showCounting` to count cube sides. It counts stickers inside a regio
 
 ## Class 3 Pattern
 
+The equal-face Class 3 lesson uses `faceAppearances` to assign one target color
+to selected named faces and `muted: true` to every excluded face. This selection
+remains stable through hints. The original index mapping above is unchanged.
+
+Optional motion controls preserve the original defaults for other callers:
+
+- `autoRotate={false}` starts in a stationary view and suppresses post-drag inertia
+  and automatic resumption. `initialRotation` sets that starting view.
+- `scriptedMotionIsFrameBased` disables CSS transform interpolation when a lesson
+  supplies its own animation frames.
+- `interruptibleScript` allows a pointer gesture to take over a scripted view;
+  `onInteractionStart` lets the owner cancel its animation before dragging.
+- `onRotationChange` reports the manual/scripted orientation to the lesson owner.
+- `focusedFaceLabelRotation` keeps labels upright on rotated top/bottom faces.
+
+Class 3 owns tour timing and routing in `useFaceMotion.ts` and `class3Lesson.ts`.
+It visits adjacent faces, tracks which selected faces were already counted, and
+uses gray waypoints when necessary. It must not iterate renderer index order,
+which places opposite faces next to each other. Reduced motion uses child-paced
+views. Tour cancellation cleans up animation frames and leaves the current view.
+
+## Class 2 Pattern
+
+Class 2 uses `returnToDefault` for free pointer and keyboard rotation without
+starting automatic spin. `homeRotation` gives teaching a shallow left/top resting
+view while review cubes retain their normal angle. After five idle seconds the cube
+returns gently to that home orientation; a new gesture cancels the return.
+
+`focusRequest` brings the current educational face home when a hint changes, and
+`hintAnimationKey` replays the short row pulse plus sequential sticker and row-label
+counting. These props are optional and do not change Class 3's frame-driven tour.
+
+The snippets below show the underlying single-face props, not the current lesson
+sequence or its tour ordering.
+
 For "this is one side":
 
 ```tsx

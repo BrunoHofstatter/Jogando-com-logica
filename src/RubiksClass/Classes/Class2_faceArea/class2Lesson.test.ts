@@ -63,11 +63,14 @@ describe("equal groups and partial-face targets", () => {
     it.each(partialSteps)("keeps excluded rows out of every hint in $id", step => {
         for (const hintLevel of [0, 1, 2, 3]) {
             const props = lessonCubeProps(step, { ...initialLessonState(false), hintLevel });
+            expect(props.returnToDefault).toBe(true);
+            expect(props.disableInteraction).not.toBe(true);
+            expect(props.scriptedRotation).toBeUndefined();
             const stickers = props.faceAppearances!.front!.stickers!;
             expect(stickers.filter(sticker => !sticker?.muted)).toHaveLength(step.rows * step.size);
             expect(stickers.slice(step.rows * step.size).every(sticker => sticker?.muted)).toBe(true);
             expect(props.rowGuides!.front!.every(guide => guide.row < step.rows)).toBe(true);
-            expect(props.rowGuides!.front).toHaveLength(step.rows);
+            expect(props.rowGuides!.front).toHaveLength(hintLevel > 0 ? step.rows : 0);
         }
     });
 

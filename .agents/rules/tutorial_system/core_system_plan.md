@@ -179,6 +179,8 @@ These states are conceptual. Some may be combined during implementation if that 
 - Starting replay begins from a clean tutorial state.
 - Refreshing or leaving mid-tutorial should not mark it completed.
 - Game cleanup runs on completion, skip, cancellation, navigation, and unexpected unmount.
+- Automatic launch must happen at a game-defined safe entry point. An active online match cannot be paused by a local tutorial; onboard before room participation or defer the tutorial.
+- Advance signals must belong to the current session and stage activation, and be consumed once. Session-only protection is insufficient when a late callback comes from an earlier stage of the same session.
 
 ## Stage Advancement
 
@@ -243,6 +245,8 @@ For board games, the safest approach may be to intercept an attempt before perma
 
 Irrelevant actions that would leave or break the tutorial scenario may be blocked or ignored. The requirement to allow mistakes applies to meaningful gameplay attempts, not unrelated navigation or mode changes.
 
+Illegal actions and legal actions that miss the exercise objective need different feedback. A legal alternative may be previewed and restored, but must be acknowledged as legal. Essential mistake text stays until acknowledgement; input is locked during restoration, while Skip and navigation remain usable.
+
 ## Predetermined States and Scripted Bridges
 
 - Introductory scenarios should be deterministic.
@@ -251,6 +255,7 @@ Irrelevant actions that would leave or break the tutorial scenario may be blocke
 - A scripted bridge should explain continuity, for example with a brief `Algumas jogadas depois...` transition.
 - The game may animate only the important changes when showing every intermediate move would be slow or confusing.
 - State preparation and scripted move legality belong to the game integration, not the shared runner.
+- A continuous miniature match must have a verified legal sequence. Arbitrary fixture replacement must be introduced as a new practice situation; a time-lapse caption alone does not establish legal continuity.
 
 ## Core and Mode Tutorials
 
@@ -290,6 +295,10 @@ Recommended behavior:
 - The replay button remains available regardless of stored status.
 - Replaying does not need to erase the stored completion before starting.
 - A version change can make a materially redesigned tutorial eligible for automatic launch again.
+
+Persistence failure must not block entry, completion, dismissal, or replay. Fall back to session-memory history when storage is unavailable or invalid. On shared school devices, stored history describes this browser, not the identity or ability of its current user.
+
+Recommended chaining semantics: skipping the current lesson dismisses only that lesson; an unseen next mode introduction may still run. Cancelling the flow cancels its remaining queue without dismissing unseen lessons. A game may offer an explicit skip-all control, but must not silently treat ordinary cancellation as completion or dismissal of queued lessons.
 
 The exact behavior after a version change remains a product decision: some revisions may justify relaunching automatically, while minor text changes should not.
 

@@ -303,9 +303,24 @@
 
 /* Educational patterns are opt-in; normal cubes keep their face colors. */
 .sticker.excludedSticker {
-  opacity: 0.18;
-  filter: grayscale(1);
+  opacity: 1;
+  filter: grayscale(0.94) brightness(0.82);
 }
+.educationalCube .dimmed {
+  opacity: 1;
+  filter: grayscale(0.94) brightness(0.82);
+}
+
+.lessonPulse {
+  animation: lessonRowPulse 0.65s ease both;
+  animation-delay: calc(var(--row) * 0.4s);
+}
+@keyframes lessonRowPulse {
+  0% { filter: grayscale(0.94) brightness(0.82); }
+  100% { filter: brightness(1); }
+  45% { filter: brightness(1.4); box-shadow: 0 0 calc(var(--ss) * 0.14) #fff; }
+}
+.cube:focus-visible { outline: 0.2vw solid #a855f7; outline-offset: 1vw; }
 
 .rowGuide {
   position: absolute;
@@ -335,6 +350,14 @@
   font-size: calc(var(--ss) * 0.48);
   line-height: 1.1;
   white-space: nowrap;
+  animation: countRowLabel 0.4s ease-out both;
+  animation-delay: calc(var(--row) * 0.4s);
+}
+
+@keyframes countRowLabel {
+  from { opacity: 0; transform: translateY(-50%) scale(0); }
+  70% { opacity: 1; transform: translateY(-50%) scale(1.15); }
+  to { opacity: 1; transform: translateY(-50%) scale(1); }
 }
 
 .patternCover {
@@ -353,7 +376,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .patternCover { display: none; }
-  .rowLabel, .stickerIndex { animation: none; }
+  .rowLabel, .stickerIndex { animation-name: countFade; }
   .highlighted { animation: none !important; }
+  .lessonPulse { animation: none; }
   .locked { transition: none; }
 }
+@keyframes countFade { from { opacity: 0; } to { opacity: 1; } }

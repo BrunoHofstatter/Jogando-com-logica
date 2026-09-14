@@ -1,6 +1,6 @@
 /* ============================================================
    Class3TotalSquares.module.css
-   Layout & styling for Class 3: total cube squares
+   Layout & styling for Class 3: multiplication across equal faces
    ============================================================ */
 
 .container {
@@ -219,7 +219,7 @@
     transform: translateY(0.4vw);
 }
 
-.calculationArea {
+.container .calculationArea {
     width: min(46vw, 100%);
     display: flex;
     align-items: center;
@@ -266,7 +266,7 @@
     margin-top: 0.8vw;
 }
 
-.calculationRoot {
+.container .calculationRoot {
     width: 100%;
     max-width: 100%;
     padding: 0;
@@ -274,7 +274,7 @@
     color: #013873;
 }
 
-.calculationWorkspace {
+.container .calculationWorkspace {
     width: 100%;
     justify-content: space-between;
     gap: 0;
@@ -282,18 +282,19 @@
     box-sizing: border-box;
 }
 
-.calculationStage {
+.container .calculationStage {
     display: flex;
     align-items: center;
     justify-content: center;
+    padding-bottom: 12dvh;
 }
 
-.calculationControlRail {
+.container .calculationControlRail {
     width: 11vw;
     gap: 0.9vw;
 }
 
-.calculationGrid {
+.container .calculationGrid {
     width: min(16vw, 100%);
     gap: 0.35vw;
     padding: 0;
@@ -301,7 +302,7 @@
     box-sizing: border-box;
 }
 
-.calculationCell {
+.container .calculationCell {
     border: 0.28vw solid #013873;
     border-radius: 0.65vw;
     background: #ffffff;
@@ -312,21 +313,21 @@
     text-shadow: none;
 }
 
-.operandCell {
+.container .operandCell {
     background: transparent;
     border-color: transparent;
     box-shadow: none;
     font-size: 2.75vw;
 }
 
-.resultCell {
+.container .resultCell {
     background: #ffffff;
     border-style: dashed;
     border-color: #0284c7;
     box-shadow: inset 0 -0.25vw 0 #bae6fd;
 }
 
-.carryCell {
+.container .carryCell {
     width: 76%;
     font-size: 1.65vw;
     background: #d9f99d;
@@ -335,7 +336,7 @@
     -webkit-text-stroke: 0;
 }
 
-.activeCell {
+.container .activeCell {
     background: #fff3a6;
     border-style: solid;
     outline: 0.35vw solid #f59e0b;
@@ -343,24 +344,24 @@
     animation: activeCalculationPulse 1.5s ease-in-out infinite;
 }
 
-.disabledCell {
+.container .disabledCell {
     opacity: 1;
 }
 
-.calculationOperator {
+.container .calculationOperator {
     color: #ffffff;
     font-size: 2.5vw;
     -webkit-text-stroke: 0.1vw #013873;
     text-shadow: 0 0.22vw 0 #013873;
 }
 
-.calculationBar {
+.container .calculationBar {
     height: 0.35vw;
     background: #013873;
     border-radius: 999vw;
 }
 
-.calculationMessage {
+.container .calculationMessage {
     min-height: 2.8vw;
     margin: 0;
     text-align: center;
@@ -376,7 +377,7 @@
     text-shadow: 0 0.15vw 0 #013873;
 }
 
-.calculationCoach {
+.container .calculationCoach {
     width: 100%;
     min-height: 0;
     gap: 0.35vw;
@@ -388,46 +389,48 @@
     box-sizing: border-box;
 }
 
-.calculationCoachLeft,
-.calculationCoachRight,
-.calculationCoachBelow {
+.container .calculationCoachLeft,
+.container .calculationCoachRight,
+.container .calculationCoachBelow {
     width: 15vw;
 }
 
-.calculationCoachArrow {
+.container .calculationCoachArrow {
     width: 1vw;
     background: #fff9d9;
     border-top-width: 0.25vw;
     border-left-width: 0.25vw;
 }
 
-.calculationCoachBadge {
+.container .calculationCoachBadge {
     padding: 0.2vw 0.7vw 0.3vw;
     background: #f59e0b;
     font-size: 0.95vw;
     -webkit-text-stroke: 0.08vw #92400e;
 }
 
-.calculationCoachText {
+.container .calculationCoachText {
     font-size: 1.15vw;
     line-height: 1.12;
-    -webkit-text-stroke: 0.06vw #013873;
+    color: #013873;
+    -webkit-text-stroke: 0;
+    text-shadow: none;
 }
 
-.calculationCoachEquation {
+.container .calculationCoachEquation {
     gap: 0.22vw;
     font-size: 1.7vw;
     -webkit-text-stroke: 0;
     text-shadow: none;
 }
 
-.calculationCoachLeadingDigit,
-.calculationCoachResultDigit {
+.container .calculationCoachLeadingDigit,
+.container .calculationCoachResultDigit {
     min-width: 1.25em;
     padding: 0.1em;
 }
 
-.calculationHelpButton {
+.container .calculationHelpButton {
     background: #fff3a6;
     border-color: #d39b13;
     box-shadow: 0 0.35vw 0 #a16207;
@@ -435,7 +438,7 @@
     text-shadow: 0 0.14vw 0 #92400e;
 }
 
-.calculationToolbar {
+.container .calculationToolbar {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -444,8 +447,8 @@
     width: 100%;
 }
 
-.calculationActionButton,
-.keypadButton {
+.container .calculationActionButton,
+.container .keypadButton {
     border: 0.25vw solid #013873;
     border-radius: 0.8vw;
     padding: 0.45vw 1vw 0.65vw;
@@ -461,20 +464,20 @@
     text-shadow: 0 0.14vw 0 #013873;
 }
 
-.calculationActionButton:hover,
-.keypadButton:hover {
+.container .calculationActionButton:hover,
+.container .keypadButton:hover {
     background: #7dd3fc;
     transform: translateY(-0.1vw);
     box-shadow: 0 0.45vw 0 #013873;
 }
 
-.calculationActionButton:active,
-.keypadButton:active {
+.container .calculationActionButton:active,
+.container .keypadButton:active {
     transform: translateY(0.25vw);
     box-shadow: 0 0.1vw 0 #013873;
 }
 
-.checkButton {
+.container .checkButton {
     background: #5ee991;
     border-color: #15803d;
     box-shadow: 0 0.55vw 0 #15803d;
@@ -485,14 +488,14 @@
     text-shadow: 0 0.18vw 0 #15803d;
 }
 
-.keypad {
+.container .keypad {
     width: min(11vw, 100%);
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.55vw;
 }
 
-.keypadButton {
+.container .keypadButton {
     min-height: 2.6vw;
     padding-left: 0;
     padding-right: 0;
@@ -611,7 +614,7 @@
         margin-right: min(0.8vw, 0.44dvh);
     }
 
-    .calculationArea {
+    .container .calculationArea {
         width: 94vw;
     }
 
@@ -637,11 +640,11 @@
         text-shadow: 0 min(0.55vw, 0.3dvh) 0 #013873;
     }
 
-    .calculationRoot {
+    .container .calculationRoot {
         gap: 0;
     }
 
-    .calculationWorkspace {
+    .container .calculationWorkspace {
         width: 94vw;
         flex-direction: row;
         align-items: center;
@@ -650,18 +653,18 @@
         padding: 0 min(2vw, 1.1dvh);
     }
 
-    .calculationControlRail {
+    .container .calculationControlRail {
         width: min(38vw, 21dvh);
         gap: min(1.2vw, 0.66dvh);
     }
 
-    .calculationGrid {
+    .container .calculationGrid {
         width: min(36vw, 19.8dvh);
         gap: min(0.7vw, 0.39dvh);
         padding: 0;
     }
 
-    .calculationCell {
+    .container .calculationCell {
         border-width: min(0.45vw, 0.25dvh);
         border-radius: min(1.3vw, 0.72dvh);
         font-size: min(5vw, 2.75dvh);
@@ -669,27 +672,27 @@
         -webkit-text-stroke: 0;
     }
 
-    .carryCell {
+    .container .carryCell {
         font-size: min(3.2vw, 1.76dvh);
         -webkit-text-stroke: 0;
     }
 
-    .activeCell {
+    .container .activeCell {
         outline-width: min(0.65vw, 0.36dvh);
         outline-offset: min(0.25vw, 0.14dvh);
     }
 
-    .calculationOperator {
+    .container .calculationOperator {
         font-size: min(4.8vw, 2.64dvh);
         -webkit-text-stroke: min(0.15vw, 0.08dvh) #013873;
         text-shadow: 0 min(0.35vw, 0.19dvh) 0 #013873;
     }
 
-    .calculationBar {
+    .container .calculationBar {
         height: min(0.7vw, 0.39dvh);
     }
 
-    .calculationMessage {
+    .container .calculationMessage {
         min-height: min(5.2vw, 2.86dvh);
         font-size: min(2.9vw, 1.6dvh);
         border-width: min(0.45vw, 0.25dvh);
@@ -700,7 +703,7 @@
         text-shadow: 0 min(0.2vw, 0.11dvh) 0 #013873;
     }
 
-    .calculationCoach {
+    .container .calculationCoach {
         width: 100%;
         min-height: 0;
         gap: min(0.6vw, 0.33dvh);
@@ -709,43 +712,43 @@
         border-radius: min(1.8vw, 0.99dvh);
     }
 
-    .calculationCoachLeft,
-    .calculationCoachRight,
-    .calculationCoachBelow {
+    .container .calculationCoachLeft,
+    .container .calculationCoachRight,
+    .container .calculationCoachBelow {
         width: min(34vw, 18.7dvh);
     }
 
-    .calculationCoachArrow {
+    .container .calculationCoachArrow {
         width: min(2vw, 1.1dvh);
         border-top-width: min(0.45vw, 0.25dvh);
         border-left-width: min(0.45vw, 0.25dvh);
     }
 
-    .calculationCoachBadge {
+    .container .calculationCoachBadge {
         padding: min(0.35vw, 0.19dvh) min(1.2vw, 0.66dvh) min(0.45vw, 0.25dvh);
         font-size: min(2.3vw, 1.27dvh);
         -webkit-text-stroke: min(0.12vw, 0.07dvh) #92400e;
     }
 
-    .calculationCoachText {
+    .container .calculationCoachText {
         font-size: min(2.7vw, 1.49dvh);
         -webkit-text-stroke: min(0.1vw, 0.06dvh) #013873;
     }
 
-    .calculationCoachEquation {
+    .container .calculationCoachEquation {
         gap: min(0.4vw, 0.22dvh);
         font-size: min(3.5vw, 1.93dvh);
         -webkit-text-stroke: 0;
     }
 
-    .calculationToolbar {
+    .container .calculationToolbar {
         flex-direction: row;
         flex-wrap: wrap;
         gap: min(1.4vw, 0.77dvh);
     }
 
-    .calculationActionButton,
-    .keypadButton {
+    .container .calculationActionButton,
+    .container .keypadButton {
         border-width: min(0.45vw, 0.25dvh);
         border-radius: min(1.4vw, 0.77dvh);
         padding: min(0.8vw, 0.44dvh) min(1.6vw, 0.88dvh) min(1vw, 0.55dvh);
@@ -755,7 +758,7 @@
         text-shadow: 0 min(0.2vw, 0.11dvh) 0 #013873;
     }
 
-    .checkButton {
+    .container .checkButton {
         box-shadow: 0 min(0.95vw, 0.52dvh) 0 #15803d;
         flex-basis: 100%;
         font-size: min(3.5vw, 1.93dvh);
@@ -764,13 +767,14 @@
         text-shadow: 0 min(0.2vw, 0.11dvh) 0 #15803d;
     }
 
-    .keypad {
+    .container .keypad {
         width: min(36vw, 19.8dvh);
         gap: min(1vw, 0.55dvh);
     }
 
-    .keypadButton {
-        min-height: min(5.2vw, 2.86dvh);
+    .container .keypadButton {
+        min-height: 4.5dvh;
+        font-size: min(3.8vw, 2.1dvh);
         padding-left: 0;
         padding-right: 0;
         -webkit-text-stroke: 0;
@@ -804,7 +808,92 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .activeCell {
+    .container .activeCell {
         animation: none;
     }
+}
+
+/* Learning layout: content stays in normal flow as support is revealed. */
+.container { min-height: 100dvh; height: auto; overflow: visible; }
+.leftPanel { flex: 0 0 46%; min-height: 100dvh; box-sizing: border-box; gap: 2dvh; }
+.rightPanel { min-height: 100dvh; box-sizing: border-box; padding: 4dvh 2vw; gap: 2dvh; overflow: visible; }
+.title { position: static; transform: none; width: 100%; max-width: 100%; font-size: 2.5vw; }
+.cubeTitle { margin-top: 5dvh; }
+.cubeStage { position: relative; display: grid; place-items: center; width: 100%; min-height: 46dvh; }
+.cubeControls { display: flex; align-items: center; flex-direction: column; gap: 1dvh; min-height: 18dvh; color: #013873; }
+.dragText, .faceCount { font-size: 1.35vw; text-align: center; }
+.rotationButtons, .inlineActions, .lessonActions { display: flex; align-items: center; justify-content: center; gap: 0.7vw; }
+.rotationButtons button, .inlineActions button, .tourButton, .hintButton {
+    font: inherit; font-size: 1.25vw; color: #013873; background: #fff9d9;
+    border: 0.18vw solid #013873; border-radius: 0.75vw; padding: 0.5vw 0.85vw;
+    cursor: pointer; box-shadow: 0 0.2vw 0 #013873;
+}
+.rotationButtons button { display: grid; place-items: center; background: #eef8ff; }
+.rotationButtons svg { width: 1.5vw; height: 1.5vw; }
+.rotationButtons button:disabled, .hintButton:disabled { opacity: 0.5; cursor: default; }
+.progress { color: #245478; font-size: 1.1vw; }
+.lessonHint { width: 94%; box-sizing: border-box; background: #fff2a8; border: 0.2vw solid #c89418; border-radius: 1vw; padding: 0.8vw 1.2vw; color: #574013; text-align: center; font-size: 1.35vw; line-height: 1.25; }
+.grouping, .revealCard { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1.5dvh; color: #013873; width: 100%; }
+.revealCard { padding: 1vw; box-sizing: border-box; background: #edf8ff; border: 0.2vw solid #91bedc; border-radius: 1vw; }
+.revealCard > strong { font-size: 2.2vw; color: #013873; -webkit-text-stroke: 0; text-shadow: none; }
+.revealCard p { font-size: 1.4vw; line-height: 1.3; margin: 0; color: #013873; -webkit-text-stroke: 0; text-shadow: none; }
+.revealCard .optionButton { padding: 0.8vw 2vw; font-size: 1.6vw; }
+.sumStrip { display: flex; align-items: center; justify-content: center; gap: 0.45vw; font-size: 1.6vw; }
+.sumTerm { border: 0.18vw solid #013873; background: #2386dc; color: white; border-radius: 0.4vw; padding: 0.3vw 0.65vw; }
+.sumTerm[data-color="red"] { background: #b91c32; }
+.sumTerm[data-color="green"] { background: #157547; }
+.sumTerm[data-color="orange"] { background: #ff9f36; color: #352710; }
+.sumTerm[data-color="yellow"] { background: #ffe65c; color: #352710; }
+.factorRow { display: flex; align-items: center; justify-content: center; gap: 1.2vw; }
+.factorRow span { display: flex; flex-direction: column; align-items: center; }
+.factorRow strong, .factorRow b { font-size: 2.2vw; color: #013873; -webkit-text-stroke: 0; text-shadow: none; }
+.factorRow small { font-size: 1.1vw; line-height: 1.1; }
+.runningTotals, .equivalentExpression { font-size: 1.5vw; color: #013873; }
+.optionsGrid { flex-shrink: 0; margin: 0; }
+.successCard { font-size: 1.35vw; padding: 0.6vw 1vw; color: #124626; -webkit-text-stroke: 0; width: 90%; }
+.completeText, .completeStats { color: #013873; -webkit-text-stroke: 0; text-shadow: none; }
+.offeredHint { outline: 0.3vw solid #f5ac26; outline-offset: 0.2vw; }
+.lessonActions > span { color: #013873; font-size: 1.1vw; }
+.dragCue { pointer-events: none; position: absolute; left: 57%; top: 58%; color: white; filter: drop-shadow(0 0.2vw 0.1vw #013873); animation: dragDemo 11.3s linear both; }
+.dragCue svg { width: 3.5vw; height: 3.5vw; fill: #fff; stroke: #013873; stroke-width: 1.5; }
+@keyframes dragDemo {
+    0%, 7% { opacity: 0; }
+    9%, 19% { opacity: 1; }
+    29%, 77% { opacity: 0; }
+    79%, 90% { opacity: 1; }
+    100% { opacity: 0; }
+}
+@media (max-width: 650px) and (orientation: portrait) {
+    .container { flex-direction: column; }
+    .leftPanel { flex: none; min-height: 43dvh; gap: 0.7dvh; padding: 1dvh 0; }
+    .rightPanel { min-height: 57dvh; padding: 2dvh 4vw 3dvh; gap: 1.4dvh; }
+    .cubeTitle { margin-top: 0; font-size: min(4vw, 2dvh); }
+    .cubeStage { min-height: 25dvh; }
+    .cubeControls { min-height: 9dvh; gap: 0.6dvh; }
+    .dragText, .faceCount { font-size: min(3.3vw, 1.8dvh); }
+    .rotationButtons, .inlineActions, .lessonActions { gap: 2vw; }
+    .rotationButtons button, .inlineActions button, .tourButton, .hintButton { font-size: min(3.5vw, 2dvh); padding: 0.7dvh 2vw; border-width: 0.4vw; border-radius: 1.6vw; }
+    .rotationButtons svg { width: 4vw; height: 4vw; }
+    .progress { font-size: min(3vw, 1.65dvh); }
+    .title { font-size: min(5.2vw, 2.85dvh); }
+    .lessonHint { padding: 1dvh 2vw; font-size: min(3.7vw, 2dvh); border-width: 0.4vw; border-radius: 2vw; }
+    .revealCard { padding: 2vw; gap: 1.4dvh; border-radius: 2vw; }
+    .revealCard > strong { font-size: min(5.5vw, 3dvh); }
+    .revealCard p { font-size: min(3.8vw, 2.1dvh); }
+    .revealCard .optionButton { font-size: 4.5vw; padding: 1dvh 4vw; }
+    .sumStrip { font-size: min(4vw, 2.2dvh); gap: 1vw; }
+    .sumTerm { padding: 0.5dvh 1.4vw; border-radius: 1vw; }
+    .factorRow { gap: 3vw; }
+    .factorRow strong, .factorRow b { font-size: min(6vw, 3.2dvh); }
+    .factorRow small { font-size: min(3.3vw, 1.8dvh); }
+    .runningTotals, .equivalentExpression { font-size: min(4vw, 2.2dvh); }
+    .lessonActions > span { font-size: 3vw; }
+    .successCard { font-size: min(3.5vw, 1.9dvh); padding: 1dvh 2vw; }
+    .container .calculationArea, .container .calculationWorkspace { width: 92vw; }
+    .container .calculationStage { padding-bottom: 14dvh; }
+    .dragCue svg { width: 8vw; height: 8vw; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .dragCue { display: none; }
+    .successCard { animation: none; }
 }

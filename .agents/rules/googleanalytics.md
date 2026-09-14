@@ -280,10 +280,13 @@ level_id: class_01 | class_02 | class_03
 activity_variant: lesson | review
 ```
 
-Class 3 currently supports `lesson` only. `assistance_count` preserves the
-meaning of each module's existing aggregate help/flag counter; it is not a
-count of students or a standardized learning score. Summary mistakes are sent
-only as an aggregate `incorrect_count`.
+Class 3 supports `lesson` only. Its equal-face rework records lesson hint
+escalations plus each completed written calculation's `usedHints` as
+`assistance_count`. Actual wrong lesson answers and failed arithmetic checks
+are `incorrect_count`. Tour replay, rotation, inactivity emphasis, and successful
+feedback reveals do not increment these counters. The final lesson question
+completes the activity; its identifier and route are unchanged. These counters
+are not counts of students or standardized learning scores.
 
 Board games:
 

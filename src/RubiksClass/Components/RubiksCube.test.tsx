@@ -25,4 +25,16 @@ describe("educational cube appearances", () => {
         expect(html).toContain(styles.rowLabel);
         expect(html).not.toContain("invalid");
     });
+
+    it("opts into a stationary lesson view and upright pole labels without changing normal defaults", () => {
+        const ordinary = renderToStaticMarkup(<RubiksCube size={2} />);
+        expect(ordinary).toContain(styles.autoRotate);
+        const lesson = renderToStaticMarkup(<RubiksCube size={2} autoRotate={false}
+            initialRotation={{ x: 90, y: -90 }} focusedFaceIndex={5}
+            focusedFaceLabel="3" focusedFaceLabelRotation={90} scriptedMotionIsFrameBased />);
+        expect(lesson).not.toContain(styles.autoRotate);
+        expect(lesson).toContain("rotateX(90deg) rotateY(-90deg)");
+        expect(lesson).toContain("rotate:90deg");
+        expect(lesson).toContain("transition:none");
+    });
 });

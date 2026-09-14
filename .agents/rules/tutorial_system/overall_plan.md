@@ -37,6 +37,21 @@ The tutorial documentation belongs in `.agents/rules/tutorial_system/`.
 - `core_system_plan.md`: shared system responsibilities and technical direction.
 - Future game documents: complete storyboards and implementation notes for each game.
 
+Current design draft: `game_crown_chase.md` contains the first complete storyboard, including exact positions, scripted replies, mistake handling, and entry/exit behavior. It is proposed design, not implemented or classroom-validated behavior.
+
+## Plan Review - September 10, 2026
+
+Keep the phase order and shared/game responsibility boundary. Before implementation, apply these clarifications:
+
+- Run online onboarding before joining or creating a room. Never pause or replace a live synchronized match to teach a lesson; a game must define a safe entry point.
+- Distinguish illegal moves from legal moves that miss the current exercise objective. Feedback must never teach that a legal move breaks a rule.
+- Use legal scripted actions for a continuous match. If a later design loads an unrelated position, explicitly call it a new practice situation instead of implying an unverified sequence of moves.
+- Essential mistake explanations wait for acknowledgement, just like essential instructions. Animation duration must not become a reading deadline.
+- Handle unavailable local storage without blocking play; completion is device/browser history, not evidence that the current child already knows the game.
+- Verify scenario legality and cancellation in the first vertical slice. Phase 8 expands and stabilizes coverage; it is not the first time lifecycle behavior gets tested.
+
+The Crown Chase storyboard is the next reviewable artifact. The Caça Soma pressure test and final technical contract still follow it; neither the runner nor the game tutorial is implemented during storyboard work.
+
 Suggested future names:
 
 - `game_crown_chase.md`

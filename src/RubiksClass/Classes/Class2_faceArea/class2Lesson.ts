@@ -1,4 +1,6 @@
-import type { HighlightRegion, RubiksCubeProps, StickerColor } from "../../Components/RubiksCube";
+import type { HighlightRegion, RubiksCubeProps } from "../../Components/RubiksCube";
+import { coloredRows } from "../../Components/educationalCube";
+export { rowColors } from "../../Components/educationalCube";
 
 export interface LessonOption { label: string; value: string }
 type QuestionKind = "rowSize" | "rowCount" | "addition" | "multiplication" | "total";
@@ -142,7 +144,6 @@ export function class2Reducer(state: Class2State, action: Class2Action): Class2S
     return state;
 }
 
-export const rowColors: readonly StickerColor[] = ["blue", "yellow", "red", "green", "orange", "white"];
 export const repeatedAddition = (step: LessonStep) => Array.from({ length: step.rows }, () => step.size).join(" + ");
 export const multiplication = (step: LessonStep) => `${step.rows} × ${step.size}`;
 
@@ -158,27 +159,20 @@ export function lessonCubeProps(step: LessonStep, state: Class2State): RubiksCub
     const regions: HighlightRegion[] = Array.from({ length: shownRows }, (_, index) => ({ type: "row", index }));
     const showLabels = reveal || hintLevel >= 2;
     return {
-        size: step.size, resetToFront: true, scriptedRotation: { x: -8, y: -10 }, disableInteraction: true,
-        faceAppearances: {
-            front: {
-                stickers: Array.from({ length: step.size * step.size }, (_, index) => {
-                    const row = Math.floor(index / step.size);
-                    return { color: striped ? rowColors[row] : undefined, muted: row >= step.rows };
-                }),
-            },
-            back: { muted: true }, right: { muted: true }, left: { muted: true },
-            top: { muted: true }, bottom: { muted: true },
-        },
+        size: step.size, returnToDefault: true, homeRotation: { x: -12, y: 18 },
+        focusRequest: `${step.id}-${hintLevel}-${reveal ? state.replayKey + 1 : 0}`,
+        hintAnimationKey: `${step.id}-${hintLevel}-${reveal ? state.replayKey + 1 : 0}`,
+        faceAppearances: coloredRows(step.size, step.rows, striped),
         rowGuides: {
-            front: striped ? Array.from({ length: outlinedRows }, (_, row) => ({
+            front: striped && (hintLevel > 0 || reveal) ? Array.from({ length: outlinedRows }, (_, row) => ({
                 row, label: showLabels ? String(step.kind === "rowCount" ? row + 1 : step.size) : undefined,
             })) : [],
         },
         // Outlines and colors carry the grouping; reserve glowing highlights for help.
-        highlightRegion: focusOneRow || hintLevel > 0 ? regions : null,
+        highlightRegion: focusOneRow || hintLevel > 0 || reveal ? regions : null,
         dimInactive: focusOneRow,
-        showIndices: step.kind === "rowSize" && hintLevel >= 2,
-        showCounting: step.kind === "rowSize" && hintLevel >= 2,
+        showIndices: (focusOneRow && hintLevel >= 1) || (step.kind === "rowSize" && hintLevel >= 2),
+        showCounting: (focusOneRow && hintLevel >= 1) || (step.kind === "rowSize" && hintLevel >= 2),
         animatePattern: step.id === "one-row" && hintLevel === 0,
     };
 }

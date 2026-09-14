@@ -14,37 +14,21 @@
     box-sizing: border-box;
 }
 
-/* --- Feedback Overlay: Center-Top ---------------------------- */
-.feedbackOverlay {
-    position: absolute;
-    top: 3dvh;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    pointer-events: none;
-    /* Let interactions pass through */
-    width: 100%;
-    gap: 1vw;
-}
-
 /* --- Aulas Back Button --- */
 .aulasButton {
     position: absolute;
-    top: 2vw;
+    bottom: 2dvh;
     left: 2vw;
     z-index: 1000;
     font-family: inherit;
-    font-size: 2vw;
+    font-size: 1.5vw;
     background: #a855f7;
     /* Purple */
     color: #ffffff;
     border: 0.3vw solid #6b21a8;
     /* Dark purple border */
     border-radius: 1vw;
-    padding: 0.5vw 1.5vw;
+    padding: 0.35vw 1vw;
     cursor: pointer;
     box-shadow: 0 0.6vw 0 #6b21a8;
     transition: transform 0.1s ease, box-shadow 0.1s ease;
@@ -64,11 +48,13 @@
 
 /* --- Title Header Overlay (Top of cube) ---------------------- */
 .headerOverlay {
-    width: 100%;
+    position: absolute;
+    top: 6dvh;
+    width: 88%;
     display: flex;
     justify-content: center;
     z-index: 10;
-    transform: translateY(-4vw);
+    min-height: 6dvh;
 }
 
 .cubeTitle {
@@ -104,14 +90,38 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     background: #d5ebfa;
     /* Slightly darker soft blue */
-    padding: 4dvh 4vw;
-    gap: 3dvh;
+    padding: 8dvh 4vw 12dvh;
+    min-width: 0;
+    min-height: 0;
     position: relative;
     overflow-y: auto;
 }
+.lessonContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 2.5dvh;
+    width: 100%;
+    margin-block: auto;
+}
+.hintDock {
+    position: fixed;
+    bottom: 2dvh;
+    right: 2vw;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 1vw;
+    padding: 0.5dvh 0.5vw;
+    border-radius: 1vw;
+    background: #d5ebfa;
+}
+.hintDock .hintButton { display: flex; align-items: center; gap: 0.4vw; }
+.hintDock svg { width: 1.6vw; height: 1.6vw; }
 
 .grouping {
     display: flex;
@@ -164,7 +174,14 @@
 .offeredHint { outline: 0.25vw solid #ca8a04; outline-offset: 0.2vw; }
 .helpPrompt { font-size: min(1.25vw, 2.5dvh); color: #013873; }
 .continueButton { padding-inline: 1.5vw; }
-.selectedOption { background: #ffe874; outline: 0.2vw solid #ca8a04; }
+.optionButton.selectedOption,
+.optionButton.selectedOption:hover:not(:disabled),
+.optionButton.selectedOption:active:not(:disabled) {
+    background: #ffe874;
+    border-color: #a16207;
+    box-shadow: 0 0.35vw 0 #a16207;
+    transform: translateY(0.25vw);
+}
 .additionOptions { grid-template-columns: 1fr; gap: 1dvh; }
 .additionOptions .optionButton { padding-block: 0.35vw; }
 .additionPreview { display: flex; align-items: center; gap: 2vw; }
@@ -310,10 +327,10 @@
     }
 
     .aulasButton {
-        font-size: 4vw;
-        top: 3vw;
+        font-size: 3.5vw;
+        bottom: 2dvh;
         left: 3vw;
-        padding: 1.5vw 3vw;
+        padding: 1vw 2vw;
         border-radius: 2vw;
         border-width: 0.6vw;
         box-shadow: 0 1.2vw 0 #6b21a8;
@@ -327,7 +344,8 @@
     }
 
     .headerOverlay {
-        transform: translateY(-2vw);
+        top: 4dvh;
+        width: 76%;
     }
 
     .cubeTitle {
@@ -339,13 +357,9 @@
         -webkit-text-stroke: 0.25vw #013873;
     }
 
-    .feedbackOverlay {
-        top: 43dvh;
-    }
-
     .rightPanel {
         flex: 1;
-        padding: 4vw;
+        padding: 3dvh 4vw 10dvh;
         gap: min(3vw, 1.7dvh);
         overflow-y: auto;
     }
@@ -391,6 +405,12 @@
     .hintIcon {
         font-size: 4vw;
     }
+}
+
+@media (max-width: 650px) and (orientation: portrait) {
+    .lessonContent { gap: 1.7dvh; }
+    .hintDock { right: 3vw; bottom: 2dvh; padding: 1vw; border-radius: 2vw; }
+    .hintDock svg { width: 4vw; height: 4vw; }
 }
 
 /* --- Animations ---------------------------------------------- */

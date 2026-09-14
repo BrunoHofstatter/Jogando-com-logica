@@ -1,6 +1,7 @@
 import React, { useRef, useState, useCallback, useEffect } from "react";
 import { CubeRotation } from "./RubiksCubeAnimations";
 import styles from "./RubiksCube.module.css";
+import { useCubeReturnRotation } from "./useCubeReturnRotation";
 
 // --- Types -------------------------------------------------------------------
 
@@ -49,6 +50,8 @@ export interface RubiksCubeProps {
   focusedFaceIndex?: number | null;
   /** Centered label shown on the focused face, such as "1" or "1 lado". */
   focusedFaceLabel?: string | null;
+  /** Counter-rotate a label on a tilted top/bottom face for readability. */
+  focusedFaceLabelRotation?: number;
   /** Lesson-controlled cube rotation. When set, it replaces auto/manual rotation. */
   scriptedRotation?: CubeRotation | null;
   /** Prevent pointer dragging while a lesson owns the cube motion. */
@@ -59,6 +62,21 @@ export interface RubiksCubeProps {
   rowGuides?: Partial<Record<CubeFace, readonly RowGuide[]>>;
   /** One short reveal from the original face colors to an educational pattern. */
   animatePattern?: boolean;
+  /** Opt-in lesson controls; other callers keep the original spinning behavior. */
+  autoRotate?: boolean;
+  initialRotation?: CubeRotation;
+  scriptedMotionIsFrameBased?: boolean;
+  interruptibleScript?: boolean;
+  onInteractionStart?: () => void;
+  onRotationChange?: (rotation: CubeRotation) => void;
+  /** Free manual rotation, returning to a chosen home view after five idle seconds. */
+  returnToDefault?: boolean;
+  /** Override the resting view without changing other cube callers. */
+  homeRotation?: CubeRotation;
+  /** Bring the educational face home for a new hint. */
+  focusRequest?: string | number;
+  /** Replay one short, staggered highlight sequence without remounting the cube. */
+  hintAnimationKey?: string;
 }
 
 // --- Face config -------------------------------------------------------------
@@ -209,15 +227,27 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
   showCounting = false,
   focusedFaceIndex = null,
   focusedFaceLabel = null,
+  focusedFaceLabelRotation = 0,
   scriptedRotation = null,
   disableInteraction = false,
   faceAppearances,
   rowGuides,
   animatePattern = false,
+  autoRotate = true,
+  initialRotation = { x: -25, y: 0 },
+  scriptedMotionIsFrameBased = false,
+  interruptibleScript = false,
+  onInteractionStart,
+  onRotationChange,
+  returnToDefault = false,
+  homeRotation,
+  focusRequest,
+  hintAnimationKey,
 }) => {
+  const homeMotion = useCubeReturnRotation(returnToDefault, focusRequest, homeRotation);
   const cubeRef = useRef<HTMLDivElement>(null);
-  const [mode, setMode] = useState<RotationMode>("auto");
-  const [rotation, setRotation] = useState({ x: -25, y: 0 });
+  const [mode, setMode] = useState<RotationMode>(autoRotate ? "auto" : "idle");
+  const [rotation, setRotation] = useState(initialRotation);
   const lastPointer = useRef({ x: 0, y: 0 });
   const resumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -231,7 +261,11 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
   // Mirrors rotation state in real-time so inertia callbacks don't close over stale state.
   // This lets us read the final position to schedule resumeAuto WITHOUT putting
   // a setTimeout inside a setRotation updater (which would double-fire in React Strict Mode).
-  const rotationRef = useRef({ x: -25, y: 0 });
+  const rotationRef = useRef(initialRotation);
+
+  useEffect(() => {
+    onRotationChange?.(scriptedRotation ?? rotation);
+  }, [onRotationChange, rotation, scriptedRotation]);
 
   // Negative animation-delay to resume auto-spin from the current Y angle
   const [animOffset, setAnimOffset] = useState(0);
@@ -253,8 +287,9 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
     if (scriptedRotation) {
       rotationRef.current = scriptedRotation;
       setRotation(scriptedRotation);
+      if (!autoRotate) setMode("idle");
     }
-  }, [disableInteraction, scriptedRotation]);
+  }, [autoRotate, disableInteraction, scriptedRotation]);
 
   // --- resetToFront effect ---------------------------------------------------
   useEffect(() => {
@@ -302,7 +337,8 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
 
   const onPointerDown = useCallback(
     (e: React.PointerEvent) => {
-      if (disableInteraction || scriptedRotation) return;
+      if (disableInteraction || (scriptedRotation && !interruptibleScript)) return;
+      onInteractionStart?.();
 
       e.currentTarget.setPointerCapture(e.pointerId);
 
@@ -334,7 +370,7 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
       lastPointer.current = { x: e.clientX, y: e.clientY };
       setMode("dragging");
     },
-    [disableInteraction, mode, scriptedRotation]
+    [disableInteraction, interruptibleScript, mode, onInteractionStart, scriptedRotation]
   );
 
   const onPointerMove = useCallback(
@@ -385,6 +421,9 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
     if (mode !== "dragging") return;
 
     setMode("idle");
+    // Educational inspection stays where the child leaves it, without inertia
+    // or a delayed return to automatic spinning.
+    if (!autoRotate) return;
 
     // Launch inertia decay loop
     const FRICTION = 0.90; // velocity multiplier per frame (lower = stops faster)
@@ -429,7 +468,7 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
     };
 
     rafId.current = requestAnimationFrame(inertiaLoop);
-  }, [disableInteraction, isHighVelocity, mode, resumeAuto, scriptedRotation]);
+  }, [autoRotate, disableInteraction, isHighVelocity, mode, resumeAuto, scriptedRotation]);
 
   // Cleanup timers and animation frames on unmount
   useEffect(() => {
@@ -444,10 +483,11 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
 
   const cubeClasses = [
     styles.cube,
-    mode === "auto" && !scriptedRotation ? styles.autoRotate : "",
+    returnToDefault ? styles.educationalCube : "",
+    mode === "auto" && !scriptedRotation && !returnToDefault ? styles.autoRotate : "",
     mode === "dragging" || mode === "idle" ? styles.dragging : "",
-    mode === "locked" || scriptedRotation ? styles.locked : "",
-    disableInteraction || scriptedRotation ? styles.noInteraction : "",
+    !returnToDefault && (mode === "locked" || scriptedRotation) ? styles.locked : "",
+    !returnToDefault && (disableInteraction || (scriptedRotation && !interruptibleScript)) ? styles.noInteraction : "",
     isHighVelocity ? styles.fastSpin : "",
   ]
     .filter(Boolean)
@@ -456,11 +496,14 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
   // In auto mode: use animation-delay to resume from current angle.
   // In dragging/locked: use inline transform.
   const inlineStyle: React.CSSProperties =
-    scriptedRotation
+    returnToDefault
+      ? { transform: `rotateX(${homeMotion.rotation.x}deg) rotateY(${homeMotion.rotation.y}deg)` }
+      : scriptedRotation
       ? { transform: `rotateX(${scriptedRotation.x}deg) rotateY(${scriptedRotation.y}deg)` }
       : mode === "auto"
       ? { animationDelay: `${animOffset}s` }
       : { transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)` };
+  if (scriptedMotionIsFrameBased) inlineStyle.transition = "none";
 
   // --- Sticker rendering helper ----------------------------------------------
 
@@ -493,7 +536,7 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
     const stickerClasses = [
       styles.sticker,
       color?.className ?? face.colorClass,
-      isHighlighted ? styles.highlighted : "",
+      isHighlighted ? (hintAnimationKey ? styles.lessonPulse : styles.highlighted) : "",
       isDimmed ? styles.dimmed : "",
       muted ? styles.excludedSticker : "",
     ]
@@ -509,7 +552,8 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
       : 0;
 
     return (
-      <div key={stickerIdx} className={stickerClasses}>
+      <div key={`${stickerIdx}-${hintAnimationKey ?? ""}`} className={stickerClasses}
+        style={hintAnimationKey ? { "--row": Math.floor(stickerIdx / size) } as React.CSSProperties : undefined}>
         {animatePattern && customColor && (
           <span
             aria-hidden="true"
@@ -552,10 +596,15 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
         ref={cubeRef}
         className={cubeClasses}
         style={inlineStyle}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
+        tabIndex={returnToDefault ? 0 : undefined}
+        aria-label={returnToDefault ? "Gire o cubo arrastando ou usando as setas." : undefined}
+        onPointerDown={returnToDefault ? homeMotion.onPointerDown : onPointerDown}
+        onPointerMove={returnToDefault ? homeMotion.onPointerMove : onPointerMove}
+        onPointerUp={returnToDefault ? homeMotion.onPointerUp : onPointerUp}
+        onPointerCancel={returnToDefault ? homeMotion.onPointerCancel : onPointerUp}
+        onLostPointerCapture={returnToDefault ? homeMotion.onPointerCancel : undefined}
+        onClickCapture={returnToDefault ? homeMotion.onClickCapture : undefined}
+        onKeyDown={returnToDefault ? homeMotion.onKeyDown : undefined}
       >
         {/* Inner solid core — blocks visibility through rounded outer edges */}
         <div className={styles.innerCore}>
@@ -576,7 +625,7 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
             )}
             {rowGuides?.[face.name]?.filter(({ row }) => row >= 0 && row < size).map(({ row, label }) => (
               <div
-                key={row}
+                key={`${row}-${hintAnimationKey ?? ""}`}
                 className={styles.rowGuide}
                 style={{ "--row": row } as React.CSSProperties}
                 aria-hidden="true"
@@ -585,7 +634,7 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
               </div>
             ))}
             {focusedFaceLabel && face.name === FACES[focusedFaceIndex ?? -1]?.name && (
-              <div className={`${styles.faceLabel} ${faceUsesDarkText(face) ? styles.darkText : ""}`}>
+              <div className={`${styles.faceLabel} ${faceUsesDarkText(face) ? styles.darkText : ""}`} style={{ rotate: `${focusedFaceLabelRotation}deg` }}>
                 {focusedFaceLabel}
               </div>
             )}

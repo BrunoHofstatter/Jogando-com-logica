@@ -63,7 +63,7 @@ The class menu currently exposes:
 
 - Aula 1: Dimensões
 - Aula 2: Multiplicação no Cubo
-- Aula 3: Cubo Inteiro
+- Aula 3: Multiplicação nas Faces
 - more classes marked as `Em Breve`
 
 For Classes 1 and 2, the menu offers:
@@ -152,7 +152,7 @@ Using the cube makes this very concrete.
 
 ### Current Learning Content
 
-The lesson now has 13 questions, with one child-paced concept reveal:
+The lesson has 13 questions and one child-paced concept reveal. Its progression is:
 
 1. 3×3: count squares in one row, then count rows.
 2. Choose repeated addition with a visual preview matching terms to rows.
@@ -164,72 +164,132 @@ The lesson now has 13 questions, with one child-paced concept reveal:
 8. 5×5: choose the full-face multiplication, then count four highlighted rows (20).
 9. 6×6: choose the full-face multiplication on an ordinary face, then count five highlighted rows (30).
 
-Colored stripes and row outlines expose equal groups. The face stays fixed during
-questions. A short initial color sweep introduces the stripes; this is an
-educational appearance change, not a simulated Rubik's layer turn. The ordinary
-6×6 question removes stripes until help is used. The cube heading does not give
-away the size as multiplication notation. Student-facing copy uses `face`,
-`linhas`, and `quadradinhos`, rather than formal area terminology.
+Colored stripes expose equal groups on one face of the full 3D cube. Other
+stickers remain mostly gray with a faint trace of their colors. All Class 2 cubes
+can be dragged or rotated using arrow keys, including during hints and review.
+After five idle seconds, they gently return to their home view: a shallow left/top
+view in teaching and the original three-quarter view in review. A new drag
+immediately interrupts that return. A short initial color sweep introduces the
+stripes; this is an educational appearance change, not a simulated Rubik's layer
+turn. The ordinary 6×6 question removes stripes until help is used. Student-facing
+copy uses `face`, `linhas`, and `quadradinhos`, rather than formal area terminology.
 
-The first factor consistently means number of rows; the second means squares
-per row. Equivalent products are not offered as incorrect distractors.
+The first factor consistently means number of rows; the second means squares per
+row. Equivalent products are not offered as incorrect distractors. On the repeated
+addition question, selecting an option first previews one addition term beside
+each visual row; the student then confirms the choice. A correct answer opens the
+intentional reveal `3 + 3 + 3` → `3 × 3`, with factor labels, a replay action, and
+a child-controlled `Continuar` action. Other correct answers use a brief 1.2-second
+transition before advancing.
 
 ### Hint Structure
 
-- The `Dica` button offers visual help immediately; wrong answers also escalate help.
-- After 45 foreground seconds, the button is emphasized; time alone is not an error.
-- First focus a row; next label the equal groups and connect them to addition and multiplication.
+- The `Dica` button offers visual help immediately; each wrong answer also advances the visual help by one level.
+- There are at most three hint levels. After 45 foreground seconds without help, the button is emphasized; time alone is not counted as an error.
+- The first level usually isolates one row. Later levels label the equal groups and connect them to repeated addition and multiplication.
+- Outlines, labels, and a short staggered row pulse are reserved for hints and reveals.
 - The final support shows running totals by row. Excluded rows stay muted through every hint.
-- Row-count and row-size questions use counting cues appropriate to their specific question.
-- Help usage and incorrect answers are separate counters. The existing review receives only lesson incorrect answers as its lesson-error count.
+- Sticker counts and outside row labels animate in sequence; row hints gradually restore color.
+- Row-count and row-size questions use counting cues appropriate to their specific question, including sticker indices when needed.
+- Hint text appears above the cube, replacing the old cube heading.
+- Sum selections retain a colored border and shadow until changed or submitted.
+- The smaller `Aulas` button stays at the bottom-left; the lightbulb hint control stays at the bottom-right.
+- Help usage and incorrect answers are separate counters. The review receives only actual incorrect answers as its lesson-error count.
 
-The cube renderer accepts optional named-face colors, row-major sticker overrides,
-muted stickers, and row outlines/labels. Default callers retain the original
-appearance. These capabilities can support custom faces in later modules.
+The shared cube renderer accepts optional named-face colors, row-major per-sticker
+overrides, muted stickers, row outlines/labels, and a staggered pattern animation.
+Default callers retain the original appearance. The implementation is generic so
+later modules can reuse it for selected faces and other educational patterns.
 
 ### Current Summary / Review Activity
 
-The summary activity for Module 2 is a more dynamic matching game.
+The review starts with a large animated introduction: a 3×3 cube with two colored
+rows, a labeled `2 × 3 = 6` calculation, three moving number cards, and a pointer
+showing number-then-cube selection. The overlay occupies 85% of the viewport height.
+Its 12-second loop slowly moves the cards, clicks the correct total, then clicks
+the cube; only then does the checkmark appear, holding for four seconds. `Jogar`
+starts play, so no cards move or spawn behind the introduction.
 
-The player:
+Five cubes are shown at once, mixing full and partial faces. The player selects a
+moving total, then a cube with that many colored stickers. Dragging a cube rotates
+it without submitting a match. Correct matches display the calculation and replace
+the cube with its slot's second target. The game ends after ten matches; each slot
+empties after its second match. Different groups with the same total can both accept
+that total. Wrong matches keep the target available for another attempt. Expressions
+appear in feedback rather than on falling cards.
 
-- clicks a falling number
-- then clicks the cube whose face has that many squares
+The deck contains two 2×2, three 3×3, three 4×4, one 5×5, and one 6×6 target.
+The 6×6 always replaces the 5×5 in the same slot, so they never coexist. Slot pairs
+(rows × squares per row) are: 2×3 → 2×4, 3×4 → 1×3, 4×5 → 3×6,
+3×3 → 4×4, and 2×2 → 1×2.
 
-Examples:
+Cards travel at 4.8% of the lane per second, 60% of the previous speed, with roughly
+8.6 seconds between spawns and a four-card safety cap. Initial cards are staggered
+along the lane. Feedback moves below the main instruction and fades after three seconds.
 
-- `4` matches a `2x2`
-- `9` matches a `3x3`
-- `16` matches a `4x4`
+## Module 3 - Multiplicação nas Faces
 
-This review is clearly more game-like than Module 1's summary and shows the intended direction: summary reviews should become increasingly fun, interactive, and dynamic.
+Class 3 is implemented and reachable through `Aprender`; its existing route remains
+`/aulas/3-cubo-inteiro`. It has no summary game or `Jogar` entry.
 
-The Class 2 learning rework deliberately leaves this summary game unchanged.
-Partial-row targets and replacement cubes are proposals for a separate rework,
-not implemented behavior.
+### Teaching Goal
 
-## Module 3 - Cubo Inteiro (Current)
+Extend Class 2's equal rows to equal whole faces: number of selected faces ×
+quadradinhos per face. Counting all six faces is an application of the same rule.
+UI uses `face` and `quadradinhos`, without formal area units. Partial rows across
+multiple faces remain future work.
 
-Class 3 is implemented and reachable through `Aprender`. It uses face counting,
-scripted whole-cube rotation, and calculations across all six faces. It currently
-has no summary game. Its existing lesson has not been changed by the Class 2 rework.
+### Current Learning Content
+
+Seven configurations provide 16 questions and five numerical totals:
+
+| Cube | Target faces | Learning steps |
+| --- | --- | --- |
+| 2×2 | 2 blue | Face count; one-face expression; total expression; total 8 |
+| 3×3 | 3 red | Face count; one-face expression; total expression; total 27 |
+| 4×4 | 4 green | Total expression; written calculation 16 × 4 = 64 |
+| 5×5 | 3 orange | Total expression only: 3 × 25 |
+| 5×5 | 6 yellow | Total expression; written calculation 25 × 6 = 150 |
+| 6×6 | 5 blue | Total expression only: 5 × 36 |
+| 6×6 | 6 red | Total expression; written calculation 36 × 6 = 216 |
+
+One-face expression answers reveal the per-face quantity with a child-paced
+`Continuar`, without another numerical question. Expressions keep faces first;
+before written work, a child-paced explanation connects `4 × 16 = 16 × 4`
+(and later equivalent products) to the reused vertical calculation component.
+Equivalent-valued distractors are excluded. Ordinary successes advance after
+1.2 seconds. The final lesson question completes the activity.
+
+### Appearance, Interaction, and Hints
+
+- All selected faces in a configuration share its target color; other faces stay
+  gray, including during hints. Colors vary across blue, red, green, orange, and
+  yellow. White is never a target.
+- A brief hand-drag cue introduces rotation. Later cues also demonstrate vertical
+  movement for bottom inspection. Dragging interrupts the cue and retains the
+  child's angle. Arrow controls offer an alternative to dragging. Class 3 does
+  not resume ambient auto-spin or inertia after inspection.
+- `Dica` is immediately available; incorrect answers also advance support up to
+  three levels. After 45 foreground seconds without help, the button is emphasized.
+  Inactivity does not count as an error.
+- Face-counting help tours adjacent faces in a stable order, with gray waypoints
+  if needed. Only newly visited selected faces increment the count. The route
+  includes the bottom, avoids opposite-face jumps and unnecessary half-turns,
+  and keeps top/bottom count labels upright. Tours can be stopped or replayed.
+- Reduced-motion users receive child-paced `Próxima face` views and no animated
+  drag demonstration. Selected faces remain inspectable through manual controls.
+- One-face hints reuse front-face row guides. Later hints connect equal faces to
+  repeated addition, labeled multiplication factors, and small running totals.
+  There is no compulsory repeated-addition concept lesson.
+- Written arithmetic retains the existing shared adaptive guidance and mobile
+  keypad, with Class 3 styling. Help usage and incorrect answers are separate.
+
+The implementation plan and verification record are in
+`docs/class3-equal-faces-implementation-plan.md`.
 
 ## Planned Modules
 
 These modules are planned ideas. They should not be described as already implemented.
-
-## Planned Class 3 Rework - Equal Faces
-
-Main idea:
-
-- extend equal rows to equal faces, using selected blue faces before the whole cube
-
-Example concept:
-
-- four blue faces with 16 squares each become `4 × 16`
-- eventually use all six faces, with the number of faces as the first factor
-
-This redesign is a planned direction, separate from the current Class 3 implementation.
 
 ## Planned Module 4 - Total Squares of Multiple Cubes and Different-Shaped Puzzles
 
@@ -333,6 +393,9 @@ Best current fit is around 3rd to 6th grade, depending on the module and the amo
 
 - `src/RubiksClass/Classes/Class3_totalSquares/Class3TotalSquares.tsx`
 - `src/RubiksClass/Classes/Class3_totalSquares/useClass3.ts`
+- `src/RubiksClass/Classes/Class3_totalSquares/class3Lesson.ts`: configuration data, reducer, hints, and adjacent-face route planning
+- `src/RubiksClass/Classes/Class3_totalSquares/LessonCube.tsx`: visual teaching and inspection controls
+- `src/RubiksClass/Classes/Class3_totalSquares/useFaceMotion.ts`: interruptible cue, guided tour, and reduced-motion views
 
 ### Future Module Structure
 
