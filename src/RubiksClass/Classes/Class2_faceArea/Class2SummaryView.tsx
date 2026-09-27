@@ -1,10 +1,11 @@
-import { memo, useCallback, useEffect, useReducer, useRef } from "react";
+import { memo, useCallback, useEffect, useLayoutEffect, useReducer, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Check } from "lucide-react";
 import RubiksCube from "../../Components/RubiksCube";
 import { coloredRows } from "../../Components/educationalCube";
 import { useCubeMobileLayout } from "../../Components/useCubeMobileLayout";
-import { initialReviewState, MATCH_COUNT, needsImmediateSpawn, REPLENISH_DELAY_MS, SPAWN_INTERVAL_MS, reviewReducer, type ReviewTarget } from "./class2Review";
+import { useReducedMotion } from "../../Components/useReducedMotion";
+import { initialReviewState, MATCH_COUNT, needsImmediateSpawn, REPLENISH_DELAY_MS, SPAWN_INTERVAL_MS, reviewBoxPosition, reviewReducer, type ReviewTarget } from "./class2Review";
 import styles from "./Class2SummaryView.module.css";
 import { ROUTES } from "../../../routes";
 
@@ -18,17 +19,11 @@ interface Class2SummaryViewProps {
 const ReviewCube = memo(function ReviewCube({ target, mobile, selected, onMatch }: {
     target: ReviewTarget; mobile: boolean; selected: boolean; onMatch: (id: number) => void;
 }) {
-    return <div className={styles.cubeWrapper}
-        role="button" tabIndex={0}
-        aria-label={`Cubo com ${target.rows} linhas coloridas de ${target.size} quadradinhos`}
-        onClick={() => onMatch(target.id)}
-        onKeyDown={event => {
-            if (!event.repeat && (event.key === "Enter" || event.key === " ")) {
-                event.preventDefault(); onMatch(target.id);
-            }
-        }}>
+    return <div className={styles.cubeWrapper} data-review-target={target.id}>
         <div className={selected ? styles.cubePulseTarget : undefined}>
             <RubiksCube size={target.size} cubeSize={mobile ? 15 : 10} returnToDefault
+                interactionLabel={`Cubo com ${target.rows} linhas coloridas de ${target.size} quadradinhos. Use as setas para girar e Enter ou espaço para combinar.`}
+                onActivate={() => onMatch(target.id)}
                 faceAppearances={coloredRows(target.size, target.rows)} />
         </div>
     </div>;
@@ -43,39 +38,63 @@ const DemoCursor = () => <svg className={styles.demoPointer} viewBox="0 0 34 36"
 export default function Class2SummaryView({ totalFlags, onStart, onComplete }: Class2SummaryViewProps) {
     const navigate = useNavigate();
     const mobile = useCubeMobileLayout();
+    const reducedMotion = useReducedMotion();
     const [state, dispatch] = useReducer(reviewReducer, undefined, initialReviewState);
     const completed = useRef(false);
     const playButton = useRef<HTMLButtonElement>(null);
     const finishButton = useRef<HTMLButtonElement>(null);
-    const match = useCallback((targetId: number) => dispatch({ type: "match", targetId }), []);
+    const container = useRef<HTMLDivElement>(null);
+    const instruction = useRef<HTMLHeadingElement>(null);
+    const lastFocused = useRef<HTMLElement | null>(null);
+    const requestedFocus = useRef<"number" | "cube" | null>(null);
+    const match = useCallback((targetId: number) => {
+        if (document.activeElement?.closest("[data-review-target]")) requestedFocus.current = "number";
+        dispatch({ type: "match", targetId });
+    }, []);
     const shouldReplenish = needsImmediateSpawn(state);
+
+    useEffect(() => { dispatch({ type: "motion", reducedMotion }); }, [reducedMotion]);
+
+    // Recover focus only when our control disappeared, not when the user moved elsewhere.
+    useLayoutEffect(() => {
+        if (state.phase !== "playing") return;
+        const lostControl = lastFocused.current && !lastFocused.current.isConnected && document.activeElement === document.body;
+        if (!requestedFocus.current && !lostControl) return;
+        const selector = requestedFocus.current === "cube" ? "[data-review-target] [role=button]" : "[data-review-number]";
+        const next = container.current?.querySelector<HTMLElement>(selector);
+        requestedFocus.current = null;
+        (next ?? instruction.current)?.focus({ preventScroll: true });
+    }, [state.phase, state.boxes, state.targets, state.feedbackId, state.selected]);
 
     useEffect(() => {
         if (state.phase === "intro") playButton.current?.focus();
-        if (state.phase !== "playing") return;
+    }, [state.phase]);
+
+    useEffect(() => {
+        if (state.phase !== "playing" || reducedMotion) return;
         let frame = 0;
         let previous: number | null = null;
         const tick = (now: number) => {
             if (previous !== null && document.visibilityState === "visible") {
-                dispatch({ type: "tick", seconds: (now - previous) / 1000, mobile });
+                dispatch({ type: "tick", seconds: (now - previous) / 1000 });
             }
             previous = now;
             frame = requestAnimationFrame(tick);
         };
         frame = requestAnimationFrame(tick);
         const interval = setInterval(() => {
-            if (document.visibilityState === "visible") dispatch({ type: "spawn", random: Math.random(), position: Math.random(), mobile });
+            if (document.visibilityState === "visible") dispatch({ type: "spawn", random: Math.random(), position: Math.random() });
         }, SPAWN_INTERVAL_MS);
         return () => { cancelAnimationFrame(frame); clearInterval(interval); };
-    }, [state.phase, mobile]);
+    }, [state.phase, reducedMotion]);
 
     useEffect(() => {
         if (!shouldReplenish) return;
         const timer = setTimeout(() => dispatch({
-            type: "spawn", random: Math.random(), position: Math.random(), mobile,
+            type: "spawn", random: Math.random(), position: Math.random(),
         }), REPLENISH_DELAY_MS);
         return () => clearTimeout(timer);
-    }, [shouldReplenish, state.boxes.length, state.nextBoxId, mobile]);
+    }, [shouldReplenish, state.boxes.length, state.nextBoxId]);
 
     useEffect(() => {
         if (!state.feedback) return;
@@ -104,7 +123,7 @@ export default function Class2SummaryView({ totalFlags, onStart, onComplete }: C
         <ReviewCube key={target.id} target={target} mobile={mobile} selected={state.selected !== null} onMatch={match} />
     ) : <div key={`finished-${slot}`} className={styles.finishedSlot} aria-label="Combinação concluída"><Check aria-hidden="true" /></div>;
 
-    return <div className={styles.container}>
+    return <div ref={container} className={styles.container} onFocusCapture={event => { lastFocused.current = event.target as HTMLElement; }}>
         <button className={styles.aulasButton} onClick={() => navigate(ROUTES.CLASS_MENU)}>Aulas</button>
         {state.phase === "intro" ? (
             <div className={styles.introBackdrop}>
@@ -133,7 +152,7 @@ export default function Class2SummaryView({ totalFlags, onStart, onComplete }: C
                         <DemoCursor />
                     </div>
                     <p className={styles.introNote}>Conte só as partes coloridas. Você pode girar os cubos!</p>
-                    <button ref={playButton} className={styles.modalButton} onClick={() => { onStart(); dispatch({ type: "start", mobile }); }}>Jogar</button>
+                    <button ref={playButton} className={styles.modalButton} onClick={() => { onStart(); requestedFocus.current = "number"; dispatch({ type: "start", reducedMotion }); }}>Jogar</button>
                 </section>
             </div>
         ) : state.phase === "complete" ? (
@@ -146,18 +165,26 @@ export default function Class2SummaryView({ totalFlags, onStart, onComplete }: C
             </div>
         ) : <>
             <div className={styles.titleOverlay}>
-                <h2 className={styles.titleText}>Escolha o número e depois o cubo!</h2>
+                <h2 ref={instruction} tabIndex={-1} className={styles.titleText}>Escolha o número e depois o cubo!</h2>
                 <span className={styles.matchProgress}>{state.matches} / {MATCH_COUNT} combinações</span>
             </div>
             <div className={styles.reviewFeedback} key={state.feedbackId} role="status">{state.feedback}</div>
             <div className={`${styles.sidePanel} ${styles.leftPanel}`}>{state.targets.slice(0, 3).map(renderCube)}</div>
             <div className={`${styles.sidePanel} ${styles.rightPanel}`}>{state.targets.slice(3).map((target, index) => renderCube(target, index + 3))}</div>
-            <div className={styles.fallingArea}>
-                {state.boxes.map(box => <button key={box.id}
+            <div className={`${styles.fallingArea} ${state.reducedMotion ? styles.stationaryArea : ""}`}>
+                {state.boxes.map(box => {
+                    const position = reviewBoxPosition(box, mobile);
+                    return <button key={box.id} data-review-number={box.id}
                     className={`${styles.fallingBox} ${state.selected === box.id ? styles.paused : ""}`}
                     aria-pressed={state.selected === box.id}
-                    style={{ top: `${box.top}%`, left: `${box.left}%` }}
-                    onClick={() => dispatch({ type: "select", id: box.id })}>{box.value}</button>)}
+                    style={state.reducedMotion ? undefined : { top: `${position.top}%`, left: `${position.left}%` }}
+                    onFocus={() => dispatch({ type: "focus", id: box.id })}
+                    onBlur={() => dispatch({ type: "focus", id: null })}
+                    onClick={event => {
+                        if (event.detail === 0 && state.selected !== box.id) requestedFocus.current = "cube";
+                        dispatch({ type: "select", id: box.id });
+                    }}>{box.value}</button>;
+                })}
             </div>
         </>}
     </div>;

@@ -12,6 +12,7 @@ export const INITIAL_ROTATION = { x: -22, y: -28 };
 export const homeRotation = (config: Configuration): CubeRotation => config.size === 3 ? { x: -22, y: 28 } : INITIAL_ROTATION;
 
 export interface Configuration {
+    id: string;
     size: number;
     color: Exclude<StickerColor, "white">;
     faces: CubeFace[];
@@ -19,13 +20,13 @@ export interface Configuration {
     squareAdjective: string;
 }
 export const CONFIGURATIONS: Configuration[] = [
-    { size: 2, color: "blue", faces: ["front", "right"], faceAdjective: "azuis", squareAdjective: "azuis" },
-    { size: 3, color: "red", faces: ["front", "right", "top"], faceAdjective: "vermelhas", squareAdjective: "vermelhos" },
-    { size: 4, color: "green", faces: ["front", "right", "back", "left"], faceAdjective: "verdes", squareAdjective: "verdes" },
-    { size: 5, color: "orange", faces: ["front", "right", "bottom"], faceAdjective: "laranja", squareAdjective: "laranja" },
-    { size: 5, color: "yellow", faces: [...FACE_ORDER], faceAdjective: "amarelas", squareAdjective: "amarelos" },
-    { size: 6, color: "blue", faces: FACE_ORDER.filter(face => face !== "back"), faceAdjective: "azuis", squareAdjective: "azuis" },
-    { size: 6, color: "red", faces: [...FACE_ORDER], faceAdjective: "vermelhas", squareAdjective: "vermelhos" },
+    { id: "two-blue", size: 2, color: "blue", faces: ["front", "right"], faceAdjective: "azuis", squareAdjective: "azuis" },
+    { id: "three-red", size: 3, color: "red", faces: ["front", "right", "top"], faceAdjective: "vermelhas", squareAdjective: "vermelhos" },
+    { id: "four-green", size: 4, color: "green", faces: ["front", "right", "back", "left"], faceAdjective: "verdes", squareAdjective: "verdes" },
+    { id: "five-orange", size: 5, color: "orange", faces: ["front", "right", "bottom"], faceAdjective: "laranja", squareAdjective: "laranja" },
+    { id: "five-all-faces", size: 5, color: "yellow", faces: [...FACE_ORDER], faceAdjective: "amarelas", squareAdjective: "amarelos" },
+    { id: "six-blue", size: 6, color: "blue", faces: FACE_ORDER.filter(face => face !== "back"), faceAdjective: "azuis", squareAdjective: "azuis" },
+    { id: "six-all-faces", size: 6, color: "red", faces: [...FACE_ORDER], faceAdjective: "vermelhas", squareAdjective: "vermelhos" },
 ];
 export type StepKind = "faces" | "faceExpression" | "expression" | "total" | "calculation";
 export interface LessonStep {

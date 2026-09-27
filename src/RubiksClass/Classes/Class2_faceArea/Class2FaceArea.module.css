@@ -182,7 +182,9 @@
     box-shadow: 0 0.35vw 0 #a16207;
     transform: translateY(0.25vw);
 }
-.additionOptions { grid-template-columns: 1fr; gap: 1dvh; }
+.optionsGrid.additionOptions { grid-template-columns: 1fr; gap: 1dvh; }
+.answerFeedback { color: #9a3412; font-size: min(2vw, 3dvh); text-align: center; }
+.answerFeedback:empty { margin-block: -1.25dvh; }
 .additionOptions .optionButton { padding-block: 0.35vw; }
 .additionPreview { display: flex; align-items: center; gap: 2vw; }
 .previewRows { display: flex; flex-direction: column; gap: 0.4dvh; color: #013873; font-size: min(1.5vw, 3dvh); }
@@ -409,6 +411,8 @@
 
 @media (max-width: 650px) and (orientation: portrait) {
     .lessonContent { gap: 1.7dvh; }
+    .answerFeedback { font-size: min(4vw, 2.5dvh); }
+    .answerFeedback:empty { margin-block: -0.85dvh; }
     .hintDock { right: 3vw; bottom: 2dvh; padding: 1vw; border-radius: 2vw; }
     .hintDock svg { width: 4vw; height: 4vw; }
 }

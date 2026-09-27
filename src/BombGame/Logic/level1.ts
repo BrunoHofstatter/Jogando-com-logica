@@ -13,8 +13,11 @@ export interface Level1State {
   manualCalculations: ManualCalculation[];
   orderingNumbers: number[];
   orderingProgress: number[];
+  orderingRevision: number;
   numericAnswers: [number | null, number | null, number | null];
   operatorAnswers: [Operator | null, Operator | null, Operator | null];
+  operatorSolutions: ["+" | "-", "+" | "-", "+" | "-"];
+  operatorNumbers: [number, number, number];
   completedSections: SectionId[];
   lastEventId: number;
   lastMistake: MistakeTarget | null;
@@ -27,7 +30,7 @@ export interface MistakeTarget {
 }
 
 export type Level1Intent =
-  | { type: "select_ordering_number"; value: number }
+  | { type: "select_ordering_number"; value: number; revision?: number }
   | { type: "submit_numeric_answer"; row: 0 | 1 | 2; value: number }
   | { type: "select_operator"; row: 0 | 1 | 2; value: Operator };
 
@@ -51,6 +54,22 @@ export function createLevel1State(random: () => number = Math.random): Level1Sta
       return [letter, randomInteger(minimum, maximum, random)];
     }),
   ) as Record<Letter, number>;
+  const operatorSolutions = createOperatorSolutions(random);
+  const operatorNumbers = (["A", "C", "D"] as const).map((letter, row) => {
+    const [minimum, maximum] = VALUE_RANGES[letter];
+    const candidates: { number: number; result: number }[] = [];
+    // Choose visible numbers independently of the sign. Both possible letter values
+    // must fit the manual's range and neither may make multiplication correct.
+    for (let number = 1; number <= Math.floor((maximum - minimum) / 2); number += 1) {
+      for (let result = minimum + number; result <= maximum - number; result += 1) {
+        if ((result - number) * number === result || (result + number) * number === result) continue;
+        candidates.push({ number, result });
+      }
+    }
+    const { number, result } = candidates[randomInteger(0, candidates.length - 1, random)];
+    values[letter] = operatorSolutions[row] === "+" ? result - number : result + number;
+    return number;
+  }) as Level1State["operatorNumbers"];
 
   return {
     values,
@@ -60,8 +79,11 @@ export function createLevel1State(random: () => number = Math.random): Level1Sta
     })),
     orderingNumbers: createOrderingNumbers(random),
     orderingProgress: [],
+    orderingRevision: 0,
     numericAnswers: [null, null, null],
     operatorAnswers: [null, null, null],
+    operatorSolutions,
+    operatorNumbers,
     completedSections: [],
     lastEventId: 0,
     lastMistake: null,
@@ -70,12 +92,14 @@ export function createLevel1State(random: () => number = Math.random): Level1Sta
 
 export function applyLevel1Intent(state: Level1State, intent: Level1Intent): IntentResult {
   if (intent.type === "select_ordering_number") {
+    if (intent.revision !== undefined && intent.revision !== state.orderingRevision) return rejected();
     if (state.completedSections.includes(1) || state.orderingProgress.includes(intent.value)) {
       return rejected();
     }
     const sorted = [...state.orderingNumbers].sort((left, right) => left - right);
     const expected = sorted[state.orderingProgress.length];
     if (!state.orderingNumbers.includes(intent.value)) return rejected();
+    state.orderingRevision += 1;
     if (intent.value !== expected) return mistake(state, { section: 1, row: null, value: intent.value });
     state.orderingProgress.push(intent.value);
     if (state.orderingProgress.length === sorted.length) completeSection(state, 1);
@@ -100,13 +124,20 @@ export function applyLevel1Intent(state: Level1State, intent: Level1Intent): Int
   if (state.completedSections.includes(3) || state.operatorAnswers[intent.row] !== null) {
     return rejected();
   }
-  const expected: Operator[] = ["+", "-", "-"];
+  const expected = state.operatorSolutions;
   if (!["+", "-", "*"].includes(intent.value) || intent.value !== expected[intent.row]) {
     return mistake(state, { section: 3, row: intent.row, value: null });
   }
   state.operatorAnswers[intent.row] = intent.value;
   if (state.operatorAnswers.every((answer) => answer !== null)) completeSection(state, 3);
   return accepted(state);
+}
+
+function createOperatorSolutions(random: () => number): Level1State["operatorSolutions"] {
+  const sets: Level1State["operatorSolutions"][] = [
+    ["+", "+", "-"], ["-", "-", "+"], ["-", "-", "-"], ["+", "+", "+"],
+  ];
+  return shuffle([...sets[randomInteger(0, 3, random)]], random) as Level1State["operatorSolutions"];
 }
 
 function createCalculation(result: number, random: () => number): string {

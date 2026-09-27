@@ -95,41 +95,38 @@ The core idea is:
 
 ### Current Learning Content
 
-The current implemented lesson uses cube sizes:
+Class 1 has six questions and one child-paced notation reveal:
 
-- 2x2
-- 3x3
-- 4x4
-- 5x5
-- 6x6
+1. On a 2×2, count quadradinhos in one row.
+2. On the same cube, count rows on one face.
+3. After a short reveal connecting those counts to the name `2×2`, identify a 3×3.
+4. Identify 5×5, then 4×4, breaking the ascending-size sequence.
+5. Identify 6×6 without permanent counting support.
 
-The student is asked:
+Every question has four choices in a symmetric two-column grid. The display-scale and rotation comparison questions were removed. No discovery counter appears above the question. The reveal waits for `Continuar`. Other correct answers advance after 1.2 seconds. Mathematical face totals remain Class 2 content.
 
-- `Qual o tamanho deste cubo?`
+### Cube Interaction and Hints
 
-### Hint Structure
+- Cubes are stationary until deliberately rotated with pointer dragging or arrow keys. They have no ambient spin, inertia, or automatic return.
+- The first three questions offer Class 3's hand/tooltip/cube demonstration, repeating with quiet gaps until an actual drag beyond the gesture threshold or arrow-key rotation. A tap pauses it without recording practice. Once the learner rotates, the demonstration stays dismissed for the rest of this lesson attempt. Hints and answer transitions suspend it. It does not appear from question four onward.
+- The demonstration shares Class 3's timeline and reduced-travel behavior under reduced motion. Background time does not advance it. Ordinary decorative feedback respects reduced motion.
+- `Dica` is immediately available. Wrong answers reveal support up to two levels; a separate visible/status message still rejects wrong answers after the cap.
+- Row support highlights a front row and then numbers its squares. Row-count support outlines the rows and then labels them.
+- Each help request brings the front row back into view. `Ver dica novamente` replays maximum help without counting another distinct level. Dragging remains available.
+- After 30 foreground seconds without help, the hint button is emphasized; waiting never counts as an error or assistance reveal.
+- Lesson wrong answers and assistance reveals are separate counters. The responsive cube sizes use the shared 650px portrait subscription.
 
-Current hints are progressive:
-
-- first hint: count the squares in the top row
-- second hint: show the counting more explicitly with indices
-
-This matches the teaching philosophy well:
-
-- the student tries first
-- the system only reveals more structure when needed
+Both phases reuse Class 2’s bottom-left purple `Aulas` button, compact warm-colored bottom-right hint control, and hint cards above the left-side cubes. Wrong-answer/game-result messages share a bottom-edge status component that disappears after three seconds; repeated attempts restart its lifetime. The notation reveal overrides the global bold-text stroke with a thin outline. The game title and matching instruction are larger, with matching white text and blue outlines.
 
 ### Current Summary / Review Activity
 
-The summary activity for Module 1 is a matching game.
+The review begins with five shuffled cubes, one of each size 2–6. The instruction is `Escolha um cubo e depois o tamanho dele.` Cube selection uses native buttons with neutral names, keyboard activation, and selection state; dragging rotates without selecting. Correct matches preserve progress and move keyboard focus to an available cube. Wrong matches retain selection and provide explicit feedback.
 
-The player:
+The `Dica` control offers optional row highlighting, then sequential counts, for the selected cube. Help and mistakes are tracked separately. The game finishes immediately after the five matches; there are no extra identification questions. Attempts remain unlimited. Visible cube names and the combination counter are omitted. The 6×6 choice is centered below the two paired rows. Matched answers turn green with a matching border/shadow and a separate green checkmark in the top-right corner. Wrong answers stay red through hover/activation, with matching red borders/shadows.
 
-- sees a shuffled set of cubes
-- selects a cube
-- matches it to the correct size label (`2x2`, `3x3`, etc.)
+Completion still means finishing the activity. It shows actual lesson errors when a lesson was attempted, game errors, and help usage, with `Jogar novamente`, `Próxima aula`, and `Aulas`. Replay resets review state and starts a new review analytics attempt; direct review/replay omits the unattempted lesson-error line. Completion appears in a modal overlay above the still-mounted finished board. The board is inert while the dialog is open, and keyboard focus stays within the dialog. White outlined summary text matches the class; smaller blue replay and green next-class buttons share a row, with a purple Aulas button below.
 
-This summary is already more game-like than the teaching phase and fits the general idea that summary reviews should be fun, interactive, and dynamic.
+Lesson data/reducer live in `class1Lesson.ts`, review rules in `class1Review.ts`, and the Class 1 camera/gesture wrapper in `Class1Cube.tsx`. Existing checkpoint IDs (`two`, `three`, `four`, `five`, `six`) remain stable; the removed comparison checkpoint IDs now resolve as invalid. Checkpoint indices derive from the current sequence.
 
 ## Module 2 - Multiplicação no Cubo
 
@@ -195,6 +192,7 @@ transition before advancing.
 - Sum selections retain a colored border and shadow until changed or submitted.
 - The smaller `Aulas` button stays at the bottom-left; the lightbulb hint control stays at the bottom-right.
 - Help usage and incorrect answers are separate counters. The review receives only actual incorrect answers as its lesson-error count.
+- Every committed wrong answer also shows and announces `Ainda não! Tente outra resposta.`, including repeated attempts after all three hints. Addition choices use a single column; choosing a different sum clears its previous rejection before confirmation.
 
 The shared cube renderer accepts optional named-face colors, row-major per-sticker
 overrides, muted stickers, row outlines/labels, and a staggered pattern animation.
@@ -230,6 +228,27 @@ and restores a valid total or distractor when either is missing. Initial cards a
 staggered along the lane. A selected card turns yellow with light text and a dark
 text outline, and all available cubes pulse until the player chooses one. Completed slots use a larger, thicker
 checkmark. Feedback moves below the main instruction and fades after three seconds.
+
+Card travel and lane position are stored independently of screen orientation, so
+switching between desktop and portrait retains each card's progress and selection.
+Spawning pauses when all targets are temporarily absent during replacement; it
+resumes once the next cube is available. Keyboard-focused cards are brought inside
+the lane and remain stationary until focus leaves.
+
+Each review cube has one keyboard stop: arrows rotate, and Enter or Space submits
+the match. Starting play focuses a number; keyboard number selection moves to a
+cube, and submitting a match returns to the numbers. Removed controls have a focus
+fallback, and completion focuses `Voltar ao Menu`. Pointer drags still suppress matching.
+
+With reduced motion enabled, number choices are stationary and refresh after
+matches/replacements, always retaining a usable total and a distractor when a target
+is available. There are no timed card spawns or travel frames in this mode. The
+introduction becomes a static example and decorative cube/hand pulses are removed.
+Changes to the system preference take effect during play without resetting progress.
+
+Product decision (2026-09-27): keep the review free of hints. Unlocking `Jogar` after
+lesson completion is planned separately and is not implemented by these fixes;
+direct game entry currently remains available.
 
 ## Module 3 - Multiplicação nas Faces
 
@@ -304,8 +323,24 @@ Equivalent-valued distractors are excluded. Ordinary successes advance after
 - One-face hints reuse front-face row guides. Later hints connect equal faces to
   repeated addition, labeled multiplication factors, and small running totals.
   There is no compulsory repeated-addition concept lesson.
-- Written arithmetic retains the existing shared adaptive guidance and mobile
-  keypad, with Class 3 styling. Help usage and incorrect answers are separate.
+- Written arithmetic starts freely: no selected cell, forced order, clearing of
+  wrong input, or automatic cursor movement. Selecting a result or carry cell
+  gives it a yellow fill and purple outline. Neutral carry boxes replace green ones.
+- The shared multiplication component provides progressive visual help to the right:
+  arrows connect operands to the multiplication, reveal its result, then connect
+  result digits to their answer/carry cells. The next column explicitly adds the
+  incoming carry. Help closes after its column is solved; entries remain editable.
+- A wrong entry is assessed after 1.2 foreground seconds without another interaction,
+  allowing quick corrections. After 25 idle foreground seconds, help is offered;
+  another 25 seconds reveals or advances it. Manual help is immediately available.
+  Automatic help never downgrades; a small back button revisits the previous hint
+  in the same column. Revisiting the same level does not add another hint count.
+- Class 3 accepts a correct result with omitted carries; entered carries must be
+  correct. Wrong settled entries and unsuccessful checks count as errors; selecting
+  another cell does not. Distinct revealed help levels count separately as hints.
+- Desktop keyboard input is scoped to the calculator; Enter/Space retain native
+  button activation. The mobile keypad stays available, and completed calculations
+  remain visible and read-only during the success transition.
 
 The implementation plan and verification record are in
 `docs/class3-equal-faces-implementation-plan.md`.
@@ -491,3 +526,28 @@ The best way to keep it maintainable is to document each module with the same ba
 
 Class 3 visual refinement (2026-09-16): cube and counting controls sit slightly
 lower, and face-count labels are enlarged independently of sticker counts.
+
+## Hidden Lesson Checkpoint Launcher
+
+`/aulas/testes` is an unlisted testing page for Classes 1–3. It offers the first
+question of each cube section, with ordinal labels for repeated sizes. Class 2
+row-highlight changes remain within the same cube section. Class 3 configurations
+are distinct sections. No public menu links to this route.
+
+Implementation lives in `src/RubiksClass/Testing/`. `registry.ts` derives the
+checkpoints from lesson data; `checkpoints.ts` generates labels and resolves IDs.
+The `checkpoint` query parameter contains a stable section ID, never a question
+index. `LessonEntry` validates it and remounts the lesson on navigation. Refresh
+restarts the selected section. Invalid IDs show a link back to the launcher.
+Checkpoint entry takes precedence over `mode=game` and resets all lesson state.
+The lesson then continues normally, including review/completion. A persistent
+`Voltar aos testes` link is available throughout the testing session. Checkpoint
+sessions pass null to the attempt analytics hook, excluding starts/completions/
+abandonments from student activity metrics (ordinary page views remain enabled).
+
+For another class: declare stable cube-section IDs in its lesson data, derive
+checkpoints from its actual question sequence, register its title/route/checkpoints,
+wrap its route with `LessonEntry`, and initialize its hook from `useLessonEntry`.
+Use the same context to suppress attempt analytics. Keep IDs stable when editing
+copy or reordering; separate cube occurrences need distinct IDs even at the same
+size. Do not put question-index lists in the launcher.

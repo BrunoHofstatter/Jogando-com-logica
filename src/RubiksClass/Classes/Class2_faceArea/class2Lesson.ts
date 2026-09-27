@@ -6,6 +6,7 @@ export interface LessonOption { label: string; value: string }
 type QuestionKind = "rowSize" | "rowCount" | "addition" | "multiplication" | "total";
 export interface LessonStep {
     id: string;
+    cubeId: string;
     size: number;
     rows: number;
     kind: QuestionKind;
@@ -20,67 +21,67 @@ const options = (values: (string | number)[]): LessonOption[] =>
 
 export const LESSON_STEPS: readonly LessonStep[] = [
     {
-        id: "one-row", size: 3, rows: 3, kind: "rowSize",
+        id: "one-row", cubeId: "three", size: 3, rows: 3, kind: "rowSize",
         question: "Quantos quadradinhos há nesta linha?",
         options: options([2, 6, 3, 9, 4, 1]), answer: "3",
     },
     {
-        id: "equal-rows", size: 3, rows: 3, kind: "rowCount",
+        id: "equal-rows", cubeId: "three", size: 3, rows: 3, kind: "rowCount",
         question: "Quantas linhas há nesta face?",
         options: options([9, 2, 6, 3, 1, 4]), answer: "3",
     },
     {
-        id: "repeated-addition", size: 3, rows: 3, kind: "addition",
+        id: "repeated-addition", cubeId: "three", size: 3, rows: 3, kind: "addition",
         question: "Qual soma conta todos os quadradinhos desta face?",
         options: options(["3 + 3", "3 + 3 + 3", "3 + 3 + 3 + 3"]), answer: "3 + 3 + 3",
     },
     {
-        id: "three-total", size: 3, rows: 3, kind: "total",
+        id: "three-total", cubeId: "three", size: 3, rows: 3, kind: "total",
         question: "Quantos quadradinhos há nesta face?",
         options: options([6, 3, 12, 8, 9, 10]), answer: "9",
     },
     {
-        id: "four-expression", size: 4, rows: 4, kind: "multiplication",
+        id: "four-expression", cubeId: "four", size: 4, rows: 4, kind: "multiplication",
         question: "Qual multiplicação calcula todos os quadradinhos desta face?",
         options: options(["4 × 2", "3 × 3", "4 × 4", "4 × 6", "5 × 5", "3 × 4"]), answer: "4 × 4",
     },
     {
-        id: "four-total", size: 4, rows: 4, kind: "total",
+        id: "four-total", cubeId: "four", size: 4, rows: 4, kind: "total",
         question: "Quantos quadradinhos há nesta face?",
         options: options([12, 24, 8, 16, 4, 20]), answer: "16",
     },
     {
-        id: "two-rows-expression", size: 4, rows: 2, kind: "multiplication",
+        id: "two-rows-expression", cubeId: "four", size: 4, rows: 2, kind: "multiplication",
         question: "Qual multiplicação conta só os quadradinhos das linhas destacadas?",
         options: options(["4 × 4", "2 × 2", "3 × 4", "2 × 4", "4 × 6", "3 × 3"]), answer: "2 × 4",
     },
     {
-        id: "two-rows-total", size: 4, rows: 2, kind: "total",
+        id: "two-rows-total", cubeId: "four", size: 4, rows: 2, kind: "total",
         question: "Quantos quadradinhos há nas linhas destacadas?",
         options: options([4, 16, 12, 6, 8, 10]), answer: "8",
     },
     {
-        id: "two-expression", size: 2, rows: 2, kind: "multiplication",
+        id: "two-expression", cubeId: "two", size: 2, rows: 2, kind: "multiplication",
         question: "Qual multiplicação calcula todos os quadradinhos desta face?",
         options: options(["2 × 3", "1 × 2", "3 × 3", "2 × 2", "2 × 4", "4 × 4"]), answer: "2 × 2",
     },
     {
-        id: "five-expression", size: 5, rows: 5, kind: "multiplication",
+        id: "five-expression", cubeId: "five", size: 5, rows: 5, kind: "multiplication",
         question: "Qual multiplicação calcula todos os quadradinhos desta face?",
         options: options(["4 × 5", "5 × 5", "5 × 6", "3 × 5", "4 × 4", "2 × 5"]), answer: "5 × 5",
     },
     {
-        id: "four-rows-total", size: 5, rows: 4, kind: "total",
+        id: "four-rows-total", cubeId: "five", size: 5, rows: 4, kind: "total",
         question: "Quantos quadradinhos há nas linhas destacadas?",
         options: options([25, 15, 9, 20, 16, 30]), answer: "20",
     },
     {
-        id: "six-expression", size: 6, rows: 6, kind: "multiplication", striped: false,
+        id: "six-expression", cubeId: "six", size: 6, rows: 6, kind: "multiplication", striped: false,
         question: "Qual multiplicação calcula todos os quadradinhos desta face?",
         options: options(["5 × 6", "3 × 6", "6 × 6", "4 × 6", "5 × 5", "6 × 7"]), answer: "6 × 6",
     },
     {
-        id: "five-rows-total", size: 6, rows: 5, kind: "total",
+        id: "five-rows-total", cubeId: "six", size: 6, rows: 5, kind: "total",
         question: "Quantos quadradinhos há nas linhas destacadas?",
         options: options([36, 24, 25, 11, 30, 42]), answer: "30",
     },
@@ -94,11 +95,12 @@ export interface Class2State {
     incorrectCount: number;
     assistanceCount: number;
     selectedSum: string | null;
+    incorrectAnswer: string | null;
 }
 
-export const initialLessonState = (review: boolean): Class2State => ({
-    stepIndex: 0, phase: review ? "summary" : "question", hintLevel: 0,
-    incorrectCount: 0, assistanceCount: 0, selectedSum: null,
+export const initialLessonState = (review: boolean, stepIndex = 0): Class2State => ({
+    stepIndex, phase: review ? "summary" : "question", hintLevel: 0,
+    incorrectCount: 0, assistanceCount: 0, selectedSum: null, incorrectAnswer: null,
 });
 
 export type Class2Action =
@@ -112,7 +114,7 @@ function nextStep(state: Class2State): Class2State {
     const finished = state.stepIndex + 1 === LESSON_STEPS.length;
     return {
         ...state, stepIndex: finished ? state.stepIndex : state.stepIndex + 1,
-        phase: finished ? "summary" : "question", hintLevel: 0, selectedSum: null,
+        phase: finished ? "summary" : "question", hintLevel: 0, selectedSum: null, incorrectAnswer: null,
     };
 }
 
@@ -129,14 +131,14 @@ export function class2Reducer(state: Class2State, action: Class2Action): Class2S
     const step = LESSON_STEPS[state.stepIndex];
     if (action.type === "selectSum") {
         return step.kind === "addition" && step.options.some(option => option.value === action.answer)
-            ? { ...state, selectedSum: action.answer } : state;
+            ? { ...state, selectedSum: action.answer, incorrectAnswer: null } : state;
     }
     if (action.type === "guess") {
         if (!step.options.some(option => option.value === action.answer)) return state;
         if (action.answer !== step.answer) {
-            return addHint({ ...state, incorrectCount: state.incorrectCount + 1 });
+            return addHint({ ...state, incorrectCount: state.incorrectCount + 1, incorrectAnswer: action.answer });
         }
-        return { ...state, phase: step.kind === "addition" ? "reveal" : "transition" };
+        return { ...state, incorrectAnswer: null, phase: step.kind === "addition" ? "reveal" : "transition" };
     }
     return state;
 }

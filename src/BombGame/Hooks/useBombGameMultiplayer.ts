@@ -15,6 +15,7 @@ import { MultiplayerReliabilityTracker } from "../../analytics/MultiplayerReliab
 import type { MultiplayerJoinType } from "../../analytics/events";
 import type { BombGameIntent } from "../Logic/levels";
 import type { BombLevelId } from "../Logic/levelCatalog";
+import { bombServerClock } from "../Logic/serverClock";
 import type {
   BombGameClientToServerEvents,
   BombGameServerToClientEvents,
@@ -39,6 +40,7 @@ interface Snapshot {
   openClassroomRooms: OpenRoomSummary[];
   errorMessage: string | null;
   opponentDisconnected: boolean;
+  orderingPending: boolean;
 }
 
 const DEFAULT_SNAPSHOT: Snapshot = {
@@ -53,15 +55,19 @@ const DEFAULT_SNAPSHOT: Snapshot = {
   openClassroomRooms: [],
   errorMessage: null,
   opponentDisconnected: false,
+  orderingPending: false,
 };
 
 let sharedSnapshot = DEFAULT_SNAPSHOT;
 let socket: Socket<BombGameServerToClientEvents, BombGameClientToServerEvents> | null = null;
 const reliabilityTracker = new MultiplayerReliabilityTracker();
 let actionSequence = 0;
+let lastOrderingClick: { value: number; at: number; progress: number } | null = null;
+let clockInterval: ReturnType<typeof setInterval> | null = null;
 const subscribers = new Set<(value: Snapshot) => void>();
 
 function updateSnapshot(patch: Partial<Snapshot>): void {
+  if (patch.gameState?.serverNow !== undefined) bombServerClock.observe(patch.gameState.serverNow);
   sharedSnapshot = { ...sharedSnapshot, ...patch };
   subscribers.forEach((listener) => listener(sharedSnapshot));
 }
@@ -81,13 +87,26 @@ function ensureSocket(): typeof socket {
 
   socket = io(`${serverUrl.replace(/\/$/, "")}/bomb-game`, { autoConnect: false, transports: ["websocket"] });
   socket.on("connect", () => {
+    const syncClock = () => {
+      const activeSocket = socket;
+      const sent = performance.now();
+      activeSocket?.emit("sync_time", (serverNow) => {
+        if (socket === activeSocket && activeSocket?.connected) bombServerClock.synchronize(serverNow, sent);
+      });
+    };
+    syncClock();
+    if (clockInterval) clearInterval(clockInterval);
+    clockInterval = setInterval(syncClock, 30_000);
     updateSnapshot({ connectionStatus: sharedSnapshot.roomCode ? sharedSnapshot.connectionStatus : "idle", errorMessage: null });
     const classroom = getActiveClassroomSession();
     if (classroom) socket?.emit("join_classroom", { code: classroom.code });
   });
   socket.on("disconnect", (reason) => {
     reliabilityTracker.disconnected(reason, sharedSnapshot.connectionStatus);
-    updateSnapshot({ connectionStatus: sharedSnapshot.roomCode ? "disconnected" : "idle" });
+    if (clockInterval) clearInterval(clockInterval);
+    clockInterval = null;
+    if (sharedSnapshot.roomCode) socket?.io.reconnection(false);
+    updateSnapshot({ connectionStatus: sharedSnapshot.roomCode ? "disconnected" : "idle", orderingPending: false });
   });
   socket.on("connect_error", () => {
     reliabilityTracker.failConnection("network_error");
@@ -121,6 +140,7 @@ function ensureSocket(): typeof socket {
     });
   });
   socket.on("state_updated", ({ players, state, levelId }) => updateSnapshot({
+    orderingPending: false,
     levelId: levelId ?? 1,
     players,
     gameState: state,
@@ -225,7 +245,19 @@ export function useBombGameMultiplayer() {
     leaveClassroom,
     setPreference: (preference: RolePreference) => { if (sharedSnapshot.roomCode) ensureSocket()?.emit("set_role_preference", { code: sharedSnapshot.roomCode, preference }); },
     setReady: (ready: boolean) => { if (sharedSnapshot.roomCode) ensureSocket()?.emit("set_ready", { code: sharedSnapshot.roomCode, ready }); },
-    submit: (intent: BombGameIntent) => { if (sharedSnapshot.roomCode && socket?.connected) socket.emit("submit_action", { code: sharedSnapshot.roomCode, roundId: sharedSnapshot.gameState?.roundId, actionId: `${Date.now()}-${actionSequence += 1}`, intent }); },
+    submit: (intent: BombGameIntent) => {
+      if (!sharedSnapshot.roomCode || !socket?.connected || sharedSnapshot.connectionStatus === "disconnected") return;
+      if (intent.type === "select_ordering_number") {
+        const now = performance.now();
+        const state = sharedSnapshot.gameState;
+        if (state?.levelId !== 1 || state.role !== "bomb") return;
+        const progress = state.orderingProgress.length;
+        if (sharedSnapshot.orderingPending || (lastOrderingClick?.value === intent.value && lastOrderingClick.progress === progress && now - lastOrderingClick.at < 650)) return;
+        lastOrderingClick = { value: intent.value, at: now, progress };
+        updateSnapshot({ orderingPending: true });
+      }
+      socket.emit("submit_action", { code: sharedSnapshot.roomCode, roundId: sharedSnapshot.gameState?.roundId, actionId: `${Date.now()}-${actionSequence += 1}`, intent });
+    },
     setReplayVote: (wantsReplay: boolean) => { if (sharedSnapshot.roomCode) ensureSocket()?.emit("set_replay_vote", { code: sharedSnapshot.roomCode, wantsReplay }); },
     clearError: () => updateSnapshot({ errorMessage: null }),
     leaveRoom: leaveBombGameRoom,
@@ -235,6 +267,8 @@ export function useBombGameMultiplayer() {
 export function hasActiveBombGameSession(): boolean { return Boolean(sharedSnapshot.roomCode); }
 
 export function leaveBombGameRoom(): void {
+  bombServerClock.reset();
+  lastOrderingClick = null;
   reliabilityTracker.reset();
   if (sharedSnapshot.roomCode) socket?.emit("leave_room", { code: sharedSnapshot.roomCode });
   socket?.disconnect();

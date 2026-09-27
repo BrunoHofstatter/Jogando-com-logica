@@ -1,5 +1,6 @@
 import type { SharedCalculationProps } from "../types";
 import { VerticalCalculation } from "./VerticalCalculation";
+import { DiscoveryMultiplication } from "./DiscoveryMultiplication";
 
 export type VerticalMultiplicationProps = SharedCalculationProps & {
   topNumber?: number;
@@ -14,6 +15,10 @@ export function VerticalMultiplication({
   editableOperands = false,
   ...sharedProps
 }: VerticalMultiplicationProps) {
+  if (sharedProps.guidanceMode === "adaptive" && !editableOperands) {
+    return <DiscoveryMultiplication key={`${topNumber}:${bottomNumber}:${maxTopDigits}`}
+      topNumber={topNumber} bottomNumber={bottomNumber} maxTopDigits={maxTopDigits} {...sharedProps} />;
+  }
   return (
     <VerticalCalculation
       operation="multiplication"

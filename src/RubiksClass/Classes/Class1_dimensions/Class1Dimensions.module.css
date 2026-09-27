@@ -261,3 +261,44 @@
         transform: translateY(0);
     }
 }
+/* Discovery content and stable inspection. */
+.cubeGroup { display: flex; align-items: center; justify-content: center; width: 100%; }
+.progress { color: #013873; font-size: min(1.5vw, 2.8dvh); margin: 0; }
+.reveal { display: flex; flex-direction: column; align-items: center; gap: 3dvh; color: #013873; font-size: min(2.1vw, 3.7dvh); text-align: center; }
+.reveal p { margin: 0; }
+.reveal .optionButton { padding-inline: 3vw; }
+.answerFeedback { min-height: 4dvh; color: #8a1c13; font-size: min(1.5vw, 2.8dvh); text-align: center; }
+.optionButton.wrongOption { background: #ffb4a8; border-color: #9f1239; }
+.helpButton { font-family: inherit; font-size: min(1.6vw, 3dvh); padding: 0.7vw 1.5vw; border: 0.25vw solid #6b21a8; border-radius: 1vw; background: #faf5ff; color: #58208c; cursor: pointer; }
+.offeredHelp { box-shadow: 0 0 0 0.5vw #facc15; }
+.rightPanel { min-width: 0; box-sizing: border-box; }
+.leftPanel { min-width: 0; }
+@media (max-width: 650px) and (orientation: portrait) {
+    .progress, .answerFeedback { font-size: min(3.6vw, 2.2dvh); }
+    .reveal { font-size: min(4.5vw, 2.8dvh); gap: 2dvh; }
+    .helpButton { font-size: min(4vw, 2.5dvh); padding: 1.5vw 3vw; }
+    .cubeGroup { padding-top: 3dvh; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .container *, .container *::before, .container *::after { animation: none !important; transition: none !important; }
+}
+
+/* Keep answer states visible through hover, focus, and activation. */
+.optionButton.wrongOption,
+.optionButton.wrongOption:hover:not(:disabled),
+.optionButton.wrongOption:active:not(:disabled) {
+    background: #ffb4a8; border-color: #9f1239; box-shadow: 0 0.6vw 0 #9f1239;
+    -webkit-text-stroke-color: #9f1239; text-shadow: 0 0.2vw 0 #9f1239;
+}
+.reveal strong { color: #c62828; -webkit-text-stroke: 0.09vw #7f1d1d; text-shadow: none; }
+.reveal p { color: #fff; -webkit-text-stroke: 0.2vw #060e13; text-shadow: none; }
+.rightPanel { padding-bottom: 12dvh; }
+.cubeGroup { transform: translateY(3dvh); }
+@media (max-width: 650px) and (orientation: portrait) {
+    .rightPanel { padding-bottom: 14dvh; }
+    .cubeGroup { transform: translateY(1.5dvh); }
+    .reveal strong { -webkit-text-stroke-width: 0.14vw; }
+    .optionButton.wrongOption,
+    .optionButton.wrongOption:hover:not(:disabled),
+    .optionButton.wrongOption:active:not(:disabled) { box-shadow: 0 1.2vw 0 #9f1239; }
+}

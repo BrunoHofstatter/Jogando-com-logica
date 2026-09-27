@@ -1,3 +1,4 @@
+import { useLessonEntry } from "../../Testing/entryContext";
 import React, { useCallback, useEffect, useState } from "react";
 import { Lightbulb } from "lucide-react";
 import { useCubeMobileLayout } from "../../Components/useCubeMobileLayout";
@@ -10,41 +11,8 @@ import styles from "./Class3TotalSquares.module.css";
 import { ROUTES } from "../../../routes";
 import { useGameAttemptAnalytics } from "../../../analytics/useGameAttemptAnalytics";
 
-const calculationClassNames = {
-    root: styles.calculationRoot,
-    workspace: styles.calculationWorkspace,
-    calculationStage: styles.calculationStage,
-    controlRail: styles.calculationControlRail,
-    grid: styles.calculationGrid,
-    cell: styles.calculationCell,
-    cellAnchor: styles.calculationCellAnchor,
-    operandCell: styles.operandCell,
-    resultCell: styles.resultCell,
-    carryCell: styles.carryCell,
-    operator: styles.calculationOperator,
-    bar: styles.calculationBar,
-    activeCell: styles.activeCell,
-    disabledCell: styles.disabledCell,
-    keypad: styles.keypad,
-    keypadButton: styles.keypadButton,
-    toolbar: styles.calculationToolbar,
-    actionButton: styles.calculationActionButton,
-    checkButton: styles.checkButton,
-    message: styles.calculationMessage,
-    coach: styles.calculationCoach,
-    coachArrow: styles.calculationCoachArrow,
-    coachBadge: styles.calculationCoachBadge,
-    coachText: styles.calculationCoachText,
-    coachEquation: styles.calculationCoachEquation,
-    coachLeadingDigit: styles.calculationCoachLeadingDigit,
-    coachResultDigit: styles.calculationCoachResultDigit,
-    coachLeft: styles.calculationCoachLeft,
-    coachRight: styles.calculationCoachRight,
-    coachBelow: styles.calculationCoachBelow,
-    helpButton: styles.calculationHelpButton,
-};
-
 const Class3TotalSquares: React.FC = () => {
+    const { isCheckpoint } = useLessonEntry();
     const { state, step, config, dispatch, offerHelp } = useClass3();
     const navigate = useNavigate();
     const portrait = useCubeMobileLayout();
@@ -58,7 +26,7 @@ const Class3TotalSquares: React.FC = () => {
         queries.forEach(query => query.addEventListener("change", update));
         return () => queries.forEach(query => query.removeEventListener("change", update));
     }, []);
-    const { completeAttempt, startAttempt } = useGameAttemptAnalytics({
+    const { completeAttempt, startAttempt } = useGameAttemptAnalytics(isCheckpoint ? null : {
         gameId: "cubo_magico", gameMode: "solo", usageContext: "standard", playerSlotCount: 1,
         levelId: "class_03", activityVariant: "lesson",
     });
@@ -109,10 +77,9 @@ const Class3TotalSquares: React.FC = () => {
                     <div className={styles.equivalentExpression}>{expression(config)} = {area} × {config.faces.length}</div>
                     <div className={styles.calculationArea}>
                         <VerticalMultiplication key={state.stepIndex} topNumber={area} bottomNumber={config.faces.length}
-                            readOnly={isTransition} maxTopDigits={2} guidanceMode="adaptive" processValidation="require"
-                            adaptiveGuidance={{ autoHintDelayMs: config.size === 4 ? 12000 : config.size === 5 ? 16000 : 20000, detailedHintDelayMs: config.size === 4 ? 26000 : config.size === 5 ? 32000 : 38000, mistakesBeforeHint: config.size === 4 ? 1 : 2, mistakesBeforeDetailedHint: config.size === 4 ? 2 : 3 }}
-                            keypadMode={portrait || touch ? "visible" : "hidden"} showClearButton={false} classNames={calculationClassNames}
-                            messages={{ chooseCell: "Clique em um espaço e comece pela coluna destacada.", assistedNextStep: "Tente seguir o espaço amarelo destacado.", checkAnswer: "Verificar", clear: "Limpar", correct: "Isso! A conta está certa.", tryAgain: "Ainda não. Revise os algarismos da conta.", help: "Preciso de ajuda", yourTurn: "Sua vez" }}
+                            readOnly={isTransition} maxTopDigits={2} guidanceMode="adaptive" processValidation="warn"
+                            adaptiveGuidance={{ autoHintDelayMs: 25000 }}
+                            keypadMode={portrait || touch ? "visible" : "hidden"} showClearButton={false}
                             onComplete={result => dispatch({ type: "calculationComplete", usedHints: result.usedHints })}
                             onMistake={() => dispatch({ type: "calculationMistake" })} />
                     </div>

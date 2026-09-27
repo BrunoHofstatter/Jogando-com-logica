@@ -1,0 +1,6 @@
+.stage { position: relative; display: grid; place-items: center; width: calc(var(--stage-size) * 1.65); height: calc(var(--stage-size) * 1.65); flex-shrink: 0; padding: 0; border: 0; border-radius: 2vw; background: transparent; touch-action: none; user-select: none; cursor: grab; font-family: inherit; }
+.stage:active { cursor: grabbing; }
+.stage:focus-visible { outline: 0.35vw solid #6b21a8; outline-offset: 0.5vw; }
+.stage[aria-pressed="true"] { background: #a855f722; box-shadow: 0 0 0 0.35vw #6b21a8; }
+.stage:disabled { opacity: 0.35; cursor: default; }
+.visual { display: grid; pointer-events: none; }

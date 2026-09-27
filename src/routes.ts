@@ -66,6 +66,7 @@ export const ROUTES = {
   MATH_WAR_MP_GAME: "/guerra-matematica/online/partida",
 
   // Classes / Rubiks
+  CLASS_TESTS: "/aulas/testes",
   CLASS_MENU: "/aulas",
   CLASS_1_OLD: "/aulas/1-antiga",
   CLASS_1: "/aulas/1-dimensoes",

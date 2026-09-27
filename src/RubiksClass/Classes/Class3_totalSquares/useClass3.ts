@@ -1,8 +1,11 @@
+import { useLessonEntry } from "../../Testing/entryContext";
 import { useEffect, useReducer, useState } from "react";
 import { class3Reducer, CONFIGURATIONS, initialState, LESSON_STEPS } from "./class3Lesson";
 
 export function useClass3() {
-    const [state, dispatch] = useReducer(class3Reducer, initialState);
+    const entry = useLessonEntry();
+    const [state, dispatch] = useReducer(class3Reducer, entry.stepIndex,
+        stepIndex => ({ ...initialState, stepIndex }));
     const [offerHelp, setOfferHelp] = useState(false);
     const step = LESSON_STEPS[state.stepIndex];
     const config = CONFIGURATIONS[step.configuration];

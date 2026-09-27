@@ -1,3 +1,4 @@
+import { useLessonEntry } from "../../Testing/entryContext";
 import React, { useCallback, useEffect, useMemo } from "react";
 import { Lightbulb } from "lucide-react";
 import { useCubeMobileLayout } from "../../Components/useCubeMobileLayout";
@@ -12,6 +13,7 @@ import { useGameAttemptAnalytics } from "../../../analytics/useGameAttemptAnalyt
 
 
 const Class2FaceArea: React.FC = () => {
+    const { isCheckpoint } = useLessonEntry();
     const mobile = useCubeMobileLayout();
     const { cubeProps, state, currentStep, feedbackText, offerHelp, dispatch } = useClass2();
     const navigate = useNavigate();
@@ -27,7 +29,7 @@ const Class2FaceArea: React.FC = () => {
         levelId: "class_02",
         activityVariant: isReview ? "review" as const : "lesson" as const,
     }), [isReview]);
-    const { completeAttempt, startAttempt } = useGameAttemptAnalytics(analyticsContext);
+    const { completeAttempt, startAttempt } = useGameAttemptAnalytics(isCheckpoint ? null : analyticsContext);
 
     useEffect(() => {
         if (!isReview) startAttempt();
@@ -87,9 +89,9 @@ const Class2FaceArea: React.FC = () => {
                 <h1 className={styles.title} aria-live="polite">
                     {isReveal ? "Uma soma pode virar multiplicação!" : currentStep.question}
                 </h1>
-
-
-
+                <div role="status" aria-live="polite" aria-atomic="true" className={styles.answerFeedback}>
+                    {state.incorrectAnswer !== null && <span key={state.incorrectCount}>Ainda não! Tente outra resposta.</span>}
+                </div>
                 {showGrouping && (
                     <div className={styles.grouping} key={currentStep.id}>
                         <div className={styles.sumStrip} aria-label={repeatedAddition(currentStep)}>

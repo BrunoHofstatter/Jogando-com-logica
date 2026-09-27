@@ -79,6 +79,9 @@ export interface RubiksCubeProps {
   focusRequest?: string | number;
   /** Replay one short, staggered highlight sequence without remounting the cube. */
   hintAnimationKey?: string;
+  /** Optional match action on the same focusable surface used for rotation. */
+  onActivate?: () => void;
+  interactionLabel?: string;
 }
 
 // --- Face config -------------------------------------------------------------
@@ -245,6 +248,8 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
   homeRotation,
   focusRequest,
   hintAnimationKey,
+  onActivate,
+  interactionLabel,
 }) => {
   const homeMotion = useCubeReturnRotation(returnToDefault, focusRequest, homeRotation);
   const cubeRef = useRef<HTMLDivElement>(null);
@@ -598,15 +603,23 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
         ref={cubeRef}
         className={cubeClasses}
         style={inlineStyle}
-        tabIndex={returnToDefault ? 0 : undefined}
-        aria-label={returnToDefault ? "Gire o cubo arrastando ou usando as setas." : undefined}
+        tabIndex={returnToDefault || onActivate ? 0 : undefined}
+        role={onActivate ? "button" : undefined}
+        aria-label={interactionLabel ?? (returnToDefault ? "Gire o cubo arrastando ou usando as setas." : undefined)}
         onPointerDown={returnToDefault ? homeMotion.onPointerDown : onPointerDown}
         onPointerMove={returnToDefault ? homeMotion.onPointerMove : onPointerMove}
         onPointerUp={returnToDefault ? homeMotion.onPointerUp : onPointerUp}
         onPointerCancel={returnToDefault ? homeMotion.onPointerCancel : onPointerUp}
         onLostPointerCapture={returnToDefault ? homeMotion.onPointerCancel : undefined}
         onClickCapture={returnToDefault ? homeMotion.onClickCapture : undefined}
-        onKeyDown={returnToDefault ? homeMotion.onKeyDown : undefined}
+        onClick={onActivate}
+        onKeyDown={event => {
+          if (returnToDefault) homeMotion.onKeyDown(event);
+          if (onActivate && (event.key === "Enter" || event.key === " ")) {
+            event.preventDefault();
+            if (!event.repeat) onActivate();
+          }
+        }}
       >
         {/* Inner solid core — blocks visibility through rounded outer edges */}
         <div className={styles.innerCore}>

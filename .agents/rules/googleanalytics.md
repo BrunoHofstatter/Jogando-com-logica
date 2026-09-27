@@ -271,9 +271,17 @@ level. `outcome` is `passed` or `failed`. Random/tutorial rounds use
 
 Rubik's activities:
 
-Class 1 records dimension exploration flags as `assistance_count` and summary quiz
-mistakes as `incorrect_count`. Its lifecycle uses `class_01` and supports both `lesson`
-and `review` variants.
+Class 1 records distinct lesson/review hint-level reveals as `assistance_count`
+and actual lesson wrong answers plus review mistakes as `incorrect_count`.
+Waiting, cue demonstrations, and maximum-hint replays increment neither counter.
+Completion includes five matches, with
+unlimited retries and no mastery threshold. Its lifecycle uses `class_01`;
+initial entry distinguishes `lesson` and `review`, and replay starts a fresh
+`review` attempt without importing previous lesson counts. Checkpoint attempts
+remain excluded. Before the 2026-09-27 Class 1 update, assistance contained mixed
+exploration flags (including waits/errors), while incorrect count covered only
+review mistakes; comparisons across that change must account for the different
+counter definitions.
 
 Class 2 records hint escalations (manual or following an incorrect answer)
 as `assistance_count`, and lesson incorrect answers plus review mistakes as
@@ -291,8 +299,13 @@ activity_variant: lesson | review
 
 Class 3 supports `lesson` only. Its equal-face rework records lesson hint
 escalations plus each completed written calculation's `usedHints` as
-`assistance_count`. Actual wrong lesson answers and failed arithmetic checks
-are `incorrect_count`. Tour replay, rotation, inactivity emphasis, and successful
+`assistance_count`. In the free-entry multiplication UI, `usedHints` counts distinct
+revealed levels per column, including automatic foreground reveals, but not
+reopening/repeating the same help or merely offering it. Actual wrong lesson
+answers, settled wrong arithmetic entries, and unsuccessful arithmetic checks
+are `incorrect_count`. A failed check is one event; an entry already reported by
+that check is not also reported by its delayed assessment. Selecting cells or
+working in a different valid order is not an error. Tour replay, rotation, inactivity emphasis, and successful
 feedback reveals do not increment these counters. The final lesson question
 completes the activity; its identifier and route are unchanged. These counters
 are not counts of students or standardized learning scores.

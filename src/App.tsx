@@ -1,3 +1,6 @@
+import CheckpointLauncher from "./RubiksClass/Testing/CheckpointLauncher";
+import { LessonEntry } from "./RubiksClass/Testing/LessonEntry";
+import { lessonCheckpoints } from "./RubiksClass/Testing/registry";
 import StopPage from "./Stop/Pages/StopGamePage";
 import Home from "./Main/Pages/Home";
 import Jogos from "./Main/Pages/Jogos";
@@ -153,6 +156,7 @@ const RETURN_ROUTE_MAP: Record<string, string> = {
   [ROUTES.CROWN_CHASE_MP_LOBBY]: ROUTES.CROWN_CHASE_RULES,
   [ROUTES.CROWN_CHASE_MP_GAME]: ROUTES.CROWN_CHASE_MP_LOBBY,
   [ROUTES.CLASS_MENU]: ROUTES.GAMES,
+  [ROUTES.CLASS_TESTS]: ROUTES.CLASS_MENU,
   [ROUTES.CLASS_1_OLD]: ROUTES.CLASS_MENU,
   [ROUTES.CLASS_1]: ROUTES.CLASS_MENU,
   [ROUTES.CLASS_2]: ROUTES.CLASS_MENU,
@@ -327,6 +331,7 @@ function App() {
         <Route path={ROUTES.CROWN_CHASE_MP_LOBBY} element={<CrownChaseMultiplayerLobbyPage />} />
         <Route path={ROUTES.CROWN_CHASE_MP_GAME} element={<CrownChaseMultiplayerGamePage />} />
         <Route path={ROUTES.CACA_SOMA_RULES} element={<CacaSomaRegras />} />
+        <Route path={ROUTES.CLASS_TESTS} element={<CheckpointLauncher />} />
         <Route path={ROUTES.CLASS_1_OLD} element={<Dimensions />} />
         <Route path={ROUTES.CLASS_MENU} element={<ClassMenu />} />
         <Route path={ROUTES.MATH_WAR_RULES} element={<MathWarRegras />} />
@@ -338,9 +343,9 @@ function App() {
         <Route path={ROUTES.CLASSROOMS} element={<ClassroomsPage />} />
         <Route path={ROUTES.CUBE_TEST} element={<CubeTestPage />} />
         <Route path={ROUTES.CALCULATION_DEMO} element={<CalculationDemoPage />} />
-        <Route path={ROUTES.CLASS_1} element={<Class1Dimensions />} />
-        <Route path={ROUTES.CLASS_2} element={<Class2FaceArea />} />
-        <Route path={ROUTES.CLASS_3} element={<Class3TotalSquares />} />
+        <Route path={ROUTES.CLASS_1} element={<LessonEntry checkpoints={lessonCheckpoints.class1}><Class1Dimensions /></LessonEntry>} />
+        <Route path={ROUTES.CLASS_2} element={<LessonEntry checkpoints={lessonCheckpoints.class2}><Class2FaceArea /></LessonEntry>} />
+        <Route path={ROUTES.CLASS_3} element={<LessonEntry checkpoints={lessonCheckpoints.class3}><Class3TotalSquares /></LessonEntry>} />
       </Routes>
     </main>
   );

@@ -4,6 +4,22 @@ Date: 2026-09-26. Scope: current Class 2 `Aprender` and `Jogar`, including entry
 
 Followed `repoSupport/overview.md` and `repoSupport/review.md`. Existing Class 3/calculation changes and the separate Bomb Game review were preserved. No implementation or tests were edited. Severity describes consequences, not implementation effort.
 
+## Implementation follow-up — 2026-09-27
+
+The findings below preserve the original review. In a subsequent authorized task,
+R2-1 through R2-6 were implemented: empty-pool spawning is guarded, card coordinates
+are orientation-independent, lesson rejection feedback is separate from hints,
+addition CSS specificity is corrected, review focus and cube keyboard actions are
+managed, and reduced motion uses stationary replenished choices with a static intro.
+Verification: 120 Rubik's/analytics tests across 14 files passed, including new
+reducer and jsdom interaction regressions; scoped lint and the production build
+passed. The build retains its application-wide chunk-size warning. No browser or
+visual verification was performed.
+
+R2-7 is resolved by the user's decision: no hints in the game. Lesson-dependent
+unlocking will be separate future work; no unlock logic was added here. Resolved
+R2 entries were removed from the pending recommendations, preserving other reviews.
+
 ## R2-1 — Prevent spawning from an empty target pool during replacement
 
 **Type:** bug. **Impact:** medium. **Confidence:** confirmed by a direct reducer execution.

@@ -102,7 +102,7 @@ When `editableOperands` is false, operand cells are shown but not editable.
 ## Guidance Modes
 
 ```ts
-type GuidanceMode = "free" | "assisted" | "locked";
+type GuidanceMode = "free" | "assisted" | "locked" | "adaptive";
 ```
 
 ### `free`
@@ -126,7 +126,72 @@ type GuidanceMode = "free" | "assisted" | "locked";
 - Wrong digits shake, clear, and show a hint.
 - Best for first teaching of the written algorithm.
 
-For multiplication and addition, the result digit is filled before the carry. Example: for `36 x 6`, the flow starts with writing `6`, then carrying `3`.
+In locked mode, the result digit is filled before the carry. Example: for `36 x 6`, the flow starts with writing `6`, then carrying `3`.
+
+### `adaptive` multiplication: free entry with visual support (2026-09-27)
+
+Fixed-operand `VerticalMultiplication` uses `DiscoveryMultiplication` in this mode.
+Other operations and editable-operand calculations retain their existing modes.
+Class 3 is the production consumer. Its new behavior is:
+
+- Initially no cell is selected, highlighted as the next step, or locked. Select
+  any result/carry cell and enter or erase a digit; no automatic cursor movement.
+- The selected cell is yellow with a purple outline. Carry cells are neutral and
+  present above internal columns even if no carry is needed, rather than exposing
+  the algorithm before help is requested. Accessible names include place and value.
+- Input is preserved. A 1.2-second foreground settling delay allows quick edits
+  before assessing incorrect entries. Valid alternative entry orders are accepted.
+- Help appears in a reserved area to the right, with measured SVG arrows tied to
+  the actual cells. Level 1 connects multiplier/operand to an unknown product;
+  level 2 reveals the product and, where needed, adds the incoming carry;
+  level 3 connects separate result digits to their answer/carry destinations.
+- Arrows leave and arrive at the top centers of boxes, with tips ending at the
+  border. Curved paths use the gaps above rows and between the calculation and hint
+  panel to avoid crossing adjacent digits. Each curve ends in a short vertical
+  landing so the entire arrowhead points into its box, clear of the curve's bend.
+  The two multiplication factors have
+  distinct matching colors. Written operands are 30% larger than the original skin.
+- Solving the helped column closes its support; the next column is free again.
+  Children may also dismiss hints. No help stage restricts which cell is editable.
+- A compact back button revisits the previous hint within the same column (disabled
+  at its first level). Revisiting levels in either direction does not count extra
+  help. Only automatic help is monotonic; deliberate backward navigation is allowed.
+- After 25 idle foreground seconds (configurable with `autoHintDelayMs`), offer
+  help; subsequent intervals reveal the next level. Manual help is immediate.
+  Background time does not consume the delay. Correct results awaiting verification
+  receive no unsolicited help. Automatic levels never decrease and repeated levels aren't
+  counted again. The older detailed-delay/mistake-threshold options are not used
+  by the new multiplication UI.
+- `Verificar` submits. Native Enter/Space activation remains available on buttons;
+  digits and erase keys are handled only inside the component. The keypad reflects
+  current `keypadMode`, including changes while mounted.
+- Class 3 uses `processValidation="warn"`: omitted carries are accepted when the
+  final answer is correct, but explicitly wrong entered digits must be corrected.
+  `require` still requires carries and `ignore` skips carry validation. This mode
+  defaults to `warn`. Completion makes the component read-only immediately.
+
+`usedHints` counts newly revealed levels per column. `onMistake` reports settled
+incorrect entries and failed checks, never cell selection or timer expiry. Edits
+corrected within the grace period aren't errors. A failed check accounts for its
+current wrong entries so their pending timer does not count them again.
+
+The new UI has its own responsive CSS module, `DiscoveryMultiplication.module.css`,
+and accepts `className` for its root. The legacy cell/coach `classNames` skin and
+text-heavy guidance messages apply to `VerticalCalculation`, not this visual mode.
+Class 3 no longer carries a duplicate calculation skin. Its mobile layout keeps
+the calculation and explanation side by side, with controls/keypad below them.
+
+Implementation: `logic/discoveryMultiplication.ts` owns mathematical column
+relationships, progression, and accounting; `components/useForegroundDelay.ts`
+owns visibility-aware timers; `components/MultiplicationArrows.tsx` measures actual
+anchors and updates on resizing. DOM interaction tests exercise this mode without
+using a browser, screenshots, or local preview.
+
+Visual follow-up (2026-09-27): browser verification was explicitly authorized.
+Checked curved operand arrows, carry addition, and both result-placement stages
+on the actual Class 3 25 × 6 lesson at 1280 × 800 and 390 × 844. Restored smooth
+curves, increased row clearance, and aligned arrowheads with their landing segments.
+The inspected browser session reported no console errors.
 
 ## Process Validation
 

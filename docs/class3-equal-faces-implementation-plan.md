@@ -136,6 +136,14 @@ Repeated addition belongs in optional help, not a mandatory concept reveal. Reus
 
 ## Written multiplication
 
+Update (2026-09-27): the later approved calculator rework supersedes the retained
+arithmetic interaction/styling instructions below. Class 3 now uses free entry,
+neutral carry boxes, a yellow/purple selected cell, and progressive arrows in a
+right-hand hint area. Carries may be omitted during independent work, while entered
+digits must be correct. See `.agents/rules/docs_calculation_system.md` for current
+timing, validation, and accessibility behavior. This rework was checked with code
+tests, lint, and build; no new browser verification was performed.
+
 Reuse `VerticalMultiplication` and the current Class 3 adaptive guidance, input, keypad, and process validation behavior for the three larger totals. Do not redesign the arithmetic component in this task.
 
 The lesson expression keeps groups first (`4 × 16`), while the existing written layout puts the two-digit quantity above the one-digit multiplier (`16 × 4`). Before the first written calculation, explicitly connect the arrangements with `4 × 16 = 16 × 4` and a short explanation that changing factor order preserves the result. Do not reveal 64. Retain a compact equivalent-expression connection for later calculations.

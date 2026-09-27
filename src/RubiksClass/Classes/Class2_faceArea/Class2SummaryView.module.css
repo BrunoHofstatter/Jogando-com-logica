@@ -632,7 +632,30 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .modalOverlay, .modalContent { animation: none; }
+    .modalOverlay, .modalContent, .demoNumber, .demoCorrect, .demoCubeTarget,
+    .demoSuccess, .cubePulseTarget, .finishedSlot svg, .reviewFeedback { animation: none; }
+    .demoPointer { display: none; }
+    .demoCorrect { background: #ffe874; }
+    .demoSuccess { opacity: 1; }
+    .cubeWrapper, .fallingBox, .modalButton, .aulasButton { transition: none; }
+    .cubeWrapper:hover:not(.matched), .modalButton:hover, .aulasButton:hover { transform: none; }
+}
+
+/* Stationary choices use normal flow so they cannot overlap or wait off screen. */
+.fallingArea.stationaryArea {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: center;
+    justify-items: center;
+    gap: 3dvh 2vw;
+    padding: 2dvh 3vw;
+}
+.stationaryArea .fallingBox,
+.stationaryArea .fallingBox:hover:not(.paused),
+.stationaryArea .fallingBox.paused {
+    position: relative;
+    transform: none;
+    transition: none;
 }
 
 @keyframes fadeSlideIn {
