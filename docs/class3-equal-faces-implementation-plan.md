@@ -29,6 +29,21 @@ The shared renderer already exposes named `faceAppearances`, per-face color/muti
 
 ## Rotation and discovery cue
 
+Correction after reviewing the restored Class 2 (2026-09-15): the hand, cube, and
+tooltip use one animation timeline. Text is a temporary overlay above the cube,
+visible only during the gesture; no permanent caption or arrow-button row is shown.
+Dragging dismisses the cue for the current question. It appears on the first
+face-count question, on the first four-face question only if rotation has not yet
+been practiced, and on the first configuration requiring bottom inspection. Other
+questions have no cue. A maximum of two passes is separated by a silent interval.
+Both motion settings use two passes if untouched; reduced motion reduces travel only.
+Keyboard arrows provide an alternative to dragging. These details supersede the
+earlier generic cue/controls description below.
+
+Presentation directly composes the restored Class 2 CSS Modules: hint above the
+cube, large title, matching answer grid, bottom-left `Aulas`, and a bottom-right
+lightbulb hint dock. Do not add cube headings or progress labels above questions.
+
 Use a brief demonstration followed by student-controlled inspection, rather than continuous automatic spinning during questions.
 
 1. Initially show a hand/cursor that drags a short distance; the cube follows and gently returns to its initial teaching angle.
@@ -38,7 +53,7 @@ Use a brief demonstration followed by student-controlled inspection, rather than
 5. Demonstrate vertical inspection when needed, because the bottom cannot be inspected through horizontal rotation alone.
 6. Preserve orientation between questions on the same configuration unless an explicit teaching hint needs to focus a face. A new configuration can establish its own useful starting angle.
 
-Add opt-in control over automatic rotation/resumption for Class 3, preserving the defaults used elsewhere. Scripted rotation currently blocks dragging; implement an explicit handoff for the interruptible introductory cue. Guided hint tours may own rotation while playing, with a way to finish/skip and return control. Respect reduced-motion settings by using static cues and child-paced face views.
+Add opt-in control over automatic rotation/resumption for Class 3, preserving the defaults used elsewhere. Scripted rotation currently blocks dragging; implement an explicit handoff for the interruptible introductory cue. Guided hint tours may own rotation while playing, with a way to finish/skip and return control. Reduced motion keeps the same automatic sequence with gentler movement.
 
 ## Face-counting hint animation
 
@@ -58,7 +73,7 @@ Represent the cube's six named faces as an adjacency graph: every pair is adjace
 
 Do not iterate the current renderer face-index order (`front, back, right, left, top, bottom`), which creates opposite-face jumps. Keep that index mapping unchanged for existing callers and create a separate tour order.
 
-Rotation keyframes must implement adjacent moves with continuous angles, including wraparound handling; simply sorting face indices or interpolating arbitrary existing Euler targets does not guarantee a short visual path. Start from the current displayed orientation through a smooth approach. Tune movement/pause durations as named constants; the count should occur only after the target face is readable. With reduced motion, show the same ordered faces as discrete child-paced views.
+Rotation keyframes must implement adjacent moves with continuous angles, including wraparound handling; simply sorting face indices or interpolating arbitrary existing Euler targets does not guarantee a short visual path. Start from the current displayed orientation through a smooth approach. Tune movement/pause durations as named constants; the count should occur only after the target face is readable. With reduced motion, run the same ordered tour automatically with slower movement.
 
 ## Lesson sequence
 
@@ -172,6 +187,46 @@ Code verification covers lesson/reducer/route tests, existing shared cube and
 calculation tests, the production build, and lint of changed TypeScript files.
 Repository-wide lint currently reports 61 errors and 7 warnings outside these changes.
 
+Correction verification (2026-09-15): compared the restored Class 2 and Class 3
+in the browser at desktop and 390 × 844 mobile sizes. Verified the visible hand,
+cube movement, and temporary tooltip together on the actual lesson page, immediate
+drag dismissal, suppression on later questions after practice, and the separate
+bottom-face gesture. Completed the lesson on mobile and inspected counting hints,
+repeated-addition hints, and written-calculation help on both layouts. The browser
+prefers reduced motion, so these cue checks exercised its gentle single-pass mode;
+timeline tests cover the normal two-pass mode and silent interval as well.
+
 ## Deferred summary-game direction
 
 Retain the earlier discussion as future proposals only: short size and one-face warm-ups, then target-color face-group challenges on slowly rotating cubes; planned ammo/target relationships; and segmented hearts with different penalties for missed shots and escaping targets. Challenge scheduling, distractor removal, penalties, and how the bottom is represented remain for the separate game design. Do not implement or expose a Class 3 `Jogar` entry as part of this learning rework.
+
+
+## Accepted interaction corrections (2026-09-15)
+
+- Use an opaque hand silhouette and repeat the drag demonstration once after a quiet
+  gap unless the child interacts; apply the same repeat rule in both motion settings.
+- Continue from a per-face result goes directly to the next question, without briefly
+  rendering the previous question with success feedback.
+- For the 2×2 and 3×3 total-expression prompts, show the face count and squares per
+  face as two concise visual lines above the short multiplication question.
+- All numerical choice questions offer six distinct answers.
+- Counting hints automatically tour adjacent faces, retain a shallow 3D view, and
+  release dragging when finished. Offer replay afterward. Face-on row/square hints
+  remain appropriate. Top and bottom remain visible and individually counted.
+- Reset orientation on each new question. The 3×3 starts with its gray left face
+  visible; other configurations retain their established home views.
+- Explain factor order only before the first written calculation. Keep completed
+  calculations, digits, and title in place during success feedback; block edits.
+
+Verification of these corrections: completed the actual lesson in the browser,
+using desktop and 390 × 844 mobile layouts. Checked the solid hand and replay,
+automatic counting including the bottom face, direct Continue transitions,
+3×3 home/reset views, concise prompts, six choices, and all three written results.
+Verified completed calculations remain visible and reject keyboard edits during
+success feedback. The browser reported no console errors. All 42 targeted
+Rubiks/calculation tests and lint of changed TypeScript files pass.
+
+Visual refinement (2026-09-16): lower the cube and counting controls slightly,
+enlarge counted-face numbers, and replace all brief inline success explanations
+with a fixed top-center green `Correto!` overlay. Keep the existing 1.2-second
+transition and preserve completed calculations beneath the overlay.

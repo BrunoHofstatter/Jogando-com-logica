@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BOX_SPEED, MAX_BOXES, SPAWN_INTERVAL_MS, initialReviewState, reviewReducer, REVIEW_TARGETS, targetTotal, type ReviewState } from "./class2Review";
+import { BOX_SPEED, MAX_BOXES, needsImmediateSpawn, SPAWN_INTERVAL_MS, initialReviewState, reviewReducer, REVIEW_TARGETS, targetTotal, type ReviewState } from "./class2Review";
 import { nearestAngle } from "../../Components/useCubeReturnRotation";
 
 describe("Class 2 replacement-cube review", () => {
@@ -12,11 +12,15 @@ describe("Class 2 replacement-cube review", () => {
             state = { ...state, selected: 100, boxes: [{ id: 100, value: targetTotal(target), top: 20, left: 20 }] };
             state = reviewReducer(state, { type: "match", targetId: target.id });
             expect(state.targets.some(target => target?.size === 6)).toBe(false);
+            state = reviewReducer(state, { type: "showReplacement", slot: state.pendingReplacement!.slot });
         }
         const slot = state.targets.findIndex(target => target?.size === 5);
         const target = state.targets[slot]!;
         state = { ...state, selected: 100, boxes: [{ id: 100, value: targetTotal(target), top: 20, left: 20 }] };
         state = reviewReducer(state, { type: "match", targetId: target.id });
+        expect(state.targets[slot]).toBeNull();
+        expect(state.pendingReplacement).toEqual({ slot, target: expect.objectContaining({ size: 6 }) });
+        state = reviewReducer(state, { type: "showReplacement", slot });
         expect(state.targets[slot]?.size).toBe(6);
         expect(state.targets.some(target => target?.size === 5)).toBe(false);
     });
@@ -28,8 +32,6 @@ describe("Class 2 replacement-cube review", () => {
             state = reviewReducer(state, { type: "tick", seconds: 0.05, mobile });
             elapsed += 50;
             if (elapsed >= SPAWN_INTERVAL_MS) {
-                // Natural spacing should not need the safety cap to reject a spawn.
-                expect(state.boxes.length).toBeLessThan(MAX_BOXES);
                 state = reviewReducer(state, { type: "spawn", random: 0.2, position: 0.3, mobile });
                 elapsed -= SPAWN_INTERVAL_MS;
             }
@@ -42,9 +44,12 @@ describe("Class 2 replacement-cube review", () => {
 
     it("clears feedback without letting an older fade erase a newer message", () => {
         let state = reviewReducer(initialReviewState(), { type: "start" });
+        state = { ...state, selected: 100, boxes: [{ id: 100, value: targetTotal(state.targets[0]!), top: 20, left: 20 }] };
         state = reviewReducer(state, { type: "match", targetId: 0 });
         const previousId = state.feedbackId;
-        state = reviewReducer(state, { type: "match", targetId: 0 });
+        state = reviewReducer(state, { type: "showReplacement", slot: state.pendingReplacement!.slot });
+        state = { ...state, selected: 101, boxes: [{ id: 101, value: targetTotal(state.targets[0]!), top: 20, left: 20 }] };
+        state = reviewReducer(state, { type: "match", targetId: 5 });
         expect(reviewReducer(state, { type: "clearFeedback", id: previousId })).toBe(state);
         expect(reviewReducer(state, { type: "clearFeedback", id: state.feedbackId }).feedback).toBeNull();
     });
@@ -68,10 +73,25 @@ describe("Class 2 replacement-cube review", () => {
             expect(state.matches).toBe(count);
             expect(state.phase).toBe(count === 10 ? "complete" : "playing");
             expect(reviewReducer(state, { type: "match", targetId: target.id })).toBe(state);
+            state = reviewReducer(state, { type: "showReplacement", slot: state.pendingReplacement!.slot });
         }
         expect(seen.size).toBe(10);
         expect(state.mistakes).toBe(0);
         expect(state.targets.every(target => target === null)).toBe(true);
+    });
+    it("keeps a matched slot empty until its delayed replacement is revealed", () => {
+        let state = reviewReducer(initialReviewState(), { type: "start" });
+        const target = state.targets[0]!;
+        state = { ...state, selected: 100, boxes: [{ id: 100, value: targetTotal(target), top: 20, left: 20 }] };
+        state = reviewReducer(state, { type: "match", targetId: target.id });
+
+        expect(state.targets[0]).toBeNull();
+        expect(state.pendingReplacement?.target?.id).toBe(5);
+        expect(reviewReducer(state, { type: "showReplacement", slot: 1 })).toBe(state);
+
+        state = reviewReducer(state, { type: "showReplacement", slot: 0 });
+        expect(state.targets[0]?.id).toBe(5);
+        expect(state.pendingReplacement).toBeNull();
     });
     it("allows either target when two different groups have the same total", () => {
         for (const targetId of [20, 21]) {
@@ -101,6 +121,22 @@ describe("Class 2 replacement-cube review", () => {
         const spawned = reviewReducer(state, { type: "spawn", random: 0.99, position: 0.9, mobile: true });
         expect(state.targets.some(target => target && targetTotal(target) === spawned.boxes[0].value)).toBe(true);
     });
+    it("quickly replenishes a missing choice and maintains a correct answer plus a distractor", () => {
+        let state: ReviewState = {
+            ...reviewReducer(initialReviewState(), { type: "start" }),
+            boxes: [{ id: 50, value: 7, top: 20, left: 20 }], nextBoxId: 51,
+        };
+        expect(needsImmediateSpawn(state)).toBe(true);
+        state = reviewReducer(state, { type: "spawn", random: 0.9, position: 0.2, mobile: false });
+        expect(state.boxes).toHaveLength(2);
+        expect(state.boxes.some(box => state.targets.some(target => target && targetTotal(target) === box.value))).toBe(true);
+        expect(needsImmediateSpawn(state)).toBe(false);
+
+        state = { ...state, boxes: state.boxes.filter(box => box.value !== 7) };
+        expect(needsImmediateSpawn(state)).toBe(true);
+        state = reviewReducer(state, { type: "spawn", random: 0.1, position: 0.1, mobile: false });
+        expect(state.boxes.some(box => !state.targets.some(target => target && targetTotal(target) === box.value))).toBe(true);
+    });
 });
 
 describe("return rotation", () => {
@@ -112,4 +148,3 @@ describe("return rotation", () => {
         }
     });
 });
-

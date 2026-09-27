@@ -94,12 +94,11 @@ export interface Class2State {
     incorrectCount: number;
     assistanceCount: number;
     selectedSum: string | null;
-    replayKey: number;
 }
 
 export const initialLessonState = (review: boolean): Class2State => ({
     stepIndex: 0, phase: review ? "summary" : "question", hintLevel: 0,
-    incorrectCount: 0, assistanceCount: 0, selectedSum: null, replayKey: 0,
+    incorrectCount: 0, assistanceCount: 0, selectedSum: null,
 });
 
 export type Class2Action =
@@ -107,8 +106,7 @@ export type Class2Action =
     | { type: "selectSum"; answer: string }
     | { type: "hint" }
     | { type: "advance" }
-    | { type: "continueReveal" }
-    | { type: "replay" };
+    | { type: "continueReveal" };
 
 function nextStep(state: Class2State): Class2State {
     const finished = state.stepIndex + 1 === LESSON_STEPS.length;
@@ -126,7 +124,6 @@ function addHint(state: Class2State): Class2State {
 export function class2Reducer(state: Class2State, action: Class2Action): Class2State {
     if (action.type === "advance") return state.phase === "transition" ? nextStep(state) : state;
     if (action.type === "continueReveal") return state.phase === "reveal" ? nextStep(state) : state;
-    if (action.type === "replay") return state.phase === "reveal" ? { ...state, replayKey: state.replayKey + 1 } : state;
     if (state.phase !== "question") return state;
     if (action.type === "hint") return addHint(state);
     const step = LESSON_STEPS[state.stepIndex];
@@ -147,30 +144,32 @@ export function class2Reducer(state: Class2State, action: Class2Action): Class2S
 export const repeatedAddition = (step: LessonStep) => Array.from({ length: step.rows }, () => step.size).join(" + ");
 export const multiplication = (step: LessonStep) => `${step.rows} × ${step.size}`;
 
+export const usesRowCountingHint = (step: LessonStep) => step.size === 3 || step.id === "four-expression";
+
 /** Target rows never change when a hint focuses just one of them. */
 export function lessonCubeProps(step: LessonStep, state: Class2State): RubiksCubeProps {
     const { hintLevel, phase } = state;
     const reveal = phase === "reveal";
     const striped = step.striped !== false || hintLevel > 0;
-    const focusOneRow = !reveal && ((step.kind === "rowSize" && hintLevel < 3) ||
-        (hintLevel === 1 && step.kind !== "rowCount"));
-    const shownRows = focusOneRow ? 1 : step.rows;
-    const outlinedRows = step.rows < step.size ? step.rows : shownRows;
+    const targetRows = step.kind === "rowSize" ? 1 : step.rows;
+    const focusOneRow = !reveal && ((step.kind === "rowSize") ||
+        (hintLevel === 1 && usesRowCountingHint(step) && step.kind !== "rowCount"));
+    const shownRows = focusOneRow ? 1 : targetRows;
     const regions: HighlightRegion[] = Array.from({ length: shownRows }, (_, index) => ({ type: "row", index }));
-    const showLabels = reveal || hintLevel >= 2;
+    const showLabels = reveal || hintLevel >= (usesRowCountingHint(step) ? 2 : 1);
     return {
         size: step.size, returnToDefault: true, homeRotation: { x: -12, y: 18 },
-        focusRequest: `${step.id}-${hintLevel}-${reveal ? state.replayKey + 1 : 0}`,
-        hintAnimationKey: `${step.id}-${hintLevel}-${reveal ? state.replayKey + 1 : 0}`,
-        faceAppearances: coloredRows(step.size, step.rows, striped),
+        focusRequest: `${step.id}-${hintLevel}-${reveal ? 1 : 0}`,
+        hintAnimationKey: `${step.id}-${hintLevel}-${reveal ? 1 : 0}`,
+        faceAppearances: coloredRows(step.size, targetRows, striped),
         rowGuides: {
-            front: striped && (hintLevel > 0 || reveal) ? Array.from({ length: outlinedRows }, (_, row) => ({
-                row, label: showLabels ? String(step.kind === "rowCount" ? row + 1 : step.size) : undefined,
+            front: striped && (hintLevel > 0 || reveal) ? Array.from({ length: shownRows }, (_, row) => ({
+                row, glow: true, label: showLabels ? String(step.kind === "rowCount" ? row + 1 : step.size) : undefined,
             })) : [],
         },
-        // Outlines and colors carry the grouping; reserve glowing highlights for help.
-        highlightRegion: focusOneRow || hintLevel > 0 || reveal ? regions : null,
-        dimInactive: focusOneRow,
+        // Keep the question’s target mask independent of hint focus.
+        highlightRegion: focusOneRow ? regions : null,
+        dimInactive: false,
         showIndices: (focusOneRow && hintLevel >= 1) || (step.kind === "rowSize" && hintLevel >= 2),
         showCounting: (focusOneRow && hintLevel >= 1) || (step.kind === "rowSize" && hintLevel >= 2),
         animatePattern: step.id === "one-row" && hintLevel === 0,
@@ -183,9 +182,10 @@ export function lessonHint(step: LessonStep, level: number): string {
         ? "Conte os quadradinhos da linha destacada."
         : `Conte: 1, 2, 3. Cada linha tem ${step.size} quadradinhos.`;
     if (step.kind === "rowCount") return level === 1
-        ? "Cada faixa contornada é uma linha. Conte de cima para baixo."
+        ? "Cada faixa iluminada é uma linha. Conte de cima para baixo."
         : "Os números ao lado contam as linhas: 1, 2, 3.";
-    if (level === 1) return "Comece contando os quadradinhos de uma linha.";
+    if (level === 1 && usesRowCountingHint(step)) return "Comece contando os quadradinhos de uma linha.";
     if (step.kind === "addition") return "Cada linha entra na soma uma vez. Ligue uma parcela a cada linha.";
+    if (level >= 3 && step.kind === "multiplication") return `${step.rows} conta as linhas; ${step.size} conta os quadradinhos em cada linha: ${multiplication(step)}.`;
     return `São ${step.rows} linhas com ${step.size} quadradinhos em cada uma.`;
 }

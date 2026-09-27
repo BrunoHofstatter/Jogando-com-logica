@@ -221,12 +221,14 @@
 }
 
 .fallingBox.paused {
-    background: #bae6fd;
-    border-color: #013873;
-    color: #ffffff;
-    box-shadow: 0 1vw 0 #013873;
+    background: #ffe874;
+    border-color: #a16207;
+    color: #fff7c2;
+    box-shadow: 0 1vw 0 #a16207;
     transform: translateX(-50%) scale(1.15) translateY(-0.2vw);
     z-index: 50;
+    -webkit-text-stroke: 0.15vw #713f12;
+    text-shadow: 0 0.2vw 0 #713f12;
 }
 
 .fallingBox.shake {
@@ -411,7 +413,9 @@
 
     .fallingBox.paused {
         transform: translateY(-50%) scale(1.15);
-        box-shadow: 0 1.5vw 0 #013873;
+        box-shadow: 0 1.5vw 0 #a16207;
+        -webkit-text-stroke: 0.25vw #713f12;
+        text-shadow: 0 0.3vw 0 #713f12;
     }
 
     .fallingBox.shake {
@@ -497,8 +501,19 @@
 .matchProgress { display: inline-block; margin-top: 1dvh; font-size: 1.7vw; color: #013873; }
 .reviewFeedback { position: absolute; top: 20dvh; left: 26vw; width: 48vw; text-align: center; color: #713f12; font-size: 1.5vw; z-index: 8; pointer-events: none; animation: reviewFeedbackFade 3s linear both; }
 @keyframes reviewFeedbackFade { 0%, 75% { opacity: 1; } 100% { opacity: 0; } }
-.readyCube { outline: 0.15vw dashed #0284c7; outline-offset: 1vw; }
-.finishedSlot { width: 10vw; text-align: center; font-size: 4vw; color: #15803d; }
+.cubePulseTarget {
+    animation: readyCubePulse 1.8s ease-in-out infinite;
+    transform-origin: center;
+    will-change: transform;
+}
+@keyframes readyCubePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+}
+.finishedSlot { width: 10vw; display: grid; place-items: center; color: #15803d; }
+.emptySlot { width: 10vw; height: 10vw; }
+.finishedSlot svg { width: 5vw; height: 5vw; stroke-width: 4; filter: drop-shadow(0 0.25vw 0 #86efac); animation: finishedPop 0.35s ease-out both; }
+@keyframes finishedPop { from { transform: scale(0); } 70% { transform: scale(1.2); } to { transform: scale(1); } }
 .cubeWrapper:focus-visible, .fallingBox:focus-visible, .modalButton:focus-visible { outline: 0.3vw solid #a855f7; outline-offset: 0.5vw; }
 .fallingArea { top: 23dvh; bottom: 2dvh; height: auto; }
 
@@ -530,74 +545,90 @@
 }
 .introCard h1 { font-size: min(3.5vw, 5dvh); margin: 0; color: #013873; }
 .introCard p { font-size: min(1.8vw, 3dvh); margin: 0; max-width: 70vw; line-height: 1.3; text-align: center; color: #013873; -webkit-text-stroke: 0; text-shadow: none; }
+.demo h2 strong { color: #6b21a8; -webkit-text-stroke: 0; text-shadow: none; }
 .introCard .introNote { font-size: min(1.5vw, 2.5dvh); }
 .introCard .modalButton { margin-top: auto; }
 .demo {
     position: relative;
     display: grid;
-    grid-template-columns: 1fr 1.4fr 1fr;
+    grid-template-columns: 1fr 1fr 1.35fr;
     align-items: center;
     width: 100%;
     flex: 1 0 27dvh;
     min-height: 27dvh;
 }
-.demoCalculation { display: flex; flex-direction: column; align-items: center; font-size: min(2vw, 3.5dvh); line-height: 1.2; }
-.demoCalculation strong { color: #15803d; -webkit-text-stroke: 0; text-shadow: none; font-size: min(3vw, 4.5dvh); margin-top: 1dvh; }
-.demoCube { position: relative; display: flex; flex-direction: column; align-items: center; gap: 3dvh; }
-.demoCube small, .demoLane small { font-size: min(1.4vw, 2.2dvh); color: #013873; }
-.demoCube small { position: absolute; top: calc(100% + 4dvh); white-space: nowrap; }
+.demo h2 { position: absolute; top: 0; left: 5%; right: 5%; margin: 0; color: #013873; font-family: inherit; font-size: min(1.45vw, 2.4dvh); font-weight: 400; line-height: 1.15; -webkit-text-stroke: 0; text-shadow: none; }
+.demo h2 > b { color: #0284c7; }
+.demo h2 strong { font-size: inherit; margin: 0; -webkit-text-stroke: 0; text-shadow: none; }
+.demoCalculation { position: relative; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding-top: 3dvh; box-sizing: border-box; font-size: min(2vw, 3.5dvh); line-height: 1.2; }
+.demoCalculation .demoResult { color: #15803d; -webkit-text-stroke: 0; text-shadow: none; font-size: min(3vw, 4.5dvh); margin-top: 1dvh; }
+.demoCube { position: relative; height: 100%; display: flex; align-items: center; justify-content: center; padding-top: 3dvh; box-sizing: border-box; }
+.demoCubeTarget { animation: demoCubeInvite 12s ease-in-out infinite; }
 .demoLane { position: relative; height: 100%; }
-.demoLane small { position: absolute; bottom: 0; left: 0; width: 100%; }
 .demoNumber {
     position: absolute;
-    top: calc(4% + var(--demo-index) * 25%);
-    left: 35%;
+    left: 50%;
     width: 4vw;
     padding: 0.3vw;
     border: 0.25vw solid #013873;
     border-radius: 0.7vw;
     background: #98defc;
     font-size: min(2.4vw, 4dvh);
+    transform: translateX(-50%);
     animation: demoFall 12s linear infinite;
 }
+.demoNumber[data-value="9"] { top: 24%; left: 22%; }
+.demoNumber[data-value="6"] { top: 60%; left: 48%; }
+.demoNumber[data-value="12"] { top: 31%; left: 76%; }
 .demoCorrect { animation: demoTargetFall 12s linear infinite, demoSelect 12s step-end infinite; }
-.demoPointer { position: absolute; top: calc(29% + 2dvh + 1vw); left: 84%; width: 3.5vw; height: 3.5vw; color: #6b21a8; fill: #fff; stroke-width: 2.5; pointer-events: none; z-index: 6; animation: demoClick 12s linear infinite; }
-.demoArrow { position: absolute; top: 30%; left: 69%; color: #6b21a8; font-size: 4vw; pointer-events: none; }
-.demoSuccess { position: absolute; right: 15%; top: 0; color: #15803d; background: #dcfce7; border-radius: 50%; padding: 0.2vw 0.6vw; font-size: 2.5vw; opacity: 0; animation: demoMatched 12s step-end infinite; pointer-events: none; }
+.demoPointer { position: absolute; top: 65.2%; left: 43.5%; width: 3.5vw; height: 3.5vw; color: #6b21a8; fill: #fff; stroke-width: 2.3; pointer-events: none; z-index: 6; filter: drop-shadow(0 0.25vw 0.15vw #01387388); animation: demoClick 12s linear infinite; }
+.demoArrow { position: absolute; top: 48%; left: 62%; color: #6b21a8; font-size: 4vw; pointer-events: none; }
+.demoSuccess { position: absolute; right: 7%; top: 14%; width: 3.4vw; height: 3.4vw; display: grid; place-items: center; color: #15803d; background: #dcfce7; border: 0.25vw solid #16a34a; border-radius: 50%; opacity: 0; animation: demoMatched 12s step-end infinite; pointer-events: none; }
+.demoSuccess svg { width: 2.5vw; height: 2.5vw; stroke-width: 4; }
 /* Two slow falls, two clicks, then four seconds holding the successful match. */
 @keyframes demoFall {
-    0%, 33.34% { transform: translateY(-2dvh); }
-    33.33%, 66.666%, 100% { transform: translateY(2dvh); }
+    0% { transform: translateX(-50%) translateY(-2dvh); }
+    18% { transform: translateX(-50%) translateY(2dvh); }
+    19% { transform: translateX(-50%) translateY(-2dvh); }
+    37%, 100% { transform: translateX(-50%) translateY(2dvh); }
 }
-@keyframes demoTargetFall { 0% { transform: translateY(-2dvh); } 25%, 100% { transform: translateY(2dvh); } }
+@keyframes demoTargetFall { 0% { transform: translateX(-50%) translateY(-2dvh); } 25%, 100% { transform: translateX(-50%) translateY(2dvh); } }
 @keyframes demoSelect { 0% { background: #98defc; } 29%, 100% { background: #ffe874; } }
 @keyframes demoClick {
-    0% { left: 94%; top: 24%; opacity: 0; transform: translateX(-35%) scale(1); }
+    0% { left: 43.5%; top: 65.2%; opacity: 0; transform: translateX(-35%) scale(1); }
     15% { opacity: 1; }
-    25%, 32% { left: 84%; top: calc(29% + 2dvh + 1vw); opacity: 1; transform: translateX(-35%) scale(1); }
-    29% { left: 84%; top: calc(29% + 2dvh + 1vw); transform: translateX(-35%) scale(0.75); }
-    62%, 66.666%, 100% { left: 50%; top: 44%; opacity: 1; transform: translateX(-35%) scale(1); }
-    65% { left: 50%; top: 44%; opacity: 1; transform: translateX(-35%) scale(0.75); }
+    25%, 32% { left: 43.5%; top: 65.2%; opacity: 1; transform: translateX(-35%) scale(1); }
+    29% { left: 43.5%; top: 65.2%; transform: translateX(-35%) scale(0.75); }
+    62%, 66.666%, 100% { left: 80%; top: 49%; opacity: 1; transform: translateX(-35%) scale(1); }
+    65% { left: 80%; top: 49%; opacity: 1; transform: translateX(-35%) scale(0.75); }
 }
 @keyframes demoMatched { 0% { opacity: 0; } 66.666%, 100% { opacity: 1; } }
+@keyframes demoCubeInvite {
+    0%, 33%, 40%, 47%, 54%, 61%, 66.666%, 100% { transform: scale(1); }
+    36.5%, 43.5%, 50.5%, 57.5%, 64% { transform: scale(1.1); }
+}
 
 @media (max-width: 650px) and (orientation: portrait) {
     .matchProgress { font-size: 3.5vw; }
     .reviewFeedback { top: 40dvh; left: 5vw; width: 90vw; font-size: 3.5vw; }
     .fallingArea { top: 43dvh; bottom: 25dvh; left: 0; right: 0; }
-    .finishedSlot { width: 15vw; font-size: 8vw; }
+    .finishedSlot { width: 15vw; }
+    .emptySlot { width: 15vw; height: 15vw; }
+    .finishedSlot svg { width: 10vw; height: 10vw; }
     .introCard { height: 85dvh; width: 92vw; border-radius: 4vw; padding: 3dvh 3vw; gap: 2dvh; }
     .introCard h1 { font-size: min(7vw, 4dvh); }
     .introCard p { font-size: min(4.3vw, 2.5dvh); max-width: 82vw; }
     .introCard .introNote { font-size: min(3.5vw, 2dvh); }
     .demo { min-height: 24dvh; flex-basis: 24dvh; }
+    .demo h2 { font-size: min(3vw, 1.8dvh); }
     .demoCalculation { font-size: min(3.8vw, 2.3dvh); }
     .demoCalculation strong { font-size: 6vw; }
     .demoCube small, .demoLane small { font-size: min(3vw, 1.8dvh); }
     .demoNumber { width: 8vw; font-size: 5vw; border-radius: 1.5vw; border-width: 0.5vw; }
     .demoPointer { width: 8vw; height: 8vw; }
     .demoArrow { font-size: 7vw; }
-    .demoSuccess { font-size: 6vw; }
+    .demoSuccess { width: 7vw; height: 7vw; border-width: 0.5vw; }
+    .demoSuccess svg { width: 5vw; height: 5vw; }
 }
 
 @media (prefers-reduced-motion: reduce) {

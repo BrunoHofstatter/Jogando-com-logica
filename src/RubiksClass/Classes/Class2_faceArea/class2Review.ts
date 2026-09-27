@@ -6,7 +6,8 @@ export const BOX_SPEED = 4.8; // Percentage of the lane per second; 60% of the p
 export const BOX_START = -12;
 export const BOX_END = 112;
 // Three naturally spaced moving cards, with room for one held card.
-export const SPAWN_INTERVAL_MS = (BOX_END - BOX_START) / BOX_SPEED / 3 * 1000;
+export const SPAWN_INTERVAL_MS = 4500;
+export const REPLENISH_DELAY_MS = 300;
 export const REVIEW_TARGETS: readonly ReviewTarget[] = [
     [3, 2], [4, 3], [5, 4], [3, 3], [2, 2],
     [4, 2], [3, 1], [6, 3], [4, 4], [2, 1],
@@ -14,6 +15,18 @@ export const REVIEW_TARGETS: readonly ReviewTarget[] = [
 // Each initial slot has one successor. In particular, only the 5×5 unlocks the 6×6.
 const DISTRACTORS = [7, 11, 14, 17, 22, 27, 35];
 export const targetTotal = (target: ReviewTarget) => target.size * target.rows;
+
+const availableTotals = (state: ReviewState) => state.targets
+    .filter((target): target is ReviewTarget => target !== null)
+    .map(targetTotal);
+
+export function needsImmediateSpawn(state: ReviewState): boolean {
+    if (state.phase !== "playing" || state.boxes.length >= MAX_BOXES) return false;
+    const totals = availableTotals(state);
+    const hasTarget = state.boxes.some(box => totals.includes(box.value));
+    const hasDistractor = state.boxes.some(box => !totals.includes(box.value));
+    return state.boxes.length < 2 || !hasTarget || (state.boxes.length < 3 && !hasDistractor);
+}
 
 export interface ReviewState {
     phase: "intro" | "playing" | "complete";
@@ -25,10 +38,12 @@ export interface ReviewState {
     mistakes: number;
     feedback: string | null;
     feedbackId: number;
+    pendingReplacement: { slot: number; target: ReviewTarget | null } | null;
 }
 export const initialReviewState = (): ReviewState => ({
     phase: "intro", targets: REVIEW_TARGETS.slice(0, 5),
     boxes: [], nextBoxId: 0, selected: null, matches: 0, mistakes: 0, feedback: null, feedbackId: 0,
+    pendingReplacement: null,
 });
 export type ReviewAction =
     | { type: "start"; mobile?: boolean }
@@ -36,6 +51,7 @@ export type ReviewAction =
     | { type: "tick"; seconds: number; mobile: boolean }
     | { type: "select"; id: number }
     | { type: "clearFeedback"; id: number }
+    | { type: "showReplacement"; slot: number }
     | { type: "match"; targetId: number };
 
 export function reviewReducer(state: ReviewState, action: ReviewAction): ReviewState {
@@ -47,13 +63,22 @@ export function reviewReducer(state: ReviewState, action: ReviewAction): ReviewS
             return { id, value, top: action.mobile ? lane : progress, left: action.mobile ? progress : lane };
         }),
     } : state;
+    if (action.type === "showReplacement") {
+        if (!state.pendingReplacement || state.pendingReplacement.slot !== action.slot) return state;
+        return {
+            ...state,
+            targets: state.targets.map((target, index) => index === action.slot ? state.pendingReplacement!.target : target),
+            pendingReplacement: null,
+        };
+    }
     if (state.phase !== "playing") return state;
     if (action.type === "clearFeedback") return state.feedbackId === action.id ? { ...state, feedback: null } : state;
     if (action.type === "spawn") {
         if (state.boxes.length >= MAX_BOXES) return state;
-        const totals = state.targets.filter((target): target is ReviewTarget => target !== null).map(targetTotal);
+        const totals = availableTotals(state);
         const hasTarget = state.boxes.some(box => totals.includes(box.value));
-        const pool = !hasTarget || action.random < 0.65 ? totals : DISTRACTORS;
+        const hasDistractor = state.boxes.some(box => !totals.includes(box.value));
+        const pool = !hasTarget ? totals : !hasDistractor ? DISTRACTORS : action.random < 0.65 ? totals : DISTRACTORS;
         const value = pool[Math.min(pool.length - 1, Math.floor(action.position * pool.length))];
         const box = { id: state.nextBoxId, value, top: action.mobile ? 20 + action.random * 50 : BOX_START, left: action.mobile ? BOX_START : 15 + action.random * 70 };
         return { ...state, boxes: [...state.boxes, box], nextBoxId: state.nextBoxId + 1 };
@@ -66,6 +91,7 @@ export function reviewReducer(state: ReviewState, action: ReviewAction): ReviewS
     }
     if (action.type === "select") return state.boxes.some(box => box.id === action.id)
         ? { ...state, selected: state.selected === action.id ? null : action.id, feedback: null } : state;
+    if (state.pendingReplacement) return state;
     const target = state.targets.find(target => target?.id === action.targetId);
     if (!target) return state;
     const box = state.boxes.find(box => box.id === state.selected);
@@ -76,12 +102,13 @@ export function reviewReducer(state: ReviewState, action: ReviewAction): ReviewS
         feedbackId: state.feedbackId + 1,
     };
     const matches = state.matches + 1;
+    const slot = state.targets.findIndex(item => item?.id === target.id);
     return {
         ...state, matches, phase: matches === MATCH_COUNT ? "complete" : "playing",
-        targets: state.targets.map(item => item?.id === target.id ? REVIEW_TARGETS[target.id + 5] ?? null : item),
+        targets: state.targets.map(item => item?.id === target.id ? null : item),
+        pendingReplacement: { slot, target: REVIEW_TARGETS[target.id + 5] ?? null },
         boxes: state.boxes.filter(item => item.id !== box.id), selected: null,
         feedback: `${target.rows} linhas × ${target.size} quadradinhos = ${targetTotal(target)}. Muito bem!`,
         feedbackId: state.feedbackId + 1,
     };
 }
-

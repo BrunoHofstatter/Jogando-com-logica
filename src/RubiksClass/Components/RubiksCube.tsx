@@ -28,6 +28,8 @@ export interface FaceAppearance extends StickerAppearance {
 
 export interface RowGuide {
   row: number;
+  /** Use a glowing white outline fitted to the row’s sticker bounds. */
+  glow?: boolean;
   label?: string;
 }
 
@@ -623,10 +625,10 @@ const RubiksCube: React.FC<RubiksCubeProps> = ({
             {Array.from({ length: stickerCount }, (_, i) =>
               renderSticker(face, i, face.name === "front")
             )}
-            {rowGuides?.[face.name]?.filter(({ row }) => row >= 0 && row < size).map(({ row, label }) => (
+            {rowGuides?.[face.name]?.filter(({ row }) => row >= 0 && row < size).map(({ row, label, glow }) => (
               <div
                 key={`${row}-${hintAnimationKey ?? ""}`}
-                className={styles.rowGuide}
+                className={`${styles.rowGuide} ${glow ? styles.rowGlow : ""}`}
                 style={{ "--row": row } as React.CSSProperties}
                 aria-hidden="true"
               >

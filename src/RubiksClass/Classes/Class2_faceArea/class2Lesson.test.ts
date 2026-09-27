@@ -12,10 +12,7 @@ describe("Class 2 lesson flow", () => {
             if (step.kind === "addition") {
                 expect(answered.phase).toBe("reveal");
                 expect(class2Reducer(answered, { type: "advance" })).toEqual(answered);
-                const replayed = class2Reducer(answered, { type: "replay" });
-                expect(replayed.stepIndex).toBe(stepIndex);
-                expect(replayed.assistanceCount).toBe(0);
-                state = class2Reducer(replayed, { type: "continueReveal" });
+                state = class2Reducer(answered, { type: "continueReveal" });
             } else {
                 expect(answered.phase).toBe("transition");
                 state = class2Reducer(answered, { type: "advance" });
@@ -100,5 +97,45 @@ describe("equal groups and partial-face targets", () => {
         const helped = lessonCubeProps(step, { ...initialLessonState(false), hintLevel: 2 });
         expect(helped.rowGuides!.front).toHaveLength(step.rows);
         expect(helped.faceAppearances!.front!.stickers!.every(sticker => sticker?.color)).toBe(true);
+    });
+});
+
+
+describe("progressive row hints", () => {
+    it("counts one row on the first 4×4 question without dimming the target", () => {
+        const step = LESSON_STEPS.find(step => step.id === "four-expression")!;
+        const props = lessonCubeProps(step, { ...initialLessonState(false), hintLevel: 1 });
+        expect(props.showCounting).toBe(true);
+        expect(props.dimInactive).toBe(false);
+        expect(props.rowGuides!.front).toHaveLength(1);
+    });
+    it.each(LESSON_STEPS.slice(5))("starts with all requested group labels in $id", step => {
+        const props = lessonCubeProps(step, { ...initialLessonState(false), hintLevel: 1 });
+        expect(props.showCounting).toBe(false);
+        expect(props.dimInactive).toBe(false);
+        expect(props.rowGuides!.front).toHaveLength(step.rows);
+        expect(props.rowGuides!.front!.every(guide => guide.glow && guide.label === String(step.size))).toBe(true);
+    });
+});
+
+
+describe("question target colors remain stable through hints", () => {
+    it.each(LESSON_STEPS)("preserves the muted sticker mask in $id", step => {
+        const initial = lessonCubeProps(step, initialLessonState(false));
+        const mask = initial.faceAppearances!.front!.stickers!.map(sticker => sticker?.muted);
+        for (const hintLevel of [1, 2, 3]) {
+            const helped = lessonCubeProps(step, { ...initialLessonState(false), hintLevel });
+            expect(helped.dimInactive).toBe(false);
+            expect(helped.faceAppearances!.front!.stickers!.map(sticker => sticker?.muted)).toEqual(mask);
+        }
+    });
+    it("keeps only the first row colored and counted in every first-question hint", () => {
+        const step = LESSON_STEPS[0];
+        for (const hintLevel of [0, 1, 2, 3]) {
+            const props = lessonCubeProps(step, { ...initialLessonState(false), hintLevel });
+            expect(props.faceAppearances!.front!.stickers!.filter(sticker => !sticker?.muted)).toHaveLength(3);
+            expect(props.highlightRegion).toEqual([{ type: "row", index: 0 }]);
+            expect(props.rowGuides!.front!.every(guide => guide.row === 0)).toBe(true);
+        }
     });
 });

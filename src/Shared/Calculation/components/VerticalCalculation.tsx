@@ -24,6 +24,7 @@ import { CalculationCell } from "./CalculationCell";
 import { CalculationKeypad } from "./CalculationKeypad";
 
 type VerticalCalculationProps = {
+  readOnly?: boolean;
   operation: CalculationOperation;
   numbers: number[];
   editableOperands?: boolean;
@@ -132,6 +133,7 @@ function getProcessCellMap(plan: CalculationPlan | null) {
 }
 
 export function VerticalCalculation({
+  readOnly = false,
   operation,
   numbers,
   editableOperands = false,
@@ -535,6 +537,7 @@ export function VerticalCalculation({
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (readOnly) return;
       if (/^\d$/.test(event.key)) {
         event.preventDefault();
         enterDigit(event.key);
@@ -680,7 +683,7 @@ export function VerticalCalculation({
   const operatorRowIndex = operandRowsForDisplay.length - 1;
 
   return (
-    <section className={clsx(styles.root, className, classNames?.root)}>
+    <section ref={node => { node?.toggleAttribute("inert", readOnly); }} aria-disabled={readOnly || undefined} className={clsx(styles.root, className, classNames?.root)}>
       <div className={clsx(styles.workspace, classNames?.workspace)}>
         <div className={clsx(styles.calculationStage, classNames?.calculationStage)}>
           <div

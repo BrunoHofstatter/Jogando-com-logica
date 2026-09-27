@@ -9,6 +9,8 @@ const OPPOSITE: Record<CubeFace, CubeFace> = {
 export const adjacent = (a: CubeFace, b: CubeFace) => a !== b && OPPOSITE[a] !== b;
 export const INITIAL_ROTATION = { x: -22, y: -28 };
 
+export const homeRotation = (config: Configuration): CubeRotation => config.size === 3 ? { x: -22, y: 28 } : INITIAL_ROTATION;
+
 export interface Configuration {
     size: number;
     color: Exclude<StickerColor, "white">;
@@ -55,7 +57,7 @@ function makeStep(configuration: number, kind: StepKind): LessonStep {
         options = [answer, `${size} × 6`, `${size} + ${size + 1}`, `${size + 1} × ${size}`, `${area} × ${size}`, `${size + 1} × ${size + 1}`];
     } else if (kind === "expression") {
         question = configuration < 2
-            ? `São ${count} faces ${faceAdjective}, com ${area} quadradinhos em cada uma. Qual multiplicação calcula o total?`
+            ? "Qual multiplicação calcula o total?"
             : `Qual multiplicação calcula todos os quadradinhos ${squareAdjective}?`;
         answer = expression(config);
         const candidates = [answer, `${count} + ${area}`, `${count} × ${size}`, `${count - 1} × ${area}`, `${count + 1} × ${area}`, `${count} × ${area + size}`, `${area} + ${size}`];
@@ -63,7 +65,7 @@ function makeStep(configuration: number, kind: StepKind): LessonStep {
     } else {
         question = `Quantos quadradinhos ${squareAdjective} há no cubo?`;
         answer = String(total);
-        options = kind === "calculation" ? [] : [...new Set([area, count, area + count, total, total + area, total - area])].map(String);
+        options = kind === "calculation" ? [] : [...new Set([area, count, area + count, total, total + area, total - area, total + 1, total - 1, total + 2])].slice(0, 6).map(String);
     }
     // Deterministic ordering avoids teaching a fixed button position.
     options = [...new Set(options)];
@@ -97,16 +99,20 @@ export type LessonAction =
     | { type: "calculationComplete"; usedHints: number }
     | { type: "advance"; stepIndex: number };
 
+function nextQuestion(state: LessonState): LessonState {
+    const next = state.stepIndex + 1;
+    return next === LESSON_STEPS.length ? { ...state, phase: "complete" }
+        : { ...state, stepIndex: next, hintLevel: 0, phase: LESSON_STEPS[next].kind === "calculation" && LESSON_STEPS[next].configuration === 2 ? "calculationIntro" : "question" };
+}
+
 export function class3Reducer(state: LessonState, action: LessonAction): LessonState {
     const step = LESSON_STEPS[state.stepIndex];
     if (action.type === "advance") {
         if (state.phase !== "transition" || action.stepIndex !== state.stepIndex) return state;
-        const next = state.stepIndex + 1;
-        return next === LESSON_STEPS.length ? { ...state, phase: "complete" }
-            : { ...state, stepIndex: next, hintLevel: 0, phase: LESSON_STEPS[next].kind === "calculation" ? "calculationIntro" : "question" };
+        return nextQuestion(state);
     }
     if (action.type === "continue") {
-        if (state.phase === "faceResult") return { ...state, phase: "transition" };
+        if (state.phase === "faceResult") return nextQuestion(state);
         if (state.phase === "calculationIntro") return { ...state, phase: "question" };
         return state;
     }
@@ -186,4 +192,11 @@ export function hintText(step: LessonStep, level: number): string {
     if (level === 1) return `Cada face tem ${config.size} linhas de ${config.size}: ${faceExpression(config)} = ${area} quadradinhos.`;
     if (level === 2) return "Conte as faces coloridas. Cada uma é um grupo com a mesma quantidade de quadradinhos.";
     return `São ${config.faces.length} grupos de ${area}. Podemos trocar a soma por ${expression(config)}.`;
+}
+
+/** Keep neighboring faces visible while the counted face remains dominant. */
+export function countingRotation(face: CubeFace, from: CubeRotation): CubeRotation {
+    if (face === "top" || face === "bottom") return { x: nearestAngle(face === "top" ? -65 : 65, from.x), y: from.y };
+    const straight = faceRotation(face, from);
+    return { x: nearestAngle(-18, from.x), y: nearestAngle(straight.y - 18, from.y) };
 }

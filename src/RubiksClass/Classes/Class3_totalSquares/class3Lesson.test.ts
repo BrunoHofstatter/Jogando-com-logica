@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { adjacent, appearanceFor, class3Reducer, closestFace, CONFIGURATIONS, FACE_ORDER, faceRotation, faceTour, initialState, LESSON_STEPS, nearestAngle, valueOfExpression } from "./class3Lesson";
+import { adjacent, appearanceFor, class3Reducer, countingRotation, closestFace, CONFIGURATIONS, FACE_ORDER, faceRotation, faceTour, initialState, LESSON_STEPS, nearestAngle, valueOfExpression } from "./class3Lesson";
 
 describe("Class 3 equal-face lesson", () => {
     it("removes scaffolding, pauses for face results, and completes exactly once", () => {
@@ -11,7 +11,7 @@ describe("Class 3 equal-face lesson", () => {
         for (const [index, step] of LESSON_STEPS.entries()) {
             expect(state.stepIndex).toBe(index);
             if (step.kind === "calculation") {
-                expect(state.phase).toBe("calculationIntro");
+                expect(state.phase).toBe(step.configuration === 2 ? "calculationIntro" : "question");
                 expect(class3Reducer(state, { type: "advance", stepIndex: index })).toEqual(state);
                 state = class3Reducer(state, { type: "continue" });
                 state = class3Reducer(state, { type: "calculationComplete", usedHints: 2 });
@@ -22,6 +22,9 @@ describe("Class 3 equal-face lesson", () => {
                     expect(state.phase).toBe("faceResult");
                     expect(class3Reducer(state, { type: "advance", stepIndex: index })).toEqual(state);
                     state = class3Reducer(state, { type: "continue" });
+                    expect(state.stepIndex).toBe(index + 1);
+                    expect(state.phase).toBe("question");
+                    continue;
                 }
             }
             expect(class3Reducer(state, { type: "advance", stepIndex: index - 1 })).toEqual(state);
@@ -33,6 +36,19 @@ describe("Class 3 equal-face lesson", () => {
         expect(class3Reducer(state, { type: "advance", stepIndex: 15 })).toEqual(state);
     });
 
+    it("provides six distinct numerical choices", () => {
+        for (const step of LESSON_STEPS.filter(step => step.kind === "total")) {
+            expect(new Set(step.options).size).toBe(6);
+            expect(step.options).toContain(step.answer);
+        }
+    });
+    it("keeps every counted surface dominant without flattening the cube", () => {
+        for (const face of FACE_ORDER) {
+            const view = countingRotation(face, { x: -22, y: -28 });
+            expect(closestFace(view)).toBe(face);
+            expect(view.x % 90).not.toBe(0);
+        }
+    });
     it("counts wrong answers separately from escalating help and ignores duplicate hints", () => {
         let state = class3Reducer(initialState, { type: "hint" });
         state = class3Reducer(state, { type: "guess", answer: "wrong" });

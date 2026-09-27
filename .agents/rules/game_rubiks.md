@@ -156,7 +156,7 @@ The lesson has 13 questions and one child-paced concept reveal. Its progression 
 
 1. 3×3: count squares in one row, then count rows.
 2. Choose repeated addition with a visual preview matching terms to rows.
-3. Reveal `3 + 3 + 3` as `3 × 3`, with labeled factors, `Continuar`, and replay.
+3. Reveal `3 + 3 + 3` as `3 × 3`, with labeled factors, `Continuar`.
 4. Ask for the 3×3 face total (9), without giving that total in the reveal.
 5. 4×4: choose the full-face multiplication, then its total (16).
 6. On that same 4×4, highlight only two rows: choose `2 × 4`, then answer 8.
@@ -178,7 +178,7 @@ The first factor consistently means number of rows; the second means squares per
 row. Equivalent products are not offered as incorrect distractors. On the repeated
 addition question, selecting an option first previews one addition term beside
 each visual row; the student then confirms the choice. A correct answer opens the
-intentional reveal `3 + 3 + 3` → `3 × 3`, with factor labels, a replay action, and
+intentional reveal `3 + 3 + 3` → `3 × 3`, with factor labels and
 a child-controlled `Continuar` action. Other correct answers use a brief 1.2-second
 transition before advancing.
 
@@ -186,12 +186,12 @@ transition before advancing.
 
 - The `Dica` button offers visual help immediately; each wrong answer also advances the visual help by one level.
 - There are at most three hint levels. After 45 foreground seconds without help, the button is emphasized; time alone is not counted as an error.
-- The first level usually isolates one row. Later levels label the equal groups and connect them to repeated addition and multiplication.
-- Outlines, labels, and a short staggered row pulse are reserved for hints and reveals.
-- The final support shows running totals by row. Excluded rows stay muted through every hint.
-- Sticker counts and outside row labels animate in sequence; row hints gradually restore color.
+- Individual-square counting remains in the introduction and first 4×4 question. From the second 4×4 question onward, hint 1 labels all requested groups, hint 2 connects addition to multiplication, and hint 3 shows the total or explains the factors for calculation-choice questions.
+- Hints and reveals use staggered glowing white outlines fitted directly to each row’s sticker bounds, with no filled glow inside the row.
+- Final total support shows the completed multiplication. Excluded rows stay muted through every hint.
+- Sticker counts and outside row labels animate in sequence. Hints preserve the question’s original muted-sticker mask: the first question keeps only its top row colored, while counting a row never dims other requested rows.
 - Row-count and row-size questions use counting cues appropriate to their specific question, including sticker indices when needed.
-- Hint text appears above the cube, replacing the old cube heading.
+- Hint text appears above the cube. The cube uses Class 3’s downward offset (3dvh desktop, 1.5dvh portrait mobile). Correct answers show only `Correto!` in a top-center overlay for 1.2 seconds. The concept reveal plays once and offers only `Continuar`.
 - Sum selections retain a colored border and shadow until changed or submitted.
 - The smaller `Aulas` button stays at the bottom-left; the lightbulb hint control stays at the bottom-right.
 - Help usage and incorrect answers are separate counters. The review receives only actual incorrect answers as its lesson-error count.
@@ -203,17 +203,18 @@ later modules can reuse it for selected faces and other educational patterns.
 
 ### Current Summary / Review Activity
 
-The review starts with a large animated introduction: a 3×3 cube with two colored
-rows, a labeled `2 × 3 = 6` calculation, three moving number cards, and a pointer
-showing number-then-cube selection. The overlay occupies 85% of the viewport height.
-Its 12-second loop slowly moves the cards, clicks the correct total, then clicks
-the cube; only then does the checkmark appear, holding for four seconds. `Jogar`
-starts play, so no cards move or spawn behind the introduction.
+The review starts with a large animated introduction. Three labeled columns show
+the sequence directly: count the colored squares with `2 × 3 = 6`, choose the correct total
+from a scattered number lane, and touch the corresponding 3×3 cube. The animation
+reuses Class 3's solid hand cursor, turns the selected 6 yellow, then pulses and
+clicks the cube; only then does the larger checkmark appear. The overlay occupies
+85% of the viewport height. `Jogar` starts play, so no cards move or spawn behind it.
 
 Five cubes are shown at once, mixing full and partial faces. The player selects a
 moving total, then a cube with that many colored stickers. Dragging a cube rotates
 it without submitting a match. Correct matches display the calculation and replace
-the cube with its slot's second target. The game ends after ten matches; each slot
+the cube with its slot's second target after leaving the slot blank for 0.5 seconds.
+The same delay precedes a completed-slot checkmark. The game ends after ten matches; each slot
 empties after its second match. Different groups with the same total can both accept
 that total. Wrong matches keep the target available for another attempt. Expressions
 appear in feedback rather than on falling cards.
@@ -223,9 +224,12 @@ The 6×6 always replaces the 5×5 in the same slot, so they never coexist. Slot 
 (rows × squares per row) are: 2×3 → 2×4, 3×4 → 1×3, 4×5 → 3×6,
 3×3 → 4×4, and 2×2 → 1×2.
 
-Cards travel at 4.8% of the lane per second, 60% of the previous speed, with roughly
-8.6 seconds between spawns and a four-card safety cap. Initial cards are staggered
-along the lane. Feedback moves below the main instruction and fades after three seconds.
+Cards travel at 4.8% of the lane per second, with 4.5 seconds between regular spawns
+and a four-card safety cap. A 300ms replenishment keeps at least two choices visible
+and restores a valid total or distractor when either is missing. Initial cards are
+staggered along the lane. A selected card turns yellow with light text and a dark
+text outline, and all available cubes pulse until the player chooses one. Completed slots use a larger, thicker
+checkmark. Feedback moves below the main instruction and fades after three seconds.
 
 ## Module 3 - Multiplicação nas Faces
 
@@ -255,8 +259,9 @@ Seven configurations provide 16 questions and five numerical totals:
 
 One-face expression answers reveal the per-face quantity with a child-paced
 `Continuar`, without another numerical question. Expressions keep faces first;
-before written work, a child-paced explanation connects `4 × 16 = 16 × 4`
-(and later equivalent products) to the reused vertical calculation component.
+before the first written calculation only, a child-paced explanation connects
+`4 × 16 = 16 × 4` to the reused vertical calculation component. Later calculations
+open directly. Continue after a face result advances directly without success feedback.
 Equivalent-valued distractors are excluded. Ordinary successes advance after
 1.2 seconds. The final lesson question completes the activity.
 
@@ -265,10 +270,19 @@ Equivalent-valued distractors are excluded. Ordinary successes advance after
 - All selected faces in a configuration share its target color; other faces stay
   gray, including during hints. Colors vary across blue, red, green, orange, and
   yellow. White is never a target.
-- A brief hand-drag cue introduces rotation. Later cues also demonstrate vertical
-  movement for bottom inspection. Dragging interrupts the cue and retains the
-  child's angle. Arrow controls offer an alternative to dragging. Class 3 does
-  not resume ambient auto-spin or inertia after inspection.
+- A brief hand-drag animation introduces rotation on the first face-count question.
+  Its tooltip appears above the cube only while the hand and cube are demonstrating
+  the gesture. One animation clock drives all three. Dragging immediately dismisses
+  the whole cue for that question and retains the child's angle.
+- The horizontal cue is offered again on the first four-face question only if the
+  child has not yet rotated a cube. The first bottom-face configuration introduces
+  a vertical gesture. Other questions do not show a cue. At most two demonstrations
+  run, separated by a quiet gap with no tooltip. Keyboard arrows also rotate the
+  focused cube; there are no persistent on-screen rotation buttons or caption.
+- Class 3 composes the restored Class 2 lesson styles: larger question title,
+  hint card above the cube, bottom-left `Aulas`, bottom-right lightbulb hint dock,
+  matching answer buttons and staggered multiplication groups. There is no cube
+  heading or question-number label. It does not resume ambient auto-spin or inertia.
 - `Dica` is immediately available; incorrect answers also advance support up to
   three levels. After 45 foreground seconds without help, the button is emphasized.
   Inactivity does not count as an error.
@@ -276,8 +290,17 @@ Equivalent-valued distractors are excluded. Ordinary successes advance after
   if needed. Only newly visited selected faces increment the count. The route
   includes the bottom, avoids opposite-face jumps and unnecessary half-turns,
   and keeps top/bottom count labels upright. Tours can be stopped or replayed.
-- Reduced-motion users receive child-paced `Próxima face` views and no animated
-  drag demonstration. Selected faces remain inspectable through manual controls.
+- Face-counting tours run automatically, including under reduced motion (slower
+  movement). They retain a shallow 3D angle, finish by themselves, restore dragging,
+  and offer `Contar novamente`. Row/square hints can still use a face-on view.
+- The opaque hand cue plays twice if untouched in either motion setting; reduced
+  motion only reduces its travel. Every new question resets the cube to its home
+  view. The 3×3 home view exposes the gray left face.
+- Early multiplication prompts separate the two given quantities from the question.
+  Numerical multiple-choice totals always have six distinct options.
+- Completed written calculations remain mounted, visible, and read-only during
+  success feedback. A fixed top-center green `Correto!` overlay replaces inline
+  explanations, so the title and calculation do not jump.
 - One-face hints reuse front-face row guides. Later hints connect equal faces to
   repeated addition, labeled multiplication factors, and small running totals.
   There is no compulsory repeated-addition concept lesson.
@@ -465,3 +488,6 @@ The best way to keep it maintainable is to document each module with the same ba
 - How much direct explanation should ever be shown before the student interacts?
 - Should later modules stay focused only on Rubik's Cubes, or fully expand into other twisty puzzles when that helps the concept?
 - Should future review modes start tracking performance more formally, or stay light and playful?
+
+Class 3 visual refinement (2026-09-16): cube and counting controls sit slightly
+lower, and face-count labels are enlarged independently of sticker counts.

@@ -429,3 +429,21 @@
 @media (prefers-reduced-motion: reduce) {
     .sumTerm, .revealEquation, .runningTotals span, .hintCard, .successCard { animation: none; }
 }
+
+/* Match Class 3's lesson placement and transient success overlay. */
+.cubeStage { transform: translateY(3dvh); }
+.successOverlay {
+    position: fixed;
+    top: 3dvh;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    pointer-events: none;
+    animation: none;
+    margin: 0;
+    font-size: min(2.4vw, 4dvh);
+}
+@media (max-width: 650px) and (orientation: portrait) {
+    .cubeStage { transform: translateY(1.5dvh); }
+    .successOverlay { font-size: min(5vw, 3dvh); padding: 1.5vw 4vw; }
+}

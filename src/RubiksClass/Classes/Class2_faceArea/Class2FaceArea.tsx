@@ -69,12 +69,14 @@ const Class2FaceArea: React.FC = () => {
                 Aulas
             </button>
 
+            {isTransition && <div role="status" aria-live="polite" className={`${styles.successCard} ${styles.successOverlay}`}>Correto!</div>}
+
             {/* --- Left panel: Cube visualization --- */}
             <div className={styles.leftPanel}>
                 <div className={styles.headerOverlay}>
                     {showHint && <div role="status" aria-live="polite" className={styles.hintCard} key={state.hintLevel}>{feedbackText}</div>}
                 </div>
-                <div role="group" aria-label={`Face com ${currentStep.size} linhas de ${currentStep.size} quadradinhos${currentStep.rows < currentStep.size ? `; ${currentStep.rows} linhas destacadas` : ""}.`}>
+                <div className={styles.cubeStage} role="group" aria-label={`Face com ${currentStep.size} linhas de ${currentStep.size} quadradinhos${currentStep.rows < currentStep.size ? `; ${currentStep.rows} linhas destacadas` : ""}.`}>
                     <RubiksCube {...cubeProps} cubeSize={mobile ? 33 : 22} />
                 </div>
             </div>
@@ -86,13 +88,10 @@ const Class2FaceArea: React.FC = () => {
                     {isReveal ? "Uma soma pode virar multiplicação!" : currentStep.question}
                 </h1>
 
-                {isTransition && <div role="status" aria-live="polite" className={styles.successCard}>
-                    {currentStep.kind === "total"
-                        ? `Correto! ${multiplication(currentStep)} = ${currentStep.answer}.` : "Correto!"}
-                </div>}
+
 
                 {showGrouping && (
-                    <div className={styles.grouping} key={`${currentStep.id}-${state.replayKey}`}>
+                    <div className={styles.grouping} key={currentStep.id}>
                         <div className={styles.sumStrip} aria-label={repeatedAddition(currentStep)}>
                             {Array.from({ length: currentStep.rows }, (_, row) => (
                                 <React.Fragment key={row}>
@@ -106,13 +105,9 @@ const Class2FaceArea: React.FC = () => {
                             <b>×</b>
                             <span><strong>{currentStep.size}</strong><small>quadradinhos<br />por linha</small></span>
                         </div>
-                        {state.hintLevel >= 3 && !isReveal && (
-                            <div className={styles.runningTotals} aria-label="Somando uma linha de cada vez">
-                                {Array.from({ length: currentStep.rows }, (_, row) => (
-                                    <span key={row} style={{ "--term": row } as React.CSSProperties}>
-                                        {row > 0 ? " → " : ""}{(row + 1) * currentStep.size}
-                                    </span>
-                                ))}
+                        {state.hintLevel >= 3 && !isReveal && currentStep.kind === "total" && (
+                            <div className={styles.runningTotals}>
+                                {multiplication(currentStep)} = {currentStep.rows * currentStep.size}
                             </div>
                         )}
                     </div>
@@ -121,7 +116,6 @@ const Class2FaceArea: React.FC = () => {
                 {isReveal ? (
                     <div className={styles.lessonActions}>
                         <button className={`${styles.optionButton} ${styles.continueButton}`} onClick={() => dispatch({ type: "continueReveal" })}>Continuar</button>
-                        <button className={styles.hintButton} onClick={() => dispatch({ type: "replay" })}>Ver de novo</button>
                     </div>
                 ) : <>
                 <div className={`${styles.optionsGrid} ${isAddition ? styles.additionOptions : ""}`}>
