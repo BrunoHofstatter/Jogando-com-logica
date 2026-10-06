@@ -16,6 +16,7 @@ function RegrasPage() {
         <h2>Como jogar</h2><p>Este é um jogo online para duas pessoas. Uma vê a bomba e interage com os desafios. A outra vê o manual e explica as pistas.</p>
         <h3>Trabalhem em equipe</h3><p>Conversem em voz alta: nenhuma das duas telas mostra todas as informações necessárias.</p>
         <h3>Corações e tempo</h3><p>A equipe começa o Nível 1 com três corações e três minutos. Uma resposta errada remove um coração. A partida termina se o tempo ou os corações acabarem.</p>
+        <h3>Envio automático</h3><p>No Código, a resposta é enviada após dois segundos sem digitar. Nos Operadores, a escolha é enviada após dois segundos. Abrir o seletor novamente pausa o envio até você escolher ou fechar o seletor.</p>
       </div></div></div>}
     </div>
   </div>;

@@ -1,18 +1,26 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import { useLessonEntry } from "../../Testing/entryContext";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Lightbulb } from "lucide-react";
+import { useCubeMobileLayout } from "../../Components/useCubeMobileLayout";
 import { useLocation, useNavigate } from "react-router-dom";
 import RubiksCube from "../../Components/RubiksCube";
 import { useClass2 } from "./useClass2";
 import { multiplication, repeatedAddition, rowColors } from "./class2Lesson";
 import Class2SummaryView from "./Class2SummaryView";
 import styles from "./Class2FaceArea.module.css";
+import { LessonSuccess } from "../../Components/LessonSuccess";
+import { TemporaryFeedback } from "../../Components/TemporaryFeedback";
 import { ROUTES } from "../../../routes";
 import { useGameAttemptAnalytics } from "../../../analytics/useGameAttemptAnalytics";
 
 
 const Class2FaceArea: React.FC = () => {
+    const { isCheckpoint } = useLessonEntry();
+    const mobile = useCubeMobileLayout();
     const { cubeProps, state, currentStep, feedbackText, offerHelp, dispatch } = useClass2();
     const navigate = useNavigate();
     const location = useLocation();
+    const [reviewRound, setReviewRound] = useState(0);
     const isReview =
         location.state?.mode === "game" ||
         new URLSearchParams(location.search).get("mode") === "game";
@@ -22,30 +30,33 @@ const Class2FaceArea: React.FC = () => {
         usageContext: "standard" as const,
         playerSlotCount: 1,
         levelId: "class_02",
-        activityVariant: isReview ? "review" as const : "lesson" as const,
-    }), [isReview]);
-    const { completeAttempt, startAttempt } = useGameAttemptAnalytics(analyticsContext);
+        activityVariant: isReview || reviewRound > 0 ? "review" as const : "lesson" as const,
+    }), [isReview, reviewRound]);
+    const { completeAttempt, startAttempt } = useGameAttemptAnalytics(isCheckpoint ? null : analyticsContext);
 
     useEffect(() => {
-        startAttempt();
-    }, [startAttempt]);
+        if (!isReview) startAttempt();
+    }, [startAttempt, isReview]);
 
     const handleSummaryComplete = useCallback((summaryMistakes: number) => {
         return completeAttempt({
-            assistanceCount: state.assistanceCount,
-            incorrectCount: state.incorrectCount + summaryMistakes,
+            assistanceCount: reviewRound ? 0 : state.assistanceCount,
+            incorrectCount: (reviewRound ? 0 : state.incorrectCount) + summaryMistakes,
             outcome: "completed",
             success: true,
         });
-    }, [completeAttempt, state.assistanceCount, state.incorrectCount]);
+    }, [completeAttempt, state.assistanceCount, state.incorrectCount, reviewRound]);
 
 
     // --- Summary phase ---
     if (state.phase === "summary") {
         return (
-            <Class2SummaryView
-                totalFlags={state.incorrectCount}
+            <Class2SummaryView key={reviewRound}
+                totalFlags={isReview || reviewRound ? undefined : state.incorrectCount}
+                lessonHints={reviewRound ? 0 : state.assistanceCount}
+                onReplay={() => setReviewRound(round => round + 1)}
                 onComplete={handleSummaryComplete}
+                onStart={startAttempt}
             />
         );
     }
@@ -65,47 +76,27 @@ const Class2FaceArea: React.FC = () => {
                 Aulas
             </button>
 
-            {/* --- Feedback Overlay (Abs positioned at top center) --- */}
-            <div className={styles.feedbackOverlay} role="status" aria-live="polite">
-                {showHint && (
-                    <div className={styles.hintCard} key={state.hintLevel}>
-                        <span className={styles.hintIcon}>💡</span>
-                        {feedbackText}
-                    </div>
-                )}
-
-                {isTransition && (
-                    <div
-                        className={styles.successCard}
-                    >
-                        <span className={styles.hintIcon}>✅</span>
-                        {currentStep.kind === "total"
-                            ? `Correto! ${multiplication(currentStep)} = ${currentStep.answer}.`
-                            : "Correto!"}
-                    </div>
-                )}
-            </div>
+            {isTransition && <LessonSuccess />}
 
             {/* --- Left panel: Cube visualization --- */}
             <div className={styles.leftPanel}>
                 <div className={styles.headerOverlay}>
-                    <div className={styles.cubeTitle}>
-                        {currentStep.rows < currentStep.size ? "Só as linhas destacadas" : "Uma face do cubo"}
-                    </div>
+                    {showHint && <div role="status" aria-live="polite" className={styles.hintCard} key={state.hintLevel}>{feedbackText}</div>}
                 </div>
-                <div role="img" aria-label={`Face com ${currentStep.size} linhas de ${currentStep.size} quadradinhos${currentStep.rows < currentStep.size ? `; ${currentStep.rows} linhas destacadas` : ""}.`}>
-                    <RubiksCube {...cubeProps} cubeSize={window.matchMedia("(max-width: 650px) and (orientation: portrait)").matches ? 33 : 22} />
+                <div className={styles.cubeStage} role="group" aria-label={`Face com ${currentStep.size} linhas de ${currentStep.size} quadradinhos${currentStep.rows < currentStep.size ? `; ${currentStep.rows} linhas destacadas` : ""}.`}>
+                    <RubiksCube {...cubeProps} cubeSize={mobile ? 33 : 22} />
                 </div>
             </div>
 
             {/* --- Right panel: Interaction --- */}
             <div className={styles.rightPanel}>
+              <div className={styles.lessonContent}>
                 <h1 className={styles.title} aria-live="polite">
                     {isReveal ? "Uma soma pode virar multiplicação!" : currentStep.question}
                 </h1>
-
+                {state.incorrectAnswer !== null && <TemporaryFeedback key={state.incorrectCount} message="Ainda não! Tente outra resposta." />}
                 {showGrouping && (
-                    <div className={styles.grouping} key={`${currentStep.id}-${state.replayKey}`}>
+                    <div className={styles.grouping} key={currentStep.id}>
                         <div className={styles.sumStrip} aria-label={repeatedAddition(currentStep)}>
                             {Array.from({ length: currentStep.rows }, (_, row) => (
                                 <React.Fragment key={row}>
@@ -119,13 +110,9 @@ const Class2FaceArea: React.FC = () => {
                             <b>×</b>
                             <span><strong>{currentStep.size}</strong><small>quadradinhos<br />por linha</small></span>
                         </div>
-                        {state.hintLevel >= 3 && !isReveal && (
-                            <div className={styles.runningTotals} aria-label="Somando uma linha de cada vez">
-                                {Array.from({ length: currentStep.rows }, (_, row) => (
-                                    <span key={row} style={{ "--term": row } as React.CSSProperties}>
-                                        {row > 0 ? " → " : ""}{(row + 1) * currentStep.size}
-                                    </span>
-                                ))}
+                        {state.hintLevel >= 3 && !isReveal && currentStep.kind === "total" && (
+                            <div className={styles.runningTotals}>
+                                {multiplication(currentStep)} = {currentStep.rows * currentStep.size}
                             </div>
                         )}
                     </div>
@@ -134,14 +121,13 @@ const Class2FaceArea: React.FC = () => {
                 {isReveal ? (
                     <div className={styles.lessonActions}>
                         <button className={`${styles.optionButton} ${styles.continueButton}`} onClick={() => dispatch({ type: "continueReveal" })}>Continuar</button>
-                        <button className={styles.hintButton} onClick={() => dispatch({ type: "replay" })}>Ver de novo</button>
                     </div>
                 ) : <>
                 <div className={`${styles.optionsGrid} ${isAddition ? styles.additionOptions : ""}`}>
                     {currentStep.options.map((opt) => (
                         <button
                             key={opt.value}
-                            className={`${styles.optionButton} ${state.selectedSum === opt.value ? styles.selectedOption : ""}`}
+                            className={`${styles.optionButton} ${state.selectedSum === opt.value ? styles.selectedOption : ""} ${state.incorrectAnswer === opt.value ? styles.wrongOption : ""}`}
                             aria-pressed={isAddition ? state.selectedSum === opt.value : undefined}
                             disabled={isTransition}
                             onClick={() => dispatch({ type: isAddition ? "selectSum" : "guess", answer: opt.value })}
@@ -167,16 +153,18 @@ const Class2FaceArea: React.FC = () => {
                         <button className={`${styles.optionButton} ${styles.continueButton}`} onClick={() => dispatch({ type: "guess", answer: state.selectedSum! })}>Confirmar</button>
                     </div>
                 )}
-                <div className={styles.lessonActions}>
+                </>}
+              </div>
+            </div>
+            {!isReveal && <div className={styles.hintDock}>
                     <button className={`${styles.hintButton} ${offerHelp ? styles.offeredHint : ""}`}
                         disabled={isTransition || state.hintLevel >= 3}
                         onClick={() => dispatch({ type: "hint" })}>
+                        <Lightbulb aria-hidden="true" />
                         {state.hintLevel >= 3 ? "Dica completa" : state.hintLevel > 0 ? "Mais uma dica" : "Dica"}
                     </button>
                     {offerHelp && <span className={styles.helpPrompt}>Precisa de uma dica?</span>}
-                </div>
-                </>}
-            </div>
+                </div>}
         </div>
     );
 };

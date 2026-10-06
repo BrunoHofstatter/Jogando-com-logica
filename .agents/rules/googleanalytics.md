@@ -5,7 +5,7 @@ description: When creating, reviewing, or modifying Google Analytics tracking.
 
 # Google Analytics (GA4)
 
-Last code update: 2026-08-18
+Last code update: 2026-09-15
 Measurement ID: `G-BXWR3NBDQL`
 
 This document separates the analytics that the repository currently sends from
@@ -59,8 +59,12 @@ src/analytics/
 ├── useBoardGameAnalytics.ts # shared local/AI board-game lifecycle
 ├── LevelAttemptTracker.ts # framework-independent level attempt lifecycle
 ├── useLevelAttemptAnalytics.ts # React visibility/page-exit integration
+├── ClassroomCreationTracker.test.ts # pending request, timeout, and result tests
+├── GameAttemptTracker.test.ts # reusable attempt lifecycle and timing tests
 ├── LevelAttemptTracker.test.ts # completion, retry, exit, and timing tests
-└── analytics.test.ts     # collection, privacy, URL, ID, and timer tests
+├── MultiplayerReliabilityTracker.test.ts # join/disconnect and isolation tests
+├── analytics.test.ts     # collection, privacy, URL, ID, and timer tests
+└── events.test.ts        # typed event payloads and parameter tests
 ```
 
 Components must call functions from `events.ts`. They must not import
@@ -107,7 +111,7 @@ All event names, parameter names, IDs, and controlled values use lowercase
 | --- | --- | --- |
 | `page_view` | Initial React route and each pathname/query change | `page_title`, sanitized `page_location` |
 | `select_content` | A game is selected in `/jogos` or through a manual game section's “Ver regras completas” button | `content_type: "game"`, `content_id`, `entry_point: "game_catalog"` or `"teacher_manual"` |
-| `game_start` | A Phase 3 Stop round, Rubik's activity, or local/AI board match becomes usable | `game_id`, `game_mode`, `usage_context`, `player_slot_count`; applicable `level_id`, `difficulty`, `activity_variant` |
+| `game_start` | A Phase 3 Stop round, Rubik's activity, or local/AI board match becomes usable | `game_id`, `game_mode`, `usage_context`, `player_slot_count`; applicable `level_id`, `difficulty`, `activity_variant`, `entry_point` |
 | `game_end` | A started Phase 3 activity completes or is abandoned by route exit/browser `pagehide` | start context, active `duration_seconds`, `end_reason`; controlled outcome and aggregates when known |
 | `level_start` | A solo Caça Soma level first becomes playable after the Magic Number finishes rolling; retries start a new attempt | `game_id`, `level_id`, `game_mode`, `usage_context`, `player_slot_count` |
 | `level_end` | A started Caça Soma level reaches its result or is abandoned by route exit/browser `pagehide` | start context, active `duration_seconds`, `end_reason`, aggregate round counts; completion outcome and stars when known |
@@ -155,9 +159,10 @@ puzzle_wire
 houses
 ```
 
-Reserved IDs do not mean those games emit lifecycle events. Bomb Game is
-online-only and remains deferred with the online measurement design. Puzzle
-Wire and Houses have empty gameplay pages, so sending a start from those
+Reserved IDs do not mean those games emit lifecycle events. Bomb Game has
+implemented cooperative online levels 1 and 3 with active reliability tracking,
+but online match start/end lifecycles remain deferred across all multiplayer games.
+Puzzle Wire and Houses have empty gameplay pages, so sending a start from those
 routes would be false telemetry. None of the three is ready to be added to the
 public catalog on analytics coverage alone.
 
@@ -266,7 +271,19 @@ level. `outcome` is `passed` or `failed`. Random/tutorial rounds use
 
 Rubik's activities:
 
-Class 2 now records hint escalations (manual or following an incorrect answer)
+Class 1 records distinct lesson/review hint-level reveals as `assistance_count`
+and actual lesson wrong answers plus review mistakes as `incorrect_count`.
+Waiting, cue demonstrations, and maximum-hint replays increment neither counter.
+Completion includes five matches, with
+unlimited retries and no mastery threshold. Its lifecycle uses `class_01`;
+initial entry distinguishes `lesson` and `review`, and replay starts a fresh
+`review` attempt without importing previous lesson counts. Checkpoint attempts
+remain excluded. Before the 2026-09-27 Class 1 update, assistance contained mixed
+exploration flags (including waits/errors), while incorrect count covered only
+review mistakes; comparisons across that change must account for the different
+counter definitions.
+
+Class 2 records hint escalations (manual or following an incorrect answer)
 as `assistance_count`, and lesson incorrect answers plus review mistakes as
 `incorrect_count`. Inactivity prompts and the successful-discovery reveal do not
 increment either counter. Its lifecycle, `class_02` identifier, and lesson/review
@@ -280,10 +297,31 @@ level_id: class_01 | class_02 | class_03
 activity_variant: lesson | review
 ```
 
-Class 3 currently supports `lesson` only. `assistance_count` preserves the
-meaning of each module's existing aggregate help/flag counter; it is not a
-count of students or a standardized learning score. Summary mistakes are sent
-only as an aggregate `incorrect_count`.
+Class 3 supports `lesson` and `review`. Its equal-face lesson records lesson hint
+escalations plus each completed written calculation's `usedHints` as
+`assistance_count`. In the free-entry multiplication UI, `usedHints` counts distinct
+revealed levels per column, including automatic foreground reveals, but not
+reopening/repeating the same help or merely offering it. Actual wrong lesson
+answers, settled wrong arithmetic entries, and unsuccessful arithmetic checks
+are `incorrect_count`. A failed check is one event; an entry already reported by
+that check is not also reported by its delayed assessment. Selecting cells or
+working in a different valid order is not an error. Tour replay, rotation, inactivity emphasis, and successful
+feedback reveals do not increment these counters. The final lesson question
+completes the activity; its identifier and route are unchanged. These counters
+are not counts of students or standardized learning scores.
+
+Class 3's desktop review is a separate attempt from its completed lesson. Direct
+game entry does not start a lesson attempt. The review starts at `Jogar`, when
+the protected size practice becomes playable, and ends once at the won/lost
+result. Intro loops and unsupported-input notices start no attempt. Main correct
+hits are `correct_count`; wrong cube shots plus escaped required targets are
+`incorrect_count` (an escape counts once, not its three-point damage).
+`completed_step_count` counts resolved rounds, `assistance_count` is zero, and
+`success`/`outcome` use true/`passed` for survival through five rounds and
+false/`failed` for zero health. This pass rule does not assert all rounds were
+answered correctly. Practice errors are excluded. Replay starts a new review;
+checkpoint entry remains excluded. The existing hook handles abandonment and
+foreground duration. No per-shot events or new analytics parameters were added.
 
 Board games:
 
@@ -316,7 +354,7 @@ human side and `success` is present only for a win/loss result.
 | Super Jogo da Velha local/AI | Yes | `game_start` / `game_end` | Shared board integration |
 | Guerra Matemática local/AI | Yes | `game_start` / `game_end` | Starts after opening dice animation |
 | Board-game online modes | No | `multiplayer_join_result` / `multiplayer_disconnect` | Reliability covered; avoid counting one match once per client/device |
-| Bomb Game | No | `multiplayer_join_result` / `multiplayer_disconnect` | Online reliability covered; match lifecycle deferred; not catalog-ready |
+| Bomb Game | No | `multiplayer_join_result` / `multiplayer_disconnect` | Online reliability covered for levels 1 & 3; match lifecycle deferred; not catalog-ready |
 | Puzzle Wire / Houses | No | — | Gameplay pages are empty; reserved IDs only |
 | Damas and test/base routes | No | — | Intentionally excluded from product reports |
 
@@ -610,7 +648,7 @@ reasonable initial set is:
 | Type | Parameters |
 | --- | --- |
 | Event-scoped dimensions | `game_id`, `level_id`, `game_mode`, `activity_variant`, `difficulty`, `usage_context`, `end_reason`, `outcome`, `success`, `tutorial_id`, `step_id`, `entry_point`, `error_code`, `reason`, `join_type`, `connection_stage` |
-| Event-scoped custom metrics | `duration_seconds`, `player_slot_count`, `completed_round_count`, `completed_step_count`, `correct_count`, `incorrect_count`, `assistance_count`, `stars_earned`, `wait_ms` |
+| Event-scoped custom metrics | `duration_seconds`, `player_slot_count`, `completed_round_count`, `completed_step_count`, `correct_count`, `incorrect_count`, `hint_count`, `assistance_count`, `stars_earned`, `wait_ms` |
 
 Do not register browser/client IDs, attempt IDs, timestamps, room codes, or any
 other high-cardinality or identifying value.

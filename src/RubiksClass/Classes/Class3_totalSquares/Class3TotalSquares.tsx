@@ -1,198 +1,114 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import RubiksCube from "../../Components/RubiksCube";
+import { useLessonEntry } from "../../Testing/entryContext";
+import React, { lazy, Suspense, useCallback, useEffect, useState } from "react";
+import { Lightbulb } from "lucide-react";
+import { useCubeMobileLayout } from "../../Components/useCubeMobileLayout";
+import { useLocation, useNavigate } from "react-router-dom";
+import { LessonCube } from "./LessonCube";
+import { expression, faceExpression } from "./class3Lesson";
 import { VerticalMultiplication } from "../../../Shared/Calculation";
 import { useClass3 } from "./useClass3";
 import styles from "./Class3TotalSquares.module.css";
+import { LessonSuccess } from "../../Components/LessonSuccess";
+import { TemporaryFeedback } from "../../Components/TemporaryFeedback";
 import { ROUTES } from "../../../routes";
 import { useGameAttemptAnalytics } from "../../../analytics/useGameAttemptAnalytics";
 
-const calculationClassNames = {
-    root: styles.calculationRoot,
-    workspace: styles.calculationWorkspace,
-    calculationStage: styles.calculationStage,
-    controlRail: styles.calculationControlRail,
-    grid: styles.calculationGrid,
-    cell: styles.calculationCell,
-    cellAnchor: styles.calculationCellAnchor,
-    operandCell: styles.operandCell,
-    resultCell: styles.resultCell,
-    carryCell: styles.carryCell,
-    operator: styles.calculationOperator,
-    bar: styles.calculationBar,
-    activeCell: styles.activeCell,
-    disabledCell: styles.disabledCell,
-    keypad: styles.keypad,
-    keypadButton: styles.keypadButton,
-    toolbar: styles.calculationToolbar,
-    actionButton: styles.calculationActionButton,
-    checkButton: styles.checkButton,
-    message: styles.calculationMessage,
-    coach: styles.calculationCoach,
-    coachArrow: styles.calculationCoachArrow,
-    coachBadge: styles.calculationCoachBadge,
-    coachText: styles.calculationCoachText,
-    coachEquation: styles.calculationCoachEquation,
-    coachLeadingDigit: styles.calculationCoachLeadingDigit,
-    coachResultDigit: styles.calculationCoachResultDigit,
-    coachLeft: styles.calculationCoachLeft,
-    coachRight: styles.calculationCoachRight,
-    coachBelow: styles.calculationCoachBelow,
-    helpButton: styles.calculationHelpButton,
-};
+const Class3SummaryView = lazy(() => import("./Class3SummaryView"));
 
-const Class3TotalSquares: React.FC = () => {
-    const { cubeProps, uiProps } = useClass3();
+const Class3Lesson: React.FC<{ onPlay: () => void }> = ({ onPlay }) => {
+    const { isCheckpoint } = useLessonEntry();
+    const { state, step, config, dispatch, offerHelp } = useClass3();
     const navigate = useNavigate();
-    const [needsOnScreenKeypad, setNeedsOnScreenKeypad] = useState(() =>
-        window.matchMedia("(pointer: coarse)").matches ||
-        window.matchMedia("(max-width: 650px) and (orientation: portrait)").matches
-    );
-    const { completeAttempt, startAttempt } = useGameAttemptAnalytics({
-        gameId: "cubo_magico",
-        gameMode: "solo",
-        usageContext: "standard",
-        playerSlotCount: 1,
-        levelId: "class_03",
-        activityVariant: "lesson",
-    });
-
+    const portrait = useCubeMobileLayout();
+    const [practicedRotation, setPracticedRotation] = useState(false);
+    const onPractice = useCallback(() => setPracticedRotation(true), []);
+    const [reducedMotion, setReducedMotion] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    const [touch, setTouch] = useState(() => window.matchMedia("(pointer: coarse)").matches);
     useEffect(() => {
-        startAttempt();
-    }, [startAttempt]);
-
-    useEffect(() => {
-        if (uiProps.currentPhase === "complete") {
-            completeAttempt({
-                assistanceCount: uiProps.totalFlags,
-                outcome: "completed",
-                success: true,
-            });
-        }
-    }, [completeAttempt, uiProps.currentPhase, uiProps.totalFlags]);
-
-
-    useEffect(() => {
-        const pointerQuery = window.matchMedia("(pointer: coarse)");
-        const portraitQuery = window.matchMedia("(max-width: 650px) and (orientation: portrait)");
-        const updateKeypadPreference = () => {
-            setNeedsOnScreenKeypad(pointerQuery.matches || portraitQuery.matches);
-        };
-
-        updateKeypadPreference();
-        pointerQuery.addEventListener("change", updateKeypadPreference);
-        portraitQuery.addEventListener("change", updateKeypadPreference);
-
-        return () => {
-            pointerQuery.removeEventListener("change", updateKeypadPreference);
-            portraitQuery.removeEventListener("change", updateKeypadPreference);
-        };
+        const queries = [window.matchMedia("(prefers-reduced-motion: reduce)"), window.matchMedia("(pointer: coarse)")];
+        const update = () => { setReducedMotion(queries[0].matches); setTouch(queries[1].matches); };
+        queries.forEach(query => query.addEventListener("change", update));
+        return () => queries.forEach(query => query.removeEventListener("change", update));
     }, []);
+    const { completeAttempt, startAttempt } = useGameAttemptAnalytics(isCheckpoint ? null : {
+        gameId: "cubo_magico", gameMode: "solo", usageContext: "standard", playerSlotCount: 1,
+        levelId: "class_03", activityVariant: "lesson",
+    });
+    useEffect(() => { startAttempt(); }, [startAttempt]);
+    useEffect(() => {
+        if (state.phase === "complete") completeAttempt({ assistanceCount: state.assistanceCount, incorrectCount: state.incorrectCount, outcome: "completed", success: true });
+    }, [completeAttempt, state.assistanceCount, state.incorrectCount, state.phase]);
 
-    const isTransition = uiProps.currentPhase === "transition";
-    const isComplete = uiProps.currentPhase === "complete";
-    const showHint =
-        uiProps.currentPhase === "hint1" ||
-        uiProps.currentPhase === "hint2" ||
-        uiProps.currentPhase === "hint3";
+    const area = config.size ** 2;
+    const isTransition = state.phase === "transition";
+    const showHint = state.phase === "question" && state.hintLevel > 0 && step.kind !== "calculation";
+    const showGrouping = showHint && state.hintLevel >= 3 && (step.kind === "expression" || step.kind === "total");
+    const isCalculation = step.kind === "calculation" && (state.phase === "question" || isTransition);
+    return <div className={styles.container}>
+        {isTransition && <LessonSuccess />}
+        <button className={styles.aulasButton} onClick={() => navigate(ROUTES.CLASS_MENU)}>Aulas</button>
+        <LessonCube key={`cube-${state.stepIndex}`} config={config} step={step} state={state} reducedMotion={reducedMotion} portrait={portrait} practicedRotation={practicedRotation} onPractice={onPractice} />
+        <div className={styles.rightPanel}>
+          <div className={styles.lessonContent}>
+            {state.phase === "complete" ? <div className={styles.completeCard}>
+                <h1 className={styles.completeTitle}>Aula completa!</h1>
+                <p className={styles.completeText}>Você aprendeu a multiplicar a quantidade de faces pelos quadradinhos de cada face. Vale para algumas faces e para o cubo inteiro!</p>
+                <p className={styles.completeStats}>Erros: {state.incorrectCount} · Dicas usadas: {state.assistanceCount}</p>
+                <button className={styles.completeButton} onClick={onPlay}>Jogar</button>
+                <button className={styles.completeButton} onClick={() => navigate(ROUTES.CLASS_MENU)}>Voltar às Aulas</button>
+            </div> : <>
 
-    return (
-        <div className={styles.container}>
-            <button className={styles.aulasButton} onClick={() => navigate(ROUTES.CLASS_MENU)}>
-                Aulas
-            </button>
+                {step.kind === "expression" && step.configuration < 2 && <div className={styles.givenFacts}>
+                    <span data-color={config.color}><strong>{config.faces.length}</strong> faces {config.faceAdjective}</span>
+                    <span><strong>{area}</strong> quadradinhos em cada face</span>
+                </div>}
+                <h1 className={styles.title} aria-live="polite">{state.phase === "faceResult" ? "Uma face colorida" : state.phase === "calculationIntro" ? "Vamos armar a multiplicação" : step.question}</h1>
 
-            <div className={styles.feedbackOverlay}>
-                {(isTransition || isComplete) && (
-                    <div className={styles.successCard}>
-                        <span className={styles.hintIcon}>{isComplete ? "Fim:" : "Boa:"}</span>
-                        {uiProps.feedbackText}
+                {showGrouping && <div className={styles.grouping}>
+                    <div className={styles.sumStrip}>{Array.from({ length: config.faces.length }, (_, index) => <React.Fragment key={index}>{index > 0 && <span>+</span>}<span className={styles.sumTerm} data-color={config.color} style={{ "--term": index } as React.CSSProperties}>{area}</span></React.Fragment>)}</div>
+                    <div className={styles.factorRow}><span><strong>{config.faces.length}</strong><small>faces</small></span><b>×</b><span><strong>{area}</strong><small>quadradinhos<br />por face</small></span></div>
+                    {step.kind === "total" && <div className={styles.runningTotals}>{config.faces.map((_, index) => (index + 1) * area).join(" → ")}</div>}
+                </div>}
+                {state.phase === "faceResult" ? <div className={styles.revealCard}>
+                    <strong>{faceExpression(config)} = {area}</strong>
+                    <p>{area} quadradinhos em cada face {config.faceAdjective === "azuis" ? "azul" : "colorida"}.</p>
+                    <button className={styles.optionButton} onClick={() => dispatch({ type: "continue" })}>Continuar</button>
+                </div> : state.phase === "calculationIntro" ? <div className={styles.revealCard}>
+                    <div className={styles.factorRow}><span><strong>{config.faces.length}</strong><small>faces</small></span><b>×</b><span><strong>{area}</strong><small>quadradinhos<br />por face</small></span></div>
+                    <strong>{expression(config)} = {area} × {config.faces.length}</strong>
+                    <p>Trocar a ordem dos fatores não muda o resultado. Na conta armada, vamos colocar {area} em cima.</p>
+                    <button className={styles.optionButton} onClick={() => dispatch({ type: "continue" })}>Fazer a conta</button>
+                </div> : isCalculation ? <>
+                    <div className={styles.equivalentExpression}>{expression(config)} = {area} × {config.faces.length}</div>
+                    <div className={styles.calculationArea}>
+                        <VerticalMultiplication key={state.stepIndex} topNumber={area} bottomNumber={config.faces.length}
+                            readOnly={isTransition} maxTopDigits={2} guidanceMode="adaptive" processValidation="warn"
+                            adaptiveGuidance={{ autoHintDelayMs: 25000 }}
+                            keypadMode={portrait || touch ? "visible" : "hidden"} showClearButton={false}
+                            onComplete={result => dispatch({ type: "calculationComplete", usedHints: result.usedHints })}
+                            onMistake={() => dispatch({ type: "calculationMistake" })} />
                     </div>
-                )}
-            </div>
+                </> : <>
+                    <div className={styles.optionsGrid}>{step.options.map(option => <button key={option} className={`${styles.optionButton} ${state.lastWrong === option ? styles.wrongOption : ""}`} disabled={isTransition} onClick={() => dispatch({ type: "guess", answer: option })}>{option}</button>)}</div>
 
-            <div className={styles.leftPanel}>
-                <div className={styles.headerOverlay}>
-                    <div className={styles.cubeTitle}>
-                        Cubo {cubeProps.size}×{cubeProps.size}
-                    </div>
-                </div>
-                <RubiksCube
-                    {...cubeProps}
-                    cubeSize={window.matchMedia("(max-width: 600px) and (orientation: portrait)").matches ? 32 : 21}
-                />
-                {showHint && (
-                    <div className={styles.cubeHintCard} key={uiProps.currentPhase}>
-                        <span className={styles.cubeHintArrow} aria-hidden="true" />
-                        <span className={styles.hintIcon}>Dica:</span>
-                        {uiProps.feedbackText}
-                    </div>
-                )}
-            </div>
-
-            <div className={styles.rightPanel}>
-                {isComplete ? (
-                    <div className={styles.completeCard}>
-                        <h1 className={styles.completeTitle}>Aula completa!</h1>
-                        <p className={styles.completeText}>
-                            Agora você sabe calcular os quadradinhos de uma face e multiplicar pelas 6 faces do cubo.
-                        </p>
-                        <p className={styles.completeStats}>Erros durante a aula: {uiProps.totalFlags}</p>
-                        <button className={styles.completeButton} onClick={() => navigate(ROUTES.CLASS_MENU)}>
-                            Voltar às Aulas
-                        </button>
-                    </div>
-                ) : (
-                    <>
-                        <h1 className={styles.title}>{uiProps.question}</h1>
-
-                        {uiProps.isCalculationStep && uiProps.calculationTopNumber !== null && uiProps.calculationBottomNumber !== null ? (
-                            <div className={styles.calculationArea}>
-                                <VerticalMultiplication
-                                    key={uiProps.currentStepIndex}
-                                    topNumber={uiProps.calculationTopNumber}
-                                    bottomNumber={uiProps.calculationBottomNumber}
-                                    maxTopDigits={2}
-                                    guidanceMode="adaptive"
-                                    adaptiveGuidance={uiProps.calculationAssistance ?? undefined}
-                                    processValidation="require"
-                                    keypadMode={needsOnScreenKeypad ? "visible" : "hidden"}
-                                    showClearButton={false}
-                                    classNames={calculationClassNames}
-                                    messages={{
-                                        chooseCell: "Clique em um espaço e comece pela coluna destacada.",
-                                        assistedNextStep: "Tente seguir o espaço amarelo destacado.",
-                                        checkAnswer: "Verificar",
-                                        clear: "Limpar",
-                                        correct: "Isso! A conta está certa.",
-                                        tryAgain: "Ainda não. Revise os algarismos da conta.",
-                                        help: "Preciso de ajuda",
-                                        yourTurn: "Sua vez",
-                                        hint: "Dica",
-                                    }}
-                                    onComplete={uiProps.handleCalculationComplete}
-                                    onMistake={uiProps.handleCalculationMistake}
-                                />
-                            </div>
-                        ) : (
-                            <div className={styles.optionsGrid}>
-                                {uiProps.options.map((opt) => (
-                                    <button
-                                        key={opt.value}
-                                        className={styles.optionButton}
-                                        disabled={isTransition}
-                                        onClick={() => uiProps.handleGuess(opt.value)}
-                                    >
-                                        {opt.label}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                    </>
-                )}
-            </div>
+                </>}
+            </>}
+          </div>
         </div>
-    );
+        {state.phase === "question" && step.kind !== "calculation" && state.lastWrong !== null && <TemporaryFeedback key={`feedback-${state.incorrectCount}`} message="Ainda não! Observe as faces e tente novamente." />}
+        {(state.phase === "question" || isTransition) && step.kind !== "calculation" && <div className={styles.hintDock}>
+            <button className={`${styles.hintButton} ${offerHelp ? styles.offeredHint : ""}`} disabled={isTransition || state.hintLevel >= 3} onClick={() => dispatch({ type: "hint" })}>
+                <Lightbulb aria-hidden="true" />{state.hintLevel >= 3 ? "Dica completa" : state.hintLevel ? "Mais uma dica" : "Dica"}
+            </button>
+            {offerHelp && <span className={styles.helpPrompt}>Precisa de uma dica?</span>}
+        </div>}
+    </div>;
 };
-
-export default Class3TotalSquares;
+export default function Class3TotalSquares() {
+    const { isCheckpoint } = useLessonEntry();
+    const location = useLocation();
+    const [review, setReview] = useState(false);
+    const directReview = !isCheckpoint && (location.state?.mode === "game" || new URLSearchParams(location.search).get("mode") === "game");
+    if (review || directReview) return <Suspense fallback={<div className={styles.container}><p>Carregando o jogo...</p></div>}><Class3SummaryView /></Suspense>;
+    return <Class3Lesson onPlay={() => setReview(true)} />;
+}

@@ -146,9 +146,30 @@ function CacaSomaRegras() {
 
               <h3 className={styles.rulesTitle}>Modo Níveis:</h3>
               <p className={styles.rulesText}>
-                Complete uma sequência de rodadas, acerte as somas e termine
-                dentro do tempo para conquistar estrelas. Os números usados em
-                respostas corretas ficam indisponíveis nas próximas rodadas.
+                Acerte todas as rodadas. Use a quantidade de números indicada
+                acima do tabuleiro e clique fora dele ou pressione Enter para
+                confirmar. Apenas os números de respostas corretas ficam
+                indisponíveis nas próximas rodadas.
+              </p>
+
+              <h3 className={styles.rulesTitle}>Tente de novo:</h3>
+              <p className={styles.rulesText}>
+                Errou? A seleção é limpa e você tenta a mesma rodada novamente
+                com outro Número Mágico, sempre que houver outra soma possível.
+                Você pode tentar quantas vezes precisar. Não há penalidade extra:
+                o tempo conta apenas enquanto você está resolvendo, incluindo
+                as tentativas incorretas. Ele pausa durante os avisos de resultado
+                e os sorteios.
+              </p>
+
+              <h3 className={styles.rulesTitle}>Estrelas e próximos níveis:</h3>
+              <p className={styles.rulesText}>
+                Concluir todas as rodadas garante <strong>1 estrela</strong>.
+                Termine mais rápido para conquistar <strong>2 ou 3 estrelas</strong>.
+                São necessárias <strong>2 estrelas</strong> para liberar o próximo
+                nível. Mesmo depois do tempo para 2 estrelas, você pode continuar
+                até concluir. Ao sair do nível ou tentar novamente, a partida
+                começa do início; suas estrelas conquistadas ficam salvas.
               </p>
 
               <h3 className={styles.rulesTitle}>Modo Versus:</h3>

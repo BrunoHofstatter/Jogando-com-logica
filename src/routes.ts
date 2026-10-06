@@ -52,6 +52,7 @@ export const ROUTES = {
   CACA_SOMA_LEVEL_BASE: "/caca-soma/niveis",
 
   // Crown Chase
+  CROWN_CHASE_TUTORIAL: "/caca-coroa/tutorial",
   CROWN_CHASE_RULES: "/caca-coroa/regras",
   CROWN_CHASE_GAME: "/caca-coroa",
   CROWN_CHASE_AI: "/caca-coroa/computador",
@@ -66,6 +67,7 @@ export const ROUTES = {
   MATH_WAR_MP_GAME: "/guerra-matematica/online/partida",
 
   // Classes / Rubiks
+  CLASS_TESTS: "/aulas/testes",
   CLASS_MENU: "/aulas",
   CLASS_1_OLD: "/aulas/1-antiga",
   CLASS_1: "/aulas/1-dimensoes",

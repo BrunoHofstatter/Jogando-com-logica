@@ -7,13 +7,10 @@ export interface LevelConfig {
   levelId: number;
   boardSize: 5 | 7 | 10;                    // Board dimension (5x5=1-25, 7x7=1-49, 10x10=1-100)
   rounds: number;                           // Number of rounds in the level
-  numbersToSelect: 2 | 3;                   // How many numbers must be selected
+  numbersToSelect: 2 | 3 | '2-or-3';         // Exact count, or either count
   randomNumberRanges: [number, number][];   // Array of ranges (one per round)
   starThresholds: {
-    oneStarCorrect: number;                 // Min correct answers for 1 star
-    twoStarCorrect: number;                 // Min correct answers for 2 stars
-    threeStarCorrect: number;               // Min correct answers for 3 stars
-    oneStarTime: number;                    // Max time (seconds) for 1 star
+    // Completing all rounds always earns one star; extra stars use active time.
     twoStarTime: number;                    // Max time (seconds) for 2 stars
     threeStarTime: number;                  // Max time (seconds) for 3 stars
   };
@@ -28,14 +25,14 @@ export interface LevelProgress {
   completed: boolean;
   bestStars: number;                        // 0-3
   bestTime: number;                         // In seconds
-  bestCorrect: number;                      // Out of 10
+  bestCorrect: number;                      // Successfully solved rounds
   attempts: number;
   lastPlayed: string;                       // ISO date string
 }
 
 // Round result for level mode
 export interface RoundResult {
-  roundNumber: number;                      // 1-10
+  roundNumber: number;                      // Retries share their round number
   magicNumber: number;
   selectedNumbers: number[];
   sum: number;

@@ -25,6 +25,7 @@ export interface RoomPlayerInfo {
 }
 
 export interface SharedViewState {
+  serverNow?: number;
   roundId: string;
   phase: RoomPhase;
   lives: number;
@@ -50,6 +51,7 @@ export interface BombViewState extends SharedViewState {
   role: "bomb";
   orderingNumbers: number[];
   orderingProgress: number[];
+  orderingRevision: number;
   numericAnswers: [number | null, number | null, number | null];
   operatorAnswers: [Operator | null, Operator | null, Operator | null];
   numericTargets: [string, string, string];
@@ -107,6 +109,7 @@ export interface StatePayload {
 }
 
 export interface BombGameClientToServerEvents {
+  sync_time: (reply: (serverNow: number) => void) => void;
   create_room: (payload: { playerName: string; hintsEnabled: boolean; classroomCode?: ClassroomCode; levelId?: BombLevelId }) => void;
   join_room: (payload: { code: string; playerName: string }) => void;
   set_role_preference: (payload: { code: string; preference: RolePreference }) => void;

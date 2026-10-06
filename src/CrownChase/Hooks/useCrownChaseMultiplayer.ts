@@ -104,7 +104,8 @@ function persistSnapshot(): void {
     return;
   }
 
-  window.sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(sharedSnapshot));
+  try { window.sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(sharedSnapshot)); }
+  catch { /* The live in-memory session does not require persistence. */ }
 }
 
 function notifySubscribers(): void {

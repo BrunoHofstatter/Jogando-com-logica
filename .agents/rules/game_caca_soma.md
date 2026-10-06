@@ -44,7 +44,8 @@ Important shared concepts:
 
 Submission differs by mode:
 
-- levels and local versus use the older local flow
+- levels submit by clicking outside the board or pressing Enter, with a separate solo attempt flow
+- local versus retains the older board/timer implementation
 - online uses an explicit `Pronto` button
 
 ## Solo Levels Mode
@@ -59,7 +60,7 @@ Each level defines:
 - number of rounds
 - required selected-number count
 - valid Magic Number ranges per round
-- star thresholds based on accuracy and total time
+- time thresholds for two and three stars; completing all rounds guarantees one star
 
 ### Current Flow
 
@@ -69,8 +70,9 @@ Each level defines:
 4. The timer starts.
 5. The player selects numbers whose sum should match the target.
 6. The player confirms the attempt through the local submission flow.
-7. The result is stored and the next round starts.
-8. At the end, stars are calculated from accuracy and total time.
+7. A correct answer locks its cells and advances the round. A wrong answer clears the selection and retries the same round with another solvable target whenever possible.
+8. Incorrect attempts get brief red/shake feedback and a correction message; successful answers pulse green. Retry transitions total approximately 3 seconds, successful round transitions 4 seconds, including target rolling. Feedback and rolling do not count toward solving time.
+9. At the end, completion earns one star. Total active solving time, including wrong attempts and without extra penalties, determines two or three stars. There is no hard deadline.
 
 ### Current Level Structure
 
@@ -78,8 +80,15 @@ Each level defines:
 - Levels 1-5 use 5x5 boards.
 - Levels 6-10 use 7x7 boards.
 - Current levels require exactly 2 selected numbers per round.
+- The solo configuration supports exactly 2, exactly 3, or either 2 or 3; the selection rule remains visible above the board. No new levels were added in the retry rework.
 - Levels currently contain 5 to 7 rounds.
 - Earning at least 2 stars unlocks the next level.
+- Existing stars and unlocks remain saved; unfinished sessions never resume after leaving. Retrying starts from round one with a fresh board.
+- Time goals were provisionally increased by 20%; they still need play-testing after the full level set is authored.
+- Gameplay and results display whole seconds rounded up while reward calculations retain precise active time. Results show mistakes and expandable round/attempt details.
+- The round tracker uses gray upcoming circles, a yellow current circle, and green completed circles with checkmarks, matching the Class 3 summary game. It has no progress bar.
+- Screen-edge feedback pulses last 1.3 seconds. Wrong-answer feedback appears over the center of the board with the attempted sum in yellow and the target in blue. Round details open in a separate dismissible overlay above the completion dialog.
+- Confirming too few numbers shows a centered popup that dismisses on tap/Enter or after 2.5 seconds. It does not count a mistake, clear valid selections, or pause solving time.
 
 ### Level Lockout
 
@@ -242,6 +251,8 @@ Best current fit is around 4th to 7th grade. This remains a recommendation, not 
 - `src/Caca_soma/componentes/tabuleiro.tsx`
 - `src/Caca_soma/Logic/levelConfigs.ts`
 - `src/Caca_soma/Logic/levelProgress.ts`
+- `src/Caca_soma/Logic/levelGameLogic.ts`
+- `src/Caca_soma/Hooks/useSoloLevelGame.ts`
 
 ### Online V2
 

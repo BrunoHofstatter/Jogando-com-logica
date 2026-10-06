@@ -1,0 +1,45 @@
+.page {
+    min-height: 100dvh;
+    padding: 8dvh 8%;
+    background: #e0f2fe;
+    color: #203c60;
+    font-family: "Cherry Bomb One", cursive;
+}
+
+.page h1, .page h2, .page p {
+    color: inherit;
+    text-shadow: none;
+    -webkit-text-stroke: 0;
+    text-align: left;
+}
+
+.page h1 { font-size: min(8vw, 5dvh); margin: 0 0 2dvh; }
+.page p { font-size: min(4.5vw, 2.6dvh); }
+.section { margin-top: 4dvh; }
+.section h2 { font-size: min(5.5vw, 3.3dvh); margin-bottom: 2dvh; }
+.cubes { display: flex; flex-wrap: wrap; gap: 1.5dvh 2vw; }
+
+.link, .returnLink {
+    display: inline-block;
+    background: #fff;
+    color: #203c60;
+    border: .15vw solid #8cb9df;
+    border-radius: 1.5dvh;
+    padding: 1.2dvh 2vw;
+    font-size: min(5vw, 3dvh);
+    text-decoration: none;
+}
+
+.link:hover, .returnLink:hover { background: #d8b4ff; color: #203c60; }
+.link:focus-visible, .returnLink:focus-visible { outline: .3vw solid #623ea0; outline-offset: .3vw; }
+
+.returnLink {
+    position: fixed;
+    bottom: 1.5dvh;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    font-family: "Cherry Bomb One", cursive;
+    font-size: min(3.5vw, 2.2dvh);
+    white-space: nowrap;
+}

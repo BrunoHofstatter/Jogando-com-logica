@@ -1,0 +1,81 @@
+.root { --calc-ink: #013873; width: 100%; color: var(--calc-ink); font-family: inherit; }
+.fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+.workspace { position: relative; display: grid; grid-template-columns: 43% 49%; column-gap: 8%; align-items: center; min-height: 25dvh; }
+.grid { display: grid; align-items: center; column-gap: .45vw; row-gap: 1.4vw; width: 100%; }
+.cell, .operandCell, .operator { min-width: 0; width: 100%; aspect-ratio: 1; display: grid; place-items: center; box-sizing: border-box; font: inherit; font-size: min(2.7vw, 4.5dvh); line-height: 1; }
+.cell { position: relative; border: .18vw solid #6c9ec4; border-radius: .65vw; background: #f9fcff; color: var(--calc-ink); cursor: pointer; touch-action: manipulation; }
+.carryCell { width: 78%; justify-self: center; font-size: min(1.9vw, 3.3dvh); border-style: dashed; background: #e8f2fa; }
+.operandCell { border-radius: .5vw; font-size: min(3.51vw, 5.85dvh); }
+.bar { height: .24vw; margin-block: .45vw; border-radius: 1vw; background: var(--calc-ink); }
+.cell[data-selected] { background: #ffe874; border: .24vw solid #7e22ce; outline: .22vw solid #7e22ce; outline-offset: .2vw; box-shadow: 0 .25vw 0 #c7a2ef; }
+.cell[data-wrong]::after { content: '!'; position: absolute; top: -25%; right: -18%; border-radius: 50%; background: #b42342; color: #fff; width: 40%; aspect-ratio: 1; display: grid; place-items: center; font-size: 60%; }
+.cell:focus-visible, .root button:focus-visible { outline: .25vw solid #7e22ce; outline-offset: .25vw; }
+.root [data-cue='operand'] { --cue-color: #7e22ce; box-shadow: 0 0 0 .18vw var(--cue-color); background: #efe0ff; border-radius: .4vw; }
+.root [data-cue='multiplier'] { --cue-color: #ba315d; box-shadow: 0 0 0 .18vw var(--cue-color); background: #ffe1eb; border-radius: .4vw; }
+.root [data-cue='carry'] { --cue-color: #b5610b; box-shadow: 0 0 0 .18vw var(--cue-color); background: #ffe2b8; border-radius: .4vw; }
+.root [data-cue='units'] { --cue-color: #087fa6; box-shadow: 0 0 0 .18vw var(--cue-color); background: #bdeeff; border-radius: .4vw; }
+/* Selection always wins over instructional color, including carried digits. */
+.root .cell[data-selected] { background: #ffe874; border-color: #7e22ce; outline: .22vw solid #7e22ce; }
+.hintArea { min-width: 0; align-self: stretch; display: flex; align-items: center; justify-content: center; }
+.hintCard { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 1.8dvh; border-radius: 1vw; background: #f5faff; padding: 1.5dvh .6vw; box-sizing: border-box; }
+.hintTitle, .offer { font-size: min(1.35vw, 2.5dvh); text-align: center; line-height: 1.2; }
+.equation { display: flex; align-items: center; justify-content: center; gap: .45vw; padding-top: 4dvh; font-size: min(2vw, 3.6dvh); white-space: nowrap; }
+.equation > span { min-width: 0; padding: .15vw; }
+.splitResult { display: flex; gap: .8vw; padding-top: 4dvh; font-size: min(3vw, 4.8dvh); }
+.splitResult > span { padding: .4vw .7vw; }
+.hintActions { display: flex; align-items: center; justify-content: center; gap: .5vw; width: 100%; }
+.root button { font-family: inherit; color: var(--calc-ink); touch-action: manipulation; }
+.hintActions button, .toolbar button, .keypad button { border: .16vw solid #6c9ec4; border-radius: .65vw; padding: .65vw .8vw; background: #fff; font-size: min(1.35vw, 2.6dvh); line-height: 1.15; cursor: pointer; }
+.hintActions button { font-size: min(1.1vw, 2.2dvh); }
+.hintActions .closeHint { padding: .35vw; display: grid; place-items: center; }
+.hintActions button:disabled { opacity: .4; }
+.closeHint svg, .helpButton svg { width: 1.5vw; height: 1.5vw; }
+.toolbar { display: flex; flex-wrap: wrap; justify-content: center; gap: .8vw; margin-top: 2dvh; }
+.toolbar .checkButton { background: #98defc; border-color: #0284c7; box-shadow: 0 .22vw 0 #3286b6; }
+.toolbar .helpButton { display: flex; align-items: center; gap: .3vw; background: #fff5c6; }
+.helpButton[data-offered] { outline: .2vw solid #bc830b; outline-offset: .2vw; }
+.root button:hover:not(:disabled) { filter: brightness(.96); }
+.root button:disabled { cursor: default; }
+.keypad { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: .6vw; margin: 2dvh auto 0; width: 100%; }
+.keypad button { min-height: 4.5dvh; padding-inline: 0; }
+.keypad button:disabled { opacity: .5; }
+.feedback { min-height: 2.5dvh; margin-top: 1dvh; text-align: center; font-size: min(1.25vw, 2.4dvh); }
+.arrows { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 2; }
+.arrows > path { fill: none; stroke-width: .18vw; stroke-linejoin: round; }
+.arrows .multiplier { stroke: #ba315d; }
+.arrows .operand { stroke: #7e22ce; }
+.arrows .carry { stroke: #b5610b; }
+.arrows .units { stroke: #087fa6; }
+.arrows marker .operand { fill: #7e22ce; }
+.arrows marker .multiplier { fill: #ba315d; }
+.arrows marker path { stroke: none; }
+.arrows marker .carry { fill: #b5610b; }
+.arrows marker .units { fill: #087fa6; }
+.srOnly { position: absolute; width: 0; height: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (max-width: 650px) and (orientation: portrait) {
+  .workspace { grid-template-columns: 44% 48%; min-height: 23dvh; }
+  .grid { column-gap: 1vw; row-gap: 3vw; }
+  .cell, .operandCell, .operator { font-size: min(6vw, 3.5dvh); }
+  .operandCell { font-size: min(7.8vw, 4.55dvh); }
+  .cell { border-width: .4vw; border-radius: 1.3vw; }
+  .carryCell { font-size: min(4.5vw, 2.8dvh); }
+  .bar { height: .5vw; margin-block: 1vw; }
+  .root .cell[data-selected] { border-width: .5vw; outline-width: .5vw; outline-offset: .5vw; }
+  .root [data-cue] { box-shadow: 0 0 0 .4vw var(--cue-color); }
+  .hintCard { padding: 1.5dvh 1vw; border-radius: 2vw; gap: 1.4dvh; }
+  .hintTitle, .offer { font-size: min(3.4vw, 2dvh); }
+  .equation { font-size: min(4.7vw, 2.8dvh); gap: 1vw; }
+  .splitResult { font-size: min(7vw, 4dvh); gap: 2vw; }
+  .splitResult > span { padding: 1vw 2vw; }
+  .hintActions { gap: 1vw; }
+  .hintActions button { font-size: min(3vw, 1.8dvh); min-height: 4.5dvh; }
+  .hintActions .closeHint { padding: 1vw; }
+  .closeHint svg, .helpButton svg { width: 4vw; height: 4vw; }
+  .toolbar { gap: 2vw; }
+  .toolbar button, .keypad button { font-size: min(4vw, 2.4dvh); min-height: 5dvh; padding: 1.5vw 2vw; border-width: .35vw; border-radius: 1.5vw; }
+  .keypad { gap: 1.5vw; }
+  .keypad button { padding-inline: 0; }
+  .keypad button:last-child { grid-column: span 2; font-size: min(3.5vw, 2.1dvh); }
+  .feedback { font-size: min(3.4vw, 2dvh); }
+  .arrows > path { stroke-width: .4vw; }
+}

@@ -1,0 +1,14 @@
+.scene { width: 100%; height: 100%; perspective: 65vw; }
+.cube { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transform: rotateX(-24deg) rotateY(var(--yaw, -28deg)); }
+.face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 5%; background-size: 100% 100%; background-repeat: no-repeat; box-shadow: inset 0 0 0 0.13vw #263444; }
+.face svg { width: 84%; height: 84%; margin: 8%; }
+.solid { border-radius: 0; box-shadow: none; background-image: linear-gradient(145deg, #ffffff15, #0000000c); }
+.solid.top { background-image: linear-gradient(145deg, #ffffff32, #ffffff12); }
+.solid.right, .solid.back { background-image: linear-gradient(145deg, #00000012, #00000026); }
+.front { transform: translateZ(var(--cube-half)); }
+.back { transform: rotateY(180deg) translateZ(var(--cube-half)); }
+.right { transform: rotateY(90deg) translateZ(var(--cube-half)); }
+.left { transform: rotateY(-90deg) translateZ(var(--cube-half)); }
+.top { transform: rotateX(90deg) translateZ(var(--cube-half)); }
+.bottom { transform: rotateX(-90deg) translateZ(var(--cube-half)); }
+.outlined { outline: 0.25vw solid white; outline-offset: -0.25vw; box-shadow: 0 0 0.5vw #fff; }

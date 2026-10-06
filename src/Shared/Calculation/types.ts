@@ -145,6 +145,7 @@ export type CalculationCheckResult = {
 };
 
 export type SharedCalculationProps = {
+  readOnly?: boolean;
   editableOperands?: boolean;
   guidanceMode?: GuidanceMode;
   processValidation?: ProcessValidation;

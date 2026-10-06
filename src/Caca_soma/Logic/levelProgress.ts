@@ -99,7 +99,7 @@ export const updateLevelProgress = (result: LevelAttemptResult): void => {
     ...current,
     attempts: current.attempts + 1,
     lastPlayed: new Date().toISOString(),
-    completed: result.passed || current.completed,
+    completed: result.starsEarned >= 1 || current.completed,
     bestStars: Math.max(current.bestStars, result.starsEarned),
     bestTime: Math.min(current.bestTime, result.totalTime),
     bestCorrect: Math.max(current.bestCorrect, result.totalCorrect)
@@ -159,39 +159,11 @@ export const resetAllProgress = (): void => {
   localStorage.removeItem(STORAGE_KEY);
 };
 
-// Calculate stars earned from attempt
-// BOTH correct answers AND time must meet thresholds
-export const calculateStars = (
-  correctAnswers: number,
-  totalTime: number,
-  levelId: number
-): number => {
+// Completion is required; mistakes only affect the active solving time.
+export const calculateStars = (correctAnswers: number, totalTime: number, levelId: number): number => {
   const level = levels.find(l => l.levelId === levelId);
-  if (!level) return 0;
-
-  const { starThresholds } = level;
-
-  // Must meet BOTH correct answers AND time requirements for each star tier
-  if (
-    correctAnswers >= starThresholds.threeStarCorrect &&
-    totalTime <= starThresholds.threeStarTime
-  ) {
-    return 3;
-  }
-
-  if (
-    correctAnswers >= starThresholds.twoStarCorrect &&
-    totalTime <= starThresholds.twoStarTime
-  ) {
-    return 2;
-  }
-
-  if (
-    correctAnswers >= starThresholds.oneStarCorrect &&
-    totalTime <= starThresholds.oneStarTime
-  ) {
-    return 1;
-  }
-
-  return 0;
+  if (!level || correctAnswers < level.rounds || !Number.isFinite(totalTime) || totalTime < 0) return 0;
+  if (totalTime <= level.starThresholds.threeStarTime) return 3;
+  if (totalTime <= level.starThresholds.twoStarTime) return 2;
+  return 1;
 };

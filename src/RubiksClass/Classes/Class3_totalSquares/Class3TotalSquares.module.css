@@ -1,810 +1,106 @@
-/* ============================================================
-   Class3TotalSquares.module.css
-   Layout & styling for Class 3: total cube squares
-   ============================================================ */
+/* Class 3 shares the restored Class 2 lesson presentation. */
+.cubeStage { position: relative; width: 100%; height: 66dvh; transform: translateY(3dvh); --face-label-scale: 0.34; display: grid; place-items: center; outline: none; }
+.cubeStage:focus-visible { outline: 0.25vw solid #a855f7; outline-offset: -2vw; border-radius: 3vw; }
+.rotationDemo { position: absolute; inset: 0; pointer-events: none; z-index: 12; }
+.rotationTooltip { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: max-content; max-width: 85%; box-sizing: border-box; border: 0.2vw solid #6b21a8; border-radius: 1vw; padding: 0.65vw 1.2vw; background: #fff; color: #58208c; font-size: min(1.65vw, 3dvh); line-height: 1.25; text-align: center; box-shadow: 0 0.35vw 0 #d8b4fe; }
+.rotationTooltip::after { content: ""; position: absolute; left: 50%; bottom: -0.55vw; width: 0.8vw; height: 0.8vw; background: #fff; border-right: 0.2vw solid #6b21a8; border-bottom: 0.2vw solid #6b21a8; transform: translateX(-50%) rotate(45deg); }
+.dragCue { position: absolute; left: 59%; top: 57%; width: 4vw; height: 4vw; filter: drop-shadow(0 0.25vw 0.15vw #01387388); }
+.dragCue svg { position: relative; width: 100%; height: 100%; color: #6b21a8; fill: #fff; stroke-width: 2.3; }
+.dragContact { position: absolute; top: -12%; left: 18%; width: 55%; height: 55%; border: 0.2vw solid #fff; border-radius: 50%; background: #a855f766; box-shadow: 0 0 0 0.35vw #c084fc55; }
+.tourControls { position: absolute; bottom: 6dvh; left: 4%; right: 4%; display: flex; flex-direction: column; align-items: center; gap: 1dvh; color: #013873; }
+.faceCount { padding: 0.3vw 1vw; border-radius: 1vw; background: #e0f2fe; font-size: min(1.5vw, 3dvh); }
+.inlineActions { display: flex; gap: 0.6vw; }
+.factorRow { composes: equation from "../Class2_faceArea/Class2FaceArea.module.css"; }
+.sumTerm[data-color] { color: #013873; background: var(--face-color); }
+.sumTerm[data-color="blue"] { --face-color: #86b3ff; }
+.sumTerm[data-color="red"] { --face-color: #ff9393; }
+.sumTerm[data-color="green"] { --face-color: #78e998; }
+.sumTerm[data-color="orange"] { --face-color: #ffbd79; }
+.sumTerm[data-color="yellow"] { --face-color: #ffe874; }
+.revealCard { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2.5dvh; color: #013873; }
+.revealCard > strong { color: #013873; font-size: min(2.6vw, 5dvh); -webkit-text-stroke: 0; text-shadow: none; }
+.revealCard p { color: #013873; font-size: min(1.7vw, 3.2dvh); margin: 0; line-height: 1.3; -webkit-text-stroke: 0; text-shadow: none; }
+.revealCard .optionButton { padding-inline: 2vw; }
+.equivalentExpression { color: #013873; font-size: min(1.7vw, 3.2dvh); }
+.completeCard { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2.5dvh; }
+.completeTitle { composes: title from "../Class2_faceArea/Class2FaceArea.module.css"; }
+.completeText, .completeStats { color: #013873; font-size: min(1.8vw, 3.5dvh); line-height: 1.3; margin: 0; text-align: center; -webkit-text-stroke: 0; text-shadow: none; }
+.completeButton { composes: optionButton from "../Class2_faceArea/Class2FaceArea.module.css"; padding-inline: 1.5vw; }
+.factorRow strong { color: #013873; -webkit-text-stroke: 0; text-shadow: none; }
+.headerOverlay { pointer-events: none; }
+@media (max-width: 650px) and (orientation: portrait) {
+    .cubeStage { height: 32dvh; transform: translateY(1.5dvh); }
+    .rotationTooltip { max-width: 70%; font-size: min(4vw, 2.2dvh); border-width: 0.4vw; border-radius: 2vw; padding: 1.2vw 2.5vw; }
+    .rotationTooltip::after { width: 1.5vw; height: 1.5vw; bottom: -1vw; border-width: 0.4vw; }
+    .dragCue { width: 8vw; height: 8vw; left: 59%; }
+    .dragContact { border-width: 0.4vw; box-shadow: 0 0 0 0.8vw #c084fc55; }
+    .tourControls { bottom: 0.3dvh; gap: 0.5dvh; }
+    .faceCount { font-size: min(3.5vw, 2dvh); padding: 0.5vw 2vw; }
+    .inlineActions { gap: 2vw; }
+    .revealCard { gap: 1.7dvh; }
+    .revealCard > strong { font-size: min(6vw, 3.5dvh); }
+    .revealCard p, .equivalentExpression, .completeText, .completeStats { font-size: min(4vw, 2.3dvh); }
+}
+.container { composes: container from "../Class2_faceArea/Class2FaceArea.module.css"; }
+.aulasButton { composes: aulasButton from "../Class2_faceArea/Class2FaceArea.module.css"; }
+.leftPanel { composes: leftPanel from "../Class2_faceArea/Class2FaceArea.module.css"; }
+.rightPanel { composes: rightPanel from "../Class2_faceArea/Class2FaceArea.module.css"; }
+.lessonContent { composes: lessonContent from "../Class2_faceArea/Class2FaceArea.module.css"; }
+.title { composes: title from "../Class2_faceArea/Class2FaceArea.module.css"; }
+.optionsGrid { composes: optionsGrid from "../Class2_faceArea/Class2FaceArea.module.css"; }
+.optionButton { composes: optionButton from "../Class2_faceArea/Class2FaceArea.module.css"; }
+.hintDock { composes: hintDock from "../Class2_faceArea/Class2FaceArea.module.css"; }
+.hintButton { composes: hintButton from "../Class2_faceArea/Class2FaceArea.module.css"; }
+.offeredHint { composes: offeredHint from "../Class2_faceArea/Class2FaceArea.module.css"; }
+.helpPrompt { composes: helpPrompt from "../Class2_faceArea/Class2FaceArea.module.css"; }
+.headerOverlay { composes: headerOverlay from "../Class2_faceArea/Class2FaceArea.module.css"; }
+.hintCard { composes: hintCard from "../Class2_faceArea/Class2FaceArea.module.css"; }
+.successCard { composes: successCard from "../Class2_faceArea/Class2FaceArea.module.css"; }
+.grouping { composes: grouping from "../Class2_faceArea/Class2FaceArea.module.css"; }
+.sumStrip { composes: sumStrip from "../Class2_faceArea/Class2FaceArea.module.css"; }
+.sumTerm { composes: sumTerm from "../Class2_faceArea/Class2FaceArea.module.css"; }
+.runningTotals { composes: runningTotals from "../Class2_faceArea/Class2FaceArea.module.css"; }
 
-.container {
-    display: flex;
-    height: 100dvh;
-    width: 100vw;
-    overflow: hidden;
-    background-color: #e0f2fe;
-    font-family: "Cherry Bomb One", system-ui;
-    box-sizing: border-box;
+/* The visual calculation owns its responsive grid and right-hand hint area. */
+.calculationArea { width: 100%; max-width: 46vw; }
+@media (max-width: 650px) and (orientation: portrait) {
+    .calculationArea { width: 100%; max-width: 92vw; }
 }
 
-.feedbackOverlay {
-    position: absolute;
+.givenFacts { display: flex; flex-direction: column; align-items: center; gap: 0.5dvh; color: #013873; font-size: min(2.1vw, 3.4dvh); line-height: 1.3; margin-bottom: 1.5dvh; }
+.givenFacts strong { font-size: 1.15em; color: inherit; -webkit-text-stroke: 0; text-shadow: none; }
+
+.givenFacts [data-color="blue"] { color: #1456b8; }
+.givenFacts [data-color="red"] { color: #b52332; }
+@media (max-width: 650px) and (orientation: portrait) {
+    .givenFacts { font-size: min(4.6vw, 2.6dvh); }
+}
+
+.successOverlay {
+    composes: successCard from "../Class2_faceArea/Class2FaceArea.module.css";
+    position: fixed;
     top: 3dvh;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    z-index: 100;
     pointer-events: none;
-    width: 100%;
-    gap: 1vw;
-}
-
-.aulasButton {
-    position: absolute;
-    top: 2vw;
-    left: 2vw;
-    z-index: 1000;
-    font-family: inherit;
-    font-size: 2vw;
-    background: #a855f7;
-    color: #ffffff;
-    border: 0.3vw solid #6b21a8;
-    border-radius: 1vw;
-    padding: 0.5vw 1.5vw 0.8vw;
-    cursor: pointer;
-    box-shadow: 0 0.6vw 0 #6b21a8;
-    transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
-    -webkit-text-stroke: 0.1vw #6b21a8;
-}
-
-.aulasButton:hover {
-    background: #c084fc;
-    transform: translateY(-0.2vw);
-    box-shadow: 0 0.8vw 0 #6b21a8;
-}
-
-.aulasButton:active {
-    transform: translateY(0.4vw);
-    box-shadow: 0 0.2vw 0 #6b21a8;
-}
-
-.headerOverlay {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    z-index: 10;
-    transform: translateY(-4vw);
-}
-
-.cubeTitle {
-    background: #9bcbff;
-    border: 0.3vw solid #013873;
-    border-radius: 1vw;
-    padding: 0.8vw 2vw 1vw;
-    font-family: inherit;
-    font-size: 2vw;
-    color: #ffffff;
-    box-shadow: 0 0.6vw 0 #013873;
-    -webkit-text-stroke: 0.1vw #013873;
-    text-shadow: 0 0.3vw 0 #013873;
-}
-
-.leftPanel {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    background: #e0f2fe;
-    border-right: 0.3vw solid #013873;
-    gap: 2vw;
-}
-
-.rightPanel {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: #d5ebfa;
-    padding: 3dvh 2vw;
-    gap: 2.5dvh;
-    position: relative;
-    overflow: hidden;
-}
-
-.title {
-    position: absolute;
-    top: 7dvh;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 44vw;
-    font-family: inherit;
-    max-width: 44vw;
-    font-size: 2.65vw;
-    color: #ffffff;
-    text-align: center;
+    animation: none;
     margin: 0;
-    -webkit-text-stroke: 0.1vw #013873;
-    text-shadow: 0 0.22vw 0 #013873;
-    line-height: 1.08;
+    font-size: min(2.4vw, 4dvh);
 }
-
-.successCard {
-    border-radius: 1vw;
-    padding: 0.8vw 1.8vw 1vw;
-    text-align: center;
-    font-family: inherit;
-    font-size: 1.8vw;
-    color: #ffffff;
-    animation: fadeSlideIn 0.4s ease-out;
-    pointer-events: auto;
-    max-width: 62vw;
-}
-
-.successCard {
-    background: #5ee991;
-    border: 0.4vw solid #16a34a;
-    box-shadow: 0 0.6vw 0 #15803d;
-    -webkit-text-stroke: 0.1vw #16a34a;
-}
-
-.cubeHintCard {
-    position: absolute;
-    right: 1.2vw;
-    bottom: 3dvh;
-    z-index: 40;
-    width: min(19vw, 66%);
-    padding: 0.75vw 1vw 0.9vw;
-    border: 0.3vw solid #ca8a04;
-    border-radius: 1vw;
-    background: #ffe874;
-    box-shadow: 0 0.5vw 0 #a16207;
-    color: #ffffff;
-    text-align: center;
-    font-size: 1.35vw;
-    line-height: 1.12;
-    -webkit-text-stroke: 0.08vw #92400e;
-    text-shadow: 0 0.12vw 0 #92400e;
-}
-
-.cubeHintArrow {
-    position: absolute;
-    top: -0.75vw;
-    left: 24%;
-    width: 1.1vw;
-    aspect-ratio: 1;
-    background: #ffe874;
-    border-top: 0.3vw solid #ca8a04;
-    border-left: 0.3vw solid #ca8a04;
-    transform: rotate(45deg);
-}
-
-.hintIcon {
-    margin-right: 0.5vw;
-    font-size: 1.8vw;
-}
-
-.optionsGrid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5vw;
-    width: 90%;
-    max-width: 40vw;
-}
-
-.optionButton,
-.completeButton {
-    font-family: inherit;
-    font-size: 2vw;
-    padding: 0.8vw 0 1vw;
-    border: 0.4vw solid #013873;
-    border-radius: 1vw;
-    background: #98defc;
-    color: #ffffff;
-    cursor: pointer;
-    box-shadow: 0 0.6vw 0 #013873;
-    transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
-    -webkit-text-stroke: 0.1vw #013873;
-    text-shadow: 0 0.2vw 0 #013873;
-}
-
-.optionButton:hover:not(:disabled),
-.completeButton:hover {
-    transform: translateY(-0.2vw);
-    box-shadow: 0 0.8vw 0 #013873;
-    background: #7dd3fc;
-}
-
-.optionButton:active:not(:disabled),
-.completeButton:active {
-    transform: translateY(0.4vw);
-    box-shadow: 0 0.2vw 0 #013873;
-}
-
-.optionButton:disabled {
-    opacity: 0.8;
-    cursor: not-allowed;
-    background: #e0f2fe;
-    box-shadow: 0 0.2vw 0 #013873;
-    transform: translateY(0.4vw);
-}
-
-.calculationArea {
-    width: min(46vw, 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-}
-
-.completeCard {
-    width: min(38vw, 78%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.2vw;
-    background: #ffffff;
-    border: 0.4vw solid #013873;
-    border-radius: 2vw;
-    box-shadow: 0 0.9vw 0 #013873;
-    padding: 1.4vw 1.8vw 1.8vw;
-}
-
-.completeText,
-.completeStats {
-    margin: 0;
-    text-align: center;
-    font-family: inherit;
-    font-size: 1.8vw;
-    line-height: 1.15;
-    color: #ffffff;
-    -webkit-text-stroke: 0.1vw #013873;
-    text-shadow: 0 0.22vw 0 #013873;
-}
-
-.completeTitle {
-    margin: 0;
-    text-align: center;
-    font-size: 3.2vw;
-    color: #ffffff;
-    -webkit-text-stroke: 0.1vw #013873;
-    text-shadow: 0 0.4vw 0 #013873;
-}
-
-.completeButton {
-    width: 72%;
-    margin-top: 0.8vw;
-}
-
-.calculationRoot {
-    width: 100%;
-    max-width: 100%;
-    padding: 0;
-    gap: 0;
-    color: #013873;
-}
-
-.calculationWorkspace {
-    width: 100%;
-    justify-content: space-between;
-    gap: 0;
-    padding: 0 1.2vw;
-    box-sizing: border-box;
-}
-
-.calculationStage {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.calculationControlRail {
-    width: 11vw;
-    gap: 0.9vw;
-}
-
-.calculationGrid {
-    width: min(16vw, 100%);
-    gap: 0.35vw;
-    padding: 0;
-    background: transparent;
-    box-sizing: border-box;
-}
-
-.calculationCell {
-    border: 0.28vw solid #013873;
-    border-radius: 0.65vw;
-    background: #ffffff;
-    color: #013873;
-    font-size: 2.45vw;
-    box-shadow: inset 0 -0.25vw 0 #bfe8fb;
-    -webkit-text-stroke: 0;
-    text-shadow: none;
-}
-
-.operandCell {
-    background: transparent;
-    border-color: transparent;
-    box-shadow: none;
-    font-size: 2.75vw;
-}
-
-.resultCell {
-    background: #ffffff;
-    border-style: dashed;
-    border-color: #0284c7;
-    box-shadow: inset 0 -0.25vw 0 #bae6fd;
-}
-
-.carryCell {
-    width: 76%;
-    font-size: 1.65vw;
-    background: #d9f99d;
-    border-color: #4d7c0f;
-    color: #365314;
-    -webkit-text-stroke: 0;
-}
-
-.activeCell {
-    background: #fff3a6;
-    border-style: solid;
-    outline: 0.35vw solid #f59e0b;
-    outline-offset: 0.18vw;
-    animation: activeCalculationPulse 1.5s ease-in-out infinite;
-}
-
-.disabledCell {
-    opacity: 1;
-}
-
-.calculationOperator {
-    color: #ffffff;
-    font-size: 2.5vw;
-    -webkit-text-stroke: 0.1vw #013873;
-    text-shadow: 0 0.22vw 0 #013873;
-}
-
-.calculationBar {
-    height: 0.35vw;
-    background: #013873;
-    border-radius: 999vw;
-}
-
-.calculationMessage {
-    min-height: 2.8vw;
-    margin: 0;
-    text-align: center;
-    color: #ffffff;
-    font-size: 1.35vw;
-    line-height: 1.1;
-    background: #ffe874;
-    border: 0.25vw solid #ca8a04;
-    border-radius: 0.9vw;
-    box-shadow: 0 0.35vw 0 #a16207;
-    padding: 0.55vw 1vw 0.7vw;
-    -webkit-text-stroke: 0.09vw #013873;
-    text-shadow: 0 0.15vw 0 #013873;
-}
-
-.calculationCoach {
-    width: 100%;
-    min-height: 0;
-    gap: 0.35vw;
-    padding: 0.75vw 1vw 0.85vw;
-    background: #fff9d9;
-    border: 0.25vw solid #d39b13;
-    border-radius: 1vw;
-    color: #013873;
-    box-sizing: border-box;
-}
-
-.calculationCoachLeft,
-.calculationCoachRight,
-.calculationCoachBelow {
-    width: 15vw;
-}
-
-.calculationCoachArrow {
-    width: 1vw;
-    background: #fff9d9;
-    border-top-width: 0.25vw;
-    border-left-width: 0.25vw;
-}
-
-.calculationCoachBadge {
-    padding: 0.2vw 0.7vw 0.3vw;
-    background: #f59e0b;
-    font-size: 0.95vw;
-    -webkit-text-stroke: 0.08vw #92400e;
-}
-
-.calculationCoachText {
-    font-size: 1.15vw;
-    line-height: 1.12;
-    -webkit-text-stroke: 0.06vw #013873;
-}
-
-.calculationCoachEquation {
-    gap: 0.22vw;
-    font-size: 1.7vw;
-    -webkit-text-stroke: 0;
-    text-shadow: none;
-}
-
-.calculationCoachLeadingDigit,
-.calculationCoachResultDigit {
-    min-width: 1.25em;
-    padding: 0.1em;
-}
-
-.calculationHelpButton {
-    background: #fff3a6;
-    border-color: #d39b13;
-    box-shadow: 0 0.35vw 0 #a16207;
-    -webkit-text-stroke-color: #92400e;
-    text-shadow: 0 0.14vw 0 #92400e;
-}
-
-.calculationToolbar {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    flex-wrap: nowrap;
-    gap: 0.8vw;
-    width: 100%;
-}
-
-.calculationActionButton,
-.keypadButton {
-    border: 0.25vw solid #013873;
-    border-radius: 0.8vw;
-    padding: 0.45vw 1vw 0.65vw;
-    background: #98defc;
-    color: #ffffff;
-    font-family: inherit;
-    font-size: 1.25vw;
-    line-height: 1;
-    cursor: pointer;
-    box-shadow: 0 0.35vw 0 #013873;
-    transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
-    -webkit-text-stroke: 0.08vw #013873;
-    text-shadow: 0 0.14vw 0 #013873;
-}
-
-.calculationActionButton:hover,
-.keypadButton:hover {
-    background: #7dd3fc;
-    transform: translateY(-0.1vw);
-    box-shadow: 0 0.45vw 0 #013873;
-}
-
-.calculationActionButton:active,
-.keypadButton:active {
-    transform: translateY(0.25vw);
-    box-shadow: 0 0.1vw 0 #013873;
-}
-
-.checkButton {
-    background: #5ee991;
-    border-color: #15803d;
-    box-shadow: 0 0.55vw 0 #15803d;
-    flex-basis: auto;
-    font-size: 1.35vw;
-    padding: 0.7vw 0.6vw 0.9vw;
-    -webkit-text-stroke: 0.1vw #15803d;
-    text-shadow: 0 0.18vw 0 #15803d;
-}
-
-.keypad {
-    width: min(11vw, 100%);
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.55vw;
-}
-
-.keypadButton {
-    min-height: 2.6vw;
-    padding-left: 0;
-    padding-right: 0;
-    color: #013873;
-    -webkit-text-stroke: 0;
-    text-shadow: none;
-}
-
 @media (max-width: 650px) and (orientation: portrait) {
-    .container {
-        flex-direction: column;
-    }
-
-    .aulasButton {
-        font-size: min(4vw, 2.2dvh);
-        top: min(3vw, 1.65dvh);
-        left: min(3vw, 1.65dvh);
-        padding: min(1.5vw, 0.83dvh) min(3vw, 1.65dvh) min(2vw, 1.1dvh);
-        border-radius: min(2vw, 1.1dvh);
-        border-width: min(0.6vw, 0.33dvh);
-        box-shadow: 0 min(1.2vw, 0.66dvh) 0 #6b21a8;
-        -webkit-text-stroke: min(0.15vw, 0.08dvh) #6b21a8;
-    }
-
-    .leftPanel {
-        flex: 0 0 36dvh;
-        border-right: none;
-        border-bottom: min(0.3vw, 0.17dvh) solid #013873;
-        gap: min(2vw, 1.1dvh);
-    }
-
-    .headerOverlay {
-        transform: translateY(calc(-1 * min(2vw, 1.1dvh)));
-    }
-
-    .cubeTitle {
-        font-size: min(4vw, 2.2dvh);
-        padding: min(1.5vw, 0.83dvh) min(3vw, 1.65dvh) min(1.9vw, 1.05dvh);
-        border-radius: min(2vw, 1.1dvh);
-        border-width: min(0.5vw, 0.28dvh);
-        box-shadow: 0 min(1vw, 0.55dvh) 0 #013873;
-        -webkit-text-stroke: min(0.15vw, 0.08dvh) #013873;
-        text-shadow: 0 min(0.5vw, 0.28dvh) 0 #013873;
-    }
-
-    .feedbackOverlay {
-        top: 34dvh;
-    }
-
-    .rightPanel {
-        flex: 1;
-        padding: min(3vw, 1.65dvh);
-        gap: min(2.2vw, 1.21dvh);
-        overflow: hidden;
-    }
-
-    .title {
-        top: min(3vw, 1.65dvh);
-        width: 92vw;
-        max-width: 92vw;
-        font-size: min(5.2vw, 2.86dvh);
-        -webkit-text-stroke: min(0.15vw, 0.08dvh) #013873;
-        text-shadow: 0 min(0.35vw, 0.19dvh) 0 #013873;
-    }
-
-    .optionsGrid {
-        width: 90%;
-        max-width: 82vw;
-        gap: min(3vw, 1.65dvh);
-    }
-
-    .optionButton,
-    .completeButton {
-        font-size: min(5vw, 2.75dvh);
-        padding: min(2vw, 1.1dvh) 0 min(2.5vw, 1.38dvh);
-        border-width: min(0.6vw, 0.33dvh);
-        border-radius: min(2vw, 1.1dvh);
-        box-shadow: 0 min(1.2vw, 0.66dvh) 0 #013873;
-        -webkit-text-stroke: min(0.15vw, 0.08dvh) #013873;
-        text-shadow: 0 min(0.4vw, 0.22dvh) 0 #013873;
-    }
-
-    .successCard {
-        font-size: min(3.4vw, 1.87dvh);
-        padding: min(1.5vw, 0.83dvh) min(3vw, 1.65dvh) min(2vw, 1.1dvh);
-        border-radius: min(2vw, 1.1dvh);
-        max-width: 86vw;
-        border-width: min(0.6vw, 0.33dvh);
-    }
-
-    .cubeHintCard {
-        right: auto;
-        bottom: min(2vw, 1.1dvh);
-        left: 50%;
-        width: 78vw;
-        max-width: 78vw;
-        padding: min(1.2vw, 0.66dvh) min(2vw, 1.1dvh) min(1.5vw, 0.83dvh);
-        border-width: min(0.5vw, 0.28dvh);
-        border-radius: min(2vw, 1.1dvh);
-        box-shadow: 0 min(0.8vw, 0.44dvh) 0 #a16207;
-        font-size: min(3vw, 1.65dvh);
-        -webkit-text-stroke: min(0.12vw, 0.07dvh) #92400e;
-        transform: translateX(-50%);
-    }
-
-    .cubeHintArrow {
-        top: calc(-1 * min(1.3vw, 0.72dvh));
-        left: 50%;
-        width: min(2vw, 1.1dvh);
-        border-top-width: min(0.5vw, 0.28dvh);
-        border-left-width: min(0.5vw, 0.28dvh);
-    }
-
-    .hintIcon {
-        font-size: min(3.4vw, 1.87dvh);
-        margin-right: min(0.8vw, 0.44dvh);
-    }
-
-    .calculationArea {
-        width: 94vw;
-    }
-
-    .completeCard {
-        width: 86vw;
-        gap: min(1.4vw, 0.77dvh);
-        border-width: min(0.6vw, 0.33dvh);
-        border-radius: min(3vw, 1.65dvh);
-        box-shadow: 0 min(1.2vw, 0.66dvh) 0 #013873;
-        padding: min(2vw, 1.1dvh) min(3vw, 1.65dvh) min(2.4vw, 1.32dvh);
-    }
-
-    .completeText,
-    .completeStats {
-        font-size: min(3.2vw, 1.76dvh);
-        -webkit-text-stroke: min(0.15vw, 0.08dvh) #013873;
-        text-shadow: 0 min(0.25vw, 0.14dvh) 0 #013873;
-    }
-
-    .completeTitle {
-        font-size: min(6vw, 3.3dvh);
-        -webkit-text-stroke: min(0.15vw, 0.08dvh) #013873;
-        text-shadow: 0 min(0.55vw, 0.3dvh) 0 #013873;
-    }
-
-    .calculationRoot {
-        gap: 0;
-    }
-
-    .calculationWorkspace {
-        width: 94vw;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0;
-        padding: 0 min(2vw, 1.1dvh);
-    }
-
-    .calculationControlRail {
-        width: min(38vw, 21dvh);
-        gap: min(1.2vw, 0.66dvh);
-    }
-
-    .calculationGrid {
-        width: min(36vw, 19.8dvh);
-        gap: min(0.7vw, 0.39dvh);
-        padding: 0;
-    }
-
-    .calculationCell {
-        border-width: min(0.45vw, 0.25dvh);
-        border-radius: min(1.3vw, 0.72dvh);
-        font-size: min(5vw, 2.75dvh);
-        box-shadow: inset 0 calc(-1 * min(0.45vw, 0.25dvh)) 0 #bfe8fb;
-        -webkit-text-stroke: 0;
-    }
-
-    .carryCell {
-        font-size: min(3.2vw, 1.76dvh);
-        -webkit-text-stroke: 0;
-    }
-
-    .activeCell {
-        outline-width: min(0.65vw, 0.36dvh);
-        outline-offset: min(0.25vw, 0.14dvh);
-    }
-
-    .calculationOperator {
-        font-size: min(4.8vw, 2.64dvh);
-        -webkit-text-stroke: min(0.15vw, 0.08dvh) #013873;
-        text-shadow: 0 min(0.35vw, 0.19dvh) 0 #013873;
-    }
-
-    .calculationBar {
-        height: min(0.7vw, 0.39dvh);
-    }
-
-    .calculationMessage {
-        min-height: min(5.2vw, 2.86dvh);
-        font-size: min(2.9vw, 1.6dvh);
-        border-width: min(0.45vw, 0.25dvh);
-        border-radius: min(1.4vw, 0.77dvh);
-        box-shadow: 0 min(0.65vw, 0.36dvh) 0 #a16207;
-        padding: min(0.8vw, 0.44dvh) min(1.6vw, 0.88dvh) min(1vw, 0.55dvh);
-        -webkit-text-stroke: min(0.16vw, 0.09dvh) #013873;
-        text-shadow: 0 min(0.2vw, 0.11dvh) 0 #013873;
-    }
-
-    .calculationCoach {
-        width: 100%;
-        min-height: 0;
-        gap: min(0.6vw, 0.33dvh);
-        padding: min(1.2vw, 0.66dvh) min(2vw, 1.1dvh) min(1.4vw, 0.77dvh);
-        border-width: min(0.45vw, 0.25dvh);
-        border-radius: min(1.8vw, 0.99dvh);
-    }
-
-    .calculationCoachLeft,
-    .calculationCoachRight,
-    .calculationCoachBelow {
-        width: min(34vw, 18.7dvh);
-    }
-
-    .calculationCoachArrow {
-        width: min(2vw, 1.1dvh);
-        border-top-width: min(0.45vw, 0.25dvh);
-        border-left-width: min(0.45vw, 0.25dvh);
-    }
-
-    .calculationCoachBadge {
-        padding: min(0.35vw, 0.19dvh) min(1.2vw, 0.66dvh) min(0.45vw, 0.25dvh);
-        font-size: min(2.3vw, 1.27dvh);
-        -webkit-text-stroke: min(0.12vw, 0.07dvh) #92400e;
-    }
-
-    .calculationCoachText {
-        font-size: min(2.7vw, 1.49dvh);
-        -webkit-text-stroke: min(0.1vw, 0.06dvh) #013873;
-    }
-
-    .calculationCoachEquation {
-        gap: min(0.4vw, 0.22dvh);
-        font-size: min(3.5vw, 1.93dvh);
-        -webkit-text-stroke: 0;
-    }
-
-    .calculationToolbar {
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: min(1.4vw, 0.77dvh);
-    }
-
-    .calculationActionButton,
-    .keypadButton {
-        border-width: min(0.45vw, 0.25dvh);
-        border-radius: min(1.4vw, 0.77dvh);
-        padding: min(0.8vw, 0.44dvh) min(1.6vw, 0.88dvh) min(1vw, 0.55dvh);
-        font-size: min(2.8vw, 1.54dvh);
-        box-shadow: 0 min(0.65vw, 0.36dvh) 0 #013873;
-        -webkit-text-stroke: min(0.12vw, 0.07dvh) #013873;
-        text-shadow: 0 min(0.2vw, 0.11dvh) 0 #013873;
-    }
-
-    .checkButton {
-        box-shadow: 0 min(0.95vw, 0.52dvh) 0 #15803d;
-        flex-basis: 100%;
-        font-size: min(3.5vw, 1.93dvh);
-        padding: min(1.2vw, 0.66dvh) min(1.6vw, 0.88dvh) min(1.5vw, 0.83dvh);
-        -webkit-text-stroke: min(0.15vw, 0.08dvh) #15803d;
-        text-shadow: 0 min(0.2vw, 0.11dvh) 0 #15803d;
-    }
-
-    .keypad {
-        width: min(36vw, 19.8dvh);
-        gap: min(1vw, 0.55dvh);
-    }
-
-    .keypadButton {
-        min-height: min(5.2vw, 2.86dvh);
-        padding-left: 0;
-        padding-right: 0;
-        -webkit-text-stroke: 0;
-        text-shadow: none;
-    }
+    .successOverlay { font-size: min(5vw, 3dvh); padding: 1.5vw 4vw; }
 }
 
-@keyframes fadeSlideIn {
-    0% {
-        opacity: 0;
-        transform: translateY(-2vw);
-    }
-
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
+/* Match Class 1 error colors through hover and activation. */
+.optionButton.wrongOption,
+.optionButton.wrongOption:hover:not(:disabled),
+.optionButton.wrongOption:active:not(:disabled) {
+    background: #ffb4a8; border-color: #9f1239; box-shadow: 0 0.6vw 0 #9f1239;
+    -webkit-text-stroke-color: #9f1239; text-shadow: 0 0.2vw 0 #9f1239;
 }
-
-@keyframes activeCalculationPulse {
-    0%,
-    100% {
-        outline-color: #f59e0b;
-        transform: scale(1);
-    }
-
-    50% {
-        outline-color: #facc15;
-        transform: scale(1.04);
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .activeCell {
-        animation: none;
-    }
+@media (max-width: 650px) and (orientation: portrait) {
+    .optionButton.wrongOption,
+    .optionButton.wrongOption:hover:not(:disabled),
+    .optionButton.wrongOption:active:not(:disabled) { box-shadow: 0 1.2vw 0 #9f1239; }
 }

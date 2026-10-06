@@ -29,12 +29,12 @@
     flex-direction: column;
     align-items: center;
     width: 60vw;
-    max-height: 90vh;
+    max-height: 90dvh;
+    overflow-y: auto;
+    box-sizing: border-box;
     box-shadow: 0 1vw 0 #7f0000;
     /* Hard drop shadow */
     animation: fadeIn 0.3s ease;
-    justify-content: center;
-    align-items: center;
     transition: all 0.2s ease;
     position: relative;
 }
@@ -86,6 +86,10 @@
 
 .resultStats p {
     margin: 0;
+}
+
+.resultStats .statLine {
+    -webkit-text-stroke: 0.09vw #7f0000;
 }
 
 .resultActions {
@@ -191,79 +195,60 @@
     color: #ffcf40;
 }
 
-/* Details Modal Overlay */
-.detailsModalOverlay {
-    position: absolute;
-    bottom: 120%;
-    /* Position above the button */
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90%;
-    max-height: 40vh;
-    background-color: #9c8080;
-    /* Board Gray Background */
-    border: 0.4vw solid #c62828;
-    border-radius: 2vw;
-    padding: 1.5vw;
-    box-shadow: 0 0.8vw 0 #7f0000;
-    display: flex;
-    flex-direction: column;
-    z-index: 10;
-    animation: fadeInDetails 0.2s ease forwards;
-}
-
-/* Specific animation for details to preserve centering */
-@keyframes fadeInDetails {
-    from {
-        opacity: 0;
-        transform: translateX(-50%) scale(0.9);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(-50%) scale(1);
-    }
-}
-
-.detailsHeader {
-    display: none;
-}
-
-/* Click outside backdrop */
-.clickOutsideBackdrop {
+.detailsBackdrop {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 9;
-    cursor: default;
+    inset: 0;
+    z-index: 2200;
+    display: grid;
+    place-items: center;
+    padding: 4vw;
+    box-sizing: border-box;
+    background: rgb(30 10 10 / 40%);
 }
 
-.detailsList {
-    width: 100%;
-    overflow-y: auto;
+.detailsDialog {
+    width: min(66vw, 105dvh);
+    max-width: 100%;
+    max-height: 82dvh;
+    min-height: 0;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    gap: 0.8vw;
-    padding-right: 0.5vw;
-}
-
-/* Scrollbar styles for details list */
-.detailsList::-webkit-scrollbar {
-    width: 0.5vw;
-}
-
-.detailsList::-webkit-scrollbar-track {
+    gap: min(1.5vw, 2dvh);
+    padding: min(2vw, 3dvh);
+    border: min(0.4vw, 0.6dvh) solid #7f0000;
+    border-radius: min(2vw, 3dvh);
     background: #d18d8d;
-    /* Matches the parent Modal */
-    border-radius: 0.25vw;
+    box-shadow: 0 min(0.8vw, 1.2dvh) #7f0000;
+    color: #fff;
+    animation: fadeIn 0.2s ease;
 }
 
-.detailsList::-webkit-scrollbar-thumb {
-    background: #c62828;
-    border-radius: 0.25vw;
+.detailsHeader { display: flex; align-items: center; justify-content: space-between; gap: 2vw; }
+.detailsHeader h2 {
+    margin: 0;
+    color: #fff;
+    font-size: min(2.8vw, 4dvh);
+    -webkit-text-stroke: min(0.13vw, 0.2dvh) #7f0000;
+    text-shadow: 0 min(0.15vw, 0.23dvh) #5c0000;
 }
+.detailsClose {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: min(3.5vw, 5.5dvh);
+    aspect-ratio: 1;
+    padding: 0;
+    color: #fff;
+    font: inherit;
+    font-size: min(2.8vw, 4dvh);
+    border: min(0.2vw, 0.3dvh) solid #7f0000;
+    border-radius: 50%;
+    background: #da3e3e;
+    cursor: pointer;
+    -webkit-text-stroke: min(0.1vw, 0.15dvh) #7f0000;
+}
+.detailsClose:focus-visible { outline: min(0.25vw, 0.4dvh) solid #ffcf40; outline-offset: min(0.2vw, 0.3dvh); }
 
 .detailItem {
     display: flex;
@@ -412,26 +397,9 @@
         margin-top: min(2vw, 1.1dvh);
     }
 
-    .detailsModalOverlay {
-        padding: min(3vw, 1.65dvh);
-        border-width: min(0.7vw, 0.385dvh);
-        border-radius: min(4vw, 2.2dvh);
-        box-shadow: 0 min(1.5vw, 0.825dvh) 0 #7f0000;
-        max-height: min(55vw, 40dvh);
-    }
-
-    .detailsList {
-        gap: min(1.5vw, 0.825dvh);
-    }
-
-    .detailsList::-webkit-scrollbar {
-        width: min(1vw, 0.55dvh);
-    }
-
-    .detailsList::-webkit-scrollbar-track,
-    .detailsList::-webkit-scrollbar-thumb {
-        border-radius: min(0.5vw, 0.275dvh);
-    }
+    .detailsDialog { width: min(92vw, 60dvh); padding: min(4vw, 2dvh); border-width: min(0.8vw, 0.4dvh); border-radius: min(4vw, 2dvh); }
+    .detailsHeader h2 { font-size: min(5.5vw, 2.75dvh); -webkit-text-stroke-width: min(0.3vw, 0.15dvh); }
+    .detailsClose { width: min(8vw, 4dvh); font-size: min(6vw, 3dvh); border-width: min(0.5vw, 0.25dvh); }
 
     .detailItem {
         padding: min(1vw, 0.55dvh) min(2vw, 1.1dvh);
@@ -443,4 +411,33 @@
     .detailInfo {
         font-size: min(2.5vw, 1.375dvh);
     }
+}
+
+.roundDetails {
+    width: 100%;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: min(0.8vw, 1dvh);
+}
+
+.roundDetail {
+    color: #fff;
+    font-size: min(1.7vw, 2.5dvh);
+    background: #7f3636;
+    border-radius: min(0.8vw, 1dvh);
+    padding: min(0.8vw, 1dvh);
+}
+
+.roundDetail summary { cursor: pointer; }
+.roundDetail .detailItem { margin-top: min(0.5vw, 0.7dvh); gap: min(0.6vw, 0.8dvh); }
+
+@media (orientation: portrait) and (max-width: 650px) {
+    .roundDetail { font-size: min(3.8vw, 1.9dvh); padding: min(2vw, 1dvh); }
+    .roundDetail .detailInfo { font-size: min(3.5vw, 1.75dvh); line-height: 1.4; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .levelResultModal, .detailsDialog { animation: none; transition: none; }
 }

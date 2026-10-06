@@ -149,6 +149,10 @@
 }
 
 /* Physical suitcase modules */
+.srOnly { position: absolute; width: 0; height: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.equation input:focus-visible, .page button:focus-visible { outline: .25vw solid #fff0cf; outline-offset: .2vw; }
+.sessionWarning { position: fixed; z-index: 30; top: 9dvh; left: 5%; width: 90%; box-sizing: border-box; padding: 1.5dvh 2vw; border: .3vw solid #ffc83d; border-radius: 1vw; background: #21070b; color: #fff0cf; font-size: min(4vw, 2.5dvh); text-align: center; }
+.sessionWarning button { margin-left: 2vw; padding: 1dvh 2vw; font: inherit; background: #ffc83d; color: #21070b; border-radius: 1vw; cursor: pointer; }
 .activeMatch { min-height: 100dvh; }
 .matchBar { position: relative; z-index: 10; height: 7dvh; box-sizing: border-box; padding: .45dvh 9vw .55dvh 6vw; display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto auto; align-items: center; gap: 1.5vw; background-color: #090204; border-bottom: .3vw solid #c3263a; }
 .matchRoom { min-width: 0; display: flex; align-items: baseline; gap: .8vw; line-height: 1; white-space: nowrap; }
@@ -235,5 +239,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mistakeSection, .wrongControl, .pendingControl { animation: none; }
+  .mistakeSection, .wrongControl, .pendingControl, .codeTable .highlightedCalculation, .heartNotice { animation: none; }
 }

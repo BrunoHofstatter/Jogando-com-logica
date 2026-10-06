@@ -410,9 +410,10 @@ Do not implement a large generic Bomb Game framework before at least one templat
 - Section 1 generates seven varied numbers across controlled low, middle, and high bands. The bomb player selects them from smallest to largest. Correct progress is preserved after a mistake.
 - The manual contains fresh simple calculations for A, B, C, and D on every round. Their results stay within A: 2–7, B: 5–10, C: 1–5, and D: 11–14.
 - Section 2 asks for A + B, B − C, and C + A. Complete numeric inputs are submitted after two seconds without typing.
-- Section 3 asks the player to select among plus, minus, and multiplication. Its equations resolve to 5 + A, 8 − C, and D − 3; multiplication is an unused distractor.
+- Section 3 selects one of four equally likely operator sets each round: two plus and one minus, two minus and one plus, all minus, or all plus. The chosen set is shuffled across the three rows. Every equation puts the letter first: A ? number, C ? number, and D ? number. Visible operands/results are chosen independently of the sign, then the manual's letter value is derived. Both addition and subtraction imply values within the existing letter range, so the visible numbers alone do not disclose the sign. Operands are 1 or 2 for A/C and 1 for D; results stay positive. Multiplication remains a selectable distractor and is never correct for either possible letter value. The actual manual value gives exactly one valid answer. Solutions are server-only; the bomb receives the equation results.
 - A completed section gets a green border and subtle green background, then locks.
-- Hints highlight ordering direction or the relevant manual calculations after mistakes.
+- When hints are enabled, the manual gives ordering guidance or highlights the relevant calculations after mistakes. Disabling hints also disables that highlighting.
+- Level 1 checks include 600 seeded puzzles, all six module completion orders, role-payload separation, numeric zero, solved controls, and stale ordering revisions. A real Socket.IO test covers full win/loss/replay, deadline expiry, malformed envelopes, duplicate delivery, and rapid repeated clicks. DOM unit tests cover input timing, hints, disconnected controls, and exit-dialog keyboard focus; these are not browser visual checks.
 
 ## Implemented Online Screen Flow
 
@@ -426,6 +427,8 @@ Do not implement a large generic Bomb Game framework before at least one templat
 - After both replay votes, a three-second replay countdown returns the same room to role selection with a newly generated puzzle.
 - The result screen also allows a player to leave for the online lobby.
 - Hosts can select Numbers or Navigation in the level menu or lobby. Joining uses the hosted level; replay preserves it and regenerates both puzzles.
+- Socket envelopes are validated before handlers destructure them. Countdown displays use server clock synchronization with round-trip estimation and a monotonic local anchor, refreshed every 30 seconds; snapshots supply an initial fallback.
+- Local and partner disconnections show an in-match warning and a lobby exit. Local disconnection disables controls and cancels pending answers. Active sessions do not automatically reconnect: room rejoining remains unimplemented.
 
 ## Implemented Level 3: Navigation (Phases 1–3)
 
@@ -467,10 +470,12 @@ Do not implement a large generic Bomb Game framework before at least one templat
 
 - Sections 2 and 3 use two rows on top with the third centered below.
 - Numeric answers validate two seconds after typing stops.
-- Operator answers use a plus/minus/multiplication selector and validate two seconds after selection; changing the selection restarts the delay.
+- Operator answers use a plus/minus/multiplication selector and validate two seconds after selection; changing the selection restarts the delay. Reopening the selector pauses submission; choosing an operator or closing it with a selected operator starts a fresh two-second delay. No answer confirmation button is used.
 - The server identifies the exact mistaken section and row so only the incorrect control clears.
-- Pending validation timers are cancelled when their control locks or the round ends.
+- Pending validation timers are cancelled when their control locks, the local connection is lost, or the round ends.
 - Each submitted intent has an action identifier so duplicate delivery cannot cost multiple lives.
+- Ordering actions also carry a revision. The client waits for the server reply and suppresses a rapid repeat of the same number at the same progress point for 650 ms; the server protects the same wrong-number repeat for 600 ms, including legacy clients. Making correct ordering progress permits a fresh attempt. Stale revisions do not cost hearts.
+- Numeric fields have visible keyboard focus and accessible error feedback. The exit dialog moves/traps focus, handles Escape, and restores focus on close.
 - Manual calculations never contain zero or negative operands.
 - The manual uses the full available width and does not show redundant section-status cards.
 - The bomb view uses the approved modern comic shell: gray and black cel-shaded metal, bold outlines, yellow caution accents, rim-mounted cartoon explosive bundles, and a separate wired timer case.

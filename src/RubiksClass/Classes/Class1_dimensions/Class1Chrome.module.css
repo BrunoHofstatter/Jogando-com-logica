@@ -1,0 +1,7 @@
+.aulasButton { composes: aulasButton from "../Class2_faceArea/Class2FaceArea.module.css"; }
+.hintDock { composes: hintDock from "../Class2_faceArea/Class2FaceArea.module.css"; }
+.hintButton { composes: hintButton from "../Class2_faceArea/Class2FaceArea.module.css"; }
+.offeredHelp { composes: offeredHint from "../Class2_faceArea/Class2FaceArea.module.css"; }
+.headerOverlay { composes: headerOverlay from "../Class2_faceArea/Class2FaceArea.module.css"; pointer-events: none; }
+.hintCard { composes: hintCard from "../Class2_faceArea/Class2FaceArea.module.css"; }
+.helpPrompt { composes: helpPrompt from "../Class2_faceArea/Class2FaceArea.module.css"; }

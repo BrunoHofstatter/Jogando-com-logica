@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { ChevronDown, Heart, Lightbulb, LockKeyhole, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -10,6 +10,7 @@ import { useBombGameMultiplayer } from "../Hooks/useBombGameMultiplayer";
 import type { Operator } from "../Logic/level1";
 import type { BombViewState, ManualViewState, RolePreference } from "../Logic/multiplayer/protocol";
 import styles from "../styles/GamePage.module.css";
+import { bombServerClock } from "../Logic/serverClock";
 
 type GameApi = ReturnType<typeof useBombGameMultiplayer>;
 
@@ -33,6 +34,8 @@ export default function BombGamePage() {
 
   return <div className={styles.page}>
     {!activeMatch && <RoomBar game={game} onLeave={() => setLeaveOpen(true)} />}
+    {game.connectionStatus === "disconnected" && <div role="alert" className={styles.sessionWarning}>Conexão interrompida. Esta partida não pode ser retomada. <button onClick={leaveRoom}>Voltar ao lobby online</button></div>}
+    {game.opponentDisconnected && <div role="alert" className={styles.sessionWarning}>Seu parceiro desconectou. O tempo continua correndo. <button onClick={leaveRoom}>Voltar ao lobby online</button></div>}
     {!game.gameState ? <RoleSelection game={game} /> : game.gameState.phase === "countdown" ? <RoleCountdown state={game.gameState} /> : game.gameState.phase === "replay_countdown" ? <ReplayCountdown state={game.gameState} /> : ["won", "lost"].includes(game.gameState.phase) ? <ResultOverlay game={game} onReturn={leaveRoom} /> : <ActiveMatch game={game} onLeave={() => setLeaveOpen(true)} />}
     {leaveOpen && <ConfirmOverlay title="Sair da sala?" text="A sala será encerrada para os dois jogadores." confirm="Sair" onCancel={() => setLeaveOpen(false)} onConfirm={leaveRoom} />}
   </div>;
@@ -61,8 +64,8 @@ function RoleSelection({ game }: { game: GameApi }) {
   return <main className={styles.rolePage}><section className={styles.roleCard}>
     <h1>Escolha seu papel</h1><p>Nível {game.levelId} · {getBombLevel(game.levelId).title}</p><p>Se os dois escolherem o mesmo papel, o sorteio será automático.</p>
     <div className={styles.playerCards}>{game.players.map((player) => <article key={player.seat} className={player.ready ? styles.playerReady : ""}><strong>{player.name}</strong><span>{preferenceLabel(player.preference)}</span>{player.ready && <span className={styles.readyMark}>✓</span>}</article>)}</div>
-    <div className={styles.roleButtons}>{options.map((option) => <button key={option.value} className={me?.preference === option.value ? styles.selectedButton : ""} onClick={() => game.setPreference(option.value)} disabled={Boolean(me?.ready)}>{option.label}</button>)}</div>
-    <button className={styles.readyButton} onClick={() => game.setReady(!me?.ready)}>{me?.ready ? "Cancelar pronto" : "Pronto"}</button>
+    <div className={styles.roleButtons}>{options.map((option) => <button key={option.value} className={me?.preference === option.value ? styles.selectedButton : ""} onClick={() => game.setPreference(option.value)} disabled={Boolean(me?.ready) || game.connectionStatus === "disconnected"}>{option.label}</button>)}</div>
+    <button className={styles.readyButton} disabled={game.connectionStatus === "disconnected" || game.opponentDisconnected} onClick={() => game.setReady(!me?.ready)}>{me?.ready ? "Cancelar pronto" : "Pronto"}</button>
   </section></main>;
 }
 
@@ -91,37 +94,38 @@ function ActiveMatch({ game, onLeave }: { game: GameApi; onLeave: () => void }) 
 
   return <div className={`${styles.activeMatch} ${state.role === "bomb" ? styles.bombMatch : ""}`}>
     <MatchBar game={game} seconds={seconds} onLeave={onLeave} />
-    {heartLost && <div className={styles.heartNotice}>Coração perdido!</div>}
-    {game.connectionStatus === "disconnected" && <p role="alert" className={styles.connectionWarning}>Conexão interrompida. Os controles estão indisponíveis.</p>}
+    <div role="status" aria-live="polite" aria-atomic="true" className={heartLost ? styles.heartNotice : styles.srOnly}>{heartLost ? "Coração perdido! Confira a resposta com seu parceiro." : ""}</div>
     {state.levelId === 3
       ? state.role === "bomb"
         ? <NavigationBombPanel key={state.roundId} state={state} seconds={seconds} submit={game.submit} disconnected={game.connectionStatus === "disconnected"} />
         : <NavigationManualPanel key={state.roundId} state={state} submit={game.submit} disconnected={game.connectionStatus === "disconnected"} />
-      : state.role === "bomb" ? <BombPanel state={state} seconds={seconds} submit={game.submit} /> : <ManualPanel state={state} />}
+      : state.role === "bomb" ? <BombPanel key={state.roundId} state={state} seconds={seconds} submit={game.submit} disconnected={game.connectionStatus === "disconnected"} orderingPending={game.orderingPending} /> : <ManualPanel state={state} />}
   </div>;
 }
 
-function BombPanel({ state, seconds, submit }: { state: BombViewState; seconds: number; submit: GameApi["submit"] }) {
+export function BombPanel({ state, seconds, submit, disconnected = false, orderingPending = false }: { state: BombViewState; seconds: number; submit: GameApi["submit"]; disconnected?: boolean; orderingPending?: boolean }) {
   const completed = (section: 1 | 2 | 3) => state.completedSections.includes(section);
+  const disabled = disconnected || state.phase !== "playing";
   return <BombCaseLayout completedSections={state.completedSections} time={formatTime(seconds)} urgent={seconds <= 30}>
     <Section module="01" title="Sequência" tone="red" done={completed(1)} mistake={state.mistake?.section === 1}>
       <p className={styles.sectionInstruction}>Selecione na ordem indicada pelo manual.</p>
       <div className={styles.numberGrid}>{state.orderingNumbers.map((number) => {
         const selected = state.orderingProgress.includes(number);
         const wrong = state.mistake?.section === 1 && state.mistake.value === number;
-        return <button key={number} aria-pressed={selected} disabled={completed(1) || selected} className={`${selected ? styles.numberSelected : ""} ${wrong ? styles.wrongControl : ""}`} onClick={() => submit({ type: "select_ordering_number", value: number })}>{number}</button>;
+        return <button key={number} aria-pressed={selected} aria-invalid={wrong} disabled={disabled || orderingPending || completed(1) || selected} className={`${selected ? styles.numberSelected : ""} ${wrong ? styles.wrongControl : ""}`} onClick={() => submit({ type: "select_ordering_number", value: number, revision: state.orderingRevision })}>{number}</button>;
       })}</div>
     </Section>
     <Section module="02" title="Código" tone="yellow" done={completed(2)} mistake={state.mistake?.section === 2}>
-      <div className={styles.equationGrid}>{state.numericTargets.map((target, row) => <NumericEquation key={target} row={row as 0 | 1 | 2} target={target} answer={state.numericAnswers[row]} eventId={state.eventId} mistakeRow={state.mistake?.section === 2 ? state.mistake.row : null} disabled={state.phase !== "playing"} submit={submit} />)}</div>
+      <div className={styles.equationGrid}>{state.numericTargets.map((target, row) => <NumericEquation key={target} row={row as 0 | 1 | 2} target={target} answer={state.numericAnswers[row]} eventId={state.eventId} mistakeRow={state.mistake?.section === 2 ? state.mistake.row : null} disabled={disabled} submit={submit} />)}</div>
     </Section>
     <Section module="03" title="Operadores" tone="blue" done={completed(3)} mistake={state.mistake?.section === 3}>
-      <div className={styles.equationGrid}>{state.operatorEquations.map((equation, row) => <OperatorEquation key={`${equation.left}-${equation.right}`} row={row as 0 | 1 | 2} equation={equation} answer={state.operatorAnswers[row]} eventId={state.eventId} mistakeRow={state.mistake?.section === 3 ? state.mistake.row : null} disabled={state.phase !== "playing"} submit={submit} />)}</div>
+      <div className={styles.equationGrid}>{state.operatorEquations.map((equation, row) => <OperatorEquation key={`${equation.left}-${equation.right}`} row={row as 0 | 1 | 2} equation={equation} answer={state.operatorAnswers[row]} eventId={state.eventId} mistakeRow={state.mistake?.section === 3 ? state.mistake.row : null} disabled={disabled} submit={submit} />)}</div>
     </Section>
   </BombCaseLayout>;
 }
 
-function NumericEquation({ row, target, answer, eventId, mistakeRow, disabled, submit }: { row: 0 | 1 | 2; target: string; answer: number | null; eventId: number; mistakeRow: number | null; disabled: boolean; submit: GameApi["submit"] }) {
+export function NumericEquation({ row, target, answer, eventId, mistakeRow, disabled, submit }: { row: 0 | 1 | 2; target: string; answer: number | null; eventId: number; mistakeRow: number | null; disabled: boolean; submit: GameApi["submit"] }) {
+  const feedbackId = useId();
   const [value, setValue] = useState(answer === null ? "" : String(answer));
   const [pending, setPending] = useState(false);
   const timeout = useRef<number | null>(null);
@@ -137,10 +141,12 @@ function NumericEquation({ row, target, answer, eventId, mistakeRow, disabled, s
       timeout.current = window.setTimeout(() => { setPending(false); submit({ type: "submit_numeric_answer", row, value: Number(nextValue) }); }, 2000);
     }
   };
-  return <label className={`${styles.equation} ${answer !== null ? styles.equationSolved : ""} ${pending ? styles.pendingControl : ""} ${mistakeRow === row ? styles.wrongControl : ""}`}><span className={styles.rowLight} aria-hidden="true" /><span>{target} =</span><input aria-label={`Resposta para ${target}`} inputMode="numeric" value={value} disabled={disabled || answer !== null} onChange={(event) => change(event.target.value)} /></label>;
+  return <label className={`${styles.equation} ${answer !== null ? styles.equationSolved : ""} ${pending ? styles.pendingControl : ""} ${mistakeRow === row ? styles.wrongControl : ""}`}><span className={styles.rowLight} aria-hidden="true" /><span>{target} =</span><input aria-label={`Resposta para ${target}`} aria-invalid={mistakeRow === row} aria-describedby={feedbackId} inputMode="numeric" value={value} disabled={disabled || answer !== null} onChange={(event) => change(event.target.value)} /><span id={feedbackId} role="status" className={styles.srOnly}>{pending ? "A resposta será enviada em dois segundos sem digitar." : mistakeRow === row ? "Resposta incorreta. Confira com seu parceiro e tente novamente." : answer !== null ? "Resposta correta." : ""}</span></label>;
 }
 
-function OperatorEquation({ row, equation, answer, eventId, mistakeRow, disabled, submit }: { row: 0 | 1 | 2; equation: BombViewState["operatorEquations"][number]; answer: Operator | null; eventId: number; mistakeRow: number | null; disabled: boolean; submit: GameApi["submit"] }) {
+export function OperatorEquation({ row, equation, answer, eventId, mistakeRow, disabled, submit }: { row: 0 | 1 | 2; equation: BombViewState["operatorEquations"][number]; answer: Operator | null; eventId: number; mistakeRow: number | null; disabled: boolean; submit: GameApi["submit"] }) {
+  const feedbackId = useId();
+  const trigger = useRef<HTMLButtonElement>(null);
   const [selected, setSelected] = useState<Operator | null>(answer);
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(false);
@@ -150,19 +156,25 @@ function OperatorEquation({ row, equation, answer, eventId, mistakeRow, disabled
   useEffect(() => { if (disabled || answer !== null) { clearPending(); setOpen(false); } if (answer !== null) setSelected(answer); }, [answer, disabled]);
   useEffect(() => { if (mistakeRow === row) { clearPending(); setSelected(null); setOpen(false); } }, [eventId, mistakeRow, row]);
   const choose = (operator: Operator) => {
+    if (disabled || answer !== null) return;
     clearPending(); setSelected(operator); setOpen(false); setPending(true);
+    trigger.current?.focus();
     timeout.current = window.setTimeout(() => { setPending(false); submit({ type: "select_operator", row, value: operator }); }, 2000);
   };
-  return <div className={`${styles.equation} ${styles.operatorEquation} ${answer !== null ? styles.equationSolved : ""} ${pending ? styles.pendingControl : ""} ${mistakeRow === row ? styles.wrongControl : ""}`}><span className={styles.rowLight} aria-hidden="true" /><span>{equation.left}</span><div className={styles.operatorSelect}><button aria-label={`Escolher operador entre ${equation.left} e ${equation.right}`} aria-expanded={open} disabled={disabled || answer !== null} onClick={() => setOpen((current) => !current)}>{selected ? displayOperator(selected) : <ChevronDown />}</button>{open && <div className={styles.operatorMenu}>{(["+", "-", "*"] as Operator[]).map((operator) => <button key={operator} onClick={() => choose(operator)}>{displayOperator(operator)}</button>)}</div>}</div><span>{equation.right} = {equation.result}</span></div>;
+  const toggle = () => {
+    if (!open) { clearPending(); setOpen(true); }
+    else { setOpen(false); if (selected) choose(selected); }
+  };
+  return <div className={`${styles.equation} ${styles.operatorEquation} ${answer !== null ? styles.equationSolved : ""} ${pending ? styles.pendingControl : ""} ${mistakeRow === row ? styles.wrongControl : ""}`}><span className={styles.rowLight} aria-hidden="true" /><span>{equation.left}</span><div className={styles.operatorSelect}><button ref={trigger} aria-label={`Escolher operador entre ${equation.left} e ${equation.right}${selected ? `: ${displayOperator(selected)}` : ""}`} aria-invalid={mistakeRow === row} aria-describedby={feedbackId} aria-expanded={open} disabled={disabled || answer !== null} onClick={toggle}>{selected ? displayOperator(selected) : <ChevronDown />}</button>{open && <div className={styles.operatorMenu}>{(["+", "-", "*"] as Operator[]).map((operator) => <button key={operator} onClick={() => choose(operator)}>{displayOperator(operator)}</button>)}</div>}</div><span>{equation.right} = {equation.result}</span><span id={feedbackId} role="status" className={styles.srOnly}>{pending ? "O operador será enviado em dois segundos." : mistakeRow === row ? "Operador incorreto. Confira com seu parceiro e tente novamente." : answer !== null ? "Operador correto." : ""}</span></div>;
 }
 
-function ManualPanel({ state }: { state: ManualViewState }) {
-  const highlighted = getHintLetters(state);
+export function ManualPanel({ state }: { state: ManualViewState }) {
+  const highlighted = state.hintsEnabled ? getHintLetters(state) : [];
   return <main className={styles.manual}>
     <h1>Manual do Nível 1</h1>
     <section className={styles.manualInstruction}><h2>Números com borda vermelha</h2><p>Clique nos números do <strong>menor para o maior</strong>.</p></section>
     <section className={styles.codeTable}><h2>Código das letras</h2><div>{state.calculations.map(({ letter, expression }) => <article key={letter} className={highlighted.includes(letter) ? styles.highlightedCalculation : ""}><strong>{letter}</strong><span>=</span><span>{expression}</span></article>)}</div></section>
-    {state.hintsEnabled && state.mistake && <div className={styles.hint}><Lightbulb aria-hidden="true" /><span>{state.mistake.section === 1 ? "Confiram qual é o próximo número maior." : "Confiram novamente as contas destacadas."}</span></div>}
+    {state.hintsEnabled && state.mistake && <div role="status" className={styles.hint}><Lightbulb aria-hidden="true" /><span>{state.mistake.section === 1 ? "Confiram qual é o próximo número maior." : "Confiram novamente as contas destacadas."}</span></div>}
   </main>;
 }
 
@@ -173,7 +185,7 @@ function ResultOverlay({ game, onReturn }: { game: GameApi; onReturn: () => void
     <h1>{state.phase === "won" ? "Bomba desarmada!" : "A bomba explodiu!"}</h1>
     <p>{state.resultReason === "time" ? "O tempo acabou." : state.resultReason === "lives" ? "Os corações acabaram." : "Vocês resolveram todas as seções!"}</p>
     <div className={styles.voteList}>{game.players.map((player) => <div key={player.seat}><span>{player.name}</span><span className={state.replayVotes.includes(player.seat) ? styles.voteYes : styles.voteWaiting}>{state.replayVotes.includes(player.seat) ? "Quer jogar novamente ✓" : "Ainda não decidiu"}</span></div>)}</div>
-    <div className={styles.resultActions}><button className={localVote ? styles.cancelReplayButton : styles.replayButton} onClick={() => game.setReplayVote(!localVote)}>{localVote ? "Cancelar" : "Jogar novamente"}</button><button className={styles.lobbyButton} onClick={onReturn}>Voltar ao lobby online</button></div>
+    <div className={styles.resultActions}><button disabled={game.connectionStatus === "disconnected" || game.opponentDisconnected} className={localVote ? styles.cancelReplayButton : styles.replayButton} onClick={() => game.setReplayVote(!localVote)}>{localVote ? "Cancelar" : "Jogar novamente"}</button><button className={styles.lobbyButton} onClick={onReturn}>Voltar ao lobby online</button></div>
   </section></main>;
 }
 
@@ -182,13 +194,30 @@ function Section({ module, title, tone, done, mistake, children }: { module: str
   return <section className={`${styles.bombSection} ${toneClass} ${done ? styles.completed : ""} ${mistake ? styles.mistakeSection : ""}`}><h2><span><small>Módulo {module}</small>{title}</span><span className={styles.statusLight} role="img" aria-label={done ? "Módulo concluído" : "Módulo pendente"}>{done && <LockKeyhole aria-hidden="true" />}</span></h2><div className={styles.moduleBody}>{children}</div></section>;
 }
 
-function ConfirmOverlay({ title, text, confirm, onCancel, onConfirm }: { title: string; text: string; confirm: string; onCancel: () => void; onConfirm: () => void }) {
-  return <div className={styles.modalOverlay}><section className={styles.confirmCard}><button className={styles.closeModal} aria-label="Fechar" onClick={onCancel}><X /></button><h2>{title}</h2><p>{text}</p><div><button onClick={onCancel}>Cancelar</button><button className={styles.dangerButton} onClick={onConfirm}>{confirm}</button></div></section></div>;
+export function ConfirmOverlay({ title, text, confirm, onCancel, onConfirm }: { title: string; text: string; confirm: string; onCancel: () => void; onConfirm: () => void }) {
+  const titleId = useId();
+  const descriptionId = useId();
+  const dialog = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const previous = document.activeElement as HTMLElement | null;
+    dialog.current?.querySelector<HTMLButtonElement>("button")?.focus();
+    return () => { if (previous?.isConnected) previous.focus(); };
+  }, []);
+  return <div className={styles.modalOverlay}><section ref={dialog} role="dialog" aria-modal="true" aria-labelledby={titleId} aria-describedby={descriptionId} className={styles.confirmCard} onKeyDown={(event) => {
+    if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); onCancel(); }
+    if (event.key === "Tab") {
+      const buttons = dialog.current?.querySelectorAll<HTMLButtonElement>("button:not(:disabled)");
+      if (!buttons?.length) return;
+      const first = buttons[0], last = buttons[buttons.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    }
+  }}><button className={styles.closeModal} aria-label="Fechar" onClick={onCancel}><X /></button><h2 id={titleId}>{title}</h2><p id={descriptionId}>{text}</p><div><button onClick={onCancel}>Cancelar</button><button className={styles.dangerButton} onClick={onConfirm}>{confirm}</button></div></section></div>;
 }
 
 function useCountdown(endsAt: number | null): number {
-  const [now, setNow] = useState(Date.now());
-  useEffect(() => { const timer = window.setInterval(() => setNow(Date.now()), 200); return () => clearInterval(timer); }, []);
+  const [now, setNow] = useState(() => bombServerClock.now());
+  useEffect(() => { const timer = window.setInterval(() => setNow(bombServerClock.now()), 200); return () => clearInterval(timer); }, []);
   return Math.max(0, Math.ceil(((endsAt ?? now) - now) / 1000));
 }
 

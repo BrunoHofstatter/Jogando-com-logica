@@ -1,6 +1,6 @@
 import type { BombRole } from "./level1";
 import type { BombLevelState } from "./levels";
-import type { BombGameViewState, SharedViewState } from "./multiplayer/protocol";
+import type { BombGameViewState, BombViewState, SharedViewState } from "./multiplayer/protocol";
 
 // Whitelist role-visible fields. Never spread authoritative puzzle state into a payload.
 export function projectBombLevel(level: BombLevelState, role: BombRole, shared: SharedViewState): BombGameViewState {
@@ -23,12 +23,15 @@ export function projectBombLevel(level: BombLevelState, role: BombRole, shared: 
   return {
     ...shared, levelId: 1, role,
     orderingNumbers: state.orderingNumbers, orderingProgress: state.orderingProgress,
+    orderingRevision: state.orderingRevision,
     numericAnswers: state.numericAnswers, operatorAnswers: state.operatorAnswers,
     numericTargets: ["A + B", "B − C", "C + A"],
-    operatorEquations: [
-      { left: "5", right: "A", result: state.values.A + 5 },
-      { left: "8", right: "C", result: 8 - state.values.C },
-      { left: "D", right: "3", result: state.values.D - 3 },
-    ],
+    operatorEquations: (["A", "C", "D"] as const).map((letter, row) => ({
+      left: letter,
+      right: String(state.operatorNumbers[row]),
+      result: state.operatorSolutions[row] === "+"
+        ? state.values[letter] + state.operatorNumbers[row]
+        : state.values[letter] - state.operatorNumbers[row],
+    })) as BombViewState["operatorEquations"],
   };
 }

@@ -49,7 +49,7 @@ function LevelCard({ level, progress, isLocked, onSelect }: LevelCardProps) {
       {/* Best time */}
       {!isLocked && progress.bestStars > 0 && progress.bestTime !== Infinity && (
         <div className={styles.bestTime}>
-          Melhor tempo: {progress.bestTime.toFixed(1)}s
+          Melhor tempo: {Math.ceil(progress.bestTime)}s
         </div>
       )}
 

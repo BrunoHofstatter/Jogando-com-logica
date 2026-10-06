@@ -16,16 +16,17 @@ const normalizeDifficulty = (value: string | number | null): number => {
 
 export const useDifficultyLock = (gameId: string) => {
     const [maxUnlockedDifficulty, setMaxUnlockedDifficulty] = useState<number>(() => {
-        const saved = localStorage.getItem(`${STORAGE_PREFIX}${gameId}`);
-        return normalizeDifficulty(saved);
+        try {
+            return normalizeDifficulty(localStorage.getItem(`${STORAGE_PREFIX}${gameId}`));
+        } catch { return MIN_DIFFICULTY; }
     });
 
     // Save to local storage whenever it changes
     useEffect(() => {
-        localStorage.setItem(
+        try { localStorage.setItem(
             `${STORAGE_PREFIX}${gameId}`,
             maxUnlockedDifficulty.toString()
-        );
+        ); } catch { /* Progress still works in this mounted game. */ }
     }, [maxUnlockedDifficulty, gameId]);
 
     const isUnlocked = (difficulty: number) => {
@@ -48,7 +49,8 @@ export const useDifficultyLock = (gameId: string) => {
 
     const resetProgress = () => {
         setMaxUnlockedDifficulty(MIN_DIFFICULTY);
-        localStorage.removeItem(`${STORAGE_PREFIX}${gameId}`);
+        try { localStorage.removeItem(`${STORAGE_PREFIX}${gameId}`); }
+        catch { /* State was already reset above. */ }
     };
 
     return {

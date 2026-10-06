@@ -1,182 +1,80 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import RubiksCube from "../../Components/RubiksCube";
+import { Check, Lightbulb } from "lucide-react";
+import { useCubeMobileLayout } from "../../Components/useCubeMobileLayout";
+import { Class1Cube } from "./Class1Cube";
+import { ReviewCompletion } from "../../Components/ReviewCompletion";
+import { TemporaryFeedback } from "../../Components/TemporaryFeedback";
+import { initialReview, reviewReducer, REVIEW_SIZES, shuffleSizes } from "./class1Review";
 import styles from "./SummaryView.module.css";
+import chrome from "./Class1Chrome.module.css";
 import { ROUTES } from "../../../routes";
 
-
-interface SummaryViewProps {
-    totalFlags: number;
-    onComplete: (mistakes: number) => boolean;
+interface Props {
+    lessonErrors?: number; lessonHints: number;
+    onComplete: (mistakes: number, hints: number) => boolean; onReplay: () => void;
 }
-
-const ITEMS = [2, 3, 4, 5, 6];
-
-const SummaryView: React.FC<SummaryViewProps> = ({ totalFlags, onComplete }) => {
+export default function SummaryView({ lessonErrors, lessonHints, onComplete, onReplay }: Props) {
     const navigate = useNavigate();
-
-    // --- State ---
-    const [selectedId, setSelectedId] = useState<number | null>(null);
-    const [matchedIds, setMatchedIds] = useState<number[]>([]);
-    const [mistakes, setMistakes] = useState<number>(0);
-    const [shakingLabel, setShakingLabel] = useState<number | null>(null);
-    const [feedback, setFeedback] = useState<string | null>(null);
-
-    // Scramble the cubes once on mount
-    const scrambledCubes = useMemo(() => {
-        return [...ITEMS].sort(() => Math.random() - 0.5);
-    }, []);
-
-    // --- Handlers ---
-    const handleCubeClick = (id: number) => {
-        if (matchedIds.includes(id)) return;
-        setSelectedId(id === selectedId ? null : id); // Toggle selection
-        setFeedback(null);
-    };
-
-    const handleLabelClick = useCallback((labelId: number) => {
-        if (matchedIds.includes(labelId)) return;
-
-        if (selectedId === null) {
-            setFeedback("Selecione um cubo primeiro!");
-            return;
-        }
-
-        if (selectedId === labelId) {
-            // Success
-            setMatchedIds((prev) => [...prev, labelId]);
-            setSelectedId(null);
-            setFeedback(null);
-        } else {
-            // Fail
-            setMistakes((prev) => prev + 1);
-            setShakingLabel(labelId);
-            setSelectedId(null);
-            setFeedback("Tamanho incorreto! Tente de novo.");
-
-            setTimeout(() => {
-                setShakingLabel(null);
-            }, 500); // match CSS animation duration
-        }
-    }, [selectedId, matchedIds]);
-
-    const isComplete = matchedIds.length === ITEMS.length;
-
+    const mobile = useCubeMobileLayout();
+    const [deck] = useState(shuffleSizes);
+    const [state, dispatch] = useReducer(reviewReducer, initialReview);
+    const area = useRef<HTMLDivElement>(null);
+    const completed = useRef(false);
     useEffect(() => {
-        if (isComplete) {
-            onComplete(mistakes);
+        if (state.phase !== "complete" && state.matched.length) area.current?.querySelector<HTMLButtonElement>("button[data-cube-select]:not(:disabled)")?.focus();
+    }, [state.phase, state.matched.length]);
+    useEffect(() => {
+        if (state.phase === "complete" && !completed.current) {
+            completed.current = true; onComplete(state.mistakes, state.hints);
         }
-    }, [isComplete, mistakes, onComplete]);
-
-    // --- Render ---
-    return (
-        <div className={styles.container}>
-            {/* --- Back to Menu Button --- */}
-            <button className={styles.aulasButton} onClick={() => navigate(ROUTES.CLASS_MENU)}>
-                Aulas
-            </button>
-
-            {/* Feedback Overlay for errors/hints */}
-            {feedback && !isComplete && (
-                <div className={styles.feedbackOverlay}>
-                    <div className={styles.feedbackBubble}>⚠️ {feedback}</div>
-                </div>
-            )}
-
-            {/* Left Panel: The Pile */}
-            <div className={styles.leftPanel}>
-                {scrambledCubes.map((id) => {
-                    const isSelected = selectedId === id;
-                    const isMatched = matchedIds.includes(id);
-
-                    const wrapperClasses = [
-                        styles.cubeWrapper,
-                        isSelected ? styles.selected : "",
-                        isMatched ? styles.matched : "",
-                    ]
-                        .filter(Boolean)
-                        .join(" ");
-
-                    return (
-                        <div
-                            key={id}
-                            className={wrapperClasses}
-                            onClick={() => handleCubeClick(id)}
-                        >
-                            <div style={{ pointerEvents: "none" }}>
-                                {/* 
-                  Render a slightly smaller cube.
-                  We keep it auto-rotating so the pile feels alive.
-                */}
-                                <RubiksCube
-                                    size={id}
-                                    cubeSize={window.matchMedia("(max-width: 600px) and (orientation: portrait)").matches ? 22 : 10} // small size in vw
-                                    resetToFront={false}
-                                    highlightRegion={null}
-                                    dimInactive={false}
-                                    showIndices={false}
-                                    showCounting={false}
-                                />
-                            </div>
-                        </div>
-                    );
+    }, [state.phase, onComplete, state.mistakes, state.hints]);
+    const isComplete = state.phase === "complete";
+    return <><div className={styles.container} ref={area} inert={isComplete} aria-hidden={isComplete || undefined}>
+        <button className={chrome.aulasButton} onClick={() => navigate(ROUTES.CLASS_MENU)}>Aulas</button>
+        <div className={styles.leftPanel}>
+            <div className={chrome.headerOverlay}>
+                {state.selected !== null && state.helpLevel > 0 && <div className={chrome.hintCard} role="status">Conte os quadradinhos de uma linha.</div>}
+            </div>
+            {deck.map((size, index) => {
+                const selected = state.selected === size;
+                const helped = selected && state.helpLevel > 0;
+                return <div key={size} data-review-cube={size}>
+                    <Class1Cube size={size} cubeSize={mobile ? 17 : 8.5}
+                        label={`Selecionar cubo ${index + 1}. Use as setas para girar.`}
+                        selected={selected} disabled={state.matched.includes(size)}
+                        onSelect={() => dispatch({ type: "select", size })}
+                        focusRequest={helped ? state.focusVersion : 0}
+                        highlightRegion={helped ? { type: "row", index: 0 } : null}
+                        dimInactive={helped} showCounting={helped && state.helpLevel === 2}
+                        hintAnimationKey={helped ? String(state.focusVersion) : undefined} />
+                </div>;
+            })}
+        </div>
+        <div className={styles.rightPanel}>
+            <h2 className={styles.title}>Combine os tamanhos!</h2>
+            <p className={styles.instruction}>Escolha um cubo e depois o tamanho dele.</p>
+            <div className={styles.labelsList}>
+                {REVIEW_SIZES.map(size => {
+                    const matched = state.matched.includes(size);
+                    return <button key={size}
+                        className={`${styles.labelButton} ${matched ? styles.correctAnswer : state.wrong === size ? styles.wrongAnswer : ""}`}
+                        disabled={matched} aria-label={matched ? `${size}×${size}, correto` : undefined}
+                        onClick={() => dispatch({ type: "answer", size })}>
+                        {size}×{size}
+                        {matched && <Check aria-hidden="true" className={styles.matchCheck} />}
+                    </button>;
                 })}
             </div>
-
-            {/* Right Panel: Labels */}
-            <div className={styles.rightPanel}>
-                <h2 className={styles.title}>Combine os Tamanhos!</h2>
-
-                <div className={styles.labelsList}>
-                    {ITEMS.map((id) => {
-                        const isMatched = matchedIds.includes(id);
-                        const isShaking = shakingLabel === id;
-
-                        const btnClasses = [
-                            styles.labelButton,
-                            isMatched ? styles.matched : "",
-                            isShaking ? styles.shake : "",
-                        ]
-                            .filter(Boolean)
-                            .join(" ");
-
-                        return (
-                            <button
-                                key={id}
-                                className={btnClasses}
-                                disabled={isMatched}
-                                onClick={() => handleLabelClick(id)}
-                            >
-                                {isMatched ? "✅ " : ""}{id}×{id}
-                            </button>
-                        );
-                    })}
-                </div>
-            </div>
-
-            {/* Completion Modal */}
-            {isComplete && (
-                <div className={styles.modalOverlay}>
-                    <div className={styles.modalContent}>
-                        <h1 className={styles.modalTitle}>Excelente! 🎉</h1>
-                        <p className={styles.modalStats}>
-                            Erros nas lições: {totalFlags}
-                            <br />
-                            Erros no final: {mistakes}
-                            <br />
-                            <span>Total de Erros: {totalFlags + mistakes}</span>
-                        </p>
-                        <button
-                            className={styles.modalButton}
-                            onClick={() => navigate(ROUTES.CLASS_MENU)}
-                        >
-                            Voltar ao Menu
-                        </button>
-                    </div>
-                </div>
-            )}
         </div>
-    );
-};
-
-export default SummaryView;
+        {state.feedback && <TemporaryFeedback key={state.feedbackVersion} message={state.feedback} success={state.feedback === "Combinação correta!"} />}
+        <div className={chrome.hintDock}>
+            <button className={chrome.hintButton} onClick={() => dispatch({ type: "hint" })}>
+                <Lightbulb aria-hidden="true" />{state.helpLevel === 2 ? "Ver dica novamente" : state.helpLevel > 0 ? "Mais uma dica" : "Dica"}
+            </button>
+        </div>
+    </div>
+        {isComplete && <ReviewCompletion lessonErrors={lessonErrors} mistakes={state.mistakes}
+            hints={lessonHints + state.hints} nextClass={ROUTES.CLASS_2} onReplay={onReplay} />}
+    </>;
+}

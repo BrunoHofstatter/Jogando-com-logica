@@ -2,7 +2,7 @@
 
 ## Status
 
-Planning only. This document defines the intended responsibilities and design direction for Core V0. It is not a description of existing code, and its provisional technical names are not a finalized API.
+This document preserves the responsibility-level plan. V0 was implemented September 28, 2026 and revised October 5 for the user-approved Crown Chase practice exercises. Shared waits now support pausing with remaining duration preserved. Consult `technical_contract.md` for the actual API and `game_crown_chase.md` for current behavior. The conceptual capabilities and provisional names below are not all implemented. Multi-lesson presentation/chaining, generic animation promises, contextual lessons, and lifecycle analytics remain deferred; history filtering supports caller-ordered lessons without a queue UI.
 
 The current `src/Shared/Components/DynamicTutorial.tsx` is an explanation overlay with step navigation, target positioning, spotlight visuals, and local completion storage. The new playable system is a separate architectural concept. Useful presentation logic may be reused, but the existing component should not be expanded into a universal game engine.
 
@@ -51,6 +51,7 @@ Consistency across games comes from predictable entry, exit, replay, completion,
 - Starting, completing, skipping, cancelling, and replaying a session.
 - Moving between stages when the game signals that progression is appropriate.
 - Cancellable timers or waits used by tutorial flow.
+- Pausing pending waits without losing remaining duration; games own visibility subscriptions and when to pause.
 - Waiting for a game-owned animation or scripted bridge to finish.
 - Completion/dismissal persistence.
 - Chaining a core tutorial into a selected mode introduction.
@@ -152,7 +153,7 @@ Conceptual identities:
 - `caca-soma.core.v1`
 - `caca-soma.levels.v1`
 - `caca-soma.versus.v1`
-- `crown-chase.core.v1`
+- `crown-chase.core.v2`
 
 The exact storage key format is an implementation decision. Callers should not manually assemble localStorage keys throughout game pages.
 
@@ -179,6 +180,8 @@ These states are conceptual. Some may be combined during implementation if that 
 - Starting replay begins from a clean tutorial state.
 - Refreshing or leaving mid-tutorial should not mark it completed.
 - Game cleanup runs on completion, skip, cancellation, navigation, and unexpected unmount.
+- Automatic launch must happen at a game-defined safe entry point. An active online match cannot be paused by a local tutorial; onboard before room participation or defer the tutorial.
+- Advance signals must belong to the current session and stage activation, and be consumed once. Session-only protection is insufficient when a late callback comes from an earlier stage of the same session.
 
 ## Stage Advancement
 
@@ -207,6 +210,7 @@ Used mainly for brief success feedback or transitional messages.
 
 - The game chooses the duration.
 - The wait must be cancellable.
+- When visible reading time matters, pause waits while the document is hidden and resume their remaining duration. Crown Chase uses this implemented V0 capability for feedback and observation.
 - Timers should not be the default for essential instructions.
 
 ### Animation or Scripted-Bridge Advancement
@@ -243,6 +247,8 @@ For board games, the safest approach may be to intercept an attempt before perma
 
 Irrelevant actions that would leave or break the tutorial scenario may be blocked or ignored. The requirement to allow mistakes applies to meaningful gameplay attempts, not unrelated navigation or mode changes.
 
+Illegal actions and legal actions that miss the exercise objective need different treatment. Feedback must not claim a legal alternative breaks a rule. The game may keep it, preview and restore it, or explain the missed objective. Important rule instructions normally remain visible, but the game owns acknowledgement versus automatic recovery. The approved Crown Chase redesign uses two-second centered feedback and automatic restoration, with persistent primary rule copy and escalating guidance. Input is locked during restoration; Skip and navigation remain usable.
+
 ## Predetermined States and Scripted Bridges
 
 - Introductory scenarios should be deterministic.
@@ -251,6 +257,7 @@ Irrelevant actions that would leave or break the tutorial scenario may be blocke
 - A scripted bridge should explain continuity, for example with a brief `Algumas jogadas depois...` transition.
 - The game may animate only the important changes when showing every intermediate move would be slow or confusing.
 - State preparation and scripted move legality belong to the game integration, not the shared runner.
+- A continuous miniature match must have a verified legal sequence. Arbitrary fixture replacement must be introduced as a new practice situation; a time-lapse caption alone does not establish legal continuity.
 
 ## Core and Mode Tutorials
 
@@ -290,6 +297,10 @@ Recommended behavior:
 - The replay button remains available regardless of stored status.
 - Replaying does not need to erase the stored completion before starting.
 - A version change can make a materially redesigned tutorial eligible for automatic launch again.
+
+Persistence failure must not block entry, completion, dismissal, or replay. Fall back to session-memory history when storage is unavailable or invalid. On shared school devices, stored history describes this browser, not the identity or ability of its current user.
+
+Recommended chaining semantics: skipping the current lesson dismisses only that lesson; an unseen next mode introduction may still run. Cancelling the flow cancels its remaining queue without dismissing unseen lessons. A game may offer an explicit skip-all control, but must not silently treat ordinary cancellation as completion or dismissal of queued lessons.
 
 The exact behavior after a version change remains a product decision: some revisions may justify relaunching automatically, while minor text changes should not.
 

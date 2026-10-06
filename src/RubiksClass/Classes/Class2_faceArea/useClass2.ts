@@ -1,3 +1,4 @@
+import { useLessonEntry } from "../../Testing/entryContext";
 import { useEffect, useReducer, useState } from "react";
 import { useLocation } from "react-router-dom";
 import {
@@ -8,10 +9,12 @@ const AUTO_HINT_THRESHOLD_S = 45;
 const TRANSITION_DELAY_MS = 1200;
 
 export function useClass2() {
+    const entry = useLessonEntry();
     const location = useLocation();
     const isGameMode = location.state?.mode === "game" ||
         new URLSearchParams(location.search).get("mode") === "game";
-    const [state, dispatch] = useReducer(class2Reducer, isGameMode, initialLessonState);
+    const [state, dispatch] = useReducer(class2Reducer, { review: isGameMode && !entry.isCheckpoint, stepIndex: entry.stepIndex },
+        ({ review, stepIndex }) => initialLessonState(review, stepIndex));
     const [offerHelp, setOfferHelp] = useState(false);
     const currentStep = LESSON_STEPS[state.stepIndex];
 

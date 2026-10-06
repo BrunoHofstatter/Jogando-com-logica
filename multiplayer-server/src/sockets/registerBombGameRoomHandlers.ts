@@ -1,5 +1,6 @@
 import type { Namespace, Socket } from "socket.io";
 import { randomUUID } from "node:crypto";
+import { isBombPayload } from "./bombPayload.ts";
 
 import type { BombRole } from "../../../src/BombGame/Logic/level1.ts";
 import { applyBombLevelIntent, createBombLevel, type BombLevelState } from "../../../src/BombGame/Logic/levels.ts";
@@ -51,6 +52,7 @@ interface Room {
   createdAt: number;
   replayVotes: Set<PlayerSeat>;
   processedActionIds: Set<string>;
+  lastOrderingMistake: { value: number; at: number; progress: number } | null;
   waitingTimeout: NodeJS.Timeout | null;
   countdownTimeout: NodeJS.Timeout | null;
   roundTimeout: NodeJS.Timeout | null;
@@ -87,7 +89,16 @@ export function registerBombGameRoomHandlers(
   );
 
   io.on("connection", (socket) => {
-    socket.on("create_room", ({ playerName, hintsEnabled, classroomCode, levelId = 1 }) => {
+    socket.use(([event, payload], next) => {
+      if (!isBombPayload(event, payload)) {
+        emitError(socket, "invalid_payload", "Não foi possível entender essa ação.");
+        return next(new Error("Invalid Bomb Game payload"));
+      }
+      next();
+    });
+    socket.on("error", () => { /* Malformed packets are reported by middleware. */ });
+    socket.on("sync_time", (reply) => reply(Date.now()));
+    socket.on("create_room", ({ playerName, hintsEnabled = true, classroomCode, levelId = 1 }) => {
       if (!isBombLevelId(levelId)) return emitError(socket, "invalid_level", "Esse nível ainda não está disponível.");
       leaveExistingRoom(io, socket);
       const name = normalizeName(playerName);
@@ -115,6 +126,7 @@ export function registerBombGameRoomHandlers(
         createdAt: Date.now(),
         replayVotes: new Set(),
         processedActionIds: new Set(),
+        lastOrderingMistake: null,
         waitingTimeout: null,
         countdownTimeout: null,
         roundTimeout: null,
@@ -193,10 +205,21 @@ export function registerBombGameRoomHandlers(
       if (typeof actionId !== "string" || !actionId || actionId.length > 100) return;
       const actionKey = `${found.player.seat}:${actionId}`;
       if (found.room.processedActionIds.has(actionKey)) return;
+      // Treat a rapid repeat of the same wrong button as one attempt, including legacy clients.
+      const previousMistake = found.room.lastOrderingMistake;
+      if (found.room.level.id === 1 && intent?.type === "select_ordering_number" &&
+          previousMistake?.value === intent.value && previousMistake.progress === found.room.level.state.orderingProgress.length && Date.now() - previousMistake.at < 600) {
+        socket.emit("state_updated", statePayload(found.room, found.player.seat));
+        return;
+      }
       const result = applyBombLevelIntent(found.room.level, found.player.role, intent);
-      if (!result.accepted) return;
+      if (!result.accepted) {
+        socket.emit("state_updated", statePayload(found.room, found.player.seat));
+        return;
+      }
       found.room.processedActionIds.add(actionKey);
       if (result.mistake) {
+        if (intent.type === "select_ordering_number" && found.room.level.id === 1) found.room.lastOrderingMistake = { value: intent.value, at: Date.now(), progress: found.room.level.state.orderingProgress.length };
         found.room.lives -= 1;
         if (found.room.lives === 0) endRound(io, found.room, "lost", "lives");
       }
@@ -223,7 +246,8 @@ export function registerBombGameRoomHandlers(
       found.player.connected = false;
       const other = found.room.players.find((player) => player && player.seat !== found.player.seat);
       if (other) io.to(other.socketId).emit("opponent_left", { code: found.room.code, message: "Seu parceiro desconectou. O tempo continua correndo." });
-      found.room.closeTimeout = setTimeout(() => closeRoom(io, found.room, "A sala foi encerrada porque o parceiro não voltou."), DISCONNECT_GRACE_MS);
+      if (found.room.closeTimeout) clearTimeout(found.room.closeTimeout);
+      found.room.closeTimeout = setTimeout(() => closeRoom(io, found.room, "A sala foi encerrada porque um jogador desconectou."), DISCONNECT_GRACE_MS);
       broadcast(io, found.room);
       broadcastClassroomRooms(io, found.room.classroomCode);
     });
@@ -262,6 +286,7 @@ function startReplayCountdown(io: BombNamespace, room: Room): void {
     room.resultReason = null;
     room.replayVotes.clear();
     room.processedActionIds.clear();
+    room.lastOrderingMistake = null;
     room.players.forEach((player) => { if (player) { player.ready = false; player.role = null; } });
     broadcast(io, room);
   }, REPLAY_COUNTDOWN_MS);
@@ -294,6 +319,7 @@ function viewFor(room: Room, seat: PlayerSeat): BombGameViewState | null {
   const role = room.players[seat]?.role;
   if (!role) return null;
   const shared = {
+    serverNow: Date.now(),
     roundId: room.roundId,
     phase: room.phase,
     lives: room.lives,

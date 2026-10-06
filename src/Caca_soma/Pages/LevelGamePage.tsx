@@ -1,57 +1,50 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, type CSSProperties } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getLevelById, getTotalLevels } from '../Logic/levelConfigs';
+import { getLevelById } from '../Logic/levelConfigs';
 import { calculateStars, updateLevelProgress, isLevelUnlocked } from '../Logic/levelProgress';
-import { LevelConfig, RoundResult } from '../Logic/gameTypes';
+import { LevelConfig } from '../Logic/gameTypes';
+import { displayLevelSeconds, getSelectionCounts } from '../Logic/levelGameLogic';
+import { useSoloLevelGame } from '../Hooks/useSoloLevelGame';
 import LevelResultModal from '../componentes/LevelResultModal';
-import Tabuleiro from '../componentes/tabuleiro';
-import Girar from '../componentes/sorteio';
 import GameButton from '../componentes/GameButton';
 import RoundTracker from '../componentes/RoundTracker';
 import styles from '../styles/levelGame.module.css';
 import DynamicTutorial, { TutorialStep } from '../../Shared/Components/DynamicTutorial';
 import tutorialStyles from '../styles/DynamicTutorial.module.css';
-import { ROUTES } from "../../routes";
-import { analytics, formatLevelId } from "../../analytics/events";
-import { useLevelAttemptAnalytics } from "../../analytics/useLevelAttemptAnalytics";
+import { ROUTES } from '../../routes';
+import { analytics, formatLevelId } from '../../analytics/events';
+import { useLevelAttemptAnalytics } from '../../analytics/useLevelAttemptAnalytics';
 
-const LEVEL_TUTORIAL_ID = "caca_soma_levels_v1";
-const LEVEL_TUTORIAL_STEP_IDS = [
-  "step1",
-  "step2",
-  "step3",
-  "step4",
-  "step5",
-] as const;
+const LEVEL_TUTORIAL_ID = 'caca_soma_levels_v1';
+const LEVEL_TUTORIAL_STEP_IDS = ['step1', 'step2', 'step3', 'step4', 'step5'] as const;
 
 function LevelGamePage() {
-
   const { levelId } = useParams<{ levelId: string }>();
   const navigate = useNavigate();
+  const config = getLevelById(Number(levelId));
+  useEffect(() => {
+    if (!config) navigate(ROUTES.CACA_SOMA_LEVELS, { replace: true });
+  }, [config, navigate]);
+  // Route changes and revisits always create a fresh level session.
+  return config ? <LevelSession key={config.levelId} levelConfig={config} /> : null;
+}
 
-  const [levelConfig, setLevelConfig] = useState<LevelConfig | null>(null);
-  const [currentRound, setCurrentRound] = useState(1);
-  const [roundResults, setRoundResults] = useState<RoundResult[]>([]);
-  const [totalTime, setTotalTime] = useState(0);
-  const [showResultModal, setShowResultModal] = useState(false);
-  const [starsEarned, setStarsEarned] = useState(0);
-
-  // Game state
-  const [sorteado, setSorteado] = useState(0);
-  const [soma, setSoma] = useState(0);
-  const [quantos, setQuantos] = useState(0);
-  const [jogar, setJogar] = useState(false);
-  const [clicar, setClicar] = useState(true);
-  const [liveTime, setLiveTime] = useState(0);
-  const [okayFunction, setOkayFunction] = useState<(() => void) | null>(null);
-  const [gameOver, setGameOver] = useState(false);
-  const [nextRoundCountdown, setNextRoundCountdown] = useState<number | null>(null);
-  const [lastRoundWasCorrect, setLastRoundWasCorrect] = useState<boolean | null>(null);
-
-  // Additional state for logic and reset
-  const [gameKey, setGameKey] = useState(0);
-  const [usedIndices, setUsedIndices] = useState<Set<string>>(new Set());
-  const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
+function LevelSession({ levelConfig }: { levelConfig: LevelConfig }) {
+  const navigate = useNavigate();
+  const savedResult = useRef(false);
+  const { completeAttempt, recordRound, startAttempt } = useLevelAttemptAnalytics({
+    gameId: 'caca_soma', levelId: formatLevelId(levelConfig.levelId), gameMode: 'solo',
+    usageContext: 'standard', playerSlotCount: 1,
+  });
+  const { game, liveTime, rollingNumber, selectionNotice, dismissNotice, start, select, submit, retry } =
+    useSoloLevelGame(levelConfig, recordRound);
+  const correctCount = game.attempts.filter(attempt => attempt.correct).length;
+  const starsEarned = calculateStars(correctCount, game.totalTime, levelConfig.levelId);
+  const selectionCounts = getSelectionCounts(levelConfig.numbersToSelect);
+  const selectionText = selectionCounts.join(' ou ');
+  const feedback = game.phase === 'feedback' ? game.feedback : null;
+  const lastAttempt = game.attempts[game.attempts.length - 1];
+  const hasNextLevel = Boolean(getLevelById(levelConfig.levelId + 1));
 
   // Tutorial state
   const [showTutorial, setShowTutorial] = useState(false);
@@ -125,33 +118,7 @@ function LevelGamePage() {
     }
   ];
 
-  const { completeAttempt, recordRound, startAttempt } =
-    useLevelAttemptAnalytics(
-      levelConfig
-        ? {
-            gameId: "caca_soma",
-            levelId: formatLevelId(levelConfig.levelId),
-            gameMode: "solo",
-            usageContext: "standard",
-            playerSlotCount: 1,
-          }
-        : null,
-    );
 
-  // Load level config on mount
-  useEffect(() => {
-    if (levelId) {
-      const level = getLevelById(parseInt(levelId));
-      if (level) {
-        setLevelConfig(level);
-      } else {
-        // Level not found, redirect back
-        navigate(ROUTES.CACA_SOMA_LEVELS);
-      }
-    }
-  }, [levelId, navigate]);
-
-  // Check tutorial on mount
   useEffect(() => {
     const completed = localStorage.getItem('tutorial_cacasoma_levels_v1_completed');
     if (completed !== 'true') {
@@ -159,12 +126,6 @@ function LevelGamePage() {
       return () => clearTimeout(timer);
     }
   }, []);
-
-  useEffect(() => {
-    if (jogar) {
-      startAttempt();
-    }
-  }, [jogar, startAttempt]);
 
   const handleTutorialStart = useCallback(() => {
     if (tutorialStartedRef.current) {
@@ -206,321 +167,133 @@ function LevelGamePage() {
     setShowTutorial(false);
   }, []);
 
-  // Toggle functions
-  const mudarJogar = useCallback(() => setJogar(prev => !prev), []);
-  const mudarClicar = useCallback(() => setClicar(prev => !prev), []);
-  const mudarSorteado = useCallback((x: number) => setSorteado(x), []);
-  const mudarSoma = useCallback((x: number) => setSoma(prev => prev + x), []);
 
-  // Update used indices when a correct match occurs
-  const handleCorrectMatch = useCallback((indices: string[]) => {
-    setUsedIndices(prev => {
-      const next = new Set(prev);
-      indices.forEach(idx => next.add(idx));
-      return next;
-    });
-  }, []);
-
-  // Calculate available numbers for the generator
-  const getAvailableNumbers = useCallback(() => {
-    if (!levelConfig) return [];
-    const boardSize = levelConfig.boardSize;
-    const allNumbers: number[] = [];
-    for (let r = 0; r < boardSize; r++) {
-      for (let c = 0; c < boardSize; c++) {
-        const key = `${r}-${c}`;
-        if (!usedIndices.has(key)) {
-          // Calculate valid number based on grid position
-          allNumbers.push(r * boardSize + c + 1);
-        }
-      }
-    }
-    return allNumbers;
-  }, [levelConfig, usedIndices]);
-
-  // Start Game handler (called by "Começar" button)
-  const onStartGame = () => {
-    mudarClicar(); // This triggers Girar effect
-  };
-
-  // Automatically start every round after the first one.
   useEffect(() => {
-    if (nextRoundCountdown === null) return;
+    if (game.phase === 'playing') startAttempt();
+  }, [game.phase, startAttempt]);
 
-    const timeout = window.setTimeout(() => {
-      if (nextRoundCountdown === 1) {
-        setNextRoundCountdown(null);
-        setLastRoundWasCorrect(null);
-        setClicar(false); // This triggers the Magic Number rolling animation.
-        return;
-      }
-
-      setNextRoundCountdown(nextRoundCountdown - 1);
-    }, 1000);
-
-    return () => window.clearTimeout(timeout);
-  }, [nextRoundCountdown]);
-
-  // Handle time updates from timer
-  const onTimeUpdate = useCallback((tempo: number) => {
-    setLiveTime(tempo);
-  }, []);
-
-  // Handle round submission
-  const noOp = useCallback(() => { }, []);
-
-  const finishLevel = useCallback((results: RoundResult[], finalTime: number) => {
-    if (!levelConfig) return;
-
-    const correctCount = results.filter(r => r.correct).length;
-    const stars = calculateStars(correctCount, finalTime, levelConfig.levelId);
-    setStarsEarned(stars);
-
-    updateLevelProgress({
-      levelId: levelConfig.levelId,
-      rounds: results,
-      totalCorrect: correctCount,
-      totalTime: finalTime,
-      starsEarned: stars,
-      passed: stars >= 2
-    });
-
-    completeAttempt({
-      success: stars >= 2,
-      outcome: stars >= 2 ? "passed" : "failed",
-      starsEarned: stars,
-    });
-    setShowResultModal(true);
-  }, [completeAttempt, levelConfig]);
-
-  const addTempo = useCallback((tempo: number, currentSoma?: number) => {
-    const actualSoma = currentSoma !== undefined ? currentSoma : soma;
-    const isCorrect = sorteado === actualSoma;
-
-    // Record round result
-    const result: RoundResult = {
-      roundNumber: currentRound,
-      magicNumber: sorteado,
-      selectedNumbers: selectedNumbers, // Store selected numbers
-      sum: actualSoma,
-      correct: isCorrect,
-      timeTaken: tempo
-    };
-
-    setRoundResults(prev => [...prev, result]);
-    setTotalTime(prev => prev + tempo);
-    setLiveTime(0);
-    recordRound(isCorrect);
-
-    // Move to next round or finish
-    if (levelConfig && currentRound < levelConfig.rounds) {
-      setLastRoundWasCorrect(isCorrect);
-      setNextRoundCountdown(5);
-      setCurrentRound(prev => prev + 1);
-      setSorteado(0);
-      setSoma(0);
-      setQuantos(0);
-      setSelectedNumbers([]); // Reset selected numbers
-      setJogar(false);
-      setClicar(true);
-    } else {
-      // Level complete, navigate to results
-      setGameOver(true);
-      finishLevel([...roundResults, result], totalTime + tempo);
-    }
-  }, [currentRound, finishLevel, levelConfig, recordRound, roundResults, selectedNumbers, soma, sorteado, totalTime]);
-
-  const handleRetry = () => {
-    setShowResultModal(false);
-    setRoundResults([]);
-    setCurrentRound(1);
-    setSorteado(0);
-    setSoma(0);
-    setQuantos(0);
-    setJogar(false);
-    setClicar(true);
-    setTotalTime(0);
-    setLiveTime(0);
-    setGameOver(false);
-    setNextRoundCountdown(null);
-    setLastRoundWasCorrect(null);
-    // Reset board and used numbers
-    setGameKey(prev => prev + 1);
-    setUsedIndices(new Set());
-  };
-
-  const handleNextLevel = () => {
-    if (levelConfig && levelConfig.levelId < getTotalLevels()) {
-      const nextId = levelConfig.levelId + 1;
-      navigate(`${ROUTES.CACA_SOMA_LEVEL_BASE}/${nextId}`);
-      setShowResultModal(false);
-      setRoundResults([]);
-      setCurrentRound(1);
-      setSorteado(0);
-      setSoma(0);
-      setQuantos(0);
-      setJogar(false);
-      setClicar(true);
-      setTotalTime(0);
-      setLiveTime(0);
-      setGameOver(false);
-      setNextRoundCountdown(null);
-      setLastRoundWasCorrect(null);
-      // Reset board and used numbers
-      setGameKey(prev => prev + 1);
-      setUsedIndices(new Set());
-    }
-  };
-
-  const handleMenu = () => {
-    navigate(ROUTES.CACA_SOMA_LEVELS);
-  };
-
-  // Get current round's magic number range
-  const getCurrentRange = (): [number, number] | undefined => {
-    if (!levelConfig) return undefined;
-    return levelConfig.randomNumberRanges[currentRound - 1];
-  };
-
-  // Global click handler for submitting the game (replacing the button)
-  const handleGlobalClick = () => {
-    if (jogar && okayFunction) {
-      okayFunction();
-    }
-  };
-
-  // Listen for "Enter" key to submit
   useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.key === 'Enter' && jogar && okayFunction) {
+    if (game.phase !== 'complete' || savedResult.current) return;
+    savedResult.current = true;
+    updateLevelProgress({ levelId: levelConfig.levelId, rounds: game.attempts,
+      totalCorrect: correctCount, totalTime: game.totalTime, starsEarned, passed: starsEarned >= 2 });
+    completeAttempt({ success: starsEarned >= 2, outcome: starsEarned >= 2 ? 'passed' : 'failed', starsEarned });
+  }, [game.phase, game.attempts, game.totalTime, correctCount, starsEarned, levelConfig.levelId, completeAttempt]);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Enter' && !event.repeat && !showTutorial && game.phase === 'playing') {
+        if (event.target instanceof HTMLElement && event.target.closest('[data-number]')) return;
         event.preventDefault();
-        okayFunction();
+        if (selectionNotice) dismissNotice();
+        else submit();
       }
     };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [submit, dismissNotice, selectionNotice, showTutorial, game.phase]);
 
-    if (jogar && okayFunction) {
-      document.addEventListener('keydown', handleKeyPress);
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyPress);
-    };
-  }, [jogar, okayFunction]);
-
-  if (!levelConfig) {
-    return <div>Carregando...</div>;
-  }
+  const handleRetry = () => { savedResult.current = false; retry(); };
 
   return (
-    <div className={styles.container} onClick={handleGlobalClick}>
+    <div className={styles.container} onClick={() => { if (!showTutorial) submit(); }}>
       <div className={styles.leftPanel}>
-        {/* Magic number & Controls */}
         <div className={styles.controlsBox}>
-          <div data-target="step5" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-            <RoundTracker levelId={levelConfig.levelId} currentRound={currentRound} totalRounds={levelConfig.rounds} />
+          <div data-target="step5" className={styles.trackerWrapper}>
+            <RoundTracker levelId={levelConfig.levelId} currentRound={game.currentRound}
+              totalRounds={levelConfig.rounds} completedRounds={correctCount} />
           </div>
-
           <div data-target="step1" className={styles.magicAndButton}>
             <div className={styles.magicNumberContainer}>
               <div className={styles.magicNumberTextColumn}>
                 <span className={styles.magicNumberTitle}>Número</span>
                 <span className={styles.magicNumberTitle}>Mágico</span>
               </div>
-              <div className={styles.magicNumberDisplay}>
-                <Girar
-                  mudarJogar={mudarJogar}
-                  clicar={clicar}
-                  mudarSorteado={mudarSorteado}
-                  rodada={currentRound}
-                  customRange={getCurrentRange()}
-                  availableNumbers={getAvailableNumbers()}
-                  numbersToSelect={levelConfig.numbersToSelect}
-                />
+              <div className={styles.magicNumberDisplay} data-magic-number aria-label="Número Mágico">
+                {game.phase === 'rolling' ? rollingNumber : game.target || '—'}
               </div>
             </div>
-            {jogar ? (
-              <div className={styles.instructionText}>
-                Clique fora do tabuleiro para confirmar
-              </div>
+            {game.phase === 'idle' ? (
+              <GameButton jogar={false} clicar gameOver={false} onStartGame={() => { if (!showTutorial) start(); }} />
             ) : (
-              <GameButton
-                jogar={jogar}
-                clicar={clicar}
-                gameOver={gameOver}
-                onStartGame={onStartGame}
-                onSubmit={okayFunction || undefined}
-              />
+              <div className={styles.instructionText}>
+                {game.phase === 'playing' ? 'Clique fora do tabuleiro para confirmar' :
+                  game.phase === 'rolling' ? 'Sorteando...' : 'Aguarde...'}
+              </div>
             )}
           </div>
-
           <div className={styles.timerDisplay} data-target="step4">
             <span className={styles.timerLabel}>Tempo Total:</span>
-            <span className={styles.timerValue}>{(totalTime + liveTime).toFixed(1)}s</span>
+            <span className={styles.timerValue} data-level-time>{displayLevelSeconds(game.totalTime + liveTime)}s</span>
           </div>
         </div>
       </div>
-
-      {/* Game board */}
       <div className={styles.rightPanel} data-target="step2">
-        <Tabuleiro
-          key={`${gameKey}-${levelConfig.levelId}`}
-          mudarClicar={mudarClicar}
-          mudarJogar={mudarJogar}
-          mudarRodada={noOp} // No-op for level mode, stable reference
-          mudarSoma={mudarSoma}
-          addTempo={addTempo}
-          soma={soma}
-          jogar={jogar}
-          qualRodada={currentRound}
-          quantos={quantos}
-          setQuantos={setQuantos}
-          sorteado={sorteado}
-          onTimeUpdate={onTimeUpdate}
-          onOkayChange={setOkayFunction}
-          boardSize={levelConfig.boardSize}
-          maxSelections={levelConfig.numbersToSelect}
-          customStyles={styles}
-          onCorrectMatch={handleCorrectMatch}
-          onSelectionChange={setSelectedNumbers}
-        />
+        <p className={styles.selectionInstruction}>Use {selectionCounts.map((count, index) => (
+          <span key={count}>{index > 0 && ' ou '}<strong>{count}</strong></span>
+        ))} números</p>
+        <div className={styles.boardSurface}>
+          <div className={styles.board} data-target="tabuleiro" onClick={event => event.stopPropagation()}
+          style={{ gridTemplateColumns: 'repeat(' + levelConfig.boardSize + ', 1fr)',
+            '--board-size': levelConfig.boardSize } as CSSProperties}>
+          {Array.from({ length: levelConfig.boardSize ** 2 }, (_, index) => index + 1).map(number => {
+            const selected = game.selected.includes(number);
+            const locked = game.locked.includes(number);
+            const feedbackClass = selected && feedback ? feedback.correct ? styles.cellSuccess : styles.cellError : '';
+            return <button key={number} type="button" data-number={number}
+              aria-label={'Número ' + number + (locked ? ', já usado' : '')} aria-pressed={selected}
+              disabled={game.phase !== 'playing' || locked || selectionNotice || showTutorial}
+              className={[styles.celula, locked ? styles.cellCorrect : selected ? styles.cellSelected : styles.cellDefault, feedbackClass].join(' ')}
+              onClick={() => select(number)}>{number}</button>;
+          })}
+          </div>
+          {feedback && !feedback.correct && (
+            <div className={styles.retryOverlay}>
+              <div className={styles.retryFeedback} role="status">
+                <strong>Tente novamente</strong>
+                <span>Sua soma foi <b className={styles.attemptedSum}>{feedback.sum}</b>.</span>
+                <span>O número mágico era <b className={styles.feedbackTarget}>{feedback.magicNumber}</b>.</span>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-
-
-      {showResultModal && (
-        <LevelResultModal
-          levelId={levelConfig.levelId}
-          rounds={roundResults}
-          totalCorrect={roundResults.filter(r => r.correct).length}
-          totalTime={totalTime}
-          starsEarned={starsEarned}
-          maxCorrect={levelConfig.rounds}
-          nextLevelUnlocked={isLevelUnlocked(levelConfig.levelId + 1)}
-          onRetry={handleRetry}
-          onNextLevel={handleNextLevel}
-          onMenu={handleMenu}
-        />
+      {lastAttempt && (
+        <div key={game.attempts.length} className={[styles.screenPulse, lastAttempt.correct ? styles.screenSuccess : styles.screenError].join(' ')} aria-hidden="true" />
       )}
-      {nextRoundCountdown !== null && (
-        <div className={styles.roundTransitionOverlay} aria-live="polite">
-          <div className={styles.roundTransitionCard}>
-            <span className={styles.roundTransitionResult}>
-              {lastRoundWasCorrect ? 'Acertou!' : 'Não foi dessa vez'}
-            </span>
-            <span className={styles.roundTransitionLabel}>Próxima rodada em</span>
-            <span className={styles.roundTransitionCountdown}>{nextRoundCountdown}</span>
+      {feedback?.correct && game.currentRound < levelConfig.rounds && (
+        <div className={styles.successOverlay} role="status">
+          <div className={styles.successCard}>
+            <strong>Acertou!</strong>
+            <span>Prepare-se para a próxima rodada</span>
           </div>
         </div>
+      )}
+      {selectionNotice && (
+        <div className={styles.selectionNoticeOverlay} onClick={event => { event.stopPropagation(); dismissNotice(); }}>
+          <div className={styles.selectionNotice} role="alert">
+            Selecione <strong>{selectionText}</strong> números para confirmar.
+          </div>
+        </div>
+      )}
+      {game.phase === 'unavailable' && (
+        <div className={styles.selectionNoticeOverlay} onClick={event => event.stopPropagation()}>
+          <div className={styles.selectionNotice} role="alert">
+            Não há números suficientes para continuar.
+            <button type="button" onClick={handleRetry}>Tentar novamente</button>
+          </div>
+        </div>
+      )}
+      {game.phase === 'complete' && (
+        <LevelResultModal levelId={levelConfig.levelId} rounds={game.attempts} totalTime={game.totalTime}
+          starsEarned={starsEarned} hasNextLevel={hasNextLevel}
+          nextLevelUnlocked={starsEarned >= 2 || isLevelUnlocked(levelConfig.levelId + 1)}
+          onRetry={handleRetry} onNextLevel={() => navigate(ROUTES.CACA_SOMA_LEVEL_BASE + '/' + (levelConfig.levelId + 1))}
+          onMenu={() => navigate(ROUTES.CACA_SOMA_LEVELS)} />
       )}
       {showTutorial && (
-        <DynamicTutorial
-          steps={tutorialSteps}
-          onStart={handleTutorialStart}
-          onStepChange={handleTutorialStepChange}
-          onFinish={handleTutorialFinish}
-          storageKey="cacasoma_levels_v1"
-          locale="pt"
-          styles={tutorialStyles}
-        />
+        <DynamicTutorial steps={tutorialSteps} onStart={handleTutorialStart} onStepChange={handleTutorialStepChange}
+          onFinish={handleTutorialFinish} storageKey="cacasoma_levels_v1" locale="pt" styles={tutorialStyles} />
       )}
     </div>
   );

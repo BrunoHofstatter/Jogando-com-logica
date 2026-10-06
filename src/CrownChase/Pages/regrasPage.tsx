@@ -1,7 +1,6 @@
 import { useState } from "react";
 import styles from "../styles/regras.module.css";
 import { useNavigate } from "react-router-dom";
-import { useTutorialCompleted } from "../../Shared/Components/DynamicTutorial";
 import { useDifficultyLock } from "../../Shared/Hooks/useDifficultyLock";
 import { ROUTES } from "../../routes";
 import { CrownChasePieceVisual } from "../Components/piece";
@@ -12,7 +11,7 @@ type GameMode = "pvp" | "ai";
 
 const RULE_PIECES: ReadonlyArray<{ type: PieceType; label: string }> = [
   { type: "jumper", label: "Saltador" },
-  { type: "killer", label: "Assassino" },
+  { type: "killer", label: "Ninja" },
   { type: "king", label: "Rei" },
 ];
 
@@ -23,7 +22,6 @@ function CrownChaseRegras() {
   const [aiDifficulty, setAiDifficulty] = useState<1 | 2 | 3 | 4>(1);
   const [showDetailedRules, setShowDetailedRules] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [, resetTutorial] = useTutorialCompleted("crownchase_v1");
 
   const { isUnlocked, unlockAll, resetProgress } =
     useDifficultyLock("crownchase");
@@ -47,14 +45,7 @@ function CrownChaseRegras() {
   };
 
   const startTutorial = () => {
-    resetTutorial(); // Clear the "completed" flag
-    if (gameMode === "ai") {
-      // If selected difficulty is locked, default to 1 for tutorial or check logic
-      // But typically tutorial forces its own flow. We'll just pass current.
-      navigate(ROUTES.CROWN_CHASE_AI, { state: { difficulty: aiDifficulty } });
-    } else {
-      navigate(ROUTES.CROWN_CHASE_GAME);
-    }
+    navigate(ROUTES.CROWN_CHASE_TUTORIAL, { state: { tutorialReturn: { destination: ROUTES.CROWN_CHASE_RULES } } });
   };
 
   const toggleDifficulty = (e: React.MouseEvent) => {
@@ -232,7 +223,7 @@ function CrownChaseRegras() {
                 <p className={styles.rulesText}>
                   Cada jogador começa com{" "}
                   <span className={styles.rulesStrong}>
-                    1 Rei, 2 Assassinos e 3 Saltadores
+                    1 Rei, 2 Ninjas e 3 Saltadores
                   </span>
                   . O jogador azul começa a partida.
                 </p>
@@ -275,8 +266,7 @@ function CrownChaseRegras() {
                 </p>
                 <p className={styles.rulesText}>
                   <span className={styles.rulesSpan}>Tutorial:</span> acompanhe
-                  uma explicação interativa das peças e das informações do
-                  tabuleiro.
+                  uma partida de treino para aprender a mover, saltar e capturar o rei.
                 </p>
 
                 <h3 className={styles.rulesTitle}> Rei </h3>
@@ -290,7 +280,7 @@ function CrownChaseRegras() {
                 </p>
 
                 <h3 className={styles.rulesTitle}>
-                  Assassino
+                  Ninja
                 </h3>
                 <p className={styles.rulesText}>
                   <span className={styles.rulesSpan}>Movimento:</span> Move{" "}
