@@ -77,7 +77,8 @@ function LevelSelectionPage() {
             <div className={styles.starCriteriaContainer}>
               <div className={styles.starCriteriaRow}>
                 <div className={styles.starIcon}>★</div>
-                <div className={styles.starText}>Conclua todas as rodadas</div>
+                <div className={styles.starText}>{selectedLevelConfig.completionRule === 'clear-board'
+                  ? `Marque todos os ${selectedLevelConfig.boardSize ** 2} números` : 'Conclua todas as rodadas'}</div>
               </div>
               <div className={styles.starCriteriaRow}>
                 <div className={styles.starIcon}>★★</div>

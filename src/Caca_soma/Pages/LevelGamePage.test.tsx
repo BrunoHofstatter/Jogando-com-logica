@@ -5,7 +5,7 @@ import { MemoryRouter, Route, Routes, useNavigate } from 'react-router-dom';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import LevelGamePage from './LevelGamePage';
 import { levels } from '../Logic/levelConfigs';
-import { getLevelProgress, isLevelUnlocked } from '../Logic/levelProgress';
+import { getAllProgress, getLevelProgress, isLevelUnlocked } from '../Logic/levelProgress';
 import { ROUTES } from '../../routes';
 
 const analytics = vi.hoisted(() => ({ startAttempt: vi.fn(), completeAttempt: vi.fn(), recordRound: vi.fn() }));
@@ -13,6 +13,7 @@ vi.mock('../../analytics/useLevelAttemptAnalytics', () => ({ useLevelAttemptAnal
 
 let container: HTMLDivElement, root: Root;
 const originalLevel = { ...levels[0] };
+const originalBoss = { ...levels[29] };
 beforeEach(() => {
   vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'Date', 'performance'] });
@@ -29,14 +30,15 @@ afterEach(() => {
   act(() => root.unmount());
   container.remove();
   Object.assign(levels[0], originalLevel);
+  Object.assign(levels[29], originalBoss);
   vi.useRealTimers(); vi.restoreAllMocks(); vi.unstubAllGlobals();
 });
 function Navigation() {
   const navigate = useNavigate();
   return <><button onClick={() => navigate('/away')}>Leave</button><button onClick={() => navigate(ROUTES.CACA_SOMA_LEVEL_BASE + '/1')}>Return</button></>;
 }
-function render() {
-  act(() => root.render(<MemoryRouter initialEntries={[ROUTES.CACA_SOMA_LEVEL_BASE + '/1']}>
+function render(levelId = 1) {
+  act(() => root.render(<MemoryRouter initialEntries={[ROUTES.CACA_SOMA_LEVEL_BASE + '/' + levelId]}>
     <Navigation /><Routes><Route path={ROUTES.CACA_SOMA_LEVEL_BASE + '/:levelId'} element={<LevelGamePage />} /><Route path="/away" element={<div>Away</div>} /></Routes>
   </MemoryRouter>));
 }
@@ -169,4 +171,44 @@ it('cannot finish on a wrong final answer or record a rapid duplicate submission
   solvePair(); advance(650);
   expect(analytics.completeAttempt).toHaveBeenCalledOnce();
   expect(container.textContent).toContain('Erros: 1');
+});
+
+it('clears all boss cells, uses the lone final number, saves stars, and resets the board on retry', () => {
+  // Exhaust the range deck immediately so pair choices deterministically leave
+  // one cell. Queue shuffling and depletion are covered by the logic tests.
+  Object.assign(levels[29], { rangeCopies: 0 });
+  render(30); start();
+  expect(container.textContent).toContain('Marque todos os números');
+  expect(container.querySelector('[data-board-progress]')?.textContent).toBe('0/49 números marcados');
+  for (let round = 1; round <= 24; round++) {
+    solvePair();
+    expect(container.textContent).not.toContain('Nível 30 concluído!');
+    advance(2000); advance(2000);
+  }
+  expect(container.querySelector('[data-board-progress]')?.textContent).toBe('48/49 números marcados');
+  expect(container.textContent).toContain('Use 1 número');
+  expect(target()).toBe(49);
+  expect(analytics.completeAttempt).not.toHaveBeenCalled();
+  click(cell(49)); advance(1000); submit(); advance(650);
+  expect(container.textContent).toContain('Nível 30 concluído!');
+  expect(container.querySelector('[data-board-progress]')?.textContent).toBe('49/49 números marcados');
+  expect(analytics.completeAttempt).toHaveBeenCalledExactlyOnceWith({ success: true, outcome: 'passed', starsEarned: 3 });
+  expect(getLevelProgress(30)?.bestCorrect).toBe(25);
+  expect(getLevelProgress(30)?.completed).toBe(true);
+  expect(button('Próximo nível')).toBeUndefined();
+  click(button('Tentar novamente'));
+  expect(container.textContent).toContain('Use 2 ou 3 números');
+  expect(container.querySelector('[data-board-progress]')?.textContent).toBe('0/49 números marcados');
+  expect(time()).toBe('0s');
+});
+
+it('adds new campaign progress without losing earlier stars, and unlocks level 11 from level 10', () => {
+  localStorage.setItem('cacasoma_level_progress', JSON.stringify([
+    { levelId: 10, completed: true, bestStars: 2, bestTime: 90, bestCorrect: 5, attempts: 3, lastPlayed: '' },
+  ]));
+  expect(getAllProgress()).toHaveLength(30);
+  expect(getLevelProgress(10)).toMatchObject({ bestStars: 2, bestTime: 90, attempts: 3 });
+  expect(isLevelUnlocked(11)).toBe(true);
+  expect(isLevelUnlocked(12)).toBe(false);
+  expect(isLevelUnlocked(30)).toBe(false);
 });

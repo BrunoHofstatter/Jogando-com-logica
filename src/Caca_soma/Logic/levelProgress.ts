@@ -1,5 +1,6 @@
 import { LevelProgress, LevelAttemptResult } from './gameTypes';
 import { levels } from './levelConfigs';
+import { isLevelComplete } from './levelGameLogic';
 
 const STORAGE_KEY = 'cacasoma_level_progress';
 
@@ -121,7 +122,7 @@ export const unlockAllLevelProgress = (): void => {
       completed: true,
       bestStars: 3,
       bestTime: 0,
-      bestCorrect: level.rounds,
+      bestCorrect: level.completionRule === 'clear-board' ? Math.ceil(level.boardSize ** 2 / 3) : level.rounds,
       lastPlayed: now
     };
   });
@@ -160,9 +161,9 @@ export const resetAllProgress = (): void => {
 };
 
 // Completion is required; mistakes only affect the active solving time.
-export const calculateStars = (correctAnswers: number, totalTime: number, levelId: number): number => {
+export const calculateStars = (correctAnswers: number, totalTime: number, levelId: number, lockedCells = 0): number => {
   const level = levels.find(l => l.levelId === levelId);
-  if (!level || correctAnswers < level.rounds || !Number.isFinite(totalTime) || totalTime < 0) return 0;
+  if (!level || !isLevelComplete(level, correctAnswers, lockedCells) || !Number.isFinite(totalTime) || totalTime < 0) return 0;
   if (totalTime <= level.starThresholds.threeStarTime) return 3;
   if (totalTime <= level.starThresholds.twoStarTime) return 2;
   return 1;

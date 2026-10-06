@@ -42,7 +42,7 @@ Direction: include server time in snapshots and estimate clock offset, or anchor
 
 With “Dicas ativadas” unchecked, an incorrect numeric/operator answer still highlights its relevant letter calculations. `ManualPanel` always calls `getHintLetters`, which checks the mistake but not `hintsEnabled`. Only the explanatory hint box is gated. This defeats part of the host's difficulty setting.
 
-Evidence: `src/BombGame/Pages/BombGamePage.tsx:159–165`, `:195–199`; highlight styling in `src/BombGame/styles/GamePage.module.css:67`; `.agents/rules/game_bomb.md`, “Hints Setting.”
+Evidence: `src/BombGame/Pages/BombGamePage.tsx:159–165`, `:195–199`; highlight styling in `src/BombGame/styles/GamePage.module.css:67`; `docs/games/bomb.md`, “Hints Setting.”
 
 Direction: gate educational highlighting with `hintsEnabled`, while keeping ordinary incorrect-answer feedback. Verify the same mistake in both settings.
 
@@ -72,7 +72,7 @@ Direction: add a focused Level 1 socket lifecycle test for win/loss/replay, wron
 
 The operator answers are always `+`, `−`, `−`, regardless of the generated manual. Returning players can complete that module from memory. Once those operators are known, the displayed equation results also reveal A, C, and D by simple arithmetic. B remains manual-only, so this is not a claim that the entire level is independently solvable. The ordering rule is also fixed. The partner therefore becomes less necessary for substantial portions of replayed rounds.
 
-Evidence: `src/BombGame/Logic/level1.ts:104–110`; `src/BombGame/Logic/levelViews.ts:31–37`; the fixed solutions are explicitly documented in `.agents/rules/game_bomb.md`, “Implemented Level 1,” and asserted in tests.
+Evidence: `src/BombGame/Logic/level1.ts:104–110`; `src/BombGame/Logic/levelViews.ts:31–37`; the fixed solutions are explicitly documented in `docs/games/bomb.md`, “Implemented Level 1,” and asserted in tests.
 
 Decision: is Level 1 intentionally a predictable introduction, or should repeated play require renewed communication? Keep the current pattern if predictable onboarding is the goal. Otherwise generate varied, unambiguous operators and corresponding role-separated clues. That changes the accepted design and needs coordinated generator, projection, instructions, and test changes; it is not a corrective refactor.
 
@@ -82,7 +82,7 @@ Decision: is Level 1 intentionally a predictable introduction, or should repeate
 
 Every integer-looking numeric draft is treated as complete after two seconds. A student entering a two-digit answer can pause after the first digit to think or speak and lose a heart. Reopening the operator selector does not pause its timer: the previous choice can be submitted while the student is choosing a replacement. The rules page does not explain automatic submission, and the controls expose a pending visual treatment but no clear confirmation instruction.
 
-Evidence: `src/BombGame/Pages/BombGamePage.tsx:123–156`; `src/BombGame/Pages/RegrasPage.tsx`; `.agents/rules/game_bomb.md`, “Level 1 Interface Details,” explicitly specifies this delay.
+Evidence: `src/BombGame/Pages/BombGamePage.tsx:123–156`; `src/BombGame/Pages/RegrasPage.tsx`; `docs/games/bomb.md`, “Level 1 Interface Details,” explicitly specifies this delay.
 
 Decision: retain automatic commitment or use an explicit confirmation action? If retained, explain it in Portuguese, make pending status understandable, and define whether opening the selector pauses submission. Explicit confirmation adds an interaction but separates thinking time from a committed answer. No classroom validation was found or inferred.
 

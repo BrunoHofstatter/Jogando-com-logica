@@ -1,5 +1,7 @@
 # React + TypeScript + Vite
 
+Project context, game references, shared systems, and plans are indexed in [docs/README.md](docs/README.md). Repository working instructions are in [AGENTS.md](AGENTS.md).
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:

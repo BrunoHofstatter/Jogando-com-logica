@@ -4,7 +4,7 @@ Status: learning rework implemented. The sections below retain the agreed design
 and implementation requirements; the summary game remains deferred.
 
 Update (2026-10-03): the separate desktop summary game is now implemented under
-`docs/class3-summary-game-implementation-plan.md`. The deferred-game references
+`docs/plans/class3-summary-game-implementation-plan.md`. The deferred-game references
 below describe this earlier learning-only task's scope, not current game status.
 
 ## Objective and scope
@@ -144,7 +144,7 @@ Update (2026-09-27): the later approved calculator rework supersedes the retaine
 arithmetic interaction/styling instructions below. Class 3 now uses free entry,
 neutral carry boxes, a yellow/purple selected cell, and progressive arrows in a
 right-hand hint area. Carries may be omitted during independent work, while entered
-digits must be correct. See `.agents/rules/docs_calculation_system.md` for current
+digits must be correct. See `docs/systems/calculations.md` for current
 timing, validation, and accessibility behavior. This rework was checked with code
 tests, lint, and build; no new browser verification was performed.
 
@@ -163,7 +163,7 @@ Small totals 8 and 27 use numerical answer choices. Expression-only configuratio
 5. Update Class 3 styles using CSS Modules and project-standard fluid units. Keep mobile input and Portuguese accents intact; add no external APIs or heavy dependencies.
 6. Update completion copy to describe selected equal faces, including the whole cube. Use `Multiplicação nas Faces` as the proposed visible Class 3 title because `Cubo Inteiro` covers only the endpoint; update menu/lesson labels consistently while preserving route constants and route paths.
 7. Preserve analytics start/completion behavior. Report actual wrong answers separately from hint use, aligned with Class 2 and the analytics documentation.
-8. After implementation, update `.agents/rules/game_rubiks.md` and `docs/rubiks-cube-component.md` to describe shipped behavior. Update analytics documentation if its Class 3 accounting changes. Keep planned game work explicitly separate from current reality.
+8. After implementation, update `docs/games/rubiks.md` and `docs/systems/rubiks-cube-component.md` to describe shipped behavior. Update analytics documentation if its Class 3 accounting changes. Keep planned game work explicitly separate from current reality.
 
 Likely primary files:
 

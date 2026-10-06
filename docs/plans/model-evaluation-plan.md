@@ -79,7 +79,7 @@ exercise into the same duration.
 | --- | --- | --- |
 | Broad single prompt | Design and implement a playable tutorial for another game, using two finished game tutorials as references | Two reference tutorials are polished; target game and manageable scope are selected |
 | Specific single prompt | Implement the Class 3 summary game from an explicit plan | Game design and plan are settled; a matching pre-feature baseline is retained |
-| Pure discussion | Discuss the teacher-led classroom tournament described in `classroom-tournament-discussion-context.md` | Initial context is captured; fixed opening can be piloted |
+| Pure discussion | Discuss the teacher-led classroom tournament described in `docs/plans/classroom-tournament-discussion-context.md` | Initial context is captured; fixed opening can be piloted |
 | Discussion and implementation | Discuss, agree on, and implement a small new Bomb Game level within a supplied theme/family | Shared Bomb Game effects and behavior are polished; theme and feasible scope are selected |
 
 The previous Caça Soma hint task and historical Class 3 learning-section plan

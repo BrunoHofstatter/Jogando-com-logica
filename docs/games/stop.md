@@ -1,8 +1,3 @@
----
-trigger: model_decision
-description: Stop Matemático documentation.
----
-
 # Stop Matemático
 
 ## Purpose of This File

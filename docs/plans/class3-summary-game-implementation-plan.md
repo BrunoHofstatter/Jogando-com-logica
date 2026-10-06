@@ -106,16 +106,16 @@ Relevant existing files:
 
 | Concern | Source |
 | --- | --- |
-| Rubik's class context | `.agents/rules/game_rubiks.md` |
-| Implemented Class 3 teaching | `docs/class3-equal-faces-implementation-plan.md` |
-| Cube API and face mapping | `docs/rubiks-cube-component.md` |
+| Rubik's class context | `docs/games/rubiks.md` |
+| Implemented Class 3 teaching | `docs/plans/class3-equal-faces-implementation-plan.md` |
+| Cube API and face mapping | `docs/systems/rubiks-cube-component.md` |
 | Class 3 page and lesson hook | `src/RubiksClass/Classes/Class3_totalSquares/Class3TotalSquares.tsx`, `useClass3.ts` |
 | Class 2 review example | `src/RubiksClass/Classes/Class2_faceArea/Class2SummaryView.tsx`, corresponding CSS and `class2Review.ts` |
 | Shared completion conventions | `src/RubiksClass/Components/ReviewCompletion.tsx` |
 | Entry and checkpoints | `src/RubiksClass/Testing/LessonEntry.tsx`, `entryContext.ts`, `checkpoints.ts` |
 | Menu entry | `src/RubiksClass/Classes/ClassMenu.tsx`, `ClassIcon.tsx` |
 | Existing navigation chrome | `src/App.tsx`, `src/routes.ts` |
-| Analytics contract | `.agents/rules/googleanalytics.md`, `src/analytics/useGameAttemptAnalytics.ts` |
+| Analytics contract | `docs/systems/analytics.md`, `src/analytics/useGameAttemptAnalytics.ts` |
 
 ## 3. Full player flow
 

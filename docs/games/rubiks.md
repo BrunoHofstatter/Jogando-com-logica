@@ -1,8 +1,3 @@
----
-trigger: model_decision
-description: Rubik's Class (Cubo Mágico) documentation.
----
-
 # Rubik's Class (Cubo Mágico) - Educational Modules
 
 ## Purpose of This File
@@ -353,7 +348,7 @@ Equivalent-valued distractors are excluded. Ordinary successes advance after
   remain visible and read-only during the success transition.
 
 The implementation plan and verification record are in
-`docs/class3-equal-faces-implementation-plan.md`.
+`docs/plans/class3-equal-faces-implementation-plan.md`.
 
 ### Current Summary / Review Activity
 
@@ -421,7 +416,7 @@ Dust uses larger contrasting gray/white puffs with about a 0.9-second lifetime;
 the frosted blue-gray corridor has stronger edge/floor/perspective cues.
 
 Detailed stages, tuning values, and verification are recorded in
-`docs/class3-summary-game-implementation-plan.md`.
+`docs/plans/class3-summary-game-implementation-plan.md`.
 
 ## Planned Modules
 

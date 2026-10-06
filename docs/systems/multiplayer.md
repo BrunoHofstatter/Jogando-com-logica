@@ -1,8 +1,3 @@
----
-trigger: model_decision
-description: Current multiplayer backend architecture, deployment decisions, and extension guide for adding online multiplayer to other games.
----
-
 # Multiplayer Backend
 
 ## Purpose
@@ -33,8 +28,8 @@ This is not a rules doc for any specific game. Crown Chase remains the first ref
 
 Important:
 
-- `.agents/rules/multiplayer_private_rooms.md` is the original planning document.
-- `.agents/rules/docs_classroom_system.md` is the current implementation guide for temporary classroom codes and room browsers.
+- `docs/archive/multiplayer-private-rooms.md` is the original planning document.
+- `docs/systems/classrooms.md` is the current implementation guide for temporary classroom codes and room browsers.
 - This file describes the implemented architecture and the decisions that were actually used.
 - When the plan doc and the code disagree, trust the code and this file.
 
@@ -321,7 +316,7 @@ Current signals:
 These are affected-participant events, not canonical room or match counts.
 Online game start/end events remain deferred until a canonical match emitter
 or an explicitly participant-scoped lifecycle is designed. See
-`.agents/rules/googleanalytics.md` for the payload and reporting contract.
+`docs/systems/analytics.md` for the payload and reporting contract.
 
 ## How To Add Multiplayer To Another Game
 
@@ -337,7 +332,7 @@ Use this order:
 8. Test locally with two tabs before touching deployment.
 9. Deploy only after local two-device testing is solid.
 
-If the game should also support classroom room browsing, read `.agents/rules/docs_classroom_system.md` after the base online multiplayer flow is working. Do not add classroom browsing before the game has a reliable private-room flow.
+If the game should also support classroom room browsing, read `docs/systems/classrooms.md` after the base online multiplayer flow is working. Do not add classroom browsing before the game has a reliable private-room flow.
 
 Things to avoid:
 

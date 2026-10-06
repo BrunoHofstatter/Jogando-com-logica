@@ -1,8 +1,3 @@
----
-trigger: model_decision
-description: Temporary classroom code system for online multiplayer room browsers.
----
-
 # Classroom System
 
 ## Purpose
@@ -281,7 +276,7 @@ Do not build permanent classrooms inside the temporary system. Permanent classro
 
 Use this order:
 
-1. Read `docs_multiplayer_backend.md` and the target game's rules doc.
+1. Read `docs/systems/multiplayer.md` and the target game's rules doc.
 2. Confirm the game already has server-authoritative online multiplayer.
 3. Decide the open room summary fields for that game.
 4. Add `visibility` and `classroomCode` to that game's room type.
@@ -292,7 +287,7 @@ Use this order:
 9. Make its hook validate and subscribe to the shared active classroom on connect.
 10. Add a student classroom section to that game's online lobby.
 11. Keep the private room flow intact.
-12. Update this doc and `docs_multiplayer_backend.md` if the shared classroom architecture changes.
+12. Update this doc and `docs/systems/multiplayer.md` if the shared classroom architecture changes.
 
 ## UI Pattern
 

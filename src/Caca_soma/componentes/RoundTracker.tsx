@@ -2,12 +2,24 @@ import styles from './roundTracker.module.css';
 
 interface RoundTrackerProps {
   currentRound: number;
-  totalRounds: number;
+  totalRounds?: number;
   levelId: number;
   completedRounds: number;
+  totalCells?: number;
+  completedCells?: number;
 }
 
-function RoundTracker({ currentRound, totalRounds, levelId, completedRounds }: RoundTrackerProps) {
+function RoundTracker({ currentRound, totalRounds = 0, levelId, completedRounds,
+  totalCells, completedCells = 0 }: RoundTrackerProps) {
+  if (totalCells !== undefined) {
+    return <div className={styles.container}>
+      <div className={styles.roundText}>Nível {levelId} - Rodada {currentRound}</div>
+      <div className={styles.roundText}>Marque todos os números</div>
+      <div className={styles.roundText} role="status" aria-live="polite" data-board-progress>
+        {completedCells}/{totalCells} números marcados
+      </div>
+    </div>;
+  }
   return (
     <div className={styles.container}>
       <div className={styles.roundText}>

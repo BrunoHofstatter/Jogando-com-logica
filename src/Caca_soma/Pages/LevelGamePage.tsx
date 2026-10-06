@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getLevelById } from '../Logic/levelConfigs';
 import { calculateStars, updateLevelProgress, isLevelUnlocked } from '../Logic/levelProgress';
 import { LevelConfig } from '../Logic/gameTypes';
-import { displayLevelSeconds, getSelectionCounts } from '../Logic/levelGameLogic';
+import { displayLevelSeconds, getSelectionCounts, isLevelComplete } from '../Logic/levelGameLogic';
 import { useSoloLevelGame } from '../Hooks/useSoloLevelGame';
 import LevelResultModal from '../componentes/LevelResultModal';
 import GameButton from '../componentes/GameButton';
@@ -36,12 +36,14 @@ function LevelSession({ levelConfig }: { levelConfig: LevelConfig }) {
     gameId: 'caca_soma', levelId: formatLevelId(levelConfig.levelId), gameMode: 'solo',
     usageContext: 'standard', playerSlotCount: 1,
   });
-  const { game, liveTime, rollingNumber, selectionNotice, dismissNotice, start, select, submit, retry } =
+  const { game, liveTime, rollingNumber, selectionNotice, selectionRule, dismissNotice, start, select, submit, retry } =
     useSoloLevelGame(levelConfig, recordRound);
   const correctCount = game.attempts.filter(attempt => attempt.correct).length;
-  const starsEarned = calculateStars(correctCount, game.totalTime, levelConfig.levelId);
-  const selectionCounts = getSelectionCounts(levelConfig.numbersToSelect);
+  const starsEarned = calculateStars(correctCount, game.totalTime, levelConfig.levelId, game.locked.length);
+  const selectionCounts = getSelectionCounts(selectionRule);
   const selectionText = selectionCounts.join(' ou ');
+  const selectionNoun = selectionRule === 1 ? 'número' : 'números';
+  const clearsBoard = levelConfig.completionRule === 'clear-board';
   const feedback = game.phase === 'feedback' ? game.feedback : null;
   const lastAttempt = game.attempts[game.attempts.length - 1];
   const hasNextLevel = Boolean(getLevelById(levelConfig.levelId + 1));
@@ -74,7 +76,7 @@ function LevelSession({ levelConfig }: { levelConfig: LevelConfig }) {
       title: 'Tabuleiro',
       body: (
         <div className={tutorialStyles.stepBody}>
-          <span>- Selecione <span className={tutorialStyles.highlight}>2 números</span></span>
+          <span>- Selecione <span className={tutorialStyles.highlight}>{selectionText} {selectionNoun}</span></span>
           <span>- A soma deles deve ser <span className={tutorialStyles.highlight}>igual</span> ao Número Mágico</span>
         </div>
       )
@@ -112,7 +114,8 @@ function LevelSession({ levelConfig }: { levelConfig: LevelConfig }) {
       title: 'Rodadas',
       body: (
         <div className={tutorialStyles.stepBody}>
-          <span>- Acerte todas as rodadas para ganhar <span className={tutorialStyles.highlight}>3 estrelas</span></span>
+          <span>- {clearsBoard ? 'Marque todos os números' : 'Conclua todas as rodadas'} para ganhar <span className={tutorialStyles.highlight}>1 estrela</span></span>
+          <span>- Termine mais rápido para ganhar <span className={tutorialStyles.highlight}>2 ou 3 estrelas</span></span>
         </div>
       )
     }
@@ -201,7 +204,8 @@ function LevelSession({ levelConfig }: { levelConfig: LevelConfig }) {
         <div className={styles.controlsBox}>
           <div data-target="step5" className={styles.trackerWrapper}>
             <RoundTracker levelId={levelConfig.levelId} currentRound={game.currentRound}
-              totalRounds={levelConfig.rounds} completedRounds={correctCount} />
+              totalRounds={levelConfig.rounds} completedRounds={correctCount}
+              totalCells={clearsBoard ? levelConfig.boardSize ** 2 : undefined} completedCells={game.locked.length} />
           </div>
           <div data-target="step1" className={styles.magicAndButton}>
             <div className={styles.magicNumberContainer}>
@@ -231,7 +235,7 @@ function LevelSession({ levelConfig }: { levelConfig: LevelConfig }) {
       <div className={styles.rightPanel} data-target="step2">
         <p className={styles.selectionInstruction}>Use {selectionCounts.map((count, index) => (
           <span key={count}>{index > 0 && ' ou '}<strong>{count}</strong></span>
-        ))} números</p>
+        ))} {selectionNoun}</p>
         <div className={styles.boardSurface}>
           <div className={styles.board} data-target="tabuleiro" onClick={event => event.stopPropagation()}
           style={{ gridTemplateColumns: 'repeat(' + levelConfig.boardSize + ', 1fr)',
@@ -261,7 +265,7 @@ function LevelSession({ levelConfig }: { levelConfig: LevelConfig }) {
       {lastAttempt && (
         <div key={game.attempts.length} className={[styles.screenPulse, lastAttempt.correct ? styles.screenSuccess : styles.screenError].join(' ')} aria-hidden="true" />
       )}
-      {feedback?.correct && game.currentRound < levelConfig.rounds && (
+      {feedback?.correct && !isLevelComplete(levelConfig, correctCount, game.locked.length) && (
         <div className={styles.successOverlay} role="status">
           <div className={styles.successCard}>
             <strong>Acertou!</strong>
@@ -272,7 +276,7 @@ function LevelSession({ levelConfig }: { levelConfig: LevelConfig }) {
       {selectionNotice && (
         <div className={styles.selectionNoticeOverlay} onClick={event => { event.stopPropagation(); dismissNotice(); }}>
           <div className={styles.selectionNotice} role="alert">
-            Selecione <strong>{selectionText}</strong> números para confirmar.
+            Selecione <strong>{selectionText}</strong> {selectionNoun} para confirmar.
           </div>
         </div>
       )}

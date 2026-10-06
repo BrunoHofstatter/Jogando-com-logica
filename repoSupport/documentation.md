@@ -66,7 +66,7 @@ Consider organization during all modes, especially review:
 - Recommend removing obsolete or redundant files only after identifying any unique reasoning, plans, or useful history to preserve.
 - Check whether filenames, folders, indexes, and links make the intended reading path clear.
 
-Review mode recommends restructuring in chat. Update/create mode may make small organizational improvements within scope. Broad moves, splits, merges, or deletions require the user to request that restructuring. When authorized, preserve useful content and update incoming references, including agent instructions and indexes. Do not move the existing `.agents/rules/` collection merely because `docs/` is the preferred future location.
+Review mode recommends restructuring in chat. Update/create mode may make small organizational improvements within scope. Broad moves, splits, merges, or deletions require the user to request that restructuring. When authorized, preserve useful content and update incoming references, including agent instructions and indexes. Keep permanent project documentation in `docs/`; keep agent instructions, skills, and Repo Support workflows in their dedicated locations.
 
 ## Final checks
 

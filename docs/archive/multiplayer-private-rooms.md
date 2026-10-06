@@ -1,9 +1,6 @@
----
-trigger: model_decision
-description: Implementation plan for basic private-room online multiplayer, starting with Crown Chase.
----
-
 # Multiplayer - Private Rooms (Phase 1)
+
+Status: historical initial implementation plan. For the current architecture and extension contract, see [the multiplayer system reference](../systems/multiplayer.md).
 
 Scope: online 1v1 via a room code. No accounts, no matchmaking, no classroom system.
 Target game: Crown Chase first, then MathWar and Damas can follow the same pattern.

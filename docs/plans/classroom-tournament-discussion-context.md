@@ -20,9 +20,9 @@ not documented as implemented features.
 
 Relevant implementation context:
 
-- `.agents/rules/docs_classroom_system.md`
-- `.agents/rules/docs_multiplayer_backend.md`
-- `.agents/rules/docs_games_overview.md`
+- `docs/systems/classrooms.md`
+- `docs/systems/multiplayer.md`
+- `docs/project/games-overview.md`
 - Individual game documentation for rules, supported modes, and limitations.
 
 ## User's proposed concept

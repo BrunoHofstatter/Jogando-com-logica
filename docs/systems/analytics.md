@@ -1,8 +1,3 @@
----
-trigger: model_decision
-description: When creating, reviewing, or modifying Google Analytics tracking.
----
-
 # Google Analytics (GA4)
 
 Last code update: 2026-09-15

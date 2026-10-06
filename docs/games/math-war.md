@@ -1,8 +1,3 @@
----
-trigger: model_decision
-description: Math War (Guerra Matemática) documentation.
----
-
 # Math War (Guerra Matemática)
 
 ## Purpose of This File

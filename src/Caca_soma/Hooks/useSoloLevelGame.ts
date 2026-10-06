@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { LevelConfig, RoundResult } from '../Logic/gameTypes';
-import { acceptsSelectionCount, chooseLevelTarget, getSelectionCounts } from '../Logic/levelGameLogic';
+import { acceptsSelectionCount, chooseNextLevelTarget, createLevelRangeQueue, getLevelSelectionRule,
+  getSelectionCounts, isLevelComplete } from '../Logic/levelGameLogic';
 
 type Phase = 'idle' | 'rolling' | 'playing' | 'feedback' | 'complete' | 'unavailable';
 
@@ -8,6 +9,8 @@ const initialState = () => ({
   phase: 'idle' as Phase,
   currentRound: 1,
   target: 0,
+  range: [0, 0] as [number, number],
+  rangeQueue: [] as [number, number][],
   rollingDuration: 2000,
   selected: [] as number[],
   locked: [] as number[],
@@ -24,6 +27,7 @@ export function useSoloLevelGame(config: LevelConfig, recordAttempt: (correct: b
   const attemptStartedAt = useRef<number | null>(null);
   const submitting = useRef(false);
   const allNumbers = Array.from({ length: config.boardSize ** 2 }, (_, index) => index + 1);
+  const selectionRule = getLevelSelectionRule(config, allNumbers.length - game.locked.length);
 
   useEffect(() => {
     if (game.phase !== 'playing') return;
@@ -46,7 +50,7 @@ export function useSoloLevelGame(config: LevelConfig, recordAttempt: (correct: b
 
   useEffect(() => {
     if (game.phase !== 'rolling') return;
-    const range = config.randomNumberRanges[game.currentRound - 1];
+    const range = game.range;
     const interval = window.setInterval(() => {
       setRollingNumber(Math.floor(Math.random() * (range[1] - range[0] + 1)) + range[0]);
     }, 50);
@@ -54,14 +58,14 @@ export function useSoloLevelGame(config: LevelConfig, recordAttempt: (correct: b
       setGame(current => ({ ...current, phase: 'playing', feedback: null }));
     }, game.rollingDuration);
     return () => { window.clearInterval(interval); window.clearTimeout(timeout); };
-  }, [game.phase, game.currentRound, game.rollingDuration, config]);
+  }, [game.phase, game.range, game.rollingDuration]);
 
   useEffect(() => {
     if (game.phase !== 'feedback' || !game.feedback) return;
     const feedback = game.feedback;
     // Cells retain their feedback appearance briefly, then the selection clears.
     const clear = window.setTimeout(() => setGame(current => ({ ...current, selected: [] })), 650);
-    const isFinal = feedback.correct && game.currentRound === config.rounds;
+    const isFinal = feedback.correct && isLevelComplete(config, game.currentRound, game.locked.length);
     const timeout = window.setTimeout(() => {
       if (isFinal) {
         setGame(current => ({ ...current, phase: 'complete', feedback: null }));
@@ -70,25 +74,27 @@ export function useSoloLevelGame(config: LevelConfig, recordAttempt: (correct: b
       const nextRound = game.currentRound + (feedback.correct ? 1 : 0);
       const available = Array.from({ length: config.boardSize ** 2 }, (_, index) => index + 1)
         .filter(number => !game.locked.includes(number));
-      const target = chooseLevelTarget(available, config.numbersToSelect,
-        config.randomNumberRanges[nextRound - 1], feedback.correct ? undefined : feedback.magicNumber);
-      setGame(current => ({ ...current, currentRound: nextRound, target: target ?? 0,
+      const next = chooseNextLevelTarget(config, available, nextRound, game.rangeQueue,
+        feedback.correct ? undefined : feedback.magicNumber, feedback.correct ? undefined : game.range);
+      setGame(current => ({ ...current, currentRound: nextRound, target: next.target ?? 0,
+        range: next.range, rangeQueue: next.rangeQueue,
         rollingDuration: feedback.correct ? 2000 : 1000,
-        phase: target === null ? 'unavailable' : 'rolling', feedback: null }));
+        phase: next.target === null ? 'unavailable' : 'rolling', feedback: null }));
     }, isFinal ? 650 : 2000);
     return () => { window.clearTimeout(clear); window.clearTimeout(timeout); };
-  }, [game.phase, game.feedback, game.currentRound, game.locked, config]);
+  }, [game.phase, game.feedback, game.currentRound, game.locked, game.rangeQueue, game.range, config]);
 
   const start = () => {
     if (game.phase !== 'idle') return;
-    const target = chooseLevelTarget(allNumbers, config.numbersToSelect, config.randomNumberRanges[0]);
-    setRollingNumber(config.randomNumberRanges[0][0]);
-    setGame(current => ({ ...current, target: target ?? 0, phase: target === null ? 'unavailable' : 'rolling' }));
+    const next = chooseNextLevelTarget(config, allNumbers, 1, createLevelRangeQueue(config));
+    setRollingNumber(next.range[0]);
+    setGame(current => ({ ...current, target: next.target ?? 0, range: next.range, rangeQueue: next.rangeQueue,
+      phase: next.target === null ? 'unavailable' : 'rolling' }));
   };
 
   const select = (number: number) => {
     if (game.phase !== 'playing' || selectionNotice || submitting.current || game.locked.includes(number)) return;
-    const maximum = Math.max(...getSelectionCounts(config.numbersToSelect));
+    const maximum = Math.max(...getSelectionCounts(selectionRule));
     setGame(current => ({ ...current, selected: current.selected.includes(number)
       ? current.selected.filter(value => value !== number)
       : current.selected.length < maximum ? [...current.selected, number] : current.selected }));
@@ -96,7 +102,7 @@ export function useSoloLevelGame(config: LevelConfig, recordAttempt: (correct: b
 
   const submit = useCallback(() => {
     if (game.phase !== 'playing' || selectionNotice || submitting.current || attemptStartedAt.current === null) return;
-    if (!acceptsSelectionCount(config.numbersToSelect, game.selected.length)) {
+    if (!acceptsSelectionCount(selectionRule, game.selected.length)) {
       setSelectionNotice(true);
       return;
     }
@@ -111,7 +117,7 @@ export function useSoloLevelGame(config: LevelConfig, recordAttempt: (correct: b
       attempts: [...current.attempts, result], totalTime: current.totalTime + timeTaken,
       locked: result.correct ? [...current.locked, ...result.selectedNumbers] : current.locked }));
     recordAttempt(result.correct);
-  }, [game, config.numbersToSelect, selectionNotice, recordAttempt]);
+  }, [game, selectionRule, selectionNotice, recordAttempt]);
 
   const retry = () => {
     submitting.current = false;
@@ -122,6 +128,6 @@ export function useSoloLevelGame(config: LevelConfig, recordAttempt: (correct: b
     setGame(initialState());
   };
 
-  return { game, liveTime, rollingNumber, selectionNotice, dismissNotice: () => setSelectionNotice(false),
+  return { game, liveTime, rollingNumber, selectionNotice, selectionRule, dismissNotice: () => setSelectionNotice(false),
     start, select, submit, retry };
 }

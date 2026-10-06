@@ -1,8 +1,3 @@
----
-trigger: model_decision
-description: Bomb Game planning and implementation reference.
----
-
 # Bomb Game
 
 ## Purpose of This File
@@ -23,7 +18,7 @@ This file documents the current design direction. It should help future work sta
 - Bomb Game uses the shared online lobby conventions, cached player name, and temporary classroom browser used by the other online games.
 - The game should be designed as an online-only two-player cooperative game.
 - The project already has a separate multiplayer backend in `multiplayer-server/`.
-- Online multiplayer should follow the current server-authoritative project pattern documented in `.agents/rules/docs_multiplayer_backend.md`.
+- Online multiplayer should follow the current server-authoritative project pattern documented in `docs/systems/multiplayer.md`.
 - The internal code name can remain `BombGame` for now.
 - The final user-facing name has not been decided yet.
 - All user-facing text must be in Brazilian Portuguese when implemented.

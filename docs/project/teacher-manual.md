@@ -1,8 +1,3 @@
----
-trigger: model_decision
-description: Context regarding the pedagogical goals and how teachers can apply the platform.
----
-
 # Teacher's Manual - Pedagogical Context
 
 ## Purpose of This File

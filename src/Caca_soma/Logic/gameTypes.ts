@@ -3,12 +3,11 @@
 export type GameMode = 'versus' | 'level';
 
 // Level configuration interface
-export interface LevelConfig {
+interface LevelSettings {
   levelId: number;
   boardSize: 5 | 7 | 10;                    // Board dimension (5x5=1-25, 7x7=1-49, 10x10=1-100)
-  rounds: number;                           // Number of rounds in the level
   numbersToSelect: 2 | 3 | '2-or-3';         // Exact count, or either count
-  randomNumberRanges: [number, number][];   // Array of ranges (one per round)
+  randomNumberRanges: [number, number][];   // Per-round ranges, or the boss's shuffle pool
   starThresholds: {
     // Completing all rounds always earns one star; extra stars use active time.
     twoStarTime: number;                    // Max time (seconds) for 2 stars
@@ -18,6 +17,11 @@ export interface LevelConfig {
   requiredStars: number;                    // Stars needed to unlock (0 for first level)
   columns?: number;                         // Optional override for grid columns
 }
+
+export type LevelConfig = LevelSettings & (
+  | { completionRule?: 'rounds'; rounds: number }
+  | { completionRule: 'clear-board'; rounds?: never; rangeCopies: number }
+);
 
 // Level progress tracking (stored in localStorage)
 export interface LevelProgress {

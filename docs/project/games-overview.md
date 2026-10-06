@@ -1,8 +1,3 @@
----
-trigger: model_decision
-description: High-level overview of the entire game catalog on the platform.
----
-
 # Games Overview - Catalog Summary
 
 This file contains a brief overview of all current games implemented in the "Jogando com Lógica" platform. Each game also has its own dedicated `.md` file with deeper technical details and roadmaps.

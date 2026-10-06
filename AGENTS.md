@@ -71,29 +71,34 @@ Routes follow the pattern `/{game}Pg` (play) and `/{game}Rg` (rules). `RubiksCla
 
 ## Context Files
 
-Deeper project context lives in `.agents/rules/`. Read these when relevant:
+Project documentation lives in `docs/`. Start with [the documentation index](docs/README.md), then read these references when relevant:
 
 | File | When to read |
 |------|--------------|
-| `game_crown_chase.md` | Working on Caça Coroa |
-| `game_math_war.md` | Working on Guerra Matemática |
-| `game_spttt.md` | Working on Super Jogo da Velha |
-| `game_stop.md` | Working on Stop Matemático |
-| `game_caca_soma.md` | Working on Caça Soma |
-| `game_rubiks.md` | Working on Cubo Mágico |
-| `game_bomb.md` | Working on Bomb Game |
-| `docs_games_overview.md` | Need the full game catalog at a glance |
-| `docs_general.md` | Need overall project context, positioning, current priorities, or future plans |
-| `docs_multiplayer_backend.md` | Working on online multiplayer architecture, backend deployment, or adding multiplayer to another game |
-| `docs_classroom_system.md` | Working on classroom codes, classroom room browsers, or adding classroom support to another online game |
-| `docs_teacher_manual.md` | Working on the `/manual` page or teacher-facing content |
-| `googleanalytics.md` | Adding or modifying GA4 event tracking |
-| `tutorial_system/overall_plan.md` | Planning or implementing the playable tutorial rollout for any game |
-| `tutorial_system/core_system_plan.md` | Designing or implementing the shared playable tutorial core or a game integration |
+| `docs/games/crown-chase.md` | Working on Caça Coroa |
+| `docs/games/math-war.md` | Working on Guerra Matemática |
+| `docs/games/spttt.md` | Working on Super Jogo da Velha |
+| `docs/games/stop.md` | Working on Stop Matemático |
+| `docs/games/caca-soma.md` | Working on Caça Soma |
+| `docs/games/rubiks.md` | Working on Cubo Mágico |
+| `docs/games/bomb.md` | Working on Bomb Game |
+| `docs/project/games-overview.md` | Need the full game catalog at a glance |
+| `docs/project/overview.md` | Need overall project context, positioning, current priorities, or future plans |
+| `docs/systems/multiplayer.md` | Working on online multiplayer architecture, backend deployment, or adding multiplayer to another game |
+| `docs/systems/calculations.md` | Working on shared vertical arithmetic components |
+| `docs/systems/rubiks-cube-component.md` | Working on the reusable Rubik's cube renderer |
+| `docs/systems/classrooms.md` | Working on classroom codes, classroom room browsers, or adding classroom support to another online game |
+| `docs/project/teacher-manual.md` | Working on the `/manual` page or teacher-facing content |
+| `docs/systems/analytics.md` | Adding or modifying GA4 event tracking |
+| `docs/tutorials/overview.md` | Understanding playable tutorials, their philosophy, and the documentation map |
+| `docs/tutorials/technical-contract.md` | Working on the implemented shared session/history or a game integration |
+| `docs/tutorials/crown-chase.md` | Working on Crown Chase's playable lesson and its game-specific decisions |
+| `docs/plans/tutorials/next-tutorials.md` | Considering another game's tutorial; flexible context, not a prescribed workflow |
+| `docs/plans/tutorials/roadmap.md` | Reviewing future tutorial work separately from implemented capabilities |
 
 ## Optional Skills
 
-Reusable on-demand skills live in `.agents/skills/`. These are separate from `.agents/rules/` and should only be loaded when the user explicitly asks for that skill or clearly requests that workflow.
+Reusable on-demand skills live in `.agents/skills/`. These are separate from project documentation in `docs/` and should only be loaded when the user explicitly asks for that skill or clearly requests that workflow.
 
 Current skill:
 

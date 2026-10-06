@@ -29,15 +29,16 @@ Infer the mode from the user's wording. Resolve approximate feature or document 
 
 ## Finding project documentation
 
-The existing documentation has not been migrated by this workflow. Start with the context index in `AGENTS.md`, then discover relevant documents, including ones absent from that index. If paths move later, locate their replacements rather than recreating stale locations.
+Start with [the documentation index](../docs/README.md) and the context table in `AGENTS.md`, then discover relevant documents, including ones absent from those indexes.
 
 | Current location | Role |
 |---|---|
-| `.agents/rules/game_*.md` | Game and lesson references; some combine current implementation, educational context, and future ideas |
-| `.agents/rules/docs_general.md`, `docs_games_overview.md`, `docs_teacher_manual.md` | Project positioning, catalog, and pedagogical context |
-| `.agents/rules/docs_multiplayer_backend.md`, `docs_classroom_system.md`, `docs_calculation_system.md`, `googleanalytics.md` | Shared-system implementation and extension references |
-| `.agents/rules/multiplayer_private_rooms.md` | Original multiplayer plan; not the current implementation specification |
-| `docs/` | Focused technical documentation, currently including the Rubik's cube component |
+| `docs/project/` | Project positioning, game catalog, and teacher context |
+| `docs/games/` | Game and lesson references; some include explicitly labeled future ideas |
+| `docs/systems/` | Shared-system implementation, operations, and extension references |
+| `docs/tutorials/` | Playable tutorial philosophy and implemented contracts and lessons |
+| `docs/plans/` | Proposals, evaluation exercises, roadmaps, and retained implementation plans; check each document's status |
+| `docs/archive/` | Superseded designs preserved for historical context |
 | `multiplayer-server/README.md`, `src/GameTemplate/README.md` | Operational and contributor instructions |
 
 Treat each document according to its stated purpose and status. Product goals, accepted designs, and classroom validation cannot be established solely from source code. Reports are intermediate evidence, not permanent specifications.

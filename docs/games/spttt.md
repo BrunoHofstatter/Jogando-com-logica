@@ -1,8 +1,3 @@
----
-trigger: model_decision
-description: SPTTT (Super Jogo da Velha / Super Tic-Tac-Toe) documentation.
----
-
 # Super Jogo da Velha (SPTTT)
 
 ## Current Reality

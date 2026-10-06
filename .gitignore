@@ -27,6 +27,3 @@ dist-ssr
 .agent/
 .claude/
 .gemini/
-
-CLAUDE.md
-

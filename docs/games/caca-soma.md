@@ -1,8 +1,3 @@
----
-trigger: model_decision
-description: Caça Soma (Number Hunting) documentation.
----
-
 # Caça Soma (Number Hunting)
 
 ## Purpose
@@ -57,7 +52,7 @@ Levels mode is a solo progression system with multiple rounds, stars, and unlock
 Each level defines:
 
 - board size
-- number of rounds
+- number of rounds, or the board-clearing completion rule for level 30
 - required selected-number count
 - valid Magic Number ranges per round
 - time thresholds for two and three stars; completing all rounds guarantees one star
@@ -76,15 +71,16 @@ Each level defines:
 
 ### Current Level Structure
 
-- 10 levels are defined.
-- Levels 1-5 use 5x5 boards.
-- Levels 6-10 use 7x7 boards.
-- Current levels require exactly 2 selected numbers per round.
-- The solo configuration supports exactly 2, exactly 3, or either 2 or 3; the selection rule remains visible above the board. No new levels were added in the retry rework.
-- Levels currently contain 5 to 7 rounds.
+- 30 levels are defined. Levels 1-10 retain their original settings after the retry rework.
+- Levels 1-5 and 23 use 5x5 boards; levels 6-19, 29, and 30 use 7x7; levels 20-22 and 24-28 use 10x10.
+- Levels 1-14 and 23 require pairs; 15-17 and 21 require triples; 28 requires pairs. Other later levels allow either 2 or 3 numbers.
+- Levels 11-29 have fixed authored settings with varied pace and a rough upward difficulty trend, not a strict measurable increase on every level.
+- Regular levels contain 4 to 8 rounds. Level 30 finishes only when all 49 cells are locked, with no fixed round count.
+- Level 30 shuffles three copies of each range (20-30, 31-40, 41-50, 51-60, 61-70, 71-80, 81-90) on every fresh start. A new successful round advances the queue; wrong attempts retain the active range and do not consume another entry. Unsolvable queued ranges are skipped. After the queue is exhausted, targets use any solvable remaining sum. A lone final cell becomes its own target and permits exactly one selection.
+- The selection rule stays visible above the board. The boss tracker shows marked cells rather than a fixed round total.
 - Earning at least 2 stars unlocks the next level.
 - Existing stars and unlocks remain saved; unfinished sessions never resume after leaving. Retrying starts from round one with a fresh board.
-- Time goals were provisionally increased by 20%; they still need play-testing after the full level set is authored.
+- Levels 1-10 retain their provisional 20% time increase. Levels 11-29 use the agreed campaign budgets; level 30 provisionally uses 420 seconds for two stars and 300 for three. All goals still need play-testing and calibration.
 - Gameplay and results display whole seconds rounded up while reward calculations retain precise active time. Results show mistakes and expandable round/attempt details.
 - The round tracker uses gray upcoming circles, a yellow current circle, and green completed circles with checkmarks, matching the Class 3 summary game. It has no progress bar.
 - Screen-edge feedback pulses last 1.3 seconds. Wrong-answer feedback appears over the center of the board with the attempted sum in yellow and the target in blue. Round details open in a separate dismissible overlay above the completion dialog.

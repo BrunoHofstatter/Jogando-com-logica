@@ -1,8 +1,3 @@
----
-trigger: model_decision
-description: Crown Chase (Caça Coroa) documentation.
----
-
 # Crown Chase (Caça Coroa)
 
 ## Core Rules
@@ -15,7 +10,7 @@ description: Crown Chase (Caça Coroa) documentation.
 ## Current Reality
 
 - The playable tutorial is implemented at `/caca-coroa/tutorial`, using seven isolated practice stages: Ninja movement/capture, Saltador steps/jumps, stationary kings, king capture, and the normal starting board. It uses the original board frame, short pointing pop-ups, automatic retry, and version 2 history. Local, AI, and online lobby entry use a first-entry gate; existing online rooms bypass it. The menu Tutorial button replays it without clearing completion history.
-- Tutorial lifecycle/history is shared in `src/Shared/Tutorial/`; Crown Chase pedagogy is in `src/CrownChase/Tutorial/`. Read `tutorial_system/technical_contract.md` and `tutorial_system/game_crown_chase.md` when changing this integration.
+- Tutorial lifecycle/history is shared in `src/Shared/Tutorial/`; Crown Chase pedagogy is in `src/CrownChase/Tutorial/`. Read `docs/tutorials/overview.md` for philosophy, `docs/tutorials/technical-contract.md` for the implemented API, and `docs/tutorials/crown-chase.md` for this lesson. `docs/plans/tutorials/next-tutorials.md` collects flexible considerations for other games.
 
 - The shipped local, computer, and online game modes use the source of truth in `src/CrownChase/Logic/v2/`.
 - The current board setup is defined in `src/CrownChase/Logic/v2/crownChase.ts`.

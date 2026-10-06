@@ -152,6 +152,13 @@ function CacaSomaRegras() {
                 indisponíveis nas próximas rodadas.
               </p>
 
+              <h3 className={styles.rulesTitle}>Desafio final:</h3>
+              <p className={styles.rulesText}>
+                No nível 30, marque todos os <strong>49 números</strong> do tabuleiro.
+                Use <strong>2 ou 3 números</strong> por resposta. Se sobrar apenas
+                um, selecione esse último número para concluir o desafio.
+              </p>
+
               <h3 className={styles.rulesTitle}>Tente de novo:</h3>
               <p className={styles.rulesText}>
                 Errou? A seleção é limpa e você tenta a mesma rodada novamente

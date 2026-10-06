@@ -62,7 +62,7 @@ Direction: offer deliberate face-by-face inspection with Portuguese face names, 
 
 The completion labels are `Erros` and `Dicas usadas`, but written calculations count more than wrong mathematical answers or newly revealed hints. Clicking a future blank cell calls `registerAdaptiveMistake`; that increments both `onMistake` and `usedHints`, even when the later calculation's first mistake is below its hint threshold. Repeated help clicks also add to `usedHints` after maximum detail. Ordinary lesson questions instead increment assistance only when the hint level increases.
 
-Evidence: `VerticalCalculation.tsx:293–316,369–385`; `Class3TotalSquares.tsx:82,113,116–117`; `class3Lesson.ts:120–129`. `.agents/rules/googleanalytics.md:292–297` accurately describes importing arithmetic `usedHints`, but its description of wrong answers/failed checks does not explain wrong-cell navigation. These are raw activity counters, not validated learning scores.
+Evidence: `VerticalCalculation.tsx:293–316,369–385`; `Class3TotalSquares.tsx:82,113,116–117`; `class3Lesson.ts:120–129`. `docs/systems/analytics.md:292–297` accurately describes importing arithmetic `usedHints`, but its description of wrong answers/failed checks does not explain wrong-cell navigation. These are raw activity counters, not validated learning scores.
 
 Decision needed: should the counters include procedural misclicks and repeated assistance requests, or represent mathematical errors and distinct support reveals? If the former, clarify internal documentation and child-facing labels; if the latter, separate navigation, error, and actual hint-escalation events in the shared component. This decision is separate from the unconditional timed downgrade in R3-2.
 

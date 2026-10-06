@@ -20,7 +20,7 @@ Direction: use native selection buttons with neutral identities such as `Cubo A`
 
 Wait for 30 interval ticks without answering: `totalFlags` increases when hint 1 appears. Answer every question correctly afterward and the completion still reports `Erros nas lições` and includes that wait in `Total de Erros`. The same counter also includes every actual wrong lesson answer, including guesses after all hints are open. Thus it measures neither errors nor distinct hints accurately. The interval has no visibility check, so background time can also trigger support and the apparent penalty, subject to browser timer throttling.
 
-Evidence: `useClass1.ts:81–98,134–145`; `SummaryView.tsx:162–167`, both under `src/RubiksClass/Classes/Class1_dimensions/`. `Class1Dimensions.tsx:34–40` sends flags as `assistanceCount` and only game mistakes as `incorrectCount`. `.agents/rules/googleanalytics.md:274–276` documents that legacy mapping, so this is not an undocumented analytics regression; it is a misleading displayed error count and an ambiguous metric.
+Evidence: `useClass1.ts:81–98,134–145`; `SummaryView.tsx:162–167`, both under `src/RubiksClass/Classes/Class1_dimensions/`. `Class1Dimensions.tsx:34–40` sends flags as `assistanceCount` and only game mistakes as `incorrectCount`. `docs/systems/analytics.md:274–276` documents that legacy mapping, so this is not an undocumented analytics regression; it is a misleading displayed error count and an ambiguous metric.
 
 Direction: keep lesson wrong answers, actual assistance reveals, and game mistakes separately. Count foreground time only and use waiting to offer help rather than record an error. Provide immediate `Dica` access instead of requiring waiting or a wrong guess; Class 2's `useClass2` already demonstrates foreground-only help emphasis. Preserve metric compatibility explicitly if changing the analytics mapping and update its documentation with the eventual implementation. Move cross-state changes out of the `setTimer` updater into an explicit transition: that updater currently also changes phase, flags, and camera state, making repeated evaluation unsafe. Verify waiting, hidden-tab return, repeated wrong answers, and direct review with zero lesson activity.
 
@@ -70,7 +70,7 @@ Direction: start from a readable, stationary three-quarter view, or at minimum s
 
 All five lesson questions are identical except size: 2, 3, 4, 5, then 6, with fixed ascending options 2×2 through 9×9. Help counts one row but never connects that count to both parts of the label. A child can succeed by recognizing successive button positions, or leave knowing how to count a row without knowing why its answer is written `3×3`. The generic `tamanho` prompt also does not distinguish grid size from physical/display size. The current review keeps every cube at the same display size, which is a useful start, but does not explicitly test that distinction.
 
-Evidence: `class1Lesson.ts:1–4`; `useClass1.ts:41–57,120–133`; `Class1Dimensions.tsx:95–106`; `SummaryView.tsx:111–118`. `.agents/rules/game_rubiks.md`, Module 1, sets the goal of understanding what the labels mean, with activity before explanation.
+Evidence: `class1Lesson.ts:1–4`; `useClass1.ts:41–57,120–133`; `Class1Dimensions.tsx:95–106`; `SummaryView.tsx:111–118`. `docs/games/rubiks.md`, Module 1, sets the goal of understanding what the labels mean, with activity before explanation.
 
 Direction: preserve the quick first attempt and add one short, child-paced discovery bridge. A concrete candidate sequence is:
 

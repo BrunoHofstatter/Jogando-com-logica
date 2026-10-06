@@ -15,4 +15,4 @@ Each entry should contain a short actionable summary, its finding identifier (fo
 No pending questions. The approved Class 3 calculator rework counts settled wrong
 entries/unsuccessful checks and distinct revealed support levels, excluding cell
 selection and repeated help. Current details are in
-[`docs_calculation_system.md`](../.agents/rules/docs_calculation_system.md).
+[`docs/systems/calculations.md`](../docs/systems/calculations.md).
