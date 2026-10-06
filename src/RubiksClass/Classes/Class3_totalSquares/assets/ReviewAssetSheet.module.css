@@ -1,0 +1,11 @@
+.sheet { padding: 3dvh 4vw; background: #e0f2fe; color: #013873; min-height: 100dvh; font-family: "Cherry Bomb One", cursive; }
+.sheet h1 { font-size: 3vw; text-align: center; }
+.cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2vw; }
+.cards section { padding: 2dvh 1vw; background: #f8fafc; border: 0.2vw solid #a9bed1; border-radius: 1vw; text-align: center; }
+.cards h2 { font-size: 1.7vw; margin: 0 0 3dvh; }
+.art { width: 9vw; height: 9vw; margin: 2dvh auto 4dvh; --cube-half: 4.5vw; --yaw: -30deg; }
+.art > svg { width: 100%; height: 100%; }
+.hearts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1vw; }
+.hearts svg { width: 100%; }
+.icons { display: flex; gap: 1vw; background: #258deb; border-radius: 1vw; }
+.icons svg { width: 45%; }

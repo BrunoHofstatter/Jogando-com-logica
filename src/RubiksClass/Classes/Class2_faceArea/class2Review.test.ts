@@ -184,20 +184,19 @@ describe("review availability and input accessibility", () => {
         expect(state.boxes[0]).toEqual(held);
     });
 
-    it("brings an off-lane focused card into view and keeps it until focus leaves", () => {
+    it("brings an off-lane focused card into view without freezing or retaining it", () => {
         let state = reviewReducer(initialReviewState(), { type: "start" });
         state = reviewReducer(state, { type: "focus", id: 0 });
         expect(state.boxes[0].top).toBeGreaterThan(0);
         const held = state.boxes[0];
-        for (let frame = 0; frame < 600; frame++) state = reviewReducer(state, { type: "tick", seconds: 0.05 });
-        expect(state.boxes.find(box => box.id === held.id)).toEqual(held);
-        state = reviewReducer(state, { type: "focus", id: null });
         state = reviewReducer(state, { type: "tick", seconds: 0.05 });
         expect(state.boxes[0].top).toBeGreaterThan(held.top);
+        for (let frame = 0; frame < 600; frame++) state = reviewReducer(state, { type: "tick", seconds: 0.05 });
+        expect(state.boxes.find(box => box.id === held.id)).toBeUndefined();
     });
 
     it("finishes all ten matches with stationary choices and no timed spawns", () => {
-        let state = reviewReducer(initialReviewState(), { type: "start", reducedMotion: true });
+        let state = reviewReducer(initialReviewState(), { type: "start", stationary: true });
         for (let count = 0; count < 10; count++) {
             expect(reviewReducer(state, { type: "tick", seconds: 1 })).toBe(state);
             expect(reviewReducer(state, { type: "spawn", random: 0, position: 0 })).toBe(state);
@@ -217,12 +216,25 @@ describe("review availability and input accessibility", () => {
     it("keeps a selected number and progress when the motion preference changes", () => {
         let state = reviewReducer(initialReviewState(), { type: "start" });
         state = reviewReducer(state, { type: "select", id: 1 });
-        for (const reducedMotion of [true, false]) {
-            state = reviewReducer(state, { type: "motion", reducedMotion });
+        for (const stationary of [true, false]) {
+            state = reviewReducer(state, { type: "motion", stationary });
             expect(state.selected).toBe(1);
             expect(state.boxes.find(box => box.id === state.selected)?.value).toBe(12);
             expect(state.matches).toBe(0);
             expect(state.boxes.every(box => box.top > 0 && box.top < 100)).toBe(true);
         }
     });
+});
+
+
+it("keeps a wrong pairing separate from selection and expires only the current feedback", () => {
+    let state = reviewReducer(initialReviewState(), { type: "start", stationary: true });
+    const box = state.boxes.find(box => box.value === 7)!;
+    state = reviewReducer(state, { type: "select", id: box.id });
+    state = reviewReducer(state, { type: "match", targetId: 0 });
+    expect(state.selected).toBeNull();
+    expect(state.wrongPair).toEqual({ boxId: box.id, targetId: 0 });
+    expect(reviewReducer(state, { type: "clearFeedback", id: state.feedbackId - 1 }).wrongPair).toEqual(state.wrongPair);
+    expect(reviewReducer(state, { type: "clearFeedback", id: state.feedbackId }).wrongPair).toBeNull();
+    expect(reviewReducer(state, { type: "select", id: box.id }).wrongPair).toBeNull();
 });

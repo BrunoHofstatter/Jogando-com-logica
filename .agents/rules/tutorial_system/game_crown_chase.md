@@ -2,188 +2,68 @@
 
 ## Status and Scope
 
-Proposed complete storyboard, September 10, 2026. Planning only: no tutorial runtime or UI is implemented by this document. The overall plan's settled product direction applies; the concrete choices below are a reviewable design proposal, not previously approved product decisions. Learning effectiveness and duration have not been validated with children.
+Updated October 5, 2026. The user-approved redesign is implemented locally as seven short practice stages. This replaces the September continuous-match storyboard. Learning effectiveness and duration have not been validated with children.
 
-Teach enough to start a match through six player moves in one small, continuous practice match. Keep the normal 5-by-5 board, existing piece symbols, player 1/blue at the bottom-left, and both stationary kings in their normal corners. Use fewer pieces to reduce the initial reading and visual load. Target a few minutes, with no deadline.
+The tutorial teaches Ninja movement and capture, Saltador steps and jumps, preservation of jumped pieces, stationary kings, the Saltador's capture restriction, and the consequence of losing a king. It does not teach every rule, turn alternation, strategy, capture counters, difficulty unlocking, skipped turns, or draws. Full rules remain available separately.
 
-The child learns selection/destination input, assassin movement and capture, alternating turns, jumper steps and jumps, the fact that jumped pieces remain, the jumper's capture restriction, and capturing the enemy king. Do not teach capture counters, difficulty unlocking, strategy, skipped turns, or draws here. These remain in detailed rules and future contextual help.
+## Current Implementation
 
-## Current Implementation Reality
+- The isolated route is `/caca-coroa/tutorial`. First-entry gates wrap local, AI, and online lobby entry before those components mount. Existing online rooms bypass onboarding; direct tutorial entry with an active room returns to the lobby.
+- Shared lifecycle/history lives in `src/Shared/Tutorial/`; fixtures, rules integration, controller, pointers, and navigation are in `src/CrownChase/Tutorial/`. The page is `src/CrownChase/Pages/tutorialPage.tsx`.
+- Use the original Crown Chase Board, purple outer frame, piece renderer, and green legal-move markers. Remove tutorial-added solid/dashed piece rings. Internal `killer` remains unchanged; visible Crown Chase text and accessible labels say `Ninja`.
+- Exercises start automatically with the blue piece selected. No introductory start button, permanent instruction panel, numeric progress bar, or stage Back button.
+- These are separate practice fixtures, not a miniature competitive match. Supporting red pieces are placed deterministically after blue actions. No opponent AI or invented turn sequence is needed.
+- Only tutorial state is mutated. Normal AI, online actions, match analytics, difficulty progression, and ordinary victory screens never mount for this route.
+- Refresh starts from stage 1. Return context is validated in router history state, with session-storage backup scoped to the entry. Invalid context returns to the rules menu; permitted AI difficulty is validated.
+- Completion uses `crown-chase.core.v2`. The substantial redesign can auto-launch once under its new identity. Previous completion/dismissal history is preserved. Menu replay never erases history.
+- Completion is recorded after the successful final king-capture visual. Skip records dismissal and returns to the validated destination. Navigation/unmount cancels without recording completion or dismissal. Normal play creates its own initial board.
+- Crown Chase has no separate mode introductions yet. Caça Soma and shared Core V1 remain future work.
 
-- Rules and state: `src/CrownChase/Logic/v2/crownChase.ts` and `types.ts`. The shipped Crown Chase board is `src/CrownChase/Components/board-component.tsx`, not the generic `AA_baseGame` Board.
-- `applyAction` resolves legality, capture, turn switching, and victory. Kings cannot move; assassins move one square in all eight directions; jumpers step orthogonally or jump exactly one occupied adjacent square orthogonally. Jumpers may land on an enemy king but never another enemy piece.
-- Local and AI pages currently duplicate explanation-overlay steps and use `tutorial_crownchase_v1_completed`.
-- The menu replay action currently clears old completion. The playable design will request replay without erasing history.
-- The board currently commits only legal intents; invalid targets generally clear selection. It cannot yet report the attempts this storyboard needs.
-- `interactionLocked` currently affects remote interaction only. Tutorial locking needs an explicit local integration change.
-- AI is scheduled by the normal AI page, and normal victory can unlock difficulty. Neither may run for tutorial states.
-- Online lobby initialization uses the multiplayer hook. A pre-room tutorial gate must be outside that mounted participation flow, not a board overlay inside a room.
+## Presentation
 
-## Proposed Entry, Persistence, and Exit
+Center the board. Short pointing pop-ups alternate left/right in landscape and above/below in portrait. Pointers use measured board-cell and pop-up geometry and adapt to resize. `Tutorial` and `Pular` are grouped at top-left beside Back. A muted yellow-orange `Dica` button with a small lightbulb appears at top-right below Home when hints are available.
 
-- One `crown-chase.core.v1` playable lesson shared across local, AI, and online entry. No separately persisted mode introductions for Crown Chase V0: the moves and goal do not change.
-- Use an isolated tutorial page with a new route constant in `src/routes.ts`. Local/AI first entry gates before normal game components mount; online first entry gates before the lobby participation component mounts. Keep the intended destination and allowed AI difficulty in validated navigation context, surviving a tutorial refresh through session storage if available. Direct tutorial entry defaults to the rules/menu destination.
-- Existing live/rejoining online sessions bypass automatic onboarding. Do not disconnect a room to start this lesson, and do not expose replay within a live match in V0.
-- The existing menu `Tutorial` button launches replay explicitly, including on shared devices. Replay from the menu returns to that menu; automatic onboarding returns to the chosen mode after completion or skip.
-- `Pular tutorial` is available throughout, including feedback and scripted replies. It stores dismissal, disposes of tutorial state, and returns to the destination. The platform Back control/browser navigation cancels without storing dismissal; do not add a second Back control.
-- Refresh restarts from the first stage; no partial board restoration. A lost or invalid return context safely returns to the menu. Storage failure uses memory history for the current app session and never traps the player.
-- Use a new playable identity: old overlay completion does not prove completion of these actions. Auto-launch the playable introduction once under its own history; minor copy fixes retain the same version.
-- Completing all six moves records completion immediately after the final legal king capture. A previous completion survives an interrupted or skipped replay. Finishing the tutorial never unlocks AI levels, sends room actions, or records a normal-match win.
-- Tutorial completion shows `Jogar` for automatic entry and `Voltar ao menu` for menu replay. Both also offer `Repetir tutorial`. Normal play starts from `createInitialState()`; the practice board never becomes the real match.
+Instruction copy is Brazilian Portuguese. Pop-ups use a slightly lighter version of the game's button purple, white lettering with the game's purple WebKit stroke, and hard purple shadows. Highlight `qualquer direção` and the Saltador's `cima`, `baixo`, and `lados` in lighter red with a slightly lighter red stroke, 20% thinner than the previous inherited highlight stroke. Continue/play/repeat and toolbar buttons have hover, pressed, and keyboard-focus states. Centered retry feedback keeps plain text without a WebKit stroke. Do not add piece outlines or dashed target circles. Portuguese board labels identify type, owner, row, and column for keyboard/accessibility use.
 
-## Presentation and Interaction
+Board, tile, token, padding, border, and gap dimensions inherit directly from normal Crown Chase styles. The tutorial does not override grid row/column sizes or impose a cell aspect ratio. Piece animation wrappers use `display: contents`, preserving the normal piece sizing parent; motion animates the token itself using the original cell pitch. Browser measurements matched original game board/tile dimensions in both portrait and landscape, including the original horizontally wider token proportions and standard selected-piece lift.
 
-- Reuse existing board and piece visuals. Place a compact instruction panel above the board on narrow screens and beside it where space permits; never cover actionable squares with a blocking spotlight.
-- Always show `Treino`, `Você: azul`, and the current turn (`Sua vez` / `Vez do oponente`). Ownership also uses labels and piece outlines, so instructions do not depend only on color.
-- Hide difficulty, capture totals, selected-piece diagnostic text, and ordinary victory controls during practice. No new artwork is needed. Keep Cherry Bomb One, fluid layout units, and base-prefixed assets.
-- Tap/click a piece, then its destination. Selecting the same piece deselects it. Empty-board taps without selection do nothing. Support the same actions through focusable board cells with Enter/Space and Portuguese accessible labels identifying piece, owner, row, and column.
-- Legal destination markers remain visible after selection, as in normal play. An exercise target has a distinct outlined ring; it is not the same marker as general legality. Invalid squares still receive attempts rather than becoming untappable.
-- `Dica` is available on action stages. First use outlines the relevant piece; second use shows the exact target and a short arrow. After two meaningful unsuccessful attempts, expose the first hint automatically; do not auto-play the solution. Do not use inactivity timers.
-- A success animation may finish automatically (roughly 300 ms, no dependency on precise duration). New rule text and error explanations always wait for a button or the next required action. Reduced motion updates positions instantly, retaining text and manual reading points.
-- No stage Back button and no numeric progress bar in V0. Named lessons (`Assassino`, `Saltador`, `Capture o rei`) identify the current focus. Replay restarts the whole lesson.
+Important stage instructions stay visible while the child acts. The kings explanation has `Continuar`. The short post-jump observation lasts three visible seconds. Incorrect-attempt feedback appears with stronger hierarchy in the center of the board for two visible seconds, then disappears automatically. There is no retry confirmation button.
 
-## Canonical State Specification
+## Stage Sequence
 
-Coordinates below are internal zero-based `(row, col)`, top to bottom and left to right. Do not show this notation to children. Identity names here are storyboard labels; engine pieces currently have only `type` and `owner`.
+Coordinates are internal zero-based `(row, col)`. Player 1 is blue; player 0 is red. Each exercise has `currentPlayer: 1`, isolated practice state, and no competitive opponent turn.
 
-| Piece | Engine type / owner | Initial square |
+| Stage | Starting board and instruction | Advancement |
 |---|---|---|
-| Blue king BK | king / 1 | (4,0) |
-| Blue assassin BA | killer / 1 | (3,0) |
-| Blue jumper BJ | jumper / 1 | (3,2) |
-| Red king RK | king / 0 | (0,4) |
-| Red assassin RA | killer / 0 | (1,4) |
-| Red jumper RJ | jumper / 0 | (2,2) |
-| Red jumper RS | jumper / 0 | (0,2) |
+| 1: Ninja movement | Only blue Ninja at (2,2), selected. `Ninja` / `Anda uma casa em qualquer direção.` Pointer to Ninja; eight normal legal markers. | Any legal one-square move. |
+| 2: Ninja capture | Keep the moved blue Ninja. Spawn red Ninja preferably one square diagonally up-right; deterministic in-bounds fallback directions. `Capture o Ninja vermelho.` Pointer to red Ninja. | Capture red Ninja using the real game rules. Other legal moves keep the exercise and reposition the supporting red Ninja adjacent to blue. |
+| 3: Saltador movement | Fresh board with only blue Saltador at (2,2), selected. `Anda uma casa para cima, para baixo ou para os lados.` Pointer to Saltador; four legal markers. | Any legal one-square orthogonal move. |
+| 4: Jumping | Keep moved blue Saltador. Spawn red Saltador adjacent, preferring right, then up/down/left, with an in-bounds landing beyond it. `Pule por cima da peça.` | Legal jump over the supporting piece. Alternate legal steps retain the exercise and reposition support. After success, keep both pieces visible; point to red piece with `Depois do salto` / `A peça pulada fica no tabuleiro.` for three visible seconds. |
+| 5: Kings | Fresh board with blue king (4,0) and red king (0,4). `Rei` / `O rei não se move.` Pointers to both kings; move input locked. | `Continuar`. |
+| 6: King capture | Blue king (4,0), red king (0,4), red Ninja (0,3), selected blue Saltador (0,2). Primary pop-up points to red king: `O Saltador só captura o rei.` Secondary points to blue king: `Se capturarem seu rei, você perde.` | Jump from (0,2) over the Ninja to (0,4), capturing only the king. The Ninja remains. |
+| 7: Ready to play | Show the complete normal `createInitialState()` board. `Agora é sua vez de jogar Caça Coroa!` | `Jogar` and `Repetir tutorial`. Play opens the intended mode, or mode selection at the menu for direct/menu replay. No automatic navigation. |
 
-All other squares are empty. Initial state S0: `currentPlayer: 1`, `turnCount: 0`, `status: playing`, `winner: null`, `endReason: null`, `capturedByPlayer: [0,0]`. Selection and hint count start empty/zero.
+Supporting-piece placement is game-owned practice setup. It preserves a legal opportunity at every blue board position, including edges. Repeated alternate moves never skip an objective and do not require an AI.
 
-Every subsequent state is the result of applying the following moves to the previous state with the v2 rules, without replacing pieces or overriding the turn. Preserve all fields returned by the engine.
+## Attempts, Guidance, and Restoration
 
-| Player action | Required blue move | Red scripted reply | Next action state |
-|---|---|---|---|
-| 1 | BA (3,0) → (2,1) | RS (0,2) → (0,1) | S1, turnCount 2 |
-| 2 | BA (2,1) → (2,2), captures RJ | RA (1,4) → (2,4) | S2, turnCount 4 |
-| 3 | BJ (3,2) → (3,3) | RA (2,4) → (2,3) | S3, turnCount 6 |
-| 4 | BJ (3,3) → (1,3), over RA (2,3) | RS (0,1) → (1,1) | S4, turnCount 8 |
-| 5 | BJ (1,3) → (0,3) OR (1,4) | RA (2,3) → (2,4) | S5a or S5b, turnCount 10 |
-| 6 | BJ from its S5 square → RK (0,4) | None: king captured | S6a or S6b, turnCount 11 |
+- All player intents are validated with the production v2 rules. Tutorial input interception happens before the normal board filters illegal destinations.
+- Stages 1/3 accept every legal move available in their fixtures. Stages 2/4 require capture/jump respectively but let alternate legal moves remain on the board. Supporting pieces relocate with a brief appearance animation.
+- Stage 6 previews a different legal move, locks input, and shows `Tente capturar o rei vermelho.` centered over the board for two visible seconds. The message disappears; the Saltador animates back to the exact fixture and is reselected. No fabricated loss, opponent capture, or button acknowledgement.
+- Illegal moves never mutate the board or pretend to capture anything. Show a short relevant rule in the same temporary central feedback treatment, then automatically restore input and selection.
+- Neutral deselection and empty taps without selection do not count as attempts. Enemy/king selection can explain ownership or immobility without increasing the mistake count.
+- After two meaningful unsuccessful attempts, color the legal objective destination gold/orange; other legal destinations remain green. After three, add a move arrow and `Pule até a casa dourada.` or `Vá até a casa dourada.` The objective never auto-completes. `Dica` can reveal the same guidance.
+- Attempt counts/guidance remain within an exercise; a new exercise resets them. Input cannot enqueue another action during feedback, movement, spawn, observation, or return animation. Skip and navigation remain usable.
+- Every delayed callback belongs to the current session/stage activation and is cancelled on skip, replay, navigation, or unmount.
+- Shared waits pause while the document is hidden and resume with their remaining duration. Reduced motion removes movement/spawn/return delays and CSS motion, retaining two-second feedback and three-second observation reading time.
+- Movement/return waits are 350 ms and support appearance is 300 ms. Progress does not depend on receiving an animation-end event.
 
-At S1 counters remain `[0,0]`; S2 through S5 have `[0,1]`; S6 has `[0,2]`, `status: ended`, `winner: 1`, `endReason: king_captured`, and `currentPlayer: 1`. RA remains after action 4. Both action-5 branches are intentionally accepted and get the same legal reply. No randomized AI, skipped turns, invented time lapses, or new scenario fixtures are needed.
+## Verification and Remaining Validation
 
-## Stage-by-Stage Storyboard
+Code checks: 52 passing tests across seven targeted shared tutorial/Crown Chase suites, production build, and targeted ESLint. Coverage includes all eight initial Ninja choices crossed with all four initial Saltador choices; support placement on every board square; repeated alternate moves without skipping; illegal feedback; final automatic rollback; gold guidance; visible-time pauses; stale/double input; skip/replay/cancellation; blocked storage; validated return context; keyboard/focus; and existing rules/AI/orientation regressions.
 
-The general attempt rules below apply to every action stage, including restoration, irrelevant input, hints, and interruption. Canonical state names refer to the complete sequence above.
+The user explicitly authorized browser verification for this redesign. Browser checks at 390×844 and 1024×768 covered responsive pop-ups, original frame/piece appearance, full interaction, centered feedback with automatic return, gold guidance, post-jump observation, completion, and replay. A global paragraph font override was found and corrected. No browser console errors were reported. This is visual verification, not classroom or real-device pedagogical validation.
 
-### 0. Enter the Practice Match
+Remaining product validation: test the short copy, timed observation/feedback, pointer clarity, and hint escalation with children. No implementation decision is blocked on that later validation.
 
-- Objective: recognize own pieces, the stationary king, and the goal.
-- Start: S0, board visible and move input locked.
-- Instruction: `Vamos treinar com poucas peças. Você joga com as azuis. Capture o rei vermelho para ganhar. Os reis não se movem.`
-- Visual: outline the blue army, then keep both king symbols clearly identified with `Seu rei` and `Rei adversário` labels. No timed reading sequence.
-- Actions: `Começar` or `Pular tutorial`; board taps do not mutate state.
-- Advance: `Começar` enters action 1 with unchanged S0. No restoration or scripted bridge.
-
-### 1. Move the Assassin
-
-- Objective: select a piece and move one square, including diagonally.
-- Start: S0. Outline BA and the empty target (2,1).
-- Instruction: `O Assassino anda uma casa em qualquer direção, até na diagonal. Toque nele e depois na casa marcada.`
-- Required: BA (3,0) → (2,1). Other blue pieces and destination attempts remain available for feedback.
-- Relevant mistakes: a longer BA move gets `O Assassino anda só uma casa por vez.`; attempting BK movement gets `O rei fica parado. Use o Assassino.`; another legal move gets the legal-alternative response below.
-- Success: hold the moved position and show `Você moveu uma peça. Agora é a vez do oponente.` with `Continuar`.
-- Advance/bridge: on `Continuar`, animate RS (0,2) → (0,1) with input locked and the opponent-turn label. Finish in S1, show `Sua vez`, enter action 2. This manual reading point teaches turns once; later replies run directly after success animation.
-- Wrong attempts restore S0, not the accepted position or S1.
-
-### 2. Capture with the Assassin
-
-- Objective: capture by moving onto an enemy; ordinary capture does not end the match.
-- Start: S1. Outline RJ at (2,2), then BA when selected or hinted.
-- Instruction: `O Assassino pode capturar qualquer peça inimiga. Capture o Saltador vermelho marcado.`
-- Required: BA (2,1) → (2,2). Show BA occupying the target and RJ removed.
-- Relevant mistakes: attempting a distant target uses the one-square explanation; selecting BJ to capture RJ uses `O Saltador só captura o rei. Nesta jogada, use o Assassino.`; choosing a legal empty square gets the legal-alternative response.
-- Advance/bridge: after the capture animation, RA (1,4) → (2,4). Finish in S2 and enter action 3. The removed piece stays removed, and the match continues normally.
-- Wrong attempts restore S1, including RJ and capture counters.
-
-### 3. Step with the Jumper
-
-- Objective: the jumper can move without jumping, but never diagonally.
-- Start: S2. Outline BJ and the empty target (3,3).
-- Instruction: `O Saltador anda uma casa para cima, para baixo ou para os lados. Leve-o até a casa marcada.`
-- Required: BJ (3,2) → (3,3).
-- Relevant mistakes: a diagonal attempt gets `O Saltador não anda na diagonal.`; a two-square attempt over an empty middle gets `Para saltar, precisa ter uma peça no meio.`; trying to land on BA at (2,2) gets the own-piece response below.
-- Advance/bridge: after success, RA (2,4) → (2,3). Finish in S3; the approaching red assassin visibly creates the next jumping opportunity.
-- Wrong attempts restore S2.
-
-### 4. Jump over a Piece
-
-- Objective: jump exactly one occupied square and leave that piece in place.
-- Start: S3. Outline RA (2,3) and the empty landing square (1,3), with BJ selected only by the child.
-- Instruction: `Pule a peça vermelha e caia na casa marcada. O Saltador pode pular uma peça de qualquer cor.`
-- Required: BJ (3,3) → (1,3), over RA. Animate the path so the landing and middle squares remain distinct.
-- Relevant mistakes: trying to land on RA gets `O Saltador só captura o rei. Pule esta peça e caia na casa vazia depois dela.`; diagonal/too-long attempts use the movement feedback below. Other legal moves get the legal-alternative response.
-- Success: hold the board before the reply; outline the still-present RA. Text: `A peça pulada continua no tabuleiro. Saltar não captura essa peça.` Button: `Continuar`.
-- Advance/bridge: `Continuar` runs RS (0,1) → (1,1), finishing in S4. Enter the final challenge.
-- Wrong attempts restore S3, including RA; correct jumping never removes RA.
-
-### 5. Approach the King
-
-- Objective: use the jumper's movement to get ready to capture the king without copying a single prescribed destination.
-- Start: S4. Outline RK only; no answer arrow or target square initially.
-- Instruction: `O Saltador só captura o rei. Aproxime seu Saltador para capturar o rei vermelho na próxima jogada.`
-- Accepted moves: BJ (1,3) → (0,3) or BJ (1,3) → (1,4). Either leaves a legal one-step capture on the next blue turn. These are two explicit authored branches, not unrestricted play.
-- Relevant mistakes: direct diagonal capture of RK gets `O Saltador não anda na diagonal. Chegue ao lado do rei primeiro.`; moving another piece or moving BJ away uses `Essa jogada é permitida. Neste desafio, aproxime o Saltador do rei.`
-- Hint 1 outlines BJ; hint 2 shows (0,3) as one possible answer. Keep (1,4) accepted even when the hint is visible.
-- Advance/bridge: RA (2,3) → (2,4). Finish in the matching S5 branch. The same brief opponent-turn treatment runs before action 6.
-- Wrong attempts restore S4. No whole-lesson restart or penalty.
-
-### 6. Capture the King and Finish
-
-- Objective: independently complete the win action.
-- Start: S5a or S5b, depending on action 5.
-- Instruction: `Agora capture o rei vermelho!`
-- Required: BJ from its current square → (0,4). The child must select and move; no finish button substitutes for capture.
-- Relevant mistakes: targeting an ordinary enemy piece gets the jumper capture restriction; another legal move gets `Essa jogada é permitida. Agora capture o rei com o Saltador.`
-- Hint 1 outlines BJ; hint 2 outlines RK and the one-square capture path.
-- Advance: only the successful v2 action ending with `king_captured` and winner 1 finishes the teaching sequence. Suppress the normal VictoryScreen and show tutorial success after the capture visual.
-- Result: S6a or S6b. Text: `Você capturou o rei! Já pode começar uma partida.` Follow with `Na partida, cada lado começa com mais peças. As regras são as mesmas.` Buttons follow the entry/exit section; no automatic navigation or red reply.
-- Wrong attempts restore the exact S5 branch, never move the jumper to the other branch.
-
-## Attempt Classification, Feedback, and Restoration
-
-Handle input before the board drops invalid destinations or permanently commits a move. The game integration, not the core runner, owns classification.
-
-1. A required/accepted legal action executes with `applyAction` against the tutorial state and follows its stage's success flow.
-2. A different legal action executes only on a temporary preview clone. Show `Essa jogada é permitida. Vamos tentar o objetivo marcado.` (or the stage's specific version), with `Tentar de novo`. Do not run an opponent reply or normal victory side effects. On acknowledgement restore the complete canonical stage state.
-3. An illegal action never becomes a legal board state. A short attempted-path/target outline acknowledges it; no ghost capture or removal. Show a specific reason and `Tentar de novo`; acknowledgement clears selection and retains the canonical state.
-4. Selecting an enemy without a selected blue piece shows `Essas peças são do oponente. Escolha uma peça azul.` without advancing. Selecting the own king shows `O rei não se move. Proteja-o e capture o rei adversário.` The next blue selection can replace this feedback. A selected piece then targeted at a different own piece is treated as reselection, preserving the normal control convention; show `Essa casa já tem uma peça sua.` and allow reselection without a rollback animation.
-5. Same-square deselection and empty taps without a selected piece are neutral and do not count as failed attempts. Input during feedback resolution or opponent animation cannot enqueue moves; Skip and navigation remain usable.
-
-Illegal feedback priority: stationary king; own occupied destination; wrong direction; wrong distance or missing jump middle; forbidden enemy landing. Stage-specific copy may replace the generic response when it explains the same rule more clearly.
-
-Generic additional copy:
-
-- Jumper diagonal: `O Saltador não anda nem pula na diagonal.`
-- Jumper too far: `O Saltador anda uma casa ou pula uma peça e cai logo depois dela.`
-- Empty jump middle: `Para saltar, precisa ter uma peça no meio.`
-- Non-king enemy landing: `O Saltador só pode capturar o rei.`
-
-Restoration includes board, turn, counters, outcome fields, selection, and pending visual effects. It retains stage-local mistake count/hint escalation. Advancing to a new action resets those hints. A late callback after retry, Skip, replay, navigation, or stage replacement must be ignored using the current activation identity. Reduced motion performs the same operations without waiting for an animation event that may never fire.
-
-## Planned Implementation Boundary
-
-- Game-owned isolated tutorial page/controller holds fixtures, accepted branches, copy, hints, preview state, and scripted replies. Mount it without normal AI, normal match analytics, difficulty progression, or room participation.
-- Extend the Crown Chase board narrowly for optional attempt interception, tutorial presentation, and interaction locking. Observe raw selection/destination intent before legal filtering, retaining default normal-game behavior. Do not change movement rules or use remote mode as a tutorial shortcut.
-- Reuse the existing piece renderer and board layout. Exact hook/prop names remain for Phase 4; do not finalize a universal stage schema from this document.
-- The shared runner needs identity/version history, session/stage activation, once-only progression, cancellation, and completion/skip/replay. This storyboard needs action/manual/animation advancement; it does not justify building extra timer types or contextual lessons now.
-- Reuse DynamicTutorial geometry only if needed during implementation; this layout does not require selector-based spotlights.
-
-## Verification and Remaining Review
-
-Design-time check performed September 10, 2026: executed both eleven-ply branches against the current v2 implementation using an in-memory TypeScript transpilation. Both passed legality, turn alternation, turn counts, capture counters, preservation of the jumped assassin, input-snapshot immutability, rejection of the direct diagonal jumper capture, and the final king-capture win. This verifies the authored sequence, not an implemented tutorial controller or its UI.
-
-Code-level scenario verification must cover all eleven plies in both accepted branches, expected counters and winner, preserved jumped piece, representative illegal attempts, and restoration to the branch-specific snapshot. Integration verification must cover double input, skip during a reply, stale stage callbacks, storage failures, refresh fallback, and absence of normal AI/unlock/network effects. The existing production rule implementation remains authoritative.
-
-No visual preview or browser verification is authorized by this design request. Exact responsive layout, focus handling, and motion still require verification during implementation under repository permissions.
-
-Remaining product review: whether the six-move length is appropriate in practice, whether the two final approach choices are understandable, and whether children distinguish the exercise target ring from normal legal-move markers. These are validation questions, not missing branches in the storyboard. The short Caça Soma outline and first shared technical contract remain the next planning phases.
+The later visual refinement reran 14 rendered tutorial interaction checks and five existing board-orientation regressions, plus production build and targeted lint. Browser measurements matched normal-game board/tile sizes at 1280×720 and 390×844; the phone completion view fit without scroll overflow. Full exercise completion and replay remained functional, with no reported browser console errors.

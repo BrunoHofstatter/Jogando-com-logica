@@ -55,7 +55,7 @@ it("offers help only after foreground waiting, never records waiting as an error
     expect(button("Dica").className).not.toContain("offeredHelp");
     visible = true; advance(30000);
     expect(button("Dica").className).toContain("offeredHelp");
-    click(button("Dica")); click(button("Dica"));
+    click(button("Dica")); click(button("Mais uma dica"));
     click(button("4")); click(button("4"));
     expect(container.textContent).toContain("Ainda não.");
     advance(3000);
@@ -154,7 +154,7 @@ it("keeps the lesson-wide demonstration dismissed and refocuses each hint withou
     click(button("Dica"));
     const cube = container.querySelector<HTMLElement>('[role="group"]')!;
     arrow(cube);
-    click(button("Dica"));
+    click(button("Mais uma dica"));
     expect(container.querySelector('[style*="rotateX(-22deg) rotateY(-32deg)"]')).not.toBeNull();
     expect(container.querySelector('[class*="autoRotate"]')).toBeNull();
 });

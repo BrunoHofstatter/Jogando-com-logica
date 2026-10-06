@@ -1,17 +1,21 @@
 import { useLessonEntry } from "../../Testing/entryContext";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import { Lightbulb } from "lucide-react";
 import { useCubeMobileLayout } from "../../Components/useCubeMobileLayout";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { LessonCube } from "./LessonCube";
 import { expression, faceExpression } from "./class3Lesson";
 import { VerticalMultiplication } from "../../../Shared/Calculation";
 import { useClass3 } from "./useClass3";
 import styles from "./Class3TotalSquares.module.css";
+import { LessonSuccess } from "../../Components/LessonSuccess";
+import { TemporaryFeedback } from "../../Components/TemporaryFeedback";
 import { ROUTES } from "../../../routes";
 import { useGameAttemptAnalytics } from "../../../analytics/useGameAttemptAnalytics";
 
-const Class3TotalSquares: React.FC = () => {
+const Class3SummaryView = lazy(() => import("./Class3SummaryView"));
+
+const Class3Lesson: React.FC<{ onPlay: () => void }> = ({ onPlay }) => {
     const { isCheckpoint } = useLessonEntry();
     const { state, step, config, dispatch, offerHelp } = useClass3();
     const navigate = useNavigate();
@@ -41,15 +45,16 @@ const Class3TotalSquares: React.FC = () => {
     const showGrouping = showHint && state.hintLevel >= 3 && (step.kind === "expression" || step.kind === "total");
     const isCalculation = step.kind === "calculation" && (state.phase === "question" || isTransition);
     return <div className={styles.container}>
-        {isTransition && <div className={styles.successOverlay} role="status">Correto!</div>}
+        {isTransition && <LessonSuccess />}
         <button className={styles.aulasButton} onClick={() => navigate(ROUTES.CLASS_MENU)}>Aulas</button>
-        <LessonCube key={state.stepIndex} config={config} step={step} state={state} reducedMotion={reducedMotion} portrait={portrait} practicedRotation={practicedRotation} onPractice={onPractice} />
+        <LessonCube key={`cube-${state.stepIndex}`} config={config} step={step} state={state} reducedMotion={reducedMotion} portrait={portrait} practicedRotation={practicedRotation} onPractice={onPractice} />
         <div className={styles.rightPanel}>
           <div className={styles.lessonContent}>
             {state.phase === "complete" ? <div className={styles.completeCard}>
                 <h1 className={styles.completeTitle}>Aula completa!</h1>
                 <p className={styles.completeText}>Você aprendeu a multiplicar a quantidade de faces pelos quadradinhos de cada face. Vale para algumas faces e para o cubo inteiro!</p>
                 <p className={styles.completeStats}>Erros: {state.incorrectCount} · Dicas usadas: {state.assistanceCount}</p>
+                <button className={styles.completeButton} onClick={onPlay}>Jogar</button>
                 <button className={styles.completeButton} onClick={() => navigate(ROUTES.CLASS_MENU)}>Voltar às Aulas</button>
             </div> : <>
 
@@ -84,12 +89,13 @@ const Class3TotalSquares: React.FC = () => {
                             onMistake={() => dispatch({ type: "calculationMistake" })} />
                     </div>
                 </> : <>
-                    <div className={styles.optionsGrid}>{step.options.map(option => <button key={option} className={styles.optionButton} disabled={isTransition} onClick={() => dispatch({ type: "guess", answer: option })}>{option}</button>)}</div>
+                    <div className={styles.optionsGrid}>{step.options.map(option => <button key={option} className={`${styles.optionButton} ${state.lastWrong === option ? styles.wrongOption : ""}`} disabled={isTransition} onClick={() => dispatch({ type: "guess", answer: option })}>{option}</button>)}</div>
 
                 </>}
             </>}
           </div>
         </div>
+        {state.phase === "question" && step.kind !== "calculation" && state.lastWrong !== null && <TemporaryFeedback key={`feedback-${state.incorrectCount}`} message="Ainda não! Observe as faces e tente novamente." />}
         {(state.phase === "question" || isTransition) && step.kind !== "calculation" && <div className={styles.hintDock}>
             <button className={`${styles.hintButton} ${offerHelp ? styles.offeredHint : ""}`} disabled={isTransition || state.hintLevel >= 3} onClick={() => dispatch({ type: "hint" })}>
                 <Lightbulb aria-hidden="true" />{state.hintLevel >= 3 ? "Dica completa" : state.hintLevel ? "Mais uma dica" : "Dica"}
@@ -98,4 +104,11 @@ const Class3TotalSquares: React.FC = () => {
         </div>}
     </div>;
 };
-export default Class3TotalSquares;
+export default function Class3TotalSquares() {
+    const { isCheckpoint } = useLessonEntry();
+    const location = useLocation();
+    const [review, setReview] = useState(false);
+    const directReview = !isCheckpoint && (location.state?.mode === "game" || new URLSearchParams(location.search).get("mode") === "game");
+    if (review || directReview) return <Suspense fallback={<div className={styles.container}><p>Carregando o jogo...</p></div>}><Class3SummaryView /></Suspense>;
+    return <Class3Lesson onPlay={() => setReview(true)} />;
+}

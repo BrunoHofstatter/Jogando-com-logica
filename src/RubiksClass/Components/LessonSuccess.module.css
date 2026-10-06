@@ -1,0 +1,23 @@
+.success {
+    position: fixed;
+    top: 3dvh;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    pointer-events: none;
+    margin: 0;
+    border-radius: 1vw;
+    padding: 0.8vw 1.8vw;
+    text-align: center;
+    font-family: inherit;
+    font-size: min(2.4vw, 4dvh);
+    color: #fff;
+    background: #5ee991;
+    border: 0.4vw solid #16a34a;
+    box-shadow: 0 0.6vw 0 #15803d;
+    -webkit-text-stroke: 0.15vw #16a34a;
+    max-width: 60vw;
+}
+@media (max-width: 650px) and (orientation: portrait) {
+    .success { font-size: min(5vw, 3dvh); padding: 1.5vw 4vw; border-radius: 2vw; border-width: 0.6vw; max-width: 85vw; }
+}

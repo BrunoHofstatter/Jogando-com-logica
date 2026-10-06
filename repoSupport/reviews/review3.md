@@ -2,7 +2,7 @@
 
 Date: 2026-09-26. Scope: the complete current `Aprender` flow for Class 3, including lesson content, progression, hints, cube motion, written calculations, accessibility, responsive styling, navigation, completion, analytics, and relevant tests.
 
-Inspected revision: branch `dev`, HEAD `cd6b504f32dd30d3cc9cb865cf3782513559f933`, **including existing uncommitted edits** in Class 3, its shared cube/calculation components, Class 2 styles, and supporting documentation. This is a feature review, not a review of a commit range. Existing work was preserved. Only this report and the pending recommendations list were edited. A separate Class 2 review took the review2.md number; its report and recommendations were preserved.
+Inspected revision: branch `dev`, HEAD `cd6b504f32dd30d3cc9cb865cf3782513559f933`, **including existing uncommitted edits** in Class 3, its shared cube/calculation components, Class 2 styles, and supporting documentation. This is a feature review, not a review of a commit range. Existing work was preserved. Only this report and the pending recommendations list were edited. A sepa rate Class 2 review took the review2.md number; its report and recommendations were preserved.
 
 ## R3-1 — Scope calculation keyboard handling to the intended control
 

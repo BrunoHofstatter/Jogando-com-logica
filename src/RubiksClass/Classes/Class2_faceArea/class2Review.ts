@@ -24,7 +24,7 @@ const availableTotals = (state: ReviewState) => state.targets
     .map(targetTotal);
 
 export function needsImmediateSpawn(state: ReviewState): boolean {
-    if (state.phase !== "playing" || state.reducedMotion || state.boxes.length >= MAX_BOXES) return false;
+    if (state.phase !== "playing" || state.stationary || state.boxes.length >= MAX_BOXES) return false;
     const totals = availableTotals(state);
     if (totals.length === 0) return false;
     const hasTarget = state.boxes.some(box => totals.includes(box.value));
@@ -39,21 +39,22 @@ export interface ReviewState {
     nextBoxId: number;
     selected: number | null;
     focused: number | null;
-    reducedMotion: boolean;
+    stationary: boolean;
     matches: number;
     mistakes: number;
     feedback: string | null;
     feedbackId: number;
+    wrongPair: { boxId: number; targetId: number } | null;
     pendingReplacement: { slot: number; target: ReviewTarget | null } | null;
 }
 export const initialReviewState = (): ReviewState => ({
     phase: "intro", targets: REVIEW_TARGETS.slice(0, 5),
     boxes: [], nextBoxId: 0, selected: null, matches: 0, mistakes: 0, feedback: null, feedbackId: 0,
-    pendingReplacement: null, focused: null, reducedMotion: false,
+    pendingReplacement: null, focused: null, stationary: false, wrongPair: null,
 });
 export type ReviewAction =
-    | { type: "start"; reducedMotion?: boolean }
-    | { type: "motion"; reducedMotion: boolean }
+    | { type: "start"; stationary?: boolean }
+    | { type: "motion"; stationary: boolean }
     | { type: "focus"; id: number | null }
     | { type: "spawn"; random: number; position: number }
     | { type: "tick"; seconds: number }
@@ -64,7 +65,7 @@ export type ReviewAction =
 
 /** Stationary choices must refresh without relying on cards eventually expiring. */
 function refreshStationaryChoices(state: ReviewState): ReviewState {
-    if (!state.reducedMotion || state.phase !== "playing") return state;
+    if (!state.stationary || state.phase !== "playing") return state;
     const totals = [...new Set(availableTotals(state))];
     if (!totals.length) return state; // Wait for the pending replacement.
     const values = [totals[0], DISTRACTORS[0], totals[1] ?? DISTRACTORS[1]];
@@ -83,7 +84,7 @@ function refreshStationaryChoices(state: ReviewState): ReviewState {
 
 export function reviewReducer(state: ReviewState, action: ReviewAction): ReviewState {
     if (action.type === "start") return state.phase === "intro" ? refreshStationaryChoices({
-        ...state, phase: "playing", nextBoxId: 3, reducedMotion: action.reducedMotion ?? false,
+        ...state, phase: "playing", nextBoxId: 3, stationary: action.stationary ?? false,
         boxes: [targetTotal(REVIEW_TARGETS[0]), targetTotal(REVIEW_TARGETS[1]), 7].map((value, id) => {
             const progress = BOX_START + id * (BOX_END - BOX_START) / 3;
             const lane = 25 + id * 25;
@@ -91,8 +92,8 @@ export function reviewReducer(state: ReviewState, action: ReviewAction): ReviewS
         }),
     }) : state;
     if (action.type === "motion") {
-        if (state.reducedMotion === action.reducedMotion) return state;
-        return refreshStationaryChoices({ ...state, reducedMotion: action.reducedMotion,
+        if (state.stationary === action.stationary) return state;
+        return refreshStationaryChoices({ ...state, stationary: action.stationary,
             boxes: state.boxes.map((box, index) => ({ ...box, top: 20 + index * 20, left: 25 + index * 15 })) });
     }
     if (action.type === "showReplacement") {
@@ -106,9 +107,9 @@ export function reviewReducer(state: ReviewState, action: ReviewAction): ReviewS
     if (state.phase !== "playing") return state;
     if (action.type === "focus") return { ...state, focused: action.id,
         boxes: state.boxes.map(box => box.id === action.id ? { ...box, top: Math.max(8, Math.min(85, box.top)) } : box) };
-    if (action.type === "clearFeedback") return state.feedbackId === action.id ? { ...state, feedback: null } : state;
+    if (action.type === "clearFeedback") return state.feedbackId === action.id ? { ...state, feedback: null, wrongPair: null } : state;
     if (action.type === "spawn") {
-        if (state.reducedMotion || state.boxes.length >= MAX_BOXES) return state;
+        if (state.stationary || state.boxes.length >= MAX_BOXES) return state;
         const totals = availableTotals(state);
         if (totals.length === 0) return state;
         const hasTarget = state.boxes.some(box => totals.includes(box.value));
@@ -119,28 +120,29 @@ export function reviewReducer(state: ReviewState, action: ReviewAction): ReviewS
         return { ...state, boxes: [...state.boxes, box], nextBoxId: state.nextBoxId + 1 };
     }
     if (action.type === "tick") {
-        if (state.reducedMotion) return state;
+        if (state.stationary) return state;
         const distance = Math.min(action.seconds, 0.05) * BOX_SPEED;
-        return { ...state, boxes: state.boxes.map(box => box.id === state.selected || box.id === state.focused ? box : {
+        return { ...state, boxes: state.boxes.map(box => box.id === state.selected ? box : {
             ...box, top: box.top + distance,
-        }).filter(box => box.id === state.selected || box.id === state.focused || box.top < BOX_END) };
+        }).filter(box => box.id === state.selected || box.top < BOX_END) };
     }
     if (action.type === "select") return state.boxes.some(box => box.id === action.id)
-        ? { ...state, selected: state.selected === action.id ? null : action.id, feedback: null } : state;
+        ? { ...state, selected: state.selected === action.id ? null : action.id, feedback: null, wrongPair: null } : state;
     if (state.pendingReplacement) return state;
     const target = state.targets.find(target => target?.id === action.targetId);
     if (!target) return state;
     const box = state.boxes.find(box => box.id === state.selected);
-    if (!box) return { ...state, feedback: "Escolha um número primeiro!", feedbackId: state.feedbackId + 1 };
+    if (!box) return { ...state, wrongPair: null, feedback: "Escolha um número primeiro!", feedbackId: state.feedbackId + 1 };
     if (box.value !== targetTotal(target)) return {
         ...state, mistakes: state.mistakes + 1, selected: null,
+        wrongPair: { boxId: box.id, targetId: target.id },
         feedback: "Ainda não combina. Conte só os quadradinhos coloridos!",
         feedbackId: state.feedbackId + 1,
     };
     const matches = state.matches + 1;
     const slot = state.targets.findIndex(item => item?.id === target.id);
     return refreshStationaryChoices({
-        ...state, matches, phase: matches === MATCH_COUNT ? "complete" : "playing",
+        ...state, matches, wrongPair: null, phase: matches === MATCH_COUNT ? "complete" : "playing",
         targets: state.targets.map(item => item?.id === target.id ? null : item),
         pendingReplacement: { slot, target: REVIEW_TARGETS[target.id + 5] ?? null },
         boxes: state.boxes.filter(item => item.id !== box.id), selected: null,

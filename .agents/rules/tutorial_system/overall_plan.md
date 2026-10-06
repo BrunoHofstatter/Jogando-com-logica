@@ -2,7 +2,7 @@
 
 ## Status
 
-Planning only. The playable tutorial system described here is not implemented yet.
+Updated October 5, 2026: the Crown Chase vertical slice and user-approved redesign are implemented locally. Phases 1-5 have concrete artifacts: the storyboard, `caca_soma_outline.md`, `technical_contract.md`, and shared/session and Crown Chase source. Crown Chase now uses separate short practice exercises, original board visuals, pointing pop-ups, automatic retry, and version 2 history. Code checks pass and the user authorized browser verification for this redesign. Classroom validation, later-game rollout, and Core V1 remain planned.
 
 ## Purpose
 
@@ -19,7 +19,7 @@ This plan covers the order in which the shared system and individual game tutori
 - Tutorials teach only the minimum needed to start playing.
 - There is one introductory tutorial rather than multiple tutorial difficulties.
 - The tutorial should use predetermined, pedagogically chosen situations.
-- Important state changes should usually feel continuous. Games may use short scripted bridges or time lapses instead of abruptly replacing a state.
+- Games may use explicit separate practice exercises or a continuous scenario. Supporting pieces and fixtures should serve the current learning objective; do not imply an unverified competitive move sequence.
 - Meaningful wrong actions are allowed. The game shows the attempt, explains the relevant mistake, restores the tutorial situation when necessary, and lets the child try again.
 - Each game owns its exact visuals, messages, hints, hint escalation, scenarios, mistake behavior, and transitions.
 - A small shared system owns tutorial lifecycle and other genuinely reusable behavior.
@@ -37,7 +37,7 @@ The tutorial documentation belongs in `.agents/rules/tutorial_system/`.
 - `core_system_plan.md`: shared system responsibilities and technical direction.
 - Future game documents: complete storyboards and implementation notes for each game.
 
-Current design draft: `game_crown_chase.md` contains the first complete storyboard, including exact positions, scripted replies, mistake handling, and entry/exit behavior. It is proposed design, not implemented or classroom-validated behavior.
+`game_crown_chase.md` contains the complete storyboard and current implementation notes. `technical_contract.md` describes the implemented V0 API. `caca_soma_outline.md` records the non-board compatibility check; Caça Soma implementation remains future work. None of these learning sequences are classroom-validated yet.
 
 ## Plan Review - September 10, 2026
 
@@ -46,11 +46,11 @@ Keep the phase order and shared/game responsibility boundary. Before implementat
 - Run online onboarding before joining or creating a room. Never pause or replace a live synchronized match to teach a lesson; a game must define a safe entry point.
 - Distinguish illegal moves from legal moves that miss the current exercise objective. Feedback must never teach that a legal move breaks a rule.
 - Use legal scripted actions for a continuous match. If a later design loads an unrelated position, explicitly call it a new practice situation instead of implying an unverified sequence of moves.
-- Essential mistake explanations wait for acknowledgement, just like essential instructions. Animation duration must not become a reading deadline.
+- Important rule instructions normally remain visible. Game-owned feedback can use acknowledgement or automatic recovery. The October 5 Crown Chase redesign explicitly chooses brief centered feedback, automatic restoration, and a three-second post-jump observation; reading waits pause while hidden.
 - Handle unavailable local storage without blocking play; completion is device/browser history, not evidence that the current child already knows the game.
 - Verify scenario legality and cancellation in the first vertical slice. Phase 8 expands and stabilizes coverage; it is not the first time lifecycle behavior gets tested.
 
-The Crown Chase storyboard is the next reviewable artifact. The Caça Soma pressure test and final technical contract still follow it; neither the runner nor the game tutorial is implemented during storyboard work.
+That review led to the Crown Chase storyboard, followed by the Caça Soma pressure test and V0 contract. Implementation was subsequently authorized and completed as the first vertical slice; the phase descriptions below retain the rollout order.
 
 Suggested future names:
 

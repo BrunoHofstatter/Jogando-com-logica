@@ -26,7 +26,6 @@ const ClassMenu: React.FC = () => {
           pagina={ROUTES.CLASS_3}
           label="Aula 3: Multiplicação nas Faces"
           imageSrc={`${import.meta.env.BASE_URL}4x4.png`}
-          hasGame={false}
         />
         <ClassIcon
           pagina=""

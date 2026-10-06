@@ -4,13 +4,16 @@ import { Check } from "lucide-react";
 import RubiksCube from "../../Components/RubiksCube";
 import { coloredRows } from "../../Components/educationalCube";
 import { useCubeMobileLayout } from "../../Components/useCubeMobileLayout";
-import { useReducedMotion } from "../../Components/useReducedMotion";
 import { initialReviewState, MATCH_COUNT, needsImmediateSpawn, REPLENISH_DELAY_MS, SPAWN_INTERVAL_MS, reviewBoxPosition, reviewReducer, type ReviewTarget } from "./class2Review";
 import styles from "./Class2SummaryView.module.css";
+import { ReviewCompletion } from "../../Components/ReviewCompletion";
+import { TemporaryFeedback } from "../../Components/TemporaryFeedback";
 import { ROUTES } from "../../../routes";
 
 interface Class2SummaryViewProps {
-    totalFlags: number;
+    totalFlags?: number;
+    lessonHints?: number;
+    onReplay: () => void;
     onStart: () => boolean;
     onComplete: (mistakes: number) => boolean;
 }
@@ -35,14 +38,12 @@ const DemoCursor = () => <svg className={styles.demoPointer} viewBox="0 0 34 36"
     <path d="M15 13v8m6-6v7m6-4v5" fill="none" />
 </svg>;
 
-export default function Class2SummaryView({ totalFlags, onStart, onComplete }: Class2SummaryViewProps) {
+export default function Class2SummaryView({ totalFlags, lessonHints = 0, onReplay, onStart, onComplete }: Class2SummaryViewProps) {
     const navigate = useNavigate();
     const mobile = useCubeMobileLayout();
-    const reducedMotion = useReducedMotion();
     const [state, dispatch] = useReducer(reviewReducer, undefined, initialReviewState);
     const completed = useRef(false);
     const playButton = useRef<HTMLButtonElement>(null);
-    const finishButton = useRef<HTMLButtonElement>(null);
     const container = useRef<HTMLDivElement>(null);
     const instruction = useRef<HTMLHeadingElement>(null);
     const lastFocused = useRef<HTMLElement | null>(null);
@@ -52,8 +53,6 @@ export default function Class2SummaryView({ totalFlags, onStart, onComplete }: C
         dispatch({ type: "match", targetId });
     }, []);
     const shouldReplenish = needsImmediateSpawn(state);
-
-    useEffect(() => { dispatch({ type: "motion", reducedMotion }); }, [reducedMotion]);
 
     // Recover focus only when our control disappeared, not when the user moved elsewhere.
     useLayoutEffect(() => {
@@ -71,7 +70,7 @@ export default function Class2SummaryView({ totalFlags, onStart, onComplete }: C
     }, [state.phase]);
 
     useEffect(() => {
-        if (state.phase !== "playing" || reducedMotion) return;
+        if (state.phase !== "playing" || state.stationary) return;
         let frame = 0;
         let previous: number | null = null;
         const tick = (now: number) => {
@@ -86,7 +85,7 @@ export default function Class2SummaryView({ totalFlags, onStart, onComplete }: C
             if (document.visibilityState === "visible") dispatch({ type: "spawn", random: Math.random(), position: Math.random() });
         }, SPAWN_INTERVAL_MS);
         return () => { cancelAnimationFrame(frame); clearInterval(interval); };
-    }, [state.phase, reducedMotion]);
+    }, [state.phase, state.stationary]);
 
     useEffect(() => {
         if (!shouldReplenish) return;
@@ -113,7 +112,6 @@ export default function Class2SummaryView({ totalFlags, onStart, onComplete }: C
         if (state.phase === "complete" && !completed.current) {
             completed.current = true;
             onComplete(state.mistakes);
-            finishButton.current?.focus();
         }
     }, [state.phase, state.mistakes, onComplete]);
 
@@ -124,7 +122,7 @@ export default function Class2SummaryView({ totalFlags, onStart, onComplete }: C
     ) : <div key={`finished-${slot}`} className={styles.finishedSlot} aria-label="Combinação concluída"><Check aria-hidden="true" /></div>;
 
     return <div ref={container} className={styles.container} onFocusCapture={event => { lastFocused.current = event.target as HTMLElement; }}>
-        <button className={styles.aulasButton} onClick={() => navigate(ROUTES.CLASS_MENU)}>Aulas</button>
+        {state.phase !== "complete" && <button className={styles.aulasButton} onClick={() => navigate(ROUTES.CLASS_MENU)}>Aulas</button>}
         {state.phase === "intro" ? (
             <div className={styles.introBackdrop}>
                 <section className={styles.introCard} role="dialog" aria-labelledby="review-intro-title">
@@ -152,32 +150,32 @@ export default function Class2SummaryView({ totalFlags, onStart, onComplete }: C
                         <DemoCursor />
                     </div>
                     <p className={styles.introNote}>Conte só as partes coloridas. Você pode girar os cubos!</p>
-                    <button ref={playButton} className={styles.modalButton} onClick={() => { onStart(); requestedFocus.current = "number"; dispatch({ type: "start", reducedMotion }); }}>Jogar</button>
+                    <button ref={playButton} className={styles.modalButton} onClick={() => { onStart(); requestedFocus.current = "number"; dispatch({ type: "start" }); }}>Jogar</button>
                 </section>
             </div>
         ) : state.phase === "complete" ? (
-            <div className={styles.modalOverlay}>
-                <div className={styles.modalContent} role="dialog" aria-labelledby="review-complete-title">
-                    <h1 id="review-complete-title" className={styles.modalTitle}>Excelente! 🎉</h1>
-                    <p className={styles.modalStats}>Você fez 10 combinações!<br />Erros nas lições: {totalFlags}<br />Tentativas incorretas no jogo: {state.mistakes}</p>
-                    <button ref={finishButton} className={styles.modalButton} onClick={() => navigate(ROUTES.CLASS_MENU)}>Voltar ao Menu</button>
-                </div>
-            </div>
+            <ReviewCompletion lessonErrors={totalFlags} mistakes={state.mistakes} hints={lessonHints}
+                nextClass={ROUTES.CLASS_3} onReplay={onReplay} />
         ) : <>
+            <button className={`${styles.motionButton} ${styles.gameMotionButton}`} onClick={() => dispatch({ type: "motion", stationary: !state.stationary })}>
+                {state.stationary ? "Mover números" : "Parar números"}
+            </button>
             <div className={styles.titleOverlay}>
                 <h2 ref={instruction} tabIndex={-1} className={styles.titleText}>Escolha o número e depois o cubo!</h2>
                 <span className={styles.matchProgress}>{state.matches} / {MATCH_COUNT} combinações</span>
             </div>
-            <div className={styles.reviewFeedback} key={state.feedbackId} role="status">{state.feedback}</div>
+            {state.feedback && (state.feedback.includes("Muito bem!")
+                ? <div className={styles.reviewFeedback} key={state.feedbackId} role="status">{state.feedback}</div>
+                : <TemporaryFeedback key={state.feedbackId} message={state.feedback} />)}
             <div className={`${styles.sidePanel} ${styles.leftPanel}`}>{state.targets.slice(0, 3).map(renderCube)}</div>
             <div className={`${styles.sidePanel} ${styles.rightPanel}`}>{state.targets.slice(3).map((target, index) => renderCube(target, index + 3))}</div>
-            <div className={`${styles.fallingArea} ${state.reducedMotion ? styles.stationaryArea : ""}`}>
+            <div className={`${styles.fallingArea} ${state.stationary ? styles.stationaryArea : ""}`}>
                 {state.boxes.map(box => {
                     const position = reviewBoxPosition(box, mobile);
                     return <button key={box.id} data-review-number={box.id}
-                    className={`${styles.fallingBox} ${state.selected === box.id ? styles.paused : ""}`}
+                    className={`${styles.fallingBox} ${state.selected === box.id ? styles.paused : ""} ${state.wrongPair?.boxId === box.id ? styles.wrongAnswer : ""}`}
                     aria-pressed={state.selected === box.id}
-                    style={state.reducedMotion ? undefined : { top: `${position.top}%`, left: `${position.left}%` }}
+                    style={state.stationary ? undefined : { top: `${position.top}%`, left: `${position.left}%` }}
                     onFocus={() => dispatch({ type: "focus", id: box.id })}
                     onBlur={() => dispatch({ type: "focus", id: null })}
                     onClick={event => {

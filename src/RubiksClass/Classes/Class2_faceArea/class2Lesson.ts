@@ -127,11 +127,11 @@ export function class2Reducer(state: Class2State, action: Class2Action): Class2S
     if (action.type === "advance") return state.phase === "transition" ? nextStep(state) : state;
     if (action.type === "continueReveal") return state.phase === "reveal" ? nextStep(state) : state;
     if (state.phase !== "question") return state;
-    if (action.type === "hint") return addHint(state);
+    if (action.type === "hint") return addHint({ ...state, incorrectAnswer: null });
     const step = LESSON_STEPS[state.stepIndex];
     if (action.type === "selectSum") {
         return step.kind === "addition" && step.options.some(option => option.value === action.answer)
-            ? { ...state, selectedSum: action.answer, incorrectAnswer: null } : state;
+            ? { ...state, selectedSum: action.answer, incorrectAnswer: state.selectedSum === action.answer ? state.incorrectAnswer : null } : state;
     }
     if (action.type === "guess") {
         if (!step.options.some(option => option.value === action.answer)) return state;

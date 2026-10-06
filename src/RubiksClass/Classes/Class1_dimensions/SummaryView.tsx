@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Check, Lightbulb } from "lucide-react";
 import { useCubeMobileLayout } from "../../Components/useCubeMobileLayout";
 import { Class1Cube } from "./Class1Cube";
-import { TemporaryFeedback } from "./TemporaryFeedback";
+import { ReviewCompletion } from "../../Components/ReviewCompletion";
+import { TemporaryFeedback } from "../../Components/TemporaryFeedback";
 import { initialReview, reviewReducer, REVIEW_SIZES, shuffleSizes } from "./class1Review";
 import styles from "./SummaryView.module.css";
 import chrome from "./Class1Chrome.module.css";
@@ -19,11 +20,9 @@ export default function SummaryView({ lessonErrors, lessonHints, onComplete, onR
     const [deck] = useState(shuffleSizes);
     const [state, dispatch] = useReducer(reviewReducer, initialReview);
     const area = useRef<HTMLDivElement>(null);
-    const replay = useRef<HTMLButtonElement>(null);
     const completed = useRef(false);
     useEffect(() => {
-        if (state.phase === "complete") replay.current?.focus();
-        else if (state.matched.length) area.current?.querySelector<HTMLButtonElement>("button[data-cube-select]:not(:disabled)")?.focus();
+        if (state.phase !== "complete" && state.matched.length) area.current?.querySelector<HTMLButtonElement>("button[data-cube-select]:not(:disabled)")?.focus();
     }, [state.phase, state.matched.length]);
     useEffect(() => {
         if (state.phase === "complete" && !completed.current) {
@@ -71,31 +70,11 @@ export default function SummaryView({ lessonErrors, lessonHints, onComplete, onR
         {state.feedback && <TemporaryFeedback key={state.feedbackVersion} message={state.feedback} success={state.feedback === "Combinação correta!"} />}
         <div className={chrome.hintDock}>
             <button className={chrome.hintButton} onClick={() => dispatch({ type: "hint" })}>
-                <Lightbulb aria-hidden="true" />{state.helpLevel === 2 ? "Ver dica novamente" : "Dica"}
+                <Lightbulb aria-hidden="true" />{state.helpLevel === 2 ? "Ver dica novamente" : state.helpLevel > 0 ? "Mais uma dica" : "Dica"}
             </button>
         </div>
     </div>
-        {isComplete && <div className={styles.modalOverlay}>
-            <section className={styles.completionCard} role="dialog" aria-modal="true" aria-labelledby="class1-complete"
-                onKeyDown={event => {
-                    if (event.key !== "Tab") return;
-                    const buttons = event.currentTarget.querySelectorAll<HTMLButtonElement>("button");
-                    const first = buttons[0], last = buttons[buttons.length - 1];
-                    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
-                    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
-                }}>
-                <h1 id="class1-complete" className={styles.modalTitle}>Excelente! 🎉</h1>
-                <p className={styles.summaryText}>Você completou os desafios!</p>
-                <p className={styles.summaryText}>
-                    {lessonErrors !== undefined && <>Erros nas lições: {lessonErrors}<br /></>}
-                    Erros no jogo: {state.mistakes}<br />Dicas usadas: {lessonHints + state.hints}
-                </p>
-                <div className={styles.completionActions}>
-                    <button ref={replay} className={`${styles.completionButton} ${styles.replayButton}`} onClick={onReplay}>Jogar novamente</button>
-                    <button className={`${styles.completionButton} ${styles.nextButton}`} onClick={() => navigate(ROUTES.CLASS_2)}>Próxima aula</button>
-                </div>
-                <button className={`${styles.completionButton} ${styles.menuButton}`} onClick={() => navigate(ROUTES.CLASS_MENU)}>Aulas</button>
-            </section>
-        </div>}
+        {isComplete && <ReviewCompletion lessonErrors={lessonErrors} mistakes={state.mistakes}
+            hints={lessonHints + state.hints} nextClass={ROUTES.CLASS_2} onReplay={onReplay} />}
     </>;
 }

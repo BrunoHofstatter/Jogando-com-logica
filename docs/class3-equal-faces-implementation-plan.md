@@ -3,6 +3,10 @@
 Status: learning rework implemented. The sections below retain the agreed design
 and implementation requirements; the summary game remains deferred.
 
+Update (2026-10-03): the separate desktop summary game is now implemented under
+`docs/class3-summary-game-implementation-plan.md`. The deferred-game references
+below describe this earlier learning-only task's scope, not current game status.
+
 ## Objective and scope
 
 Extend Class 2's equal-row grouping to equal whole faces of one cube:

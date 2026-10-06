@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, ReactNode, Ref } from "react";
 import { useEffect, useState } from "react";
 
 import {
@@ -18,8 +18,22 @@ import { toLogicalBoardPosition } from "./boardOrientation";
 import PieceComponent from "./piece";
 import styles from "../styles/board.module.css";
 import { VictoryScreen } from "./VictoryScreen";
+import practiceStyles from "../Tutorial/tutorial.module.css";
+
+export interface PracticeBoardAdapter {
+  revision: number;
+  onAttempt: (intent: MoveIntent) => void;
+  onSelection: (position: Position, occupied?: boolean) => void;
+  targets: Position[];
+  autoSelect: Position | null;
+  movement: MoveIntent | null;
+  spawned: Position | null;
+  frameRef?: Ref<HTMLDivElement>;
+  overlay?: ReactNode;
+}
 
 interface BoardProps {
+  practice?: PracticeBoardAdapter;
   onlineHeader?: ReactNode;
   mode?: "local" | "remote";
   gameState?: CrownChaseState;
@@ -39,6 +53,7 @@ interface BoardProps {
 }
 
 const Board: React.FC<BoardProps> = ({
+  practice,
   onlineHeader,
   mode = "local",
   gameState: externalGameState,
@@ -59,7 +74,7 @@ const Board: React.FC<BoardProps> = ({
   const [internalGameState, setInternalGameState] = useState<CrownChaseState>(() =>
     createInitialState(),
   );
-  const [selectedSquare, setSelectedSquare] = useState<Position | null>(null);
+  const [selectedSquare, setSelectedSquare] = useState<Position | null>(practice?.autoSelect ?? null);
   const gameState = externalGameState ?? internalGameState;
   const boardHeight = gameState.board.length;
   const boardWidth = gameState.board[0]?.length ?? 0;
@@ -94,16 +109,18 @@ const Board: React.FC<BoardProps> = ({
         : "Vez do Jogador"
   );
   const interactionBlocked =
+    interactionLocked ||
     gameState.status === "ended" ||
     (mode === "remote"
-      ? interactionLocked ||
-        playerSeat === undefined ||
+      ? playerSeat === undefined ||
         gameState.currentPlayer !== playerSeat
       : isAIMode && gameState.currentPlayer === 0);
+  const autoRow = practice?.autoSelect?.row;
+  const autoCol = practice?.autoSelect?.col;
 
   useEffect(() => {
-    setSelectedSquare(null);
-  }, [gameState]);
+    setSelectedSquare(autoRow !== undefined && autoCol !== undefined ? { row: autoRow, col: autoCol } : null);
+  }, [gameState, practice?.revision, autoRow, autoCol]);
 
   const updateGameState = (newState: CrownChaseState) => {
     if (onGameStateChange) {
@@ -137,6 +154,17 @@ const Board: React.FC<BoardProps> = ({
         return;
       }
 
+      if (practice) {
+        if (clickedPiece?.owner === 1) {
+          setSelectedSquare(clickedPosition);
+          practice.onSelection(clickedPosition, true);
+        } else {
+          practice.onAttempt({ from: selectedSquare, to: clickedPosition });
+          setSelectedSquare(null);
+        }
+        return;
+      }
+
       const action =
         resolveMoveIntent(gameState, {
           from: selectedSquare,
@@ -162,6 +190,7 @@ const Board: React.FC<BoardProps> = ({
       return;
     }
 
+    practice?.onSelection(clickedPosition);
     if (clickedPiece?.owner === gameState.currentPlayer) {
       setSelectedSquare(clickedPosition);
     }
@@ -199,7 +228,7 @@ const Board: React.FC<BoardProps> = ({
       case "king":
         return "Rei";
       case "killer":
-        return "Assassino";
+        return "Ninja";
       case "jumper":
         return "Saltador";
       default:
@@ -208,12 +237,12 @@ const Board: React.FC<BoardProps> = ({
   };
 
   return (
-    <div className={styles.gamePage}>
-      <div className={`${styles.gameContainer} ${onlineHeader ? styles.gameContainerOnline : ""}`}>
+    <div className={practice ? practiceStyles.practiceBoard : styles.gamePage}>
+      <div className={practice ? practiceStyles.boardContainer : `${styles.gameContainer} ${onlineHeader ? styles.gameContainerOnline : ""}`}>
         {onlineHeader && (
           <div className={styles.onlineHeaderSlot}>{onlineHeader}</div>
         )}
-        <div className={styles.gameInfo} data-target="gameInfo">
+        {!practice && <div className={styles.gameInfo} data-target="gameInfo">
           {isAIMode && difficulty && (
             <div className={styles.difficultyBox}>
               Nível: {difficulty === 1 ? "Muito Fácil" : difficulty === 2 ? "Fácil" : difficulty === 3 ? "Médio" : "Difícil"}
@@ -229,7 +258,7 @@ const Board: React.FC<BoardProps> = ({
             </span>
           </div>
 
-          <div className={styles.capturesSection}>
+          {!practice && <div className={styles.capturesSection}>
             <div className={styles.captureInfo}>
               <span className={styles.captureText}>
                 Peças <span className={styles.redIndicator}>●</span> capturadas: {gameState.capturedByPlayer[0]}
@@ -240,12 +269,12 @@ const Board: React.FC<BoardProps> = ({
                 Peças <span className={styles.blueIndicator}>●</span> capturadas: {gameState.capturedByPlayer[1]}
               </span>
             </div>
-          </div>
-        </div>
+          </div>}
+        </div>}
 
-        <div className={styles.boardWrapper}>
+        <div ref={practice?.frameRef} data-practice-board={practice ? true : undefined} className={`${styles.boardWrapper} ${practice ? practiceStyles.boardFrame : ""}`}>
           <div
-            className={styles.board}
+            className={`${styles.board} ${practice ? practiceStyles.grid : ""}`}
             style={
               {
                 "--board-cols": boardWidth,
@@ -268,32 +297,49 @@ const Board: React.FC<BoardProps> = ({
                   (displayRowIndex + displayColIndex) % 2 === 0
                     ? styles.lightSquare
                     : styles.darkSquare;
+                const matches = (p: Position) => p.row === rowIndex && p.col === colIndex;
+                const isTarget = practice?.targets.some(matches);
+                const arrival = practice?.movement && matches(practice.movement.to) ? practice.movement : null;
+                const spawned = practice?.spawned && matches(practice.spawned);
 
                 return (
                   <div
                     key={`${rowIndex}-${colIndex}`}
                     data-square={`${String.fromCharCode(97 + colIndex)}${rowIndex + 1}`}
                     data-piece={piece ? `${piece.owner === 0 ? "red" : "blue"}-${piece.type}` : undefined}
-                    className={`${styles.square} ${squareType} ${isHighlighted ? styles.squareHighlighted : ""}`}
+                    role={practice ? "button" : undefined}
+                    tabIndex={practice ? 0 : undefined}
+                    aria-disabled={practice ? interactionBlocked : undefined}
+                    aria-pressed={practice ? isSelected : undefined}
+                    aria-label={practice ? `${piece ? `${getPieceLabel(piece.type)} ${piece.owner === 1 ? "seu, azul" : "do oponente, vermelho"}` : "Casa vazia"}, linha ${rowIndex + 1}, coluna ${colIndex + 1}${isTarget ? ", objetivo marcado" : ""}` : undefined}
+                    onKeyDown={practice ? event => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        if (!event.repeat) handleSquareClick(rowIndex, colIndex);
+                      }
+                    } : undefined}
+                    className={`${styles.square} ${squareType} ${isHighlighted ? styles.squareHighlighted : ""} ${practice ? practiceStyles.cell : ""} ${isTarget && isHighlighted ? practiceStyles.target : ""}`}
                     onClick={() => handleSquareClick(rowIndex, colIndex)}
                   >
-                    {piece && (
+                    {piece && <div key={arrival ? `${practice?.revision}-${arrival.from.row}-${arrival.from.col}` : "piece"}
+                      className={practice ? `${practiceStyles.pieceHolder} ${arrival ? practiceStyles.arrival : spawned ? practiceStyles.spawn : ""}` : undefined}
+                      style={arrival ? { "--move-x": `calc(${arrival.from.col - arrival.to.col} * var(--tutorial-cell-pitch))`, "--move-y": `calc(${arrival.from.row - arrival.to.row} * var(--tutorial-cell-pitch))` } as CSSProperties : !practice ? { display: "contents" } : undefined}>
                       <PieceComponent
                         piece={piece}
                         isSelected={isSelected}
                         onPieceClick={() => handleSquareClick(rowIndex, colIndex)}
                       />
-                    )}
-
+                    </div>}
                     {isHighlighted && !piece && <div className={styles.moveIndicator} />}
                   </div>
                 );
               }),
             )}
           </div>
+          {practice?.overlay}
         </div>
 
-        {selectedSquare && selectedPiece && (
+        {!practice && selectedSquare && selectedPiece && (
           <div className={styles.pieceInfo}>
             <h4>Peça Selecionada</h4>
             <p>Tipo: {getPieceLabel(selectedPiece.type)}</p>
@@ -302,7 +348,7 @@ const Board: React.FC<BoardProps> = ({
           </div>
         )}
 
-        {finalWin && (
+        {!practice && finalWin && (
           <VictoryScreen
             winner={finalWin.winner}
             endReason={finalWin.endReason}

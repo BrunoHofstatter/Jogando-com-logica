@@ -5,11 +5,15 @@ const ROTATE_OVERLAY_BYPASS_KEY = "rotateOverlayBypassed";
 
 function RotateDeviceOverlay() {
   const [isBypassed, setIsBypassed] = useState(
-    () => sessionStorage.getItem(ROTATE_OVERLAY_BYPASS_KEY) === "true"
+    () => {
+      try { return sessionStorage.getItem(ROTATE_OVERLAY_BYPASS_KEY) === "true"; }
+      catch { return false; }
+    }
   );
 
   const handleBypass = () => {
-    sessionStorage.setItem(ROTATE_OVERLAY_BYPASS_KEY, "true");
+    try { sessionStorage.setItem(ROTATE_OVERLAY_BYPASS_KEY, "true"); }
+    catch { /* The current page can still dismiss the overlay. */ }
     setIsBypassed(true);
   };
 

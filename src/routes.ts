@@ -52,6 +52,7 @@ export const ROUTES = {
   CACA_SOMA_LEVEL_BASE: "/caca-soma/niveis",
 
   // Crown Chase
+  CROWN_CHASE_TUTORIAL: "/caca-coroa/tutorial",
   CROWN_CHASE_RULES: "/caca-coroa/regras",
   CROWN_CHASE_GAME: "/caca-coroa",
   CROWN_CHASE_AI: "/caca-coroa/computador",

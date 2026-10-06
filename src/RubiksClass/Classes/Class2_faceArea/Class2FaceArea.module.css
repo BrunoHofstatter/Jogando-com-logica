@@ -451,3 +451,16 @@
     .cubeStage { transform: translateY(1.5dvh); }
     .successOverlay { font-size: min(5vw, 3dvh); padding: 1.5vw 4vw; }
 }
+
+/* Match Class 1 error colors through hover and activation. */
+.optionButton.wrongOption,
+.optionButton.wrongOption:hover:not(:disabled),
+.optionButton.wrongOption:active:not(:disabled) {
+    background: #ffb4a8; border-color: #9f1239; box-shadow: 0 0.6vw 0 #9f1239;
+    -webkit-text-stroke-color: #9f1239; text-shadow: 0 0.2vw 0 #9f1239;
+}
+@media (max-width: 650px) and (orientation: portrait) {
+    .optionButton.wrongOption,
+    .optionButton.wrongOption:hover:not(:disabled),
+    .optionButton.wrongOption:active:not(:disabled) { box-shadow: 0 1.2vw 0 #9f1239; }
+}

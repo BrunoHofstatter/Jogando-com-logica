@@ -290,14 +290,12 @@
     background: #ffb4a8; border-color: #9f1239; box-shadow: 0 0.6vw 0 #9f1239;
     -webkit-text-stroke-color: #9f1239; text-shadow: 0 0.2vw 0 #9f1239;
 }
-.reveal strong { color: #c62828; -webkit-text-stroke: 0.09vw #7f1d1d; text-shadow: none; }
-.reveal p { color: #fff; -webkit-text-stroke: 0.2vw #060e13; text-shadow: none; }
+.reveal strong, .reveal p { color: #013873; -webkit-text-stroke: 0; text-shadow: none; text-align: center; }
 .rightPanel { padding-bottom: 12dvh; }
 .cubeGroup { transform: translateY(3dvh); }
 @media (max-width: 650px) and (orientation: portrait) {
     .rightPanel { padding-bottom: 14dvh; }
     .cubeGroup { transform: translateY(1.5dvh); }
-    .reveal strong { -webkit-text-stroke-width: 0.14vw; }
     .optionButton.wrongOption,
     .optionButton.wrongOption:hover:not(:disabled),
     .optionButton.wrongOption:active:not(:disabled) { box-shadow: 0 1.2vw 0 #9f1239; }

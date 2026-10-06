@@ -92,8 +92,9 @@ export interface LessonState {
     hintLevel: number;
     assistanceCount: number;
     incorrectCount: number;
+    lastWrong: string | null;
 }
-export const initialState: LessonState = { stepIndex: 0, phase: "question", hintLevel: 0, assistanceCount: 0, incorrectCount: 0 };
+export const initialState: LessonState = { stepIndex: 0, phase: "question", hintLevel: 0, assistanceCount: 0, incorrectCount: 0, lastWrong: null };
 export type LessonAction =
     | { type: "guess"; answer: string }
     | { type: "hint" | "calculationMistake" | "continue" }
@@ -103,7 +104,7 @@ export type LessonAction =
 function nextQuestion(state: LessonState): LessonState {
     const next = state.stepIndex + 1;
     return next === LESSON_STEPS.length ? { ...state, phase: "complete" }
-        : { ...state, stepIndex: next, hintLevel: 0, phase: LESSON_STEPS[next].kind === "calculation" && LESSON_STEPS[next].configuration === 2 ? "calculationIntro" : "question" };
+        : { ...state, stepIndex: next, hintLevel: 0, lastWrong: null, phase: LESSON_STEPS[next].kind === "calculation" && LESSON_STEPS[next].configuration === 2 ? "calculationIntro" : "question" };
 }
 
 export function class3Reducer(state: LessonState, action: LessonAction): LessonState {
@@ -121,11 +122,11 @@ export function class3Reducer(state: LessonState, action: LessonAction): LessonS
     if (action.type === "calculationMistake") return { ...state, incorrectCount: state.incorrectCount + 1 };
     if (action.type === "calculationComplete") return step.kind === "calculation" ? { ...state, phase: "transition", assistanceCount: state.assistanceCount + action.usedHints } : state;
     if (action.type === "guess" && action.answer === step.answer) {
-        return { ...state, phase: step.kind === "faceExpression" ? "faceResult" : "transition" };
+        return { ...state, lastWrong: null, phase: step.kind === "faceExpression" ? "faceResult" : "transition" };
     }
     const nextHint = Math.min(3, state.hintLevel + 1);
     return {
-        ...state, hintLevel: nextHint,
+        ...state, hintLevel: nextHint, lastWrong: action.type === "guess" ? action.answer : null,
         assistanceCount: state.assistanceCount + (nextHint > state.hintLevel ? 1 : 0),
         incorrectCount: state.incorrectCount + (action.type === "guess" ? 1 : 0),
     };

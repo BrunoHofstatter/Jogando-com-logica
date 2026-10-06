@@ -1,5 +1,5 @@
 import { useLessonEntry } from "../../Testing/entryContext";
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Lightbulb } from "lucide-react";
 import { useCubeMobileLayout } from "../../Components/useCubeMobileLayout";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -8,6 +8,8 @@ import { useClass2 } from "./useClass2";
 import { multiplication, repeatedAddition, rowColors } from "./class2Lesson";
 import Class2SummaryView from "./Class2SummaryView";
 import styles from "./Class2FaceArea.module.css";
+import { LessonSuccess } from "../../Components/LessonSuccess";
+import { TemporaryFeedback } from "../../Components/TemporaryFeedback";
 import { ROUTES } from "../../../routes";
 import { useGameAttemptAnalytics } from "../../../analytics/useGameAttemptAnalytics";
 
@@ -18,6 +20,7 @@ const Class2FaceArea: React.FC = () => {
     const { cubeProps, state, currentStep, feedbackText, offerHelp, dispatch } = useClass2();
     const navigate = useNavigate();
     const location = useLocation();
+    const [reviewRound, setReviewRound] = useState(0);
     const isReview =
         location.state?.mode === "game" ||
         new URLSearchParams(location.search).get("mode") === "game";
@@ -27,8 +30,8 @@ const Class2FaceArea: React.FC = () => {
         usageContext: "standard" as const,
         playerSlotCount: 1,
         levelId: "class_02",
-        activityVariant: isReview ? "review" as const : "lesson" as const,
-    }), [isReview]);
+        activityVariant: isReview || reviewRound > 0 ? "review" as const : "lesson" as const,
+    }), [isReview, reviewRound]);
     const { completeAttempt, startAttempt } = useGameAttemptAnalytics(isCheckpoint ? null : analyticsContext);
 
     useEffect(() => {
@@ -37,19 +40,21 @@ const Class2FaceArea: React.FC = () => {
 
     const handleSummaryComplete = useCallback((summaryMistakes: number) => {
         return completeAttempt({
-            assistanceCount: state.assistanceCount,
-            incorrectCount: state.incorrectCount + summaryMistakes,
+            assistanceCount: reviewRound ? 0 : state.assistanceCount,
+            incorrectCount: (reviewRound ? 0 : state.incorrectCount) + summaryMistakes,
             outcome: "completed",
             success: true,
         });
-    }, [completeAttempt, state.assistanceCount, state.incorrectCount]);
+    }, [completeAttempt, state.assistanceCount, state.incorrectCount, reviewRound]);
 
 
     // --- Summary phase ---
     if (state.phase === "summary") {
         return (
-            <Class2SummaryView
-                totalFlags={state.incorrectCount}
+            <Class2SummaryView key={reviewRound}
+                totalFlags={isReview || reviewRound ? undefined : state.incorrectCount}
+                lessonHints={reviewRound ? 0 : state.assistanceCount}
+                onReplay={() => setReviewRound(round => round + 1)}
                 onComplete={handleSummaryComplete}
                 onStart={startAttempt}
             />
@@ -71,7 +76,7 @@ const Class2FaceArea: React.FC = () => {
                 Aulas
             </button>
 
-            {isTransition && <div role="status" aria-live="polite" className={`${styles.successCard} ${styles.successOverlay}`}>Correto!</div>}
+            {isTransition && <LessonSuccess />}
 
             {/* --- Left panel: Cube visualization --- */}
             <div className={styles.leftPanel}>
@@ -89,9 +94,7 @@ const Class2FaceArea: React.FC = () => {
                 <h1 className={styles.title} aria-live="polite">
                     {isReveal ? "Uma soma pode virar multiplicação!" : currentStep.question}
                 </h1>
-                <div role="status" aria-live="polite" aria-atomic="true" className={styles.answerFeedback}>
-                    {state.incorrectAnswer !== null && <span key={state.incorrectCount}>Ainda não! Tente outra resposta.</span>}
-                </div>
+                {state.incorrectAnswer !== null && <TemporaryFeedback key={state.incorrectCount} message="Ainda não! Tente outra resposta." />}
                 {showGrouping && (
                     <div className={styles.grouping} key={currentStep.id}>
                         <div className={styles.sumStrip} aria-label={repeatedAddition(currentStep)}>
@@ -124,7 +127,7 @@ const Class2FaceArea: React.FC = () => {
                     {currentStep.options.map((opt) => (
                         <button
                             key={opt.value}
-                            className={`${styles.optionButton} ${state.selectedSum === opt.value ? styles.selectedOption : ""}`}
+                            className={`${styles.optionButton} ${state.selectedSum === opt.value ? styles.selectedOption : ""} ${state.incorrectAnswer === opt.value ? styles.wrongOption : ""}`}
                             aria-pressed={isAddition ? state.selectedSum === opt.value : undefined}
                             disabled={isTransition}
                             onClick={() => dispatch({ type: isAddition ? "selectSum" : "guess", answer: opt.value })}

@@ -64,6 +64,21 @@ uses gray waypoints when necessary. It must not iterate renderer index order,
 which places opposite faces next to each other. Reduced motion uses child-paced
 views. Tour cancellation cleans up animation frames and leaves the current view.
 
+## Class 3 Review Renderer
+
+The desktop Class 3 cannon game uses `SummaryCube` in Class3_totalSquares rather
+than altering the interactive lesson renderer. It has six CSS 3D faces with cached
+SVG grid textures (`class3ReviewTextures.ts`), preserving exact sizes, named-face
+mapping, and muted/colored appearance without one DOM element per sticker.
+The game owns approach and Y motion through its foreground scene clock. Rounds
+1–4 rock gently with three inspectable faces; 5–8 sweep continuously back and forth
+with four inspectable faces (never back); 9–10 fully rotate with five. Practice and
+intro use gentle rocking. `class3ReviewMotion.ts` constrains targets and distractors
+to those inspectable sets: top always colored, additional sides adjacent, hidden
+faces gray and bottom excluded. This does not change the lesson's manual inspection
+or six-face counting tours. Solid clock/checkmark cubes use the same six-face
+geometry without sticker grids, dark face borders, or gaps.
+
 ## Class 2 Pattern
 
 Class 2 uses `returnToDefault` for free pointer and keyboard rotation without

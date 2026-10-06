@@ -297,7 +297,7 @@ level_id: class_01 | class_02 | class_03
 activity_variant: lesson | review
 ```
 
-Class 3 supports `lesson` only. Its equal-face rework records lesson hint
+Class 3 supports `lesson` and `review`. Its equal-face lesson records lesson hint
 escalations plus each completed written calculation's `usedHints` as
 `assistance_count`. In the free-entry multiplication UI, `usedHints` counts distinct
 revealed levels per column, including automatic foreground reveals, but not
@@ -309,6 +309,19 @@ working in a different valid order is not an error. Tour replay, rotation, inact
 feedback reveals do not increment these counters. The final lesson question
 completes the activity; its identifier and route are unchanged. These counters
 are not counts of students or standardized learning scores.
+
+Class 3's desktop review is a separate attempt from its completed lesson. Direct
+game entry does not start a lesson attempt. The review starts at `Jogar`, when
+the protected size practice becomes playable, and ends once at the won/lost
+result. Intro loops and unsupported-input notices start no attempt. Main correct
+hits are `correct_count`; wrong cube shots plus escaped required targets are
+`incorrect_count` (an escape counts once, not its three-point damage).
+`completed_step_count` counts resolved rounds, `assistance_count` is zero, and
+`success`/`outcome` use true/`passed` for survival through five rounds and
+false/`failed` for zero health. This pass rule does not assert all rounds were
+answered correctly. Practice errors are excluded. Replay starts a new review;
+checkpoint entry remains excluded. The existing hook handles abandonment and
+foreground duration. No per-shot events or new analytics parameters were added.
 
 Board games:
 

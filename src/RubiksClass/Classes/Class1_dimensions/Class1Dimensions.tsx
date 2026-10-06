@@ -8,7 +8,8 @@ import { Class1Cube } from "./Class1Cube";
 import SummaryView from "./SummaryView";
 import { Lightbulb } from "lucide-react";
 import chrome from "./Class1Chrome.module.css";
-import { TemporaryFeedback } from "./TemporaryFeedback";
+import { LessonSuccess } from "../../Components/LessonSuccess";
+import { TemporaryFeedback } from "../../Components/TemporaryFeedback";
 import styles from "./Class1Dimensions.module.css";
 import { ROUTES } from "../../../routes";
 import { useGameAttemptAnalytics } from "../../../analytics/useGameAttemptAnalytics";
@@ -50,9 +51,7 @@ export default function Class1Dimensions() {
     };
     return <div className={styles.container}>
         <button className={chrome.aulasButton} onClick={() => navigate(ROUTES.CLASS_MENU)}>Aulas</button>
-        <div className={styles.feedbackOverlay}>
-            {state.phase === "transition" && <div className={styles.successCard} role="status">Correto!</div>}
-        </div>
+        {state.phase === "transition" && <LessonSuccess />}
         <div className={styles.leftPanel}>
             <div className={chrome.headerOverlay}>{hint && <div className={chrome.hintCard} role="status">{class1Hint(step, state.hintLevel)}</div>}</div>
             <div className={styles.cubeGroup}>
@@ -80,8 +79,9 @@ export default function Class1Dimensions() {
                     <button className={`${chrome.hintButton} ${offerHelp ? chrome.offeredHelp : ""}`}
                         disabled={state.phase !== "question"} onClick={() => dispatch({ type: "hint" })}>
                         <Lightbulb aria-hidden="true" />
-                        {state.hintLevel === 2 ? "Ver dica novamente" : "Dica"}
+                        {state.hintLevel === 2 ? "Ver dica novamente" : state.hintLevel > 0 ? "Mais uma dica" : "Dica"}
                     </button>
+                    {offerHelp && <span className={chrome.helpPrompt}>Precisa de uma dica?</span>}
                 </div>
             </>}
         </div>

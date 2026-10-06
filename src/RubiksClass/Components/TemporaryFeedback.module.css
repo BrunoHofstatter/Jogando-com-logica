@@ -1,0 +1,7 @@
+.text { color: #8a1c13; font-family: "Cherry Bomb One", system-ui; font-size: min(1.45vw, 2.6dvh); line-height: 1.2; -webkit-text-stroke: 0; text-shadow: none; }
+.feedback { composes: text; position: fixed; bottom: 1.5dvh; left: 50%; transform: translateX(-50%); width: 48%; margin: 0; z-index: 900; text-align: center; pointer-events: none; }
+.success { color: #166534; }
+@media (max-width: 650px) and (orientation: portrait) {
+    .feedback { bottom: 8dvh; width: 88%; }
+    .text { font-size: min(3.8vw, 2.2dvh); }
+}

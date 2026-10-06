@@ -27,6 +27,8 @@ import { useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import DamasRegras from "./AA_baseGame/Pages/regrasPage";
 import CrownChasePage from "./CrownChase/Pages/baseGamePage";
+import CrownChaseTutorialPage from "./CrownChase/Pages/tutorialPage";
+import TutorialGate from "./CrownChase/Tutorial/TutorialGate";
 import CrownChaseRegras from "./CrownChase/Pages/regrasPage";
 import CrownChaseAIPage from "./CrownChase/Pages/aiGamePage";
 import CrownChaseMultiplayerGamePage from "./CrownChase/Pages/multiplayerGamePage";
@@ -152,6 +154,7 @@ const RETURN_ROUTE_MAP: Record<string, string> = {
   [ROUTES.BASE_GAME]: ROUTES.DAMAS_RULES_BASE,
   [ROUTES.CROWN_CHASE_RULES]: ROUTES.GAMES,
   [ROUTES.CROWN_CHASE_GAME]: ROUTES.CROWN_CHASE_RULES,
+  [ROUTES.CROWN_CHASE_TUTORIAL]: ROUTES.CROWN_CHASE_RULES,
   [ROUTES.CROWN_CHASE_AI]: ROUTES.CROWN_CHASE_RULES,
   [ROUTES.CROWN_CHASE_MP_LOBBY]: ROUTES.CROWN_CHASE_RULES,
   [ROUTES.CROWN_CHASE_MP_GAME]: ROUTES.CROWN_CHASE_MP_LOBBY,
@@ -254,7 +257,7 @@ function App() {
   }, [location.pathname]);
 
   useEffect(() => {
-    const isCrownChaseOnlineRoute = location.pathname.startsWith(ROUTES.CROWN_CHASE_MP_LOBBY);
+    const isCrownChaseOnlineRoute = location.pathname.startsWith(ROUTES.CROWN_CHASE_MP_LOBBY) || location.pathname === ROUTES.CROWN_CHASE_TUTORIAL;
     const isMathWarOnlineRoute = location.pathname.startsWith(ROUTES.MATH_WAR_MP_LOBBY);
     const isStopOnlineRoute = location.pathname.startsWith(ROUTES.STOP_MP_LOBBY);
     const isSPTTTOnlineRoute = location.pathname.startsWith(ROUTES.SPTTT_MP_LOBBY);
@@ -289,7 +292,7 @@ function App() {
   return (
     <main>
       <PageViewTracker />
-      <RotateDeviceOverlay />
+      {location.pathname !== ROUTES.CROWN_CHASE_TUTORIAL && <RotateDeviceOverlay />}
       <ReturnButton />
       <HomeButton />
       <Routes>
@@ -325,10 +328,11 @@ function App() {
         <Route path={ROUTES.CACA_SOMA_LEVEL_DYNAMIC} element={<LevelGamePage />} />
         <Route path={ROUTES.BASE_GAME} element={<BaseGame />} />
         <Route path={ROUTES.DAMAS_RULES_BASE} element={<DamasRegras />} />
-        <Route path={ROUTES.CROWN_CHASE_GAME} element={<CrownChasePage />} />
+        <Route path={ROUTES.CROWN_CHASE_TUTORIAL} element={<CrownChaseTutorialPage />} />
+        <Route path={ROUTES.CROWN_CHASE_GAME} element={<TutorialGate><CrownChasePage /></TutorialGate>} />
         <Route path={ROUTES.CROWN_CHASE_RULES} element={<CrownChaseRegras />} />
-        <Route path={ROUTES.CROWN_CHASE_AI} element={<CrownChaseAIPage />} />
-        <Route path={ROUTES.CROWN_CHASE_MP_LOBBY} element={<CrownChaseMultiplayerLobbyPage />} />
+        <Route path={ROUTES.CROWN_CHASE_AI} element={<TutorialGate><CrownChaseAIPage /></TutorialGate>} />
+        <Route path={ROUTES.CROWN_CHASE_MP_LOBBY} element={<TutorialGate><CrownChaseMultiplayerLobbyPage /></TutorialGate>} />
         <Route path={ROUTES.CROWN_CHASE_MP_GAME} element={<CrownChaseMultiplayerGamePage />} />
         <Route path={ROUTES.CACA_SOMA_RULES} element={<CacaSomaRegras />} />
         <Route path={ROUTES.CLASS_TESTS} element={<CheckpointLauncher />} />

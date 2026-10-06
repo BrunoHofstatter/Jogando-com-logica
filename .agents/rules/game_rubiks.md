@@ -51,7 +51,7 @@ This makes the class feel more fun, dynamic, and discovery-based.
 
 - RubiksClass is a module system, not a single game loop
 - The first 3 modules have lessons available in the class menu
-- Classes 1 and 2 include `Aprender` and `Jogar`; Class 3 currently offers only `Aprender`
+- Classes 1–3 include `Aprender` and `Jogar`; Class 3's game currently requires a mouse
 - The summary or review parts are designed to be more game-like and interactive
 - More modules are already planned and should be easy to document later in the same structure
 
@@ -66,7 +66,7 @@ The class menu currently exposes:
 - Aula 3: Multiplicação nas Faces
 - more classes marked as `Em Breve`
 
-For Classes 1 and 2, the menu offers:
+For Classes 1–3, the menu offers:
 
 - `Aprender`
 - `Jogar`
@@ -116,7 +116,7 @@ Every question has four choices in a symmetric two-column grid. The display-scal
 - After 30 foreground seconds without help, the hint button is emphasized; waiting never counts as an error or assistance reveal.
 - Lesson wrong answers and assistance reveals are separate counters. The responsive cube sizes use the shared 650px portrait subscription.
 
-Both phases reuse Class 2’s bottom-left purple `Aulas` button, compact warm-colored bottom-right hint control, and hint cards above the left-side cubes. Wrong-answer/game-result messages share a bottom-edge status component that disappears after three seconds; repeated attempts restart its lifetime. The notation reveal overrides the global bold-text stroke with a thin outline. The game title and matching instruction are larger, with matching white text and blue outlines.
+Both phases reuse Class 2’s bottom-left purple `Aulas` button, compact warm-colored bottom-right hint control, and hint cards above the left-side cubes. Wrong-answer/game-result messages share a bottom-edge status component that disappears after three seconds; repeated attempts restart its lifetime. The notation reveal uses plain dark-blue explanatory text without a text outline. All three lessons share the same top-positioned `Correto!` overlay on desktop and portrait. Class 1 uses `Mais uma dica` for the next help level and the shared `Precisa de uma dica?` invitation, while keeping `Ver dica novamente` for replay. The game title and matching instruction are larger, with matching white text and blue outlines.
 
 ### Current Summary / Review Activity
 
@@ -233,18 +233,26 @@ Card travel and lane position are stored independently of screen orientation, so
 switching between desktop and portrait retains each card's progress and selection.
 Spawning pauses when all targets are temporarily absent during replacement; it
 resumes once the next cube is available. Keyboard-focused cards are brought inside
-the lane and remain stationary until focus leaves.
+the lane and keep moving; only explicitly selected cards pause while choosing a cube.
 
 Each review cube has one keyboard stop: arrows rotate, and Enter or Space submits
 the match. Starting play focuses a number; keyboard number selection moves to a
 cube, and submitting a match returns to the numbers. Removed controls have a focus
-fallback, and completion focuses `Voltar ao Menu`. Pointer drags still suppress matching.
+fallback, and completion focuses `Jogar novamente`. Pointer drags still suppress matching.
 
-With reduced motion enabled, number choices are stationary and refresh after
-matches/replacements, always retaining a usable total and a distractor when a target
-is available. There are no timed card spawns or travel frames in this mode. The
-introduction becomes a static example and decorative cube/hand pulses are removed.
-Changes to the system preference take effect during play without resetting progress.
+The instructional demonstration and falling numbers run regardless of the system
+reduced-motion preference; decorative cube pulses and scaling remain suppressed.
+The introduction loops automatically without pause/resume controls. During play, `Parar números`
+switches to stationary choices and `Mover números` restores travel without resetting
+progress. Stationary choices refresh after matches/replacements, retaining a usable
+total and distractor whenever a target is available, with no timed spawns or travel frames.
+
+Completion uses Class 1's shared dialog and typography, with `Jogar novamente`,
+`Próxima aula` (Class 3), and `Aulas`. It shows `Erros no jogo` and lesson hint
+usage; lesson errors appear only when the lesson was attempted. Replay starts a
+fresh review introduction and excludes previous lesson errors/hints. Successful
+match feedback uses the same green text styling as Class 1, retaining its
+calculation text and placement below the instruction.
 
 Product decision (2026-09-27): keep the review free of hints. Unlocking `Jogar` after
 lesson completion is planned separately and is not implemented by these fixes;
@@ -252,8 +260,10 @@ direct game entry currently remains available.
 
 ## Module 3 - Multiplicação nas Faces
 
-Class 3 is implemented and reachable through `Aprender`; its existing route remains
-`/aulas/3-cubo-inteiro`. It has no summary game or `Jogar` entry.
+Class 3 is implemented and reachable through `Aprender` and `Jogar`; its existing
+route remains `/aulas/3-cubo-inteiro`. The lesson completion also offers `Jogar`.
+Direct game entry recognizes navigation state or `?mode=game`; checkpoint entry
+continues to take precedence. The review is loaded separately from the lesson.
 
 ### Teaching Goal
 
@@ -344,6 +354,74 @@ Equivalent-valued distractors are excluded. Ordinary successes advance after
 
 The implementation plan and verification record are in
 `docs/class3-equal-faces-implementation-plan.md`.
+
+### Current Summary / Review Activity
+
+The desktop game uses a mouse-aimed toy cannon and a red assisted crosshair.
+Its large animated introduction shows `1 × 9`, a 3×3 with only its top colored,
+a fully colored 3×3, and a 4×4 with three colored faces. The preview fires at the
+correct cube, replaces it with a green checkmark cube, and clears distractors
+with dust. The explanation connects the selected face and its grid to the two
+factors. One random nonwhite target color is shared by intro, practice, and game.
+
+`Jogar` starts protected shooting practice: a centered 3×3, then a centered 4×4,
+each alone and both required. They rock gently and cannot leak or cost health.
+No ammo/icon or practice counter is shown; a compact left-side instruction says
+`Mire no cubo e clique para atirar!`. Ten main rounds follow with full health.
+There is no separate one-face warm-up or global survival timer. Each round starts
+with three varied cubes and exactly one matching target. Ammo means selected
+faces × quadradinhos per face and always belongs to the oldest unresolved trio.
+A second trio can approach and can be shot; every shot at it is wrong. Those cubes
+flash/recoil/shake but stay, preserving the next target. Current wrong cubes react
+and disappear. A hit or normalized depth 0.55 requests the next trio once, with a
+one-second appearance delay, 1.2-second spawn interval and two-trio cap. Correct
+hits reserve the target immediately, keep its mathematical cube visible, then
+resolve after 0.55 seconds with a solid green/check replacement and simultaneous
+visible dust from removed distractors. Ammo changes at resolution; existing later
+trios stay visible. Results wait for the last success/dust feedback rather than
+covering it immediately.
+
+Curved, slightly staggered paths run from a wide upper frosted-gray entrance
+toward the cannon. Grids keep their exact sizes; all mathematical cubes share
+the same physical scale. A game-only renderer uses six cached SVG face textures
+instead of per-sticker DOM elements, preserving the lesson's gray/colored look.
+Rounds 1–4 gently rock ±8° around a shared ±30° pose (6-second cycle), retaining
+top/front/one side. Rounds 5–8 sweep continuously ±55° (10-second cycle), revealing
+top/front/left/right across motion but never the back; there are no paused views.
+Only rounds 9–10 use full Y rotation (10-second turns). Motion styles are shared
+within each trio and persist when ammo changes. Every gameplay cube colors the
+top first and adds adjacent lateral faces; faces outside its motion's inspectable
+set remain gray. Target AND distractor face-count limits are 3/4/5 by stage. Count
+distractors prefer a difference of at least two when feasible, with a bounded
+fallback. The requested fully colored intro distractor is a demo-only exception.
+Initial travel remains 28 seconds; observed readability/balance is not yet visually
+validated.
+
+Three red hearts have three irregular shards each (nine health). Wrong cube hits
+cost one; required targets escaping cost three; empty shots and distractor escapes
+cost nothing. Ten round circles sit below the hearts in two rows of five: current
+amber, all completed rounds green/check (including escapes), upcoming gray.
+Surviving all ten finishes; zero health loses immediately. Results show actual
+remaining full/partial hearts, separate hit/escape/wrong-shot totals, and replay
+and Aulas actions, using light outlined text on a contrasting panel.
+
+Solid borderless blue clock cubes accompany rounds 2/4/6/8/10 and move twice as fast.
+Collecting one freezes approach and new spawns for five foreground seconds while
+rotation and shooting continue. Hidden tabs pause both clock domains without a
+catch-up jump. Replay starts a fresh introduction and separate analytics attempt.
+Direct review never starts a lesson attempt; the existing Class 3 lesson still
+finishes independently before optional review entry. Checkpoint analytics stay
+excluded. Coarse-pointer-only devices receive a local mouse notice and Aulas action.
+Mobile joystick controls and dedicated reduced-motion adaptation remain planned.
+
+The detailed enlarged SVG cannon has its purple ammo box and small matching energy
+icon to the left, without overlap. Blue clock/green success cubes use solid joined
+faces with white icons and subtle shading, no dark Rubik-style outlines or grids.
+Dust uses larger contrasting gray/white puffs with about a 0.9-second lifetime;
+the frosted blue-gray corridor has stronger edge/floor/perspective cues.
+
+Detailed stages, tuning values, and verification are recorded in
+`docs/class3-summary-game-implementation-plan.md`.
 
 ## Planned Modules
 

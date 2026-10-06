@@ -499,7 +499,7 @@
 /* --- Animations --- */
 
 .matchProgress { display: inline-block; margin-top: 1dvh; font-size: 1.7vw; color: #013873; }
-.reviewFeedback { position: absolute; top: 20dvh; left: 26vw; width: 48vw; text-align: center; color: #713f12; font-size: 1.5vw; z-index: 8; pointer-events: none; animation: reviewFeedbackFade 3s linear both; }
+.reviewFeedback { composes: text success from "../../Components/TemporaryFeedback.module.css"; position: absolute; top: 20dvh; left: 26vw; width: 48vw; text-align: center; z-index: 8; pointer-events: none; animation: reviewFeedbackFade 3s linear both; }
 @keyframes reviewFeedbackFade { 0%, 75% { opacity: 1; } 100% { opacity: 0; } }
 .cubePulseTarget {
     animation: readyCubePulse 1.8s ease-in-out infinite;
@@ -610,7 +610,7 @@
 
 @media (max-width: 650px) and (orientation: portrait) {
     .matchProgress { font-size: 3.5vw; }
-    .reviewFeedback { top: 40dvh; left: 5vw; width: 90vw; font-size: 3.5vw; }
+    .reviewFeedback { top: 40dvh; left: 5vw; width: 90vw; }
     .fallingArea { top: 43dvh; bottom: 25dvh; left: 0; right: 0; }
     .finishedSlot { width: 15vw; }
     .emptySlot { width: 15vw; height: 15vw; }
@@ -632,11 +632,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .modalOverlay, .modalContent, .demoNumber, .demoCorrect, .demoCubeTarget,
-    .demoSuccess, .cubePulseTarget, .finishedSlot svg, .reviewFeedback { animation: none; }
-    .demoPointer { display: none; }
-    .demoCorrect { background: #ffe874; }
-    .demoSuccess { opacity: 1; }
+    /* Keep the instructional sequence; suppress decorative scaling and pulses. */
+    .modalOverlay, .modalContent, .demoCubeTarget,
+    .cubePulseTarget, .finishedSlot svg, .reviewFeedback { animation: none; }
     .cubeWrapper, .fallingBox, .modalButton, .aulasButton { transition: none; }
     .cubeWrapper:hover:not(.matched), .modalButton:hover, .aulasButton:hover { transform: none; }
 }
@@ -756,4 +754,35 @@
         transform: scale(1) translateY(0);
         opacity: 1;
     }
+}
+
+/* Match Class 1 error colors through hover and activation. */
+.fallingBox.wrongAnswer,
+.fallingBox.wrongAnswer:hover:not(:disabled),
+.fallingBox.wrongAnswer:active:not(:disabled) {
+    background: #ffb4a8; border-color: #9f1239; box-shadow: 0 0.6vw 0 #9f1239;
+    -webkit-text-stroke-color: #9f1239; text-shadow: 0 0.2vw 0 #9f1239;
+}
+@media (max-width: 650px) and (orientation: portrait) {
+    .fallingBox.wrongAnswer,
+    .fallingBox.wrongAnswer:hover:not(:disabled),
+    .fallingBox.wrongAnswer:active:not(:disabled) { box-shadow: 0 1.2vw 0 #9f1239; }
+}
+
+
+/* Motion controls are explicit choices, independent of the device preference. */
+.motionButton {
+    font: inherit;
+    font-size: min(1.5vw, 2.5dvh);
+    color: #013873;
+    background: #ffffff;
+    border: 0.2vw solid #0284c7;
+    border-radius: 1vw;
+    padding: 0.6dvh 1vw;
+    cursor: pointer;
+}
+.motionButton:focus-visible { outline: 0.3vw solid #a855f7; outline-offset: 0.5vw; }
+.gameMotionButton { position: absolute; bottom: 2dvh; right: 2vw; z-index: 10; }
+@media (max-width: 650px) and (orientation: portrait) {
+    .motionButton { font-size: min(3.5vw, 2.5dvh); padding: 1dvh 2vw; border-width: 0.5vw; border-radius: 2vw; }
 }

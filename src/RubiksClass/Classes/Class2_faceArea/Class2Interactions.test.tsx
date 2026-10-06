@@ -7,6 +7,7 @@ import Class2SummaryView from "./Class2SummaryView";
 import Class2FaceArea from "./Class2FaceArea";
 import { EntryContext } from "../../Testing/entryContext";
 import { REVIEW_TARGETS, targetTotal } from "./class2Review";
+import { LESSON_STEPS } from "./class2Lesson";
 
 const analytics = vi.hoisted(() => ({ startAttempt: vi.fn(() => true), completeAttempt: vi.fn(() => true) }));
 vi.mock("../../../analytics/useGameAttemptAnalytics", () => ({ useGameAttemptAnalytics: () => analytics }));
@@ -44,13 +45,15 @@ const cubes = () => [...container.querySelectorAll<HTMLDivElement>("[data-review
 function key(node: HTMLElement, value: string, repeat = false) {
     act(() => node.dispatchEvent(new KeyboardEvent("keydown", { key: value, repeat, bubbles: true, cancelable: true })));
 }
+const motionButton = (label: string) => [...container.querySelectorAll<HTMLButtonElement>("button")].find(button => button.textContent === label)!;
+function stationaryPlay() { click(motionButton("Parar números")); }
 function start() {
     const button = [...container.querySelectorAll<HTMLButtonElement>("button")].find(button => button.textContent === "Jogar")!;
     click(button);
 }
 
 it("uses one cube tab stop for rotation and matching, then restores number focus", () => {
-    render(<Class2SummaryView totalFlags={0} onStart={() => true} onComplete={() => true} />);
+    render(<Class2SummaryView onReplay={() => {}} totalFlags={0} onStart={() => true} onComplete={() => true} />);
     start();
     expect(document.activeElement).toBe(numbers()[0]);
     expect(container.querySelectorAll("[data-review-target] [tabindex='0']")).toHaveLength(5);
@@ -71,10 +74,13 @@ it("uses one cube tab stop for rotation and matching, then restores number focus
 });
 
 it("returns to numbers after a wrong keyboard match and supports Space", () => {
-    render(<Class2SummaryView totalFlags={0} onStart={() => true} onComplete={() => true} />);
+    render(<Class2SummaryView onReplay={() => {}} totalFlags={0} onStart={() => true} onComplete={() => true} />);
     start();
     click(numbers().find(button => button.textContent === "7")!);
+    const wrongNumber = numbers().find(button => button.textContent === "7")!;
     key(cubes()[0], " ");
+    expect(wrongNumber.className).toContain("wrongAnswer");
+    expect(container.querySelector("[data-review-target]")!.className).not.toContain("wrongTarget");
     expect(container.textContent).toContain("Ainda não combina");
     expect(container.textContent).toContain("0 / 10");
     expect(numbers()).toContain(document.activeElement);
@@ -82,9 +88,10 @@ it("returns to numbers after a wrong keyboard match and supports Space", () => {
 
 it("finishes stationary play without waiting for numbers and focuses completion once", () => {
     const complete = vi.fn(() => true);
-    render(<Class2SummaryView totalFlags={2} onStart={() => true} onComplete={complete} />);
+    render(<Class2SummaryView onReplay={() => {}} totalFlags={2} onStart={() => true} onComplete={complete} />);
     start();
-    expect(requestAnimationFrame).not.toHaveBeenCalled();
+    stationaryPlay();
+    expect(cancelAnimationFrame).toHaveBeenCalled();
     const initial = numbers().map(button => button.textContent);
     advance(30000);
     expect(numbers().map(button => button.textContent)).toEqual(initial);
@@ -97,27 +104,46 @@ it("finishes stationary play without waiting for numbers and focuses completion 
         advance(500);
     }
     expect(complete).toHaveBeenCalledExactlyOnceWith(0);
-    expect(document.activeElement?.textContent).toBe("Voltar ao Menu");
+    expect(document.activeElement?.textContent).toBe("Jogar novamente");
     advance(30000);
     expect(complete).toHaveBeenCalledTimes(1);
 });
 
-it("updates motion preference during play and cancels animation work", () => {
-    reduced = false;
-    render(<Class2SummaryView totalFlags={0} onStart={() => true} onComplete={() => true} />);
+it("keeps numbers moving under reduced motion and supports explicit stop/resume", () => {
+    render(<Class2SummaryView onReplay={() => {}} totalFlags={0} onStart={() => true} onComplete={() => true} />);
     start();
-    click(numbers().find(button => button.textContent === "12")!);
-    act(() => { reduced = true; mediaListeners.forEach(listener => listener()); });
+    expect(requestAnimationFrame).toHaveBeenCalled();
+    const moving = numbers().find(button => button.textContent === "12")!;
+    const focused = document.activeElement as HTMLButtonElement;
+    const focusedTop = parseFloat(focused.style.top);
+    const top = parseFloat(moving.style.top);
+    const frame = (time: number) => act(() => {
+        const calls = vi.mocked(requestAnimationFrame).mock.calls;
+        calls[calls.length - 1][0](time);
+    });
+    frame(0);
+    frame(50);
+    expect(parseFloat(moving.style.top)).toBeGreaterThan(top);
+    expect(parseFloat(focused.style.top)).toBeGreaterThan(focusedTop);
+    click(moving);
+    stationaryPlay();
     expect(cancelAnimationFrame).toHaveBeenCalled();
     expect(numbers().find(button => button.getAttribute("aria-pressed") === "true")?.textContent).toBe("12");
     const frameCalls = vi.mocked(requestAnimationFrame).mock.calls.length;
     advance(30000);
     expect(vi.mocked(requestAnimationFrame).mock.calls).toHaveLength(frameCalls);
     expect(numbers().every(button => button.style.top === "" && button.style.left === "")).toBe(true);
+    act(() => { reduced = false; mediaListeners.forEach(listener => listener()); });
+    expect(motionButton("Mover números")).toBeDefined();
+    click(motionButton("Mover números"));
+    expect(vi.mocked(requestAnimationFrame).mock.calls.length).toBeGreaterThan(frameCalls);
+    act(() => { reduced = true; mediaListeners.forEach(listener => listener()); });
+    expect(numbers().every(button => button.style.top !== "" && button.style.left !== "")).toBe(true);
+    expect(numbers().find(button => button.getAttribute("aria-pressed") === "true")?.textContent).toBe("12");
 });
 
 it("still suppresses drag clicks while allowing keyboard matching afterward", () => {
-    render(<Class2SummaryView totalFlags={0} onStart={() => true} onComplete={() => true} />);
+    render(<Class2SummaryView onReplay={() => {}} totalFlags={0} onStart={() => true} onComplete={() => true} />);
     start();
     click(numbers().find(button => button.textContent === "6")!);
     const cube = cubes()[0];
@@ -145,9 +171,65 @@ it.each([0, 2])("reports repeated wrong lesson submissions after all hints at st
     } else submit = buttons().find(button => button.textContent === "2")!;
     click(submit);
     const status = [...container.querySelectorAll('[role="status"]')].find(node => node.textContent?.includes("Ainda não!"))!;
-    const firstMessage = status.firstChild;
+    const wrongOption = buttons().find(button => button.textContent === (stepIndex === 2 ? "3 + 3" : "2"))!;
+    expect(wrongOption.className).toContain("wrongOption");
+    act(() => vi.advanceTimersByTime(2000));
     click(submit);
-    expect(status.textContent).toBe("Ainda não! Tente outra resposta.");
-    expect(status.firstChild).not.toBe(firstMessage);
+    expect(status.isConnected).toBe(false);
+    act(() => vi.advanceTimersByTime(2000));
+    expect(container.textContent).toContain("Ainda não! Tente outra resposta.");
+    act(() => vi.advanceTimersByTime(1000));
+    expect(container.textContent).not.toContain("Ainda não! Tente outra resposta.");
+    expect(wrongOption.className).toContain("wrongOption");
+    if (stepIndex === 2) {
+        click(buttons().find(button => button.textContent === "3 + 3 + 3")!);
+        expect(wrongOption.className).not.toContain("wrongOption");
+        expect(container.textContent).not.toContain("Ainda não!");
+    }
     expect(buttons().find(button => button.textContent === "Dica completa")?.disabled).toBe(true);
+});
+
+it("replays Class 2 with fresh game statistics and no previous lesson totals", () => {
+    analytics.startAttempt.mockClear();
+    analytics.completeAttempt.mockClear();
+    const stepIndex = LESSON_STEPS.length - 1;
+    const step = LESSON_STEPS[stepIndex];
+    render(<EntryContext.Provider value={{ isCheckpoint: true, stepIndex }}><Class2FaceArea /></EntryContext.Provider>);
+    const button = (text: string) => [...container.querySelectorAll<HTMLButtonElement>("button")].find(node => node.textContent === text)!;
+    click(button(step.options.find(option => option.value !== step.answer)!.label));
+    click(button(step.answer));
+    advance(1200);
+    const finish = () => {
+        for (let match = 0; match < 10; match++) {
+            const cube = cubes().find(cube => numbers().some(button => Number(button.textContent) === targetTotal(REVIEW_TARGETS[Number(cube.closest("[data-review-target]")!.getAttribute("data-review-target"))])))!;
+            const target = REVIEW_TARGETS[Number(cube.closest("[data-review-target]")!.getAttribute("data-review-target"))];
+            click(numbers().find(button => Number(button.textContent) === targetTotal(target))!);
+            key(cube, "Enter");
+            advance(500);
+        }
+    };
+    start();
+    stationaryPlay();
+    finish();
+    expect(container.textContent).toContain("Erros nas lições: 1");
+    expect(container.textContent).toContain("Dicas usadas: 1");
+    const dialog = container.querySelector('[role="dialog"]')!;
+    expect(dialog.getAttribute("aria-modal")).toBe("true");
+    expect(document.activeElement?.textContent).toBe("Jogar novamente");
+    act(() => button("Aulas").focus());
+    key(button("Aulas"), "Tab");
+    expect(document.activeElement?.textContent).toBe("Jogar novamente");
+    click(button("Jogar novamente"));
+    expect(document.activeElement?.textContent).toBe("Jogar");
+    const startsBeforeReplay = analytics.startAttempt.mock.calls.length;
+    start();
+    expect(analytics.startAttempt).toHaveBeenCalledTimes(startsBeforeReplay + 1);
+    expect(container.textContent).toContain("0 / 10");
+    stationaryPlay();
+    finish();
+    expect(container.textContent).not.toContain("Erros nas lições");
+    expect(container.textContent).toContain("Erros no jogo: 0");
+    expect(container.textContent).toContain("Dicas usadas: 0");
+    expect(analytics.completeAttempt).toHaveBeenCalledTimes(2);
+    expect(analytics.completeAttempt).toHaveBeenLastCalledWith({ assistanceCount: 0, incorrectCount: 0, outcome: "completed", success: true });
 });

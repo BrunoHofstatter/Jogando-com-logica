@@ -77,18 +77,18 @@ function LevelSelectionPage() {
             <div className={styles.starCriteriaContainer}>
               <div className={styles.starCriteriaRow}>
                 <div className={styles.starIcon}>★</div>
-                <div className={styles.starText}>{selectedLevelConfig.starThresholds.oneStarCorrect} acertos</div>
+                <div className={styles.starText}>Conclua todas as rodadas</div>
               </div>
               <div className={styles.starCriteriaRow}>
                 <div className={styles.starIcon}>★★</div>
                 <div className={styles.starText}>
-                  {selectedLevelConfig.starThresholds.twoStarCorrect} acertos em {selectedLevelConfig.starThresholds.twoStarTime}s
+                  Conclua em até {selectedLevelConfig.starThresholds.twoStarTime}s
                 </div>
               </div>
               <div className={styles.starCriteriaRow}>
                 <div className={styles.starIcon}>★★★</div>
                 <div className={styles.starText}>
-                  {selectedLevelConfig.starThresholds.threeStarCorrect} acertos em {selectedLevelConfig.starThresholds.threeStarTime}s
+                  Conclua em até {selectedLevelConfig.starThresholds.threeStarTime}s
                 </div>
               </div>
             </div>

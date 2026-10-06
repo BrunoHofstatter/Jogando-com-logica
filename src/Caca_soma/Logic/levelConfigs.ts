@@ -1,6 +1,7 @@
 import { LevelConfig } from './gameTypes';
 
-// Level configuration definitions
+// Provisional time goals raised 20% for all-round completion and retries.
+// Calibrate after the complete level set is play-tested.
 export const levels: LevelConfig[] = [
   {
     levelId: 1,
@@ -15,12 +16,8 @@ export const levels: LevelConfig[] = [
       [5, 20],
     ],
     starThresholds: {
-      oneStarCorrect: 1,
-      twoStarCorrect: 3,
-      threeStarCorrect: 5,
-      oneStarTime: 999,      // 2 minutes
-      twoStarTime: 90,       // 1.5 minutes
-      threeStarTime: 60      // 1 minute
+      twoStarTime: 108,
+      threeStarTime: 72
     },
     description: "Tabuleiro 5x5, soma de 2 números",
     requiredStars: 0  // First level always unlocked
@@ -38,15 +35,11 @@ export const levels: LevelConfig[] = [
       [7, 20],
     ],
     starThresholds: {
-      oneStarCorrect: 1,
-      twoStarCorrect: 3,
-      threeStarCorrect: 5,
-      oneStarTime: 999,      // 2 minutes
-      twoStarTime: 90,       // 1.5 minutes
-      threeStarTime: 60      // 1 minute
+      twoStarTime: 108,
+      threeStarTime: 72
     },
     description: "Tabuleiro 5x5, soma de 2 números",
-    requiredStars: 2  // First level always unlocked
+    requiredStars: 2
   }
   ,
   {
@@ -62,15 +55,11 @@ export const levels: LevelConfig[] = [
       [7, 20],
     ],
     starThresholds: {
-      oneStarCorrect: 1,
-      twoStarCorrect: 3,
-      threeStarCorrect: 5,
-      oneStarTime: 999,      // 2 minutes
-      twoStarTime: 80,       // 1.5 minutes
-      threeStarTime: 50      // 1 minute
+      twoStarTime: 96,
+      threeStarTime: 60
     },
     description: "Tabuleiro 5x5, soma de 2 números",
-    requiredStars: 2  // First level always unlocked
+    requiredStars: 2
   }
   ,
   {
@@ -87,15 +76,11 @@ export const levels: LevelConfig[] = [
       [7, 20],
     ],
     starThresholds: {
-      oneStarCorrect: 2,
-      twoStarCorrect: 4,
-      threeStarCorrect: 6,
-      oneStarTime: 999,      // 2 minutes
-      twoStarTime: 90,       // 1.5 minutes
-      threeStarTime: 60      // 1 minute
+      twoStarTime: 108,
+      threeStarTime: 72
     },
     description: "Tabuleiro 5x5, soma de 2 números",
-    requiredStars: 2  // First level always unlocked
+    requiredStars: 2
   }
   ,
   {
@@ -112,15 +97,11 @@ export const levels: LevelConfig[] = [
       [11, 20],
     ],
     starThresholds: {
-      oneStarCorrect: 2,
-      twoStarCorrect: 4,
-      threeStarCorrect: 6,
-      oneStarTime: 999,      // 2 minutes
-      twoStarTime: 90,       // 1.5 minutes
-      threeStarTime: 60      // 1 minute
+      twoStarTime: 108,
+      threeStarTime: 72
     },
     description: "Tabuleiro 5x5, soma de 2 números",
-    requiredStars: 2  // First level always unlocked
+    requiredStars: 2
   }
   ,
   {
@@ -136,15 +117,11 @@ export const levels: LevelConfig[] = [
       [10, 25],
     ],
     starThresholds: {
-      oneStarCorrect: 1,
-      twoStarCorrect: 3,
-      threeStarCorrect: 5,
-      oneStarTime: 999,      // 2 minutes
-      twoStarTime: 90,       // 1.5 minutes
-      threeStarTime: 60      // 1 minute
+      twoStarTime: 108,
+      threeStarTime: 72
     },
     description: "Tabuleiro 7x7, soma de 2 números",
-    requiredStars: 2  // First level always unlocked
+    requiredStars: 2
   }
   ,
   {
@@ -160,12 +137,8 @@ export const levels: LevelConfig[] = [
       [7, 20],
     ],
     starThresholds: {
-      oneStarCorrect: 1,
-      twoStarCorrect: 3,
-      threeStarCorrect: 5,
-      oneStarTime: 999,
-      twoStarTime: 70,
-      threeStarTime: 45
+      twoStarTime: 84,
+      threeStarTime: 54
     },
     description: "Tabuleiro 7x7, soma de 2 números",
     requiredStars: 2
@@ -185,15 +158,11 @@ export const levels: LevelConfig[] = [
       [11, 25],
     ],
     starThresholds: {
-      oneStarCorrect: 2,
-      twoStarCorrect: 4,
-      threeStarCorrect: 6,
-      oneStarTime: 999,
-      twoStarTime: 90,
-      threeStarTime: 60
+      twoStarTime: 108,
+      threeStarTime: 72
     },
     description: "Tabuleiro 7x7, soma de 2 números",
-    requiredStars: 2  // First level always unlocked
+    requiredStars: 2
   }
   ,
   {
@@ -211,15 +180,11 @@ export const levels: LevelConfig[] = [
       [7, 40],
     ],
     starThresholds: {
-      oneStarCorrect: 3,
-      twoStarCorrect: 5,
-      threeStarCorrect: 7,
-      oneStarTime: 999,      // 2 minutes
-      twoStarTime: 90,       // 1.5 minutes
-      threeStarTime: 60      // 1 minute
+      twoStarTime: 108,
+      threeStarTime: 72
     },
     description: "Tabuleiro 7x7, soma de 2 números",
-    requiredStars: 2  // First level always unlocked
+    requiredStars: 2
   }
   ,
   {
@@ -235,15 +200,11 @@ export const levels: LevelConfig[] = [
       [30, 40],
     ],
     starThresholds: {
-      oneStarCorrect: 1,
-      twoStarCorrect: 3,
-      threeStarCorrect: 5,
-      oneStarTime: 999,      // 2 minutes
-      twoStarTime: 90,       // 1.5 minutes
-      threeStarTime: 60      // 1 minute
+      twoStarTime: 108,
+      threeStarTime: 72
     },
     description: "Tabuleiro 7x7, soma de 2 números",
-    requiredStars: 2  // First level always unlocked
+    requiredStars: 2
   }
   // More levels can be added here
 ];
