@@ -5,6 +5,8 @@ implemented. The working description is "Kahoot-like"; no final name is chosen.
 This document preserves the user's ideas separately from open questions and
 suggested discussion priorities.
 
+Priority update (October 12, 2026): Bruno confirmed that he definitely intends to add this system, ahead of Houses, and considers it a potentially major JcL feature. This establishes intention and relative priority, not a fixed delivery date or settled mechanics. The design questions below remain open. See `docs/project/overview.md` for current project priorities.
+
 ## Project context
 
 Jogando com Lógica is a free educational game platform primarily for Brazilian

@@ -6,18 +6,20 @@ Start with the project overview or the reference for the game or system you are 
 
 | Folder | Purpose |
 |---|---|
-| `project/` | Platform context, game catalog, and teacher guidance |
+| `project/` | Current platform context, detailed history, founder perspective, catalog, and teacher guidance |
 | `games/` | Game and lesson references |
 | `systems/` | Shared components, implementation contracts, analytics, and multiplayer operations |
 | `tutorials/` | Playable tutorial philosophy, shared contract, and implemented lessons |
 | `plans/` | Proposals, future work, evaluation exercises, and retained implementation plans |
-| `archive/` | Superseded designs preserved for historical context |
+| `archive/` | Original sources and superseded designs/references preserved for historical context |
 
 Check each document's status and section labels. Game and project references can include clearly labeled future ideas. A retained implementation plan may describe work that has since shipped; use the corresponding game or system reference for current behavior. Grade recommendations and educational benefits are not evidence of classroom validation unless explicitly documented as such.
 
 ## Project
 
 - [Platform overview](project/overview.md)
+- [Project history](project/history.md) — school arrangements, application motivation, early team, and website chronology
+- [Founder context](project/founder-context.md) — subjective experience, working approach, availability, and collaboration preferences
 - [Game catalog](project/games-overview.md)
 - [Teacher manual context](project/teacher-manual.md)
 
@@ -55,8 +57,10 @@ Check each document's status and section labels. Game and project references can
 - [Classroom tournament discussion](plans/classroom-tournament-discussion-context.md)
 - [Personal model evaluation plan](plans/model-evaluation-plan.md) — evaluation context, not production implementation instructions
 
-## Historical designs
+## Historical sources and designs
 
+- [Original project history source](archive/project-history-original.md) — full attachment text, including superseded expectations; use the corrected project history for current understanding
+- [Superseded Math War reference](archive/math-war-legacy-reference.md) — older engine description and technical claims; use the current game reference
 - [Initial multiplayer private-room plan](archive/multiplayer-private-rooms.md) — historical context; the current contract is in the multiplayer system reference
 
 ## Related instructions and workflows
@@ -66,3 +70,5 @@ Check each document's status and section labels. Game and project references can
 - [Game template README](../src/GameTemplate/README.md)
 
 Keep reusable skills in `.agents/skills/` and component READMEs beside their components. New permanent project documentation belongs in the appropriate `docs/` subfolder. Use descriptive kebab-case filenames, give each subject a primary home, and update this index and incoming references when moving or adding documents.
+
+For project discussions, begin with the overview, then use history or founder context for depth. The founder's October 12, 2026 account takes priority over the older history attachment where they differ. Preserve subjective judgments as perspective and original expectations as history. Repository implementation, deployment status, actual adoption, and educational validation are separate claims.

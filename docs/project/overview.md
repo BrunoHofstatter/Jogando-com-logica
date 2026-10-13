@@ -1,125 +1,96 @@
-# Jogando com Lógica - Project Overview
+# Jogando com Lógica project overview
 
-## What It Is
+Current project context confirmed by Bruno on October 12, 2026. Technical summaries describe the repository, not proof that every latest change is deployed or validated in classrooms.
 
-Jogando com Lógica (Playing with Logic) is a free educational game platform for Brazilian public school students. It started in 2024 when Bruno, then a high school student, was teaching after-school math programs at a municipal school in Novo Hamburgo, Rio Grande do Sul. He began with Rubik's cube lessons to teach mathematical concepts in a hands-on way, then expanded into original board games. By 2025 the project was formalized, expanded to two schools, and a remote team was assembled. The MVP website (`jogandocomlogica.com`) launched late 2025.
+## What it is
 
-## Current Project
+Jogando com Lógica (JcL, Playing with Logic) is currently a free educational game platform in Brazilian Portuguese, primarily for Brazilian public schools. Students and teachers do not need accounts. The public website is `jogandocomlogica.com`.
 
-The platform already exists as a public website with multiple games and a teacher manual page. It is still in an early stage of validation and outreach.
+Bruno founded the project in Novo Hamburgo, Rio Grande do Sul, in 2024. His original motivation was strengthening his study-abroad application profile, with encouragement from Daqui Pra Fora. Math, teaching, and Rubik's cubes were existing interests. He brought cubes from his first school visit, before the project had a name or a concrete format.
 
-Important current reality:
+The in-person work expanded from one school in 2024 to two different schools in 2025. Website development began in early 2025 and the website launched in late 2025. Bruno stopped the in-person classes after 2025 because he started college in 2026 and no longer had time for that schedule.
 
-- The main focus is schools and classroom use
-- The project is prioritizing outreach to teachers, schools, and coordinators
-- There are currently no schools actively using the platform in a validated ongoing way
-- Individual use at home is welcome, but it is not the current product focus
+Read [history.md](history.md) for chronology and school arrangements, and [founder-context.md](founder-context.md) for motivation, working approach, availability, and collaboration experience. The [original history source](../archive/project-history-original.md) is preserved separately.
 
-## Who It's For
+## Current use and priority
 
-**Students:** Ages 8-13, grades 3-7 (some games starting at grade 3). Primarily students at Brazilian municipal/public schools, often in after-school programs ("contra turno"). Many have limited access to engaging educational materials.
+The main objective is getting teachers to use the platform in their classes. JcL remains early in outreach and validation.
 
-**Teachers:** Elementary and middle school math teachers and after-school coordinators. They are time-constrained and need activities that are ready to use without preparation. They are key users - if teachers don't adopt it, students won't play it. What they need: clear instructions, grade recommendations, time estimates, and activities that fit naturally into their lessons.
+Bruno presented the website to a teacher after contacting a coordinator at his old school. He believes she used it a few times, based on activity in his city on several days in Google Analytics after that contact. Continued use is unknown. This is an early indication of use, not confirmed sustained school adoption or evidence of learning outcomes. Analytics alone does not identify that teacher or count individual students.
 
-**Usage contexts:** Focused on in-class teacher-led sessions, school computer labs, after-school programs, and individual practice at home.
+Immediate priorities are:
 
-## Current Focus
+- Reach teachers, schools, and coordinators, especially through existing relationships.
+- Gather early-user feedback about fundamental problems in the experience.
+- Improve the website and make its value and classroom use clear to educators.
+- Find contributors, particularly someone who can independently test games and features and suggest improvements.
+- Use analytics to understand activity and reliability, with the measurement limits in [analytics.md](../systems/analytics.md).
 
-The current strategic focus is outreach rather than scale.
+Teacher adoption is the strategic priority, but most of Bruno's own time still goes into website development. He currently sees limited useful outreach work to fill many hours every day. Automated checks exist; he does not consider the games and features sufficiently tested through human use.
 
-- Contact teachers, schools, and coordinators directly to offer the platform as a classroom resource
-- Improve how clearly the project explains itself to educators
-- Make the website, teacher manual, and public materials credible enough that a school can quickly understand the value
-- Instrument the website better with Google Analytics events so the team can understand user behavior and interest
+## Audience and classroom role
 
-## How We Reach People
+The usual target is children around ages 8–13, with many activities recommended around 3rd–7th grade. In-person work previously included 1st–6th graders. Recommendations vary by activity and teacher support; these ranges are not validated eligibility limits.
 
-The main intended path is not viral consumer growth. The main intended path is school adoption through direct contact and relationship-building.
+Teachers and coordinators are key users. They need clear instructions, suggested grades, approximate durations, and activities fitting lessons, computer labs, pairs, small groups, or contraturno programs. The platform supports teachers as an auxiliary resource, not a complete curriculum.
 
-**Schools and educators:** This is the priority. The goal is that teachers and schools see the platform as a practical resource for classes, labs, or after-school activities.
+Independent use at home is welcome. Bruno imagines some children playing independently after encountering JcL at school, but school and classroom use remain the focus.
 
-**Instagram and Facebook:** These exist mainly as places where teachers, schools, and coordinators can check the project, know more about it, and contact the team if needed. They are useful for credibility and explanation. They are not currently expected to be the main engine of growth or discovery. Reach on these channels is still small. At the moment, the team already has general project posts and is working on more game-specific posts.
+## Educational approach
 
-**Home use:** Of course it would be good if students also used the platform casually at home, without classes. But that is harder to make happen, and it is not the main focus right now.
+- **Learn through activity:** children should interact and try things before lengthy explanation. Most activities reinforce existing math and logic knowledge; cube modules also explicitly teach concepts.
+- **Support understanding:** progressive hints and feedback help children understand the activity and continue playing. Explanation follows useful discovery or difficulty when appropriate.
+- **Practice through play:** reasoning belongs inside the activity rather than unrelated quizzes between moves. Games can reinforce material a teacher is covering.
+- **Use mental calculation where it fits:** mental reasoning is common, but not an absolute restriction. Cube lessons also contain interactive written multiplication.
+- **Adapt difficulty to the activity:** levels, complexity, and help should suit the intended learners. Every game need not cover every grade.
 
-## Educational Philosophy
+These are product intentions. Grade fit, learning effectiveness, and classroom duration still require observation and feedback. See [teacher-manual.md](teacher-manual.md) for educator-facing detail.
 
-**Learning by doing:** Start with the activity, let students discover concepts through experience rather than instruction. Hints are introduced progressively when students struggle - not upfront.
+## Game design principles
 
-**Games as the primary vehicle:** Games aren't a reward for learning - they are the learning. Strategic thinking, pattern recognition, and mathematical reasoning develop naturally through gameplay.
+Useful activities have a clear objective, understandable controls, meaningful math or logic in their actions, replayability, and feedback that makes choices and consequences readable. Simple rules can support deeper strategy. New activities should add useful content or a different experience rather than merely repeat an existing game.
 
-**Games as reinforcement:** Games can also be a tool for teachers to reinforce content. For example, if they are teaching multiplication, they can use a multiplication game with the class.
+Avoid unnecessary rule complexity, unclear win conditions, heavy text, and avoidable external materials or setup. A cooperative communication puzzle, a mental-arithmetic round, and a cube lesson need not have identical structures.
 
-**Mental thinking as a priority:** The goal is to make math and logic fun, so the games do not include calculations on paper. They are based purely on mental reasoning and calculation.
+## Platform in the repository
 
-**Scaffolded difficulty:** Games should be accessible to beginners but deepen naturally. Multiple difficulty levels, progressive hints, and increasing complexity keep students engaged over time. Though this is not possible with every game, so each game has specific target grades. We try to make difficulty and levels for all target grades when possible.
+The main catalog has six entries: Caça Coroa, Guerra Matemática, Super Jogo da Velha, Stop Matemático, Caça Soma, and Cubo Mágico. [games-overview.md](games-overview.md) describes their current modes.
 
-## Game Design Principles
+Other implemented support includes rule pages, a teacher manual, temporary classroom codes, room monitoring, and analytics. Bomb Game has online cooperative Numbers and Navigation content implemented but is not in the six-entry main catalog. Houses and Puzzle Wire have placeholder gameplay pages.
 
-A good game for this platform has:
+The frontend is static, deployed through GitHub Pages with Cloudflare. A separate Render backend supports online multiplayer. Current online flows use temporary in-memory rooms and classrooms without accounts or a database; online modes require a server connection. These features do not imply sustained adoption, universal offline availability, or classroom validation.
 
-- **One clear objective** - simple to explain, immediately understood
-- **Math baked into every action** - not tacked on as a quiz between moves
-- **Strategic depth from simple rules** - complexity should emerge from gameplay, not from complicated instructions
-- **Replayability** - random elements (dice, magic numbers), different strategies each game, competitive motivation
-- **Visual clarity** - students should immediately see what they can do; use color-coding, highlights, clear feedback
-- **Self-contained** - playable without external explanation, though teacher guides supplement
-- **Not repetitive** - doesn't include similar features to existing games
+## Current team and working arrangement
 
-What to avoid: overly complex rules, requiring external materials, unclear win conditions, heavy text.
+There are three active members:
 
-## The Games
+- **Bruno, the founder:** leads website behavior, feature and game design, and implementation through AI agents. He currently writes almost no code manually and puts substantially more time into JcL than the other members.
+- **Gabriel:** outreach, social media, school contact, ideas, and game design; he is taking on analytics.
+- **The other Bruno:** outreach, social media, school contact, ideas, and game design. This name refers to the teammate, not the founder.
 
-- Caça Coroa (Crown Chase)
-- Guerra Matemática (Math War)
-- Super Jogo da Velha (SPTTT)
-- Stop Matemático (Stop)
-- Caça Soma (Caca Soma)
-- Cubo Mágico (Rubiks Classes)
+Weekly meetings cover the website, games, what the founder implemented, what the others did, and the project overall. Product discussions involve everyone. Recruitment is active, but specific arrangements are changing.
 
-## What Exists Today
+Bruno's time varies with college, exams, and other projects. Some weeks are around 3 hours, others 15–20 or more. A desired average of 10–15 hours is an estimate, not a measured routine. More detail belongs in [founder-context.md](founder-context.md).
 
-Current supporting project elements:
+## Outreach
 
-- Main public website
-- Teacher manual page
-- Individual game pages and rule pages
-- Instagram page
-- Facebook page
+Personal contacts and people already known to the team have made it easier to get someone to try the website. The team is pursuing those relationships, while finding adoption difficult.
 
-## Team and History
+Instagram and Facebook support explanation, credibility, and contact with educators. Reach has been small, and they are not established as the main acquisition channel. Post schedules and recruitment tactics should be updated as they change.
 
-Project was created by Bruno, and he works more on it than anyone else. He started Jogando com Lógica alone in 2024 as an informal after-school initiative in Novo Hamburgo, teaching logic reasoning, initially using the Rubik's cube, and later incorporating chess and original educational games. Following its initial success, the project formalized and expanded in early 2025, reaching two additional schools and implementing a more structured rotating class setup for 1st through 6th graders. The project has since evolved from a single person's effort to a digital platform with the potential for widespread reach across Brazil.
+## Confirmed intentions and tentative ideas
 
-Today we have 6 people in total in the team. Some work on social media, outreach, design of ideas, and coding. All team members are students and remote, from different parts of Brazil.
+These are plans, not implemented promises or a fixed delivery schedule:
 
-## Future Possibilities / Planned Work
+- **Teacher-led tournament system:** definitely intended, ahead of Houses. Bruno sees it as a potentially important feature. The working comparison is "Kahoot-like"; grouping, timing, and scoring remain open. See [the tournament discussion](../plans/classroom-tournament-discussion-context.md).
+- **Houses:** definitely intended because it fills the gap in word puzzles and mathematical story/word-problem content. The current concept identifies a person among houses using clues; the final design can evolve.
+- **Puzzle Wire:** probably intended eventually, but lower priority. A better game idea can move it farther down the queue.
+- **More games over time:** an ongoing intention. Additional cube modules and Bomb Game level ideas are documented in their own references; they have no fixed schedule here.
 
-The items below are future plans or active ideas. They should not be described as already implemented.
+## Long-term intention and uncertainty
 
-### Platform-Level Plans
+Bruno wants to continue JcL indefinitely because of his attachment to the project. His picture of growth includes many schools actively using it, more contributors, and more people involved. There is no settled numerical scale target.
 
-- Implement multiplayer for all games over time
-- Add better Google Analytics event tracking to report user interactions across the website
-- Continue improving teacher-facing materials, documentation, and outreach assets
+Access is free today. Permanent free access and eventual income or monetization are both possible; neither is a settled financial commitment. Older "What Won't Change" wording is not a promise that free access can never change.
 
-### New Games in Planning
-
-These are planned games that are being thought out and are close to starting implementation, but they are not ready yet and do not have final public names.
-
-- **Houses:** find a person in a set of houses using word-problem-based hints
-- **Bomb game:** one person has the puzzle (the bomb), the other has the manual, and both work together to defuse it as an offline collaborative game
-- **Puzzle game:** place jigsaw pieces in the correct pattern or sequence to fix the wire, turn on the light, and open the door
-
-## Open Questions / Uncertain Assumptions
-
-- Exact best grade ranges are still recommendations, not final validated truths
-- The best teacher acquisition strategy is still being tested in practice
-- The strongest use cases for at-home student adoption are still uncertain
-- Some future game names, presentation, and positioning will likely change
-
-## What Won't Change
-
-- Free access for all students and teachers
-- Focus on Brazilian schools and Portuguese language
-- The core mission: make math and logic genuinely fun and accessible
+Other open questions include sustained teacher use, effective acquisition, sufficient human testing, classroom fit, future contributors, and which improvements early feedback will justify.

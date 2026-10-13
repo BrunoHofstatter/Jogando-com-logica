@@ -1,21 +1,23 @@
 # Multiplayer Backend
 
+Reference refreshed October 12, 2026. Implementation, live deployment, and classroom validation are separate claims; this refresh reports no new runtime checks.
+
 ## Purpose
 
 This file explains the current backend multiplayer architecture used in this repo.
 
 It is meant to help future work on other games without needing to read the whole `multiplayer-server/` folder first.
 
-This is not a rules doc for any specific game. Crown Chase remains the first reference example, while Math War, Stop Matemático, Super Jogo da Velha, and Caça Soma now add game-specific variations of the same server-authoritative approach.
+This is not a rules doc for any specific game. Crown Chase remains the first reference example, while Math War, Stop Matemático, Super Jogo da Velha, Caça Soma, and Bomb Game add game-specific variations of the same server-authoritative approach.
 
 ## Current Reality
 
-- Online multiplayer currently exists for Crown Chase, Math War, Stop Matemático, Super Jogo da Velha, Caça Soma, and Bomb Game Level 1.
+- Online multiplayer exists for Crown Chase, Math War, Stop Matemático, Super Jogo da Velha, Caça Soma, and Bomb Game Levels 1 (Numbers) and 3 (Navigation).
 - The frontend remains a static site.
 - The backend is a separate Node.js service deployed independently from the frontend.
 - The server is authoritative. Clients do not own the real game state during online play.
 - Rooms are in memory only. There is no database, login, account system, or persistence.
-- Crown Chase, Math War, Super Jogo da Velha, Caça Soma, and Stop Matemático support one shared temporary classroom code that groups each game's visible waiting rooms.
+- Crown Chase, Math War, Super Jogo da Velha, Caça Soma, Stop Matemático, and Bomb Game support one shared temporary classroom code that groups each game's visible waiting rooms.
 - Student classroom membership is remembered across supported games in browser `localStorage`; room and match sessions remain game-specific.
 - Temporary classroom sessions are in memory, last 8 hours, and can be deleted from the creating browser.
 - Reconnection after refresh is not implemented yet.
@@ -92,6 +94,14 @@ Current implementation is spread across these areas:
   Caça Soma room lifecycle, dynamic 1v1/2v2 capacity, classroom room listing, server-controlled round phases, and socket event handling on `/caca-soma`.
 - `multiplayer-server/src/sockets/registerStopRoomHandlers.ts`
   Stop Matemático room lifecycle, host-started 2–8 player rooms, classroom room listing, and socket event handling on `/stop`.
+- `multiplayer-server/src/sockets/registerSptttRoomHandlers.ts`
+  Super Jogo da Velha room lifecycle and classroom room listing on `/spttt`.
+- `multiplayer-server/src/sockets/registerBombGameRoomHandlers.ts`
+  Cooperative roles, levels, ready/countdown, timing/lives/results, replay, and classroom rooms on `/bomb-game`.
+- `src/BombGame/Logic/levelCatalog.ts`, `level1.ts`, and `navigation.ts`
+  Level metadata and shared serializable rules; official validation stays on the server.
+- `src/BombGame/Hooks/useBombGameMultiplayer.ts`
+  Role-specific client state, room/classroom flow, and reliability telemetry.
 - `multiplayer-server/src/rooms/roomTypes.ts`
   Shared room structure, seat constants, timeout constants.
 - `multiplayer-server/src/rooms/roomStore.ts`
@@ -111,7 +121,7 @@ Current implementation is spread across these areas:
 - `src/CrownChase/Hooks/useCrownChaseMultiplayer.ts`
   Client-side socket session state and event wiring.
 - `src/Main/Pages/classroomsPage.tsx`
-  Teacher-facing temporary classroom management page with game selection, linked from the manual.
+  Game-independent temporary classroom creation/deletion and a management-token-protected cross-game room monitor, linked from the manual.
 - `src/CrownChase/Components/board-component.tsx`
   Board supports a remote mode where it emits intent instead of mutating state locally.
 - `src/MathWar/Logic/multiplayer/protocol.ts`
@@ -293,6 +303,8 @@ Current behavior:
 - refreshing the page is effectively a disconnect
 - the backend may keep the room alive briefly during the disconnect grace window, but the frontend does not rejoin automatically
 
+The room/rematch example above describes Crown Chase's two-seat lifecycle. Stop requires all match players' rematch votes, Caça Soma supports two or four seats, and Bomb Game has role/ready/countdown/replay phases. Use the game handler for actual capacity, start conditions, and vote policy rather than treating "both players" as a universal rule.
+
 This is good enough for Phase 1 and should not be treated as a bug unless reconnection work is explicitly in scope.
 
 ## Client Reliability Analytics
@@ -452,7 +464,7 @@ Current decision:
 
 Reason:
 
-- there are no real users yet
+- public use remains limited, with an early teacher trial reported by Bruno but no confirmed sustained school adoption
 - the current goal is validation, testing, and learning
 - free-tier cold starts are acceptable for now
 
@@ -485,7 +497,7 @@ Not implemented yet:
 - spectators
 - public matchmaking
 - persistence across backend restarts
-- server-side room/match monitoring and canonical match analytics
+- canonical server room/match analytics and persistent operational history; the live classroom room-summary monitor is already implemented
 - cross-game shared multiplayer framework
 
 These are all optional future improvements, not missing parts of the current core architecture.

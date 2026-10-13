@@ -1,26 +1,35 @@
-# Games Overview - Catalog Summary
+# Games overview
 
-This file contains a brief overview of all current games implemented in the "Jogando com Lógica" platform. Each game also has its own dedicated `.md` file with deeper technical details and roadmaps.
+Repository reference checked October 12, 2026. This distinguishes the main catalog from other implemented content and placeholders. Implementation does not establish deployment of the latest changes, sustained school adoption, or classroom validation.
 
-## 🎲 Board-Based Games (Using the Shared Engine `AA_baseGame`)
+## Main catalog
 
-These board games share the central `gameEngine.ts` and component logic for their grids, turn systems, and move executions.
+`src/Main/Pages/Jogos.tsx` currently exposes these six entries:
 
-1. **Crown Chase (Caça Coroa):** 
-   - A strategic battle where the goal is to protect your "King" while navigating multiple piece types (Warriors, Pawns) across the board. Teaches spatial awareness and sacrifice logic. It is simple, doesnt last long and has a small board (5x5)
-2. **Math War (Guerra Matemática):** 
-   - A logic-combat game utilizing dice rolls, arithmetic, and energy-based movement. Pieces have math operations or values associated with them. Complex game, lasts longer, big board (10x10)
+| Activity | Core experience | Current modes and scope |
+|---|---|---|
+| [Caça Coroa](../games/crown-chase.md) | Short strategy game on a 5×5 board. Capture the stationary opposing king. Ninja moves one square in any direction and captures any enemy; Saltador steps/jumps orthogonally and captures only the king. | Local two-player, AI, online private rooms and classroom rooms. |
+| [Guerra Matemática](../games/math-war.md) | Strategy on an 8×8 board. Piece value plus shared dice total supplies energy for movement/capture; capture the opposing Captain. | Local two-player, four AI difficulties, online private rooms and classroom rooms. |
+| [Super Jogo da Velha](../games/spttt.md) | Ultimate Tic-Tac-Toe: nine small boards form a larger board, and a move directs the opponent's next board. | Local two-player, AI, online private rooms and classroom rooms. |
+| [Stop Matemático](../games/stop.md) | Mental arithmetic from a Magic Number, with single operations or two sequential operations per answer box. | Solo random play and 10 levels; online 2–8 player rooms with host settings, multiple rounds, rematches, and classroom discovery. |
+| [Caça Soma](../games/caca-soma.md) | Select numbers adding to a Magic Number; correct cells become unavailable in later rounds. | 30 solo levels, legacy local versus, online 1v1 and cooperative 2v2 points races, private and classroom rooms. |
+| [Cubo Mágico](../games/rubiks.md) | Interactive lessons and review activities using cubes to explore dimensions and multiplication. | Three lessons: Dimensões, Multiplicação no Cubo, Multiplicação nas Faces. Each offers Aprender/Jogar; Class 3's review currently requires a mouse. |
 
-## 🧩 Custom Logic Games (Independent Logic)
+Grade recommendations and expected educational benefits belong in [teacher-manual.md](teacher-manual.md). They are recommendations, not measured outcomes.
 
-These games have bespoke rules and their own internal engines optimized for their specific UI requirements.
+## Additional implemented content
 
-3. **SPTTT (Super Jogo da Velha / Super Tic-Tac-Toe):** 
-   - An advanced meta-tic-tac-toe where winning a small 3x3 grid contributes to winning a cell in the larger overarching 3x3 grid. Excellent for recursive thinking.
-4. **Stop Matemático:** 
-   - A fast-paced arithmetic game (based on levels (1-10 for now, planned to add more)). A "magic number" drops, and players must rush to perform addition, subtraction, multiplication, and division to reach the target number across multiple rows. Includes solo play and server-authoritative online rooms for 2-8 players, including classroom room discovery.
-5. **Caça Soma (Number Hunting):** 
-   - A grid puzzle game with an active timer. Players find numbers on the board that sum to a generated Magic Number. Includes solo levels, legacy local versus play, and private-room online 1v1 or collaborative 2v2 races. Trains fast visual scanning, rapid addition, decomposition, and team reasoning.
-6. **Rubiks Class (Cubo Mágico):** 
-   - A structured educational sequence (currently modules 2 out of 6+ completed) teaching children math concepts with the Rubik's Cube, using interactive 3D elements and logical breakdowns. 
+[Bomb Game](../games/bomb.md) has role-specific online cooperative content for Level 1 (Números) and Level 3 (Navegação), with server-owned rooms, timing, lives, and results. One player sees the puzzle and the other sees the manual. It supports temporary classroom discovery but is not in the six-entry main catalog. Level 2 is reserved for planned Language content; the final public name is not settled.
 
+## Planned content and legacy routes
+
+- Houses and Puzzle Wire have routes and placeholder gameplay pages; their presence is not a finished game. Houses is definitely intended; Puzzle Wire is tentative and lower priority. See [the overview](overview.md).
+- The teacher-led tournament system is planned before Houses. Existing classroom codes/monitoring are not a tournament, automatic pairing, or cumulative leaderboard.
+- Damas and base-game/test routes use legacy `AA_baseGame` content and are not main catalog entries. There is no separate current `src/Damas/` folder.
+- Later cube modules have documented concepts and placeholders, not completed lessons.
+
+## Implementation boundaries
+
+Caça Coroa, Guerra Matemática, and Super Jogo da Velha use game-specific pure rules in their `Logic/v2/` folders for current local/AI/online behavior. They do not all execute through the legacy `AA_baseGame` engine. Renderers and page orchestration remain game-specific.
+
+Stop, Caça Soma, cube lessons, and Bomb Game have their own interaction and rule structures. Online rules are shared with the authoritative backend where applicable. Read [multiplayer.md](../systems/multiplayer.md) and [classrooms.md](../systems/classrooms.md) for those systems; do not force non-board activities into a board engine.

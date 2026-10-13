@@ -1,6 +1,6 @@
 # Google Analytics (GA4)
 
-Last code update: 2026-09-15
+Reference checked against current source: 2026-10-12. Sections retain dated implementation milestones; this is a documentation check, not a new code change or deployed DebugView validation.
 Measurement ID: `G-BXWR3NBDQL`
 
 This document separates the analytics that the repository currently sends from
@@ -174,7 +174,7 @@ Stable values:
 
 ```text
 game_id: caca_soma
-level_id: level_01 ... level_10
+level_id: level_01 ... level_30
 game_mode: solo
 usage_context: standard
 player_slot_count: 1
@@ -307,12 +307,12 @@ are not counts of students or standardized learning scores.
 
 Class 3's desktop review is a separate attempt from its completed lesson. Direct
 game entry does not start a lesson attempt. The review starts at `Jogar`, when
-the protected size practice becomes playable, and ends once at the won/lost
+the protected shooting practice becomes playable, and ends once at the won/lost
 result. Intro loops and unsupported-input notices start no attempt. Main correct
 hits are `correct_count`; wrong cube shots plus escaped required targets are
 `incorrect_count` (an escape counts once, not its three-point damage).
 `completed_step_count` counts resolved rounds, `assistance_count` is zero, and
-`success`/`outcome` use true/`passed` for survival through five rounds and
+`success`/`outcome` use true/`passed` for survival through ten rounds and
 false/`failed` for zero health. This pass rule does not assert all rounds were
 answered correctly. Practice errors are excluded. Replay starts a new review;
 checkpoint entry remains excluded. The existing hook handles abandonment and
@@ -338,13 +338,14 @@ human side and `success` is present only for a win/loss result.
 
 | Activity | Start/end coverage | Current event unit | Notes |
 | --- | --- | --- | --- |
-| Caça Soma solo levels | Yes | `level_start` / `level_end` | Phase 2 pilot |
+| Caça Soma solo levels | Yes | `level_start` / `level_end` | Phase 2 pilot, now all 30 authored levels |
 | Caça Soma legacy local-versus | No | — | Needs a separate local lifecycle design |
 | Caça Soma online | No | `multiplayer_join_result` / `multiplayer_disconnect` | Reliability covered; match lifecycle deferred |
 | Stop level, random, tutorial-fixed | Yes | `game_start` / `game_end` | One event pair per round |
 | Stop online | No | `multiplayer_join_result` / `multiplayer_disconnect` | Reliability covered; round/match lifecycle deferred |
 | Cubo Mágico classes 1–2 learn/review | Yes | `game_start` / `game_end` | `activity_variant` separates lesson/review |
-| Cubo Mágico class 3 lesson | Yes | `game_start` / `game_end` | No review mode currently exposed |
+| Cubo Mágico class 3 lesson | Yes | `game_start` / `game_end` | Lesson attempt finishes independently |
+| Cubo Mágico class 3 desktop review | Yes | `game_start` / `game_end` | Separate practice-to-result attempt; ten main rounds, mouse input; checkpoint/unsupported entry excluded |
 | Caça Coroa local/AI | Yes | `game_start` / `game_end` | Shared board integration |
 | Super Jogo da Velha local/AI | Yes | `game_start` / `game_end` | Shared board integration |
 | Guerra Matemática local/AI | Yes | `game_start` / `game_end` | Starts after opening dice animation |

@@ -1,5 +1,7 @@
 # Teacher's Manual - Pedagogical Context
 
+Context and capability descriptions checked October 12, 2026. These are recommendations and repository capabilities, not evidence of classroom effectiveness or deployment of every latest change.
+
 ## Purpose of This File
 
 Use this file when working on the `/manual` page or any teacher-facing description of the platform. This is the main internal reference for pedagogical framing, classroom use, grade recommendations, skills, and school-content positioning.
@@ -13,15 +15,18 @@ The "Jogando com Lógica" platform serves as an interactive auxiliary tool for m
 ## Important Positioning Notes
 
 - The platform is meant to support teachers, not replace them
+- Most games reinforce knowledge through activity; cube lessons also teach concepts explicitly. Prefer interaction and progressive hints to lengthy explanation before play.
 - It should be presented as a practical classroom resource, not as a complete curriculum
 - Grade ranges and pedagogical fit are recommendations based on current judgment, not fully validated conclusions
 - The project does not currently have validated ongoing school adoption, so teacher-facing writing should not overclaim proven classroom impact
+- Bruno reports an early teacher trial after a presentation, supported by local analytics activity. Continued use is unknown; this is not confirmed sustained adoption or measured educational impact. The detailed account is in [the overview](overview.md).
 
 ## Classroom Application
 
-- **Zero Friction:** Teachers do not need to register their students, create classes, or manage passwords. Students simply open the link and start playing immediately.
-- **Format:** The platform is versatile. It can be used individually on mobile phones/tablets or collaboratively in pairs on school computers.
-- **Timeframe:** Perfect for filling standard 40-50 minute school lab sessions with engaging, productive activities.
+- **Access:** Students and teachers do not need accounts or passwords. Online group play can use a temporary classroom code; creating that code is optional and does not create a permanent class roster.
+- **Format:** Many activities support phones/tablets or school computers and pair/group play. Device support differs: Class 3's cube review currently requires a mouse, while its learning section remains usable on touch devices.
+- **Timeframe:** Activities can be combined in a standard 40–50 minute school lab session. Actual duration, engagement, and mediation needs depend on the activity and class and remain estimates.
+- **Connectivity:** Online rooms and classroom tools require the multiplayer backend. Do not promise that the whole website works offline after its first load.
 - **Teacher role:** The games can be used as reinforcement, warm-up, practice, rotation-station activity, or after-school enrichment.
 
 ## Targeted Competencies
@@ -67,7 +72,7 @@ These should be presented as broad possible alignments, not as formal certificat
 
 ### Stop Matemático
 
-**What it is:** A fast arithmetic game inspired by traditional Stop, but using calculations instead of words. Each round generates a Magic Number, and the student solves addition, subtraction, multiplication, or division operations mentally under time pressure.
+**What it is:** A fast arithmetic game inspired by traditional Stop, but using calculations instead of words. Each round generates a Magic Number for arithmetic challenges. It supports solo play and online groups of 2–8 players with host-controlled settings and multiple rounds.
 
 **Suggested grade range:** Best current fit is around 3rd to 7th grade, depending on level and teacher support.
 
@@ -93,6 +98,7 @@ These should be presented as broad possible alignments, not as formal certificat
 **Estimated use in class:**
 
 - Short independent rounds
+- Online group competition for 2–8 players, with teacher-appropriate host settings
 - Warm-up activity
 - Rotation station
 - Individual reinforcement
@@ -107,12 +113,12 @@ These should be presented as broad possible alignments, not as formal certificat
 
 **Current limitations:**
 
-- Currently solo-focused
-- Multiplayer is a future idea, not current reality
+- Online play requires internet/server availability and has no refresh reconnection
+- Classroom fit and the effect of time pressure still need observation with children
 
 ### Caça Soma
 
-**What it is:** A grid puzzle game where the student finds numbers that add up to a target Magic Number. It includes solo levels, legacy same-device versus play, and server-authoritative online private rooms for 1v1 or collaborative 2v2 races.
+**What it is:** A grid puzzle game where the student finds numbers that add up to a target Magic Number. It includes 30 solo levels, legacy same-device versus play, and server-authoritative online private or classroom rooms for 1v1 or collaborative 2v2 races.
 
 **Suggested grade range:** Best current fit is around 4th to 7th grade.
 
@@ -157,7 +163,7 @@ These should be presented as broad possible alignments, not as formal certificat
 
 - Grade recommendation is still provisional
 - Best classroom use pattern still needs more real-world validation
-- Online rooms currently require a short room code; classroom room discovery is a future idea
+- Online play requires internet/server availability and has no refresh reconnection
 
 ### Cubo Mágico
 
@@ -205,6 +211,7 @@ These should be presented as broad possible alignments, not as formal certificat
 
 - Only part of the planned module sequence is complete
 - Current content is still limited compared to the long-term vision
+- Classes 1–3 have learning and review activities; Class 3's cannon review currently requires a mouse
 
 ### Super Jogo da Velha
 
@@ -353,3 +360,6 @@ Use this space to document ideas for features aimed specifically at educators. T
 - [ ] Provide an end-of-session summary screen that teachers can walk by and look at to evaluate student performance
 - [ ] Create printable board-game activity sheets linked to the digital games for blended offline/online learning
 - [ ] Allow teachers to generate custom URLs or parameters to lock games in a specific difficulty level for their classroom
+- [ ] Teacher-led tournament sessions with pairing/grouping and cumulative scoring; definitely intended before Houses, with mechanics still open
+
+Current temporary classroom codes and live room monitoring are described in [classrooms.md](../systems/classrooms.md). They do not yet provide tournament assignment, a permanent roster, or longitudinal student performance records.

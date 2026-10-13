@@ -1,5 +1,7 @@
 # Stop Matemático
 
+Reference refreshed against source on October 12, 2026.
+
 ## Purpose of This File
 
 Use this file as the main reference when discussing ideas, balancing progression, or making code changes to Stop Matemático.
@@ -13,7 +15,7 @@ This file should help with both:
 
 Stop Matemático is a fast mental-math game inspired by the classic "Stop" format. A Magic Number is revealed at the start of the round, and the player must use that number to solve a grid of arithmetic challenges as quickly as possible.
 
-The game is focused on mental calculation under time pressure. It is currently a solo game.
+The game focuses on mental calculation under time pressure, with solo random/level play and server-authoritative online rounds for 2–8 players.
 
 ## Current Reality
 
@@ -23,7 +25,7 @@ The game is focused on mental calculation under time pressure. It is currently a
   - random mode
   - level mode
   - tutorial-fixed mode
-- The tutorial is shown automatically on first contact and the first run effectively forces easy difficulty (`d1`)
+- The explanation overlay is shown on first contact; initial random/tutorial difficulty is `d1`, while level mode uses its selected level's own configuration
 - Random mode uses hidden internal difficulties (`d1` to `d6`)
 - Level mode uses a separate custom progression with 10 levels
 - On touch devices, the game uses a custom virtual keyboard instead of the native keyboard
@@ -129,14 +131,21 @@ The game is meant to feel quick, direct, and pressure-based. The fun comes from 
 ### Main Files
 
 - `src/Stop/Pages/RegrasPage.tsx`: rules modal and mode selection
-- `src/Stop/Pages/StopGamePage.tsx`: page-level orchestration for reveal, tutorial, and board
+- `src/Stop/Pages/StopGamePage.tsx`: creates rounds from mode templates; orchestrates reveal, explanation overlay, board, and attempt analytics
 - `src/Stop/Components/NumberReveal.tsx`: animated Magic Number reveal
-- `src/Stop/Components/GameBoard.tsx`: round generation, timer, checking, level result modal, keyboard flow
+- `src/Stop/Components/GameBoard.tsx`: renders the generated round, timer, checking, level result modal, and keyboard flow
 - `src/Stop/Components/CalculationCell.tsx`: individual single/dual calculation cells and validation feedback
 - `src/Stop/Logic/gameConfig.ts`: hidden random-mode difficulty configs (`d1` to `d6`)
 - `src/Stop/Logic/levelsConfig.ts`: custom level configs, stars, unlock logic
-- `src/Stop/Logic/gameLogic.ts`: number selection, shuffle helpers, timer formatting
-- `src/Stop/Logic/validationUtils.ts`: single and dual answer validation
+- `src/Stop/Logic/stopRound.ts`: shared serializable round generation, answer evaluation, and point values
+- `src/Stop/Logic/gameLogic.ts`: timer formatting and older helpers; current generation is in `stopRound.ts`
+- `src/Stop/Logic/validationUtils.ts`: arithmetic helpers used by shared round evaluation
+- `src/Stop/Logic/multiplayer/types.ts` and `matchLogic.ts`: online settings, phases, points, and transitions
+- `src/Stop/Logic/multiplayer/protocol.ts`: socket contract
+- `src/Stop/Hooks/useStopMultiplayer.ts`: online state, snapshots, room/classroom entry, and reliability telemetry
+- `src/Stop/Pages/multiplayerLobbyPage.tsx` and `multiplayerGamePage.tsx`: online lobby and match UI
+- `multiplayer-server/src/stop/stopAdapter.ts` and `stopRoomTypes.ts`: shared-rules adapter and room state
+- `multiplayer-server/src/sockets/registerStopRoomHandlers.ts`: server lifecycle, snapshots, STOP locking, settings, rematch, and classroom listing
 
 ### Mode Structure
 
@@ -156,10 +165,11 @@ The game is meant to feel quick, direct, and pressure-based. The fun comes from 
 
 - route state uses `mode: "tutorial_fixed"`
 - tutorial currently uses fixed difficulty `d1`
-- first-time play also effectively forces `d1` until the tutorial is marked complete
+- first-contact random play uses `d1`; custom level templates remain distinct from difficulty presets
 
 ### Generation Logic
 
+- The page builds a template from either the selected level or a random/tutorial difficulty, then calls `createStopRound`. `GameBoard` receives the generated round; it does not generate boxes or pass a difficulty key into level validation.
 - The Magic Number is chosen from the current difficulty or level's `possibleRandomNumbers`
 - Single boxes are generated from `possibleNumbersByBox` and `contasPorBox`
 - Dual boxes are generated from `dualBoxes`
@@ -175,9 +185,9 @@ The game is meant to feel quick, direct, and pressure-based. The fun comes from 
 
 ## Known Mismatches and Design Tensions
 
-### Rules Modal vs Actual Box Counts
+### Variable Box Counts and Random Configuration
 
-The detailed rules modal in `src/Stop/Pages/RegrasPage.tsx` says the game presents 10 challenge boxes and frames the round around those 10 boxes.
+The current rules modal correctly says box counts and operations vary by mode and level. It explains sequential dual boxes with one final answer. The former absolute claim of ten boxes is no longer present.
 
 That is not always true in the shipped implementation:
 
@@ -185,13 +195,13 @@ That is not always true in the shipped implementation:
 - random `d1` currently generates only 8 boxes because its config lengths do not match
 - level mode does not always use 10 boxes; some levels use 6 boxes and others use 8
 
-So the current rules text is too absolute and should eventually be updated.
+Random `d1` still has eight operand arrays but nine operation entries. That configuration mismatch remains worth checking when changing generation; it is not a claim that the current rules modal requires ten boxes.
 
 ### Manual STOP vs Actual End Conditions
 
-The rules modal suggests the player finishes all challenges and then clicks `STOP`.
+The rules modal now accurately documents early `STOP` and final-field `Enter` as solo end conditions.
 
-In the actual implementation:
+Current solo behavior:
 
 - the player can press `STOP` early
 - pressing `Enter` on the last input also ends the round automatically
@@ -202,22 +212,35 @@ Random mode internally uses six difficulty presets, but the player is not told w
 
 ### Level Entry from the Rules Page
 
-In `RegrasPage.tsx`, the main `Jogar` button in level mode currently launches level 1 because `currentLevel` is still a placeholder constant.
+`RegrasPage.tsx` uses `getCurrentLevelId()` from `levelsConfig.ts`: the main `Jogar` button enters the highest currently unlocked level from saved stars, rather than a hard-coded level 1.
 
-Choosing a specific level currently depends on entering the level menu.
+The level menu remains available for choosing another unlocked level. Completion uses at least one star; unlocking the next level requires two.
 
-### Level Config vs Difficulty Key Coupling
+### Level Templates and Difficulty Presets
 
-`GameBoard.tsx` still passes a `difficulty` key into helper logic even when level mode is using a custom `LevelConfig`.
+The older difficulty-key coupling in `GameBoard` has been removed. Level templates explicitly use authored settings and `allowNegativeSubtraction: false`; difficulty templates permit negative subtraction only for `d6`.
 
-This is mostly harmless with the current levels, but it is a coupling worth remembering if future levels introduce division-heavy or more advanced subtraction behavior.
+If future levels introduce negative subtraction, change their template policy deliberately rather than assuming a random-mode difficulty controls it.
+
+## Online Round and Match Flow
+
+- Rooms contain 2–8 players. The host chooses initial difficulty, fixed/progressive difficulty, 1–10 rounds, and player limit. Defaults: `d2`, fixed difficulty, 5 rounds, 8 seats.
+- The host starts after at least two players join. Private codes and temporary classroom discovery are implemented.
+- The server generates one shared round and owns countdown, playing, locked, and results phases. Clients submit answer snapshots.
+- Unlike solo early STOP, online `press_stop` requires every box to have a nonblank answer. Correctness is not required to press it; the server checks answers when locking.
+- An accepted STOP locks the round for everyone. A 120-second safety deadline also locks a round if nobody stops it.
+- The server evaluates the latest snapshots and accumulates box points across rounds. Highest total wins; ties retain multiple winners.
+- Rematch requires all players' votes and starts fresh in the same room. Non-host removal while waiting is host-controlled.
+- Refresh reconnection is not implemented. Room lifecycle, temporary membership, and availability follow [multiplayer.md](../systems/multiplayer.md) and [classrooms.md](../systems/classrooms.md).
+
+Solo start/end, foreground duration, completion, retry, and abandonment analytics are implemented. Online join/disconnect reliability exists; canonical online match lifecycle analytics remain deferred. See [analytics.md](../systems/analytics.md).
 
 ## Future Ideas / Planned Work
 
 - expand and refine the level progression
-- improve rules clarity so the written rules match the actual current modes
+- maintain rules clarity as mode and progression behavior change; the previously listed solo rules mismatches have been corrected
 - possibly expose or rethink random difficulty presentation
-- add better analytics for how players start, finish, retry, and abandon rounds
+- extend analytics only for a concrete reporting need; solo start/end/retry/abandonment and online join/disconnect reliability already exist
 
 ## Open Questions
 

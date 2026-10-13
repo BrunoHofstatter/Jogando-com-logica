@@ -1,5 +1,7 @@
 # Classroom System
 
+Reference refreshed October 12, 2026 against the current teacher page and classroom implementation.
+
 ## Purpose
 
 The classroom system lets a teacher create one short temporary code that works across every supported online game. Students enter the code once, and supported game lobbies remember it while listing only that game's open waiting rooms.
@@ -40,7 +42,7 @@ Current implementation files:
 - `multiplayer-server/src/sockets/registerStopRoomHandlers.ts`
   Stop Matemático room lifecycle plus host-started, dynamic-capacity classroom room listing on the `/stop` namespace.
 - `src/Main/Pages/classroomsPage.tsx`
-  Teacher-facing temporary classroom page with game selection.
+  Game-independent classroom creation/deletion and cross-game room monitor; there is no classroom-level game-selection step.
 - `src/Main/CSS/classrooms.module.css`
   Teacher classroom page styles.
 - `src/CrownChase/Logic/multiplayer/protocol.ts`
@@ -289,6 +291,8 @@ Use this order:
 11. Keep the private room flow intact.
 12. Update this doc and `docs/systems/multiplayer.md` if the shared classroom architecture changes.
 
+Also register the game's room summaries with `classroomMonitor.ts` and update the teacher page's game labels. The monitor includes waiting/playing/retained-ended rooms; its filtering and access differ from student waiting-room discovery.
+
 ## UI Pattern
 
 Teacher page:
@@ -296,17 +300,19 @@ Teacher page:
 ```text
 Turmas Online
 
-Crie uma turma temporária para organizar partidas de Caça Coroa.
-O código funciona por 8 horas.
+Crie uma turma temporária para organizar partidas online com seus alunos.
+[ Como funciona? ]
 
 [ Criar Nova Turma ]
-[ Caça Coroa ] [ Super Jogo da Velha ] [ Guerra Matemática ] [ Caça Soma ]
 
 BKRM
-Jogo: Caça Coroa
 Expira às 15:30
 
 [ Copiar Código ] [ Excluir Turma ]
+[ Acompanhar salas ]
+
+Quando aberto: salas de todos os jogos compatíveis,
+estado, ocupação e nomes informados pelos jogadores.
 ```
 
 Student lobby:
@@ -372,8 +378,8 @@ Browser visual verification is prohibited by default in this repo. Use browser c
 - No classroom roster.
 - The monitor only includes students occupying rooms; students who entered a classroom but have not joined or created a room are not listed.
 - No cross-device teacher management.
-- No classroom analytics.
-- No spectator or teacher monitor mode.
+- No student/classroom performance analytics or persistent monitoring history. GA4 tracks confirmed classroom-creation results as actions, not individual students or learning outcomes; see [analytics.md](analytics.md).
+- No live game-board spectator view. The teacher room-summary monitor is implemented; it is not a spectator player or a view of full match state.
 - No reconnection after refresh.
 
 These are future product ideas, not missing pieces of the current temporary classroom system.
