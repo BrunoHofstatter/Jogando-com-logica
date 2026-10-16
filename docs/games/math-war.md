@@ -1,6 +1,6 @@
 # Guerra Matemática
 
-Current reference checked against source on October 12, 2026. Use this for rules, balancing, AI, rendering, and online work. The [superseded reference](../archive/math-war-legacy-reference.md) preserves the older mutable-engine description and suspected bugs; those are not current findings.
+Current reference checked against source on October 12, 2026; playable tutorial updated October 14. Use this for rules, balancing, AI, rendering, and online work. The [superseded reference](../archive/math-war-legacy-reference.md) preserves the older mutable-engine description and suspected bugs; those are not current findings.
 
 ## Game summary
 
@@ -11,7 +11,7 @@ Guerra Matemática is a strategy board game inspired by chess, with arithmetic e
 - Local two-player mode.
 - Computer opponent with four visible difficulties: Muito Fácil, Fácil, Médio, Difícil. Winning unlocks subsequent difficulties through browser-local progress.
 - Server-authoritative online 1v1, with private room codes, temporary classroom discovery, and rematches. The namespace is `/math-war`.
-- Local/AI introductory explanation overlays remain available. These are separate from the newer shared playable-tutorial foundation.
+- A dedicated [playable tutorial](../tutorials/math-war.md) teaches movement, energy, capture, dice cadence, and Captains. It replaces the old local/AI explanation overlays and gates first entry to local/AI/online lobby before their pages mount.
 
 Current local, AI, and online rules come from `src/MathWar/Logic/v2/`. The public modes do not use the old `AA_baseGame` engine or removed Math War `gameConfig.ts`/`gameRules.ts` files.
 
@@ -58,8 +58,9 @@ The v2 API has no pass or automatic draw action for a side without legal moves. 
 | `src/MathWar/Components/piece.tsx` | Piece shape/value and Captain presentation |
 | `src/MathWar/Components/DiceAnimation.tsx` | Local/AI dice reveal |
 | `src/MathWar/Pages/regrasPage.tsx` | Mode selection, difficulty lock, rules, and progress reset |
-| `src/MathWar/Pages/baseGamePage.tsx` | Local state, explanation overlay, dice animation, and activity analytics |
+| `src/MathWar/Pages/baseGamePage.tsx` | Local state, dice animation, and activity analytics |
 | `src/MathWar/Pages/aiGamePage.tsx` | AI turn loop, human-first setup, unlocks, and activity analytics |
+| `src/MathWar/Pages/tutorialPage.tsx` and `src/MathWar/Tutorial/` | Isolated practice lesson, controlled fixtures, cost labels, local history, entry gate, and validated return |
 | `src/MathWar/Pages/multiplayerLobbyPage.tsx` | Private/classroom room entry |
 | `src/MathWar/Pages/multiplayerGamePage.tsx` | Authoritative match view, leave confirmation, and rematch controls |
 | `src/MathWar/Hooks/useMathWarMultiplayer.ts` | Socket/session state, intents, classroom listing, and join/disconnect telemetry |
@@ -81,11 +82,11 @@ There is no current generic Roll Dice button/config fallback. The old `2d4` conf
 - Difficulty 2 prefers captures, particularly Captain capture, with movement preferences when no capture exists.
 - Difficulties 3–4 evaluate moves with threat awareness and increasingly strong Captain-safety/tactical heuristics.
 - Human victory unlocks the next difficulty through `src/Shared/Hooks/useDifficultyLock.ts`.
-- The menu's normal play button enforces the selected difficulty lock. Its explanation-overlay entry still navigates to the selected AI difficulty without the same lock check; this is a lightweight progression boundary, not strict access control.
+- The menu's normal play button enforces the selected difficulty lock. Tutorial automatic return validates difficulty against unlocked progress; explicit menu replay returns to the menu without resetting completion history or unlocking difficulties.
 
 ### Analytics
 
-Local/AI attempts use the shared foreground lifecycle. They start after the explanation overlay and opening dice animation and finish at rules-based ending or abandonment. Online join/disconnect reliability is instrumented; canonical online match start/end analytics remain deferred. See [analytics.md](../systems/analytics.md).
+Local/AI attempts use the shared foreground lifecycle. Their pages mount after onboarding; attempts start after the opening dice animation and finish at rules-based ending or abandonment. Tutorial practice does not emit normal-match start/end events or unlock difficulties. Online join/disconnect reliability is instrumented; canonical online match start/end analytics remain deferred. See [analytics.md](../systems/analytics.md).
 
 ## Educational and classroom context
 
@@ -103,4 +104,4 @@ Potential confusion includes energy belonging to one chosen piece, cost scaling 
 - The Captain's double-cost rule and progression-lock strictness remain possible design discussions, not approved changes.
 - More rule-menu/mode-selection analytics could be considered for a concrete reporting need; existing activity and reliability tracking should not be described as entirely future work.
 
-This documentation refresh used source inspection and reference checks. It introduces no gameplay changes or new runtime/classroom verification claim.
+The October 12 documentation refresh used source inspection and reference checks. The October 14 tutorial implementation and its technical verification are documented in [the tutorial reference](../tutorials/math-war.md); there is no classroom-validation claim.

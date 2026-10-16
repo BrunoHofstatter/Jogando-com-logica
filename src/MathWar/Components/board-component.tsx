@@ -28,6 +28,24 @@ import type {
 import PieceComponent from "./piece";
 import styles from "../styles/board.module.css";
 import { VictoryScreen } from "./VictoryScreen";
+import { costLabels, samePosition } from "../Tutorial/lesson";
+import practiceStyles from "../Tutorial/tutorial.module.css";
+
+export interface MathWarPracticeAdapter {
+  revision: number;
+  selected: Position | null;
+  onSelect: (position: Position | null) => void;
+  onAttempt: (intent: MoveIntent) => void;
+  exactDestinations: boolean;
+  showDirections: boolean;
+  showCosts: boolean;
+  hideValues: boolean;
+  hideCaptain: boolean;
+  target: Position | null;
+  movement: MoveIntent | null;
+  spawned: Position | null;
+  overlay?: React.ReactNode;
+}
 
 const HINT_SYSTEM_CONFIG = {
   samePieceMissesToReveal: 3,
@@ -52,6 +70,7 @@ type DirectionKey =
 type PreviewStrength = 1 | 2 | 3;
 
 interface BoardProps {
+  practice?: MathWarPracticeAdapter;
   mode?: "local" | "remote";
   gameState?: MathWarState;
   onGameStateChange?: (newState: MathWarState) => void;
@@ -71,6 +90,7 @@ interface BoardProps {
 }
 
 const Board: React.FC<BoardProps> = ({
+  practice,
   mode = "local",
   gameState: externalGameState,
   onGameStateChange,
@@ -91,7 +111,8 @@ const Board: React.FC<BoardProps> = ({
   const [internalGameState, setInternalGameState] = useState<MathWarState>(() =>
     createInitialState(),
   );
-  const [selectedSquare, setSelectedSquare] = useState<Position | null>(null);
+  const [normalSelection, setSelectedSquare] = useState<Position | null>(null);
+  const selectedSquare = practice ? practice.selected : normalSelection;
   const [samePieceMisses, setSamePieceMisses] = useState(0);
   const [turnMisses, setTurnMisses] = useState(0);
   const [revealedHintsPieceId, setRevealedHintsPieceId] = useState<string | null>(null);
@@ -115,20 +136,21 @@ const Board: React.FC<BoardProps> = ({
     turnMisses >= HINT_SYSTEM_CONFIG.turnMissesToReveal;
   const exactHintsVisible =
     selectedPiece !== null &&
-    (turnRevealActive || revealedHintsPieceId === selectedPiece.id);
+    (practice ? practice.exactDestinations : turnRevealActive || revealedHintsPieceId === selectedPiece.id);
   const highlightedSquares = exactHintsVisible
     ? availableActions.map((action) => action.to)
     : [];
+  const directionArrowsEnabled = practice?.showDirections ?? HINT_SYSTEM_CONFIG.showDirectionArrows;
   const visibleDirections = useMemo(
     () =>
-      HINT_SYSTEM_CONFIG.showDirectionArrows && selectedSquare
+      directionArrowsEnabled && selectedSquare
         ? getAvailableDirections(selectedSquare, availableActions)
         : [],
-    [availableActions, selectedSquare],
+    [availableActions, selectedSquare, directionArrowsEnabled],
   );
   const directionalPreviewMap = useMemo(
     () =>
-      selectedSquare && !exactHintsVisible
+      !practice && selectedSquare && !exactHintsVisible
         ? getDirectionalPreviewMap(
             gameState,
             selectedSquare,
@@ -136,7 +158,7 @@ const Board: React.FC<BoardProps> = ({
             HINT_SYSTEM_CONFIG.directionPreviewDistance,
           )
         : new Map<string, PreviewStrength>(),
-    [exactHintsVisible, gameState, selectedSquare, visibleDirections],
+    [exactHintsVisible, gameState, selectedSquare, visibleDirections, practice],
   );
   const allCurrentPlayerActions = useMemo(
     () => getLegalActions(gameState),
@@ -160,6 +182,7 @@ const Board: React.FC<BoardProps> = ({
         ? "Computador"
         : "Jogador";
   const interactionBlocked =
+    interactionLocked ||
     gameState.status === "ended" ||
     (mode === "remote"
       ? interactionLocked ||
@@ -327,6 +350,13 @@ const Board: React.FC<BoardProps> = ({
       return;
     }
 
+    if (practice) {
+      if (samePosition(selectedSquare, clickedPosition)) practice.onSelect(null);
+      else if (clickedPiece?.owner === 1) practice.onSelect(clickedPosition);
+      else if (selectedSquare) practice.onAttempt({ from: selectedSquare, to: clickedPosition });
+      return;
+    }
+
     if (selectedSquare) {
       if (selectedSquare.row === row && selectedSquare.col === col) {
         handlePieceSelection(null);
@@ -380,17 +410,18 @@ const Board: React.FC<BoardProps> = ({
     ? String(getPieceAvailableEnergy(gameState, selectedPiece))
     : "-";
   const roundsUntilNextRoll = getRoundsUntilNextRoll(gameState);
+  const costs = practice?.showCosts ? costLabels(gameState, selectedSquare) : [];
 
   return (
-    <div className={styles.gamePage}>
+    <div className={practice ? practiceStyles.practiceBoard : styles.gamePage}>
       <div
-        className={`${styles.gameContainer} ${onlineHeader ? styles.gameContainerOnline : ""}`}
+        className={practice ? practiceStyles.boardContainer : `${styles.gameContainer} ${onlineHeader ? styles.gameContainerOnline : ""}`}
       >
         {onlineHeader && (
           <div className={styles.onlineHeaderSlot}>{onlineHeader}</div>
         )}
 
-        <div className={styles.gameInfo}>
+        {!practice && <div className={styles.gameInfo}>
           {isAIMode && difficulty && (
             <div className={styles.difficultyBox}>
               Nível: {difficulty === 1 ? "Muito Fácil" : difficulty === 2 ? "Fácil" : difficulty === 3 ? "Médio" : "Difícil"}
@@ -448,9 +479,9 @@ const Board: React.FC<BoardProps> = ({
               </div>
             )}
           </div>
-        </div>
+        </div>}
 
-        <div className={styles.boardWrapper}>
+        <div className={`${styles.boardWrapper} ${practice ? practiceStyles.boardFrame : ""}`} data-practice-board={practice ? true : undefined}>
           {feedbackMessage && (
             <div
               className={`${styles.boardFeedback} ${feedbackVisible ? "" : styles.boardFeedbackHidden}`}
@@ -460,7 +491,7 @@ const Board: React.FC<BoardProps> = ({
           )}
 
           <div
-            className={styles.board}
+            className={`${styles.board} ${practice ? practiceStyles.grid : ""}`}
             data-target="board"
             style={{
               "--board-cols": gameState.board[0]?.length ?? 0,
@@ -477,22 +508,41 @@ const Board: React.FC<BoardProps> = ({
                   (rowIndex + colIndex) % 2 === 0
                     ? styles.lightSquare
                     : styles.darkSquare;
+                const cost = costs.find(label => samePosition(label.position, { row: rowIndex, col: colIndex }));
+                const target = samePosition(practice?.target ?? null, { row: rowIndex, col: colIndex });
+                const arrival = practice?.movement && samePosition(practice.movement.to, { row: rowIndex, col: colIndex }) ? practice.movement : null;
+                const spawned = samePosition(practice?.spawned ?? null, { row: rowIndex, col: colIndex });
+                const label = `${piece ? `${practice?.hideCaptain || !piece.isCaptain ? piece.type === "sumDiag" ? "Peça quadrada" : "Peça redonda" : "Capitão"} ${piece.owner === 1 ? "azul, sua" : "vermelho, do oponente"}${practice?.hideValues ? "" : `, valor ${piece.value}`}` : "Casa vazia"}, linha ${rowIndex + 1}, coluna ${colIndex + 1}${cost ? `, ${cost.capture ? "capturar" : "mover"} custa ${cost.cost} de energia, ${cost.affordable ? "possível" : "energia insuficiente"}` : ""}${target ? ", objetivo marcado" : ""}`;
 
                 return (
                   <div
                     key={`${rowIndex}-${colIndex}`}
                     data-square={`${String.fromCharCode(97 + colIndex)}${rowIndex + 1}`}
                     data-piece={piece ? `${piece.owner === 0 ? "red" : "blue"}-${piece.type}` : undefined}
-                    data-captain={piece?.isCaptain ? "true" : undefined}
-                    className={`${styles.square} ${squareType} ${isSelected ? styles.squareSelectedLayer : ""} ${!isHighlighted && previewStrength === 1 ? styles.squareDirectionalPreviewNear : ""} ${!isHighlighted && previewStrength === 2 ? styles.squareDirectionalPreviewMid : ""} ${!isHighlighted && previewStrength === 3 ? styles.squareDirectionalPreviewFar : ""} ${isHighlighted ? styles.squareHighlighted : ""}`}
+                    data-captain={piece?.isCaptain && !practice?.hideCaptain ? "true" : undefined}
+                    data-cost={cost?.cost}
+                    data-affordable={cost ? String(cost.affordable) : undefined}
+                    role={practice ? "button" : undefined}
+                    tabIndex={practice ? 0 : undefined}
+                    aria-label={practice ? label : undefined}
+                    aria-pressed={practice ? isSelected : undefined}
+                    aria-disabled={practice ? interactionBlocked : undefined}
+                    onKeyDown={practice ? event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); if (!event.repeat) handleSquareClick(rowIndex, colIndex); } } : undefined}
+                    className={`${styles.square} ${squareType} ${practice ? practiceStyles.cell : ""} ${target ? practiceStyles.target : ""} ${isSelected ? styles.squareSelectedLayer : ""} ${!isHighlighted && previewStrength === 1 ? styles.squareDirectionalPreviewNear : ""} ${!isHighlighted && previewStrength === 2 ? styles.squareDirectionalPreviewMid : ""} ${!isHighlighted && previewStrength === 3 ? styles.squareDirectionalPreviewFar : ""} ${isHighlighted ? styles.squareHighlighted : ""}`}
                     onClick={() => handleSquareClick(rowIndex, colIndex)}
                   >
                     {piece && (
+                      <div className={`${practiceStyles.pieceHolder} ${arrival ? practiceStyles.arrival : spawned ? practiceStyles.spawn : ""}`}
+                        key={arrival ? `${practice?.revision}:${arrival.from.row}:${arrival.from.col}` : "piece"}
+                        style={arrival ? { "--move-x": `calc(${arrival.from.col - arrival.to.col} * var(--tutorial-cell-pitch))`, "--move-y": `calc(${arrival.from.row - arrival.to.row} * var(--tutorial-cell-pitch))` } as React.CSSProperties : undefined}>
                       <PieceComponent
                         piece={piece}
                         isSelected={isSelected}
                         onPieceClick={() => handleSquareClick(rowIndex, colIndex)}
+                        hideValue={practice?.hideValues}
+                        hideCaptain={practice?.hideCaptain}
                       />
+                      </div>
                     )}
 
                     {isSelected && visibleDirections.length > 0 && (
@@ -508,17 +558,19 @@ const Board: React.FC<BoardProps> = ({
                       </div>
                     )}
 
-                    {isHighlighted && !piece && (
+                    {isHighlighted && !piece && !cost && (
                       <div className={styles.moveIndicator} />
                     )}
+                    {cost && <span aria-hidden="true" className={`${practiceStyles.cost} ${cost.affordable ? practiceStyles.affordable : practiceStyles.expensive} ${cost.capture ? practiceStyles.captureCost : ""}`}><span>{cost.cost}</span><span className={practiceStyles.bolt}>⚡</span></span>}
                   </div>
                 );
               }),
             )}
           </div>
+          {practice?.overlay}
         </div>
 
-        {selectedSquare && selectedPiece && (
+        {!practice && selectedSquare && selectedPiece && (
           <div className={styles.pieceInfo}>
             <h4>Peça selecionada</h4>
             <p>Tipo: {selectedPiece.type === "sumDiag" ? "Soma quadrada" : "Soma redonda"}</p>
@@ -527,14 +579,14 @@ const Board: React.FC<BoardProps> = ({
           </div>
         )}
 
-        {!selectedSquare && gameState.status === "playing" && allCurrentPlayerActions.length === 0 && (
+        {!practice && !selectedSquare && gameState.status === "playing" && allCurrentPlayerActions.length === 0 && (
           <div className={styles.pieceInfo}>
             <h4>Sem jogadas</h4>
             <p>O jogador atual não tem movimentos válidos com o dado atual.</p>
           </div>
         )}
 
-        {finalWin && (
+        {!practice && finalWin && (
           <VictoryScreen
             winner={finalWin.winner}
             reason={finalWin.reason}

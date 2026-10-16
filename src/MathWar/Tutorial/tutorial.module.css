@@ -1,0 +1,46 @@
+.page { min-height: 100dvh; box-sizing: border-box; padding: 12dvh 3vw 4dvh; background: #adfad2; color: #fff; font-family: "Cherry Bomb One", system-ui; display: flex; align-items: center; justify-content: center; }
+.toolbar { position: absolute; z-index: 30; top: 3dvh; left: 14vw; display: flex; align-items: center; gap: 3vw; font-size: min(4.5vw, 3dvh); color: #064e3b; }
+.toolbar button, .popup button, .hintButton { font: inherit; color: #fff; background: #059669; border: .4vw solid #064e3b; border-radius: 2vw; padding: 1.2vw 2.5vw; box-shadow: 0 .6vw 0 #064e3b; cursor: pointer; transition: transform 100ms ease, box-shadow 100ms ease; }
+.hintButton { position: absolute; z-index: 30; top: calc(4dvh + min(12vw, 10dvh)); right: 3vw; display: flex; align-items: center; gap: 1vw; font-size: min(4.5vw, 3dvh); background: #eab45a; border-color: #92400e; color: #713f12; box-shadow: 0 .6vw 0 #92400e; }
+.hintButton svg { width: min(5vw, 3.5dvh); height: min(5vw, 3.5dvh); }
+.scene { width: 94vw; position: relative; display: grid; grid-template-columns: 1fr; align-items: center; justify-items: center; gap: 2.4dvh; }
+.leftColumn, .rightColumn { width: min(88vw, 100%); position: relative; z-index: 8; display: flex; flex-direction: column; gap: 2dvh; }
+.leftColumn { grid-row: 1; }.rightColumn { grid-row: 3; }.rightColumn:empty { display: none; }
+.popup { border: .5vw solid #064e3b; border-radius: 4vw; background: #059669; box-shadow: 0 .8vw 0 #064e3b; padding: 3vw 4vw; font-size: min(4.6vw, 3.2dvh); line-height: 1.3; text-shadow: 0 .25vw 0 #064e3b; box-sizing: border-box; animation: appear 200ms ease-out; }
+.popup h1 { margin: 0 0 1vw; font-size: min(6vw, 4dvh); color: inherit; text-shadow: inherit; }
+.popup p { margin: 0; font-size: inherit; color: inherit; line-height: inherit; text-shadow: inherit; }
+.popup strong { color: #ffde81; font-weight: inherit; }.popup button { margin-top: 2vw; background: #047857; }
+.popup .shortHelp { margin-top: 1.5vw; }.actions { display: flex; flex-wrap: wrap; gap: 2vw; }
+.hud { display: flex; align-items: center; gap: 3vw; flex-wrap: wrap; color: #064e3b; }
+.dice, .energy { display: flex; flex-direction: column; align-items: center; font-size: min(4vw, 2.8dvh); background: #d1fae5; border: .4vw solid #064e3b; border-radius: 3vw; padding: 1vw 3vw; box-shadow: 0 .5vw 0 #064e3b; }
+.dice strong, .energy strong { font-size: min(7vw, 4.8dvh); font-weight: inherit; }.turn { font-size: min(3.8vw, 2.6dvh); }
+.equation { display: flex; gap: 1.3vw; align-items: center; justify-content: center; margin-top: 2vw; font-size: min(7vw, 4.5dvh); white-space: nowrap; }
+.equation > span, .equation > strong { position: relative; z-index: 9; }.equation strong { color: #ffe08a; }
+.calculation { text-align: center; }.pointers { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 7; }
+.practiceBoard { grid-row: 2; width: max-content; }.boardContainer { display: block; }.boardContainer .boardFrame { margin: 0; position: relative; }
+.grid { --tutorial-cell-pitch: var(--square-size, clamp(2.6vw, 9.15dvh, 5vw)); }.pieceHolder { display: contents; }.cell { position: relative; }
+.grid .target { border-color: #d97706; box-shadow: 0 .5vw 0 #92400e; }
+.cost { position: absolute; z-index: 5; display: flex; align-items: center; justify-content: center; gap: .1vw; border-radius: 1vw; padding: .15vw .3vw; font-size: min(3.2vw, 2.1dvh); line-height: 1; pointer-events: none; background: #f0fdf4; border: .2vw solid currentColor; }
+.affordable { color: #166534; }.expensive { color: #b91c1c; background: #fff1f2; }.bolt { color: #eab308; font-size: .8em; }
+.captureCost { bottom: 1%; right: 1%; z-index: 6; font-size: min(2.8vw, 1.9dvh); }
+.boardFeedback, .spent { position: absolute; z-index: 20; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 86%; box-sizing: border-box; padding: 4vw 3vw; border: .6vw solid #92400e; border-radius: 3vw; background: #fef3c7; color: #713f12; text-align: center; font-size: min(5.5vw, 3.8dvh); line-height: 1.3; box-shadow: 0 .8vw 0 #92400e; pointer-events: none; }
+.boardFeedback p { margin: 0; font-size: inherit; color: inherit; line-height: inherit; text-shadow: none; }.spent { width: auto; white-space: nowrap; }
+.feedbackPhase .popup, .feedbackPhase .pointers { opacity: .45; }
+.arrival > div { animation: arrive 300ms ease-out; z-index: 6; }.spawn > div { animation: appear 350ms ease-out; }.rolling { animation: shake 150ms ease-in-out infinite alternate; }
+@keyframes arrive { from { translate: var(--move-x) var(--move-y); } to { translate: 0 0; } }
+@keyframes appear { from { opacity: 0; scale: .95; } to { opacity: 1; scale: 1; } }
+@keyframes shake { from { rotate: -3deg; } to { rotate: 3deg; } }
+.toolbar button:focus-visible, .popup button:focus-visible, .hintButton:focus-visible, .cell:focus-visible { outline: .6vw solid #075985; outline-offset: .3vw; }
+@media (hover: hover) { .toolbar button:hover, .popup button:hover, .hintButton:hover { transform: translateY(-.2vw); filter: brightness(1.08); } }
+.toolbar button:active, .popup button:active, .hintButton:active { transform: translateY(.4vw); box-shadow: 0 .2vw 0 #064e3b; }
+@media (orientation: landscape) {
+  .scene { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 2vw; }
+  .leftColumn { grid-column: 1; grid-row: 1; width: 100%; }.rightColumn { grid-column: 3; grid-row: 1; width: 100%; }.practiceBoard { grid-column: 2; grid-row: 1; }
+  .toolbar { left: 8vw; font-size: min(1.9vw, 3.2dvh); gap: 1.5vw; }.toolbar button, .popup button, .hintButton { border-width: .25vw; padding: .6vw 1vw; border-radius: 1.2vw; }
+  .hintButton { top: calc(4dvh + 5vw); font-size: min(1.9vw, 3.2dvh); }.hintButton svg { width: min(2.4vw, 4dvh); height: min(2.4vw, 4dvh); }
+  .popup { padding: 1.3vw; border-width: .3vw; border-radius: 2vw; font-size: min(1.9vw, 3.4dvh); }.popup h1 { font-size: min(2.7vw, 4.5dvh); }
+  .hud { gap: 1vw; }.dice, .energy { font-size: min(1.5vw, 2.5dvh); border-width: .25vw; padding: .6vw 1vw; border-radius: 1.5vw; }.dice strong, .energy strong { font-size: min(2.8vw, 4.7dvh); }.turn { font-size: min(1.5vw, 2.5dvh); }
+  .equation { flex-wrap: wrap; font-size: min(2.6vw, 4.4dvh); gap: .5vw; margin-top: 1vw; }.cost { font-size: min(1.5vw, 2.5dvh); }.captureCost { font-size: min(1.3vw, 2.2dvh); }
+  .boardFeedback, .spent { font-size: min(2.5vw, 4.2dvh); padding: 2vw; border-width: .3vw; border-radius: 2vw; }
+}
+@media (prefers-reduced-motion: reduce) { .practiceBoard *, .popup, .rolling { animation: none !important; transition: none !important; }.toolbar button, .hintButton { transition: none; } }

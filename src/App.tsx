@@ -42,6 +42,8 @@ import Class2FaceArea from "./RubiksClass/Classes/Class2_faceArea/Class2FaceArea
 import Class3TotalSquares from "./RubiksClass/Classes/Class3_totalSquares/Class3TotalSquares";
 import CalculationDemoPage from "./Shared/Calculation/CalculationDemoPage";
 import MathWarRegras from "./MathWar/Pages/regrasPage";
+import MathWarTutorialPage from "./MathWar/Pages/tutorialPage";
+import MathWarTutorialGate from "./MathWar/Tutorial/TutorialGate";
 import MathWarPage from "./MathWar/Pages/baseGamePage";
 import MathWarAIPage from "./MathWar/Pages/aiGamePage";
 import MathWarMultiplayerGamePage from "./MathWar/Pages/multiplayerGamePage";
@@ -166,6 +168,7 @@ const RETURN_ROUTE_MAP: Record<string, string> = {
   [ROUTES.CLASS_3]: ROUTES.CLASS_MENU,
   [ROUTES.CUBE_TEST]: ROUTES.CLASS_MENU,
   [ROUTES.CALCULATION_DEMO]: ROUTES.HOME,
+  [ROUTES.MATH_WAR_TUTORIAL]: ROUTES.MATH_WAR_RULES,
   [ROUTES.MATH_WAR_RULES]: ROUTES.GAMES,
   [ROUTES.MATH_WAR_GAME]: ROUTES.MATH_WAR_RULES,
   [ROUTES.MATH_WAR_AI]: ROUTES.MATH_WAR_RULES,
@@ -258,7 +261,7 @@ function App() {
 
   useEffect(() => {
     const isCrownChaseOnlineRoute = location.pathname.startsWith(ROUTES.CROWN_CHASE_MP_LOBBY) || location.pathname === ROUTES.CROWN_CHASE_TUTORIAL;
-    const isMathWarOnlineRoute = location.pathname.startsWith(ROUTES.MATH_WAR_MP_LOBBY);
+    const isMathWarOnlineRoute = location.pathname.startsWith(ROUTES.MATH_WAR_MP_LOBBY) || location.pathname === ROUTES.MATH_WAR_TUTORIAL;
     const isStopOnlineRoute = location.pathname.startsWith(ROUTES.STOP_MP_LOBBY);
     const isSPTTTOnlineRoute = location.pathname.startsWith(ROUTES.SPTTT_MP_LOBBY);
     const isCacaSomaOnlineRoute = location.pathname.startsWith(ROUTES.CACA_SOMA_MP_LOBBY);
@@ -292,7 +295,7 @@ function App() {
   return (
     <main>
       <PageViewTracker />
-      {location.pathname !== ROUTES.CROWN_CHASE_TUTORIAL && <RotateDeviceOverlay />}
+      {location.pathname !== ROUTES.CROWN_CHASE_TUTORIAL && location.pathname !== ROUTES.MATH_WAR_TUTORIAL && <RotateDeviceOverlay />}
       <ReturnButton />
       <HomeButton />
       <Routes>
@@ -338,10 +341,11 @@ function App() {
         <Route path={ROUTES.CLASS_TESTS} element={<CheckpointLauncher />} />
         <Route path={ROUTES.CLASS_1_OLD} element={<Dimensions />} />
         <Route path={ROUTES.CLASS_MENU} element={<ClassMenu />} />
+        <Route path={ROUTES.MATH_WAR_TUTORIAL} element={<MathWarTutorialPage />} />
         <Route path={ROUTES.MATH_WAR_RULES} element={<MathWarRegras />} />
-        <Route path={ROUTES.MATH_WAR_GAME} element={<MathWarPage />} />
-        <Route path={ROUTES.MATH_WAR_AI} element={<MathWarAIPage />} />
-        <Route path={ROUTES.MATH_WAR_MP_LOBBY} element={<MathWarMultiplayerLobbyPage />} />
+        <Route path={ROUTES.MATH_WAR_GAME} element={<MathWarTutorialGate><MathWarPage /></MathWarTutorialGate>} />
+        <Route path={ROUTES.MATH_WAR_AI} element={<MathWarTutorialGate><MathWarAIPage /></MathWarTutorialGate>} />
+        <Route path={ROUTES.MATH_WAR_MP_LOBBY} element={<MathWarTutorialGate><MathWarMultiplayerLobbyPage /></MathWarTutorialGate>} />
         <Route path={ROUTES.MATH_WAR_MP_GAME} element={<MathWarMultiplayerGamePage />} />
         <Route path={ROUTES.MANUAL} element={<Manual />} />
         <Route path={ROUTES.CLASSROOMS} element={<ClassroomsPage />} />

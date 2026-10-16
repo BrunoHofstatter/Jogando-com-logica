@@ -1,6 +1,6 @@
 # Playable tutorial system: implemented contract
 
-Current implementation reference, consolidated October 6, 2026. The contract remains provisional until a second game integration. See [overview.md](overview.md) for teaching philosophy and [crown-chase.md](crown-chase.md) for the first complete integration.
+Current implementation reference, consolidated October 6, 2026; Math War integration added October 14. The contract remains provisional and is now used by two board-game integrations. See [overview.md](overview.md) for teaching philosophy and [crown-chase.md](crown-chase.md) and [math-war.md](math-war.md) for implemented lessons.
 
 ## Responsibility boundary
 
@@ -74,6 +74,8 @@ Crown Chase's `TutorialGate.tsx` is a game-owned wrapper in `App.tsx`, outside l
 Crown Chase's `navigation.ts` validates intended destinations and AI difficulty. Router history carries return context through refresh. Session storage is a backup tied to that history entry, not a global return destination. Invalid/direct context falls back to the rules menu. Refresh restarts the lesson rather than restoring a partial practice board.
 
 The shared core contains none of these route names or difficulty rules. Another game can use a different safe integration.
+
+Math War now implements the same game-owned gate, validated return, visibility, and isolation pattern with its own route and history identity. Its Board adapter also supports piece-value/Captain concealment, cost labels, and controlled selection. These remain game-owned capabilities; the shared API has not changed.
 
 Practice should not trigger normal AI, room actions, rewards/unlocks, or normal-match victory analytics. Crown Chase isolates these by not mounting those gameplay components. The global page-view tracker still runs; isolation does not mean the whole page emits no analytics.
 

@@ -7,12 +7,16 @@ interface PieceProps {
   piece: MathWarPiece;
   isSelected: boolean;
   onPieceClick: () => void;
+  hideValue?: boolean;
+  hideCaptain?: boolean;
 }
 
 const PieceComponent: React.FC<PieceProps> = ({
   piece,
   isSelected,
   onPieceClick,
+  hideValue = false,
+  hideCaptain = false,
 }) => {
   const getPlayerColor = (owner: number, isCaptain: boolean = false) => {
     const colors = [
@@ -40,7 +44,7 @@ const PieceComponent: React.FC<PieceProps> = ({
 
   const display = {
     symbol: `+${piece.value}`,
-    backgroundColor: getPlayerColor(piece.owner, piece.isCaptain),
+    backgroundColor: getPlayerColor(piece.owner, piece.isCaptain && !hideCaptain),
     textColor: "white",
     shape: piece.type === "sumDiag" ? "square" : "circle",
   };
@@ -52,7 +56,6 @@ const PieceComponent: React.FC<PieceProps> = ({
         width: display.shape === "square" ? "70%" : "75%",
         height: display.shape === "square" ? "70%" : "75%",
         background: display.backgroundColor,
-        fontSize: "12px",
         color: display.textColor,
       }}
       onClick={(event) => {
@@ -61,12 +64,12 @@ const PieceComponent: React.FC<PieceProps> = ({
       }}
     >
       <div className={styles.pieceContent}>
-        <div className={styles.pieceValueText}>
-          {display.symbol}
+        <div className={styles.pieceValueText} data-piece-value={!hideValue ? true : undefined}>
+          {!hideValue && display.symbol}
         </div>
       </div>
 
-      {piece.isCaptain && (
+      {piece.isCaptain && !hideCaptain && (
         <div className={styles.pieceCaptainIndicator}>C</div>
       )}
     </div>

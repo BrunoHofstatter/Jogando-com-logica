@@ -1,6 +1,6 @@
 # Playable tutorials: overview and philosophy
 
-Current reference for the playable tutorial system. Consolidated October 6, 2026.
+Current reference for the playable tutorial system. Consolidated October 6, 2026; Math War integration added October 14.
 
 ## Reading this folder
 
@@ -8,17 +8,18 @@ Current reference for the playable tutorial system. Consolidated October 6, 2026
 |---|---|
 | [technical-contract.md](technical-contract.md) | Implemented shared APIs, ownership, lifecycle, history, and technical limits. |
 | [crown-chase.md](crown-chase.md) | Crown Chase's implemented lesson, its decisions, and the relevant source files. |
+| [math-war.md](math-war.md) | Math War's implemented energy, capture, dice, and Captain lesson. |
 | [next-tutorials.md](../plans/tutorials/next-tutorials.md) | Flexible considerations and lessons useful when designing other games' tutorials. |
 | [roadmap.md](../plans/tutorials/roadmap.md) | Future possibilities, explicitly separated from current capabilities. |
 | [caca-soma-outline.md](../plans/tutorials/caca-soma-outline.md) | A tentative non-board compatibility example, not an implemented or approved lesson. |
 
-This overview and the first three linked documents are the four main references. They replace the old overall/core planning documents. Source code remains authoritative for implemented behavior. Future proposals belong in the roadmap or a clearly marked game proposal.
+This overview, the technical contract, implemented game lessons, and future-tutorial considerations are the main references. They replace the old overall/core planning documents. Source code remains authoritative for implemented behavior. Future proposals belong in the roadmap or a clearly marked game proposal.
 
 ## What exists today
 
 The shared foundation in `src/Shared/Tutorial/` provides a small session lifecycle and local completion/dismissal history. Crown Chase is the first complete playable integration, with an isolated tutorial route, automatic first-entry launch, explicit replay, real gameplay actions, guidance, and safe return to play.
 
-The shared foundation has not yet been validated through a second game's implementation. It has no universal stage schema, automatic lesson queue, or shared visual theme. Its provisional contract is documented separately.
+Math War now provides a second integration using the same session/history and its own arithmetic exercises. Both integrations are board games; applicability to other interaction structures remains untested. The foundation has no universal stage schema, automatic lesson queue, or shared visual theme. Its provisional contract is documented separately.
 
 Session execution and history stay local and require no tutorial service or login. Keeping the shared layer small and the scenarios lightweight helps the existing offline platform remain usable on school computers.
 

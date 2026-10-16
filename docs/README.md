@@ -46,6 +46,7 @@ Check each document's status and section labels. Game and project references can
 - [Overview and teaching philosophy](tutorials/overview.md)
 - [Implemented technical contract](tutorials/technical-contract.md)
 - [Implemented Crown Chase lesson](tutorials/crown-chase.md)
+- [Implemented Math War lesson](tutorials/math-war.md)
 
 ## Plans and retained design context
 

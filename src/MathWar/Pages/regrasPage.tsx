@@ -1,7 +1,6 @@
 import { useState } from "react";
 import styles from "../styles/regras.module.css";
 import { useNavigate } from "react-router-dom";
-import { useTutorialCompleted } from "../../Shared/Components/DynamicTutorial";
 import { useDifficultyLock } from "../../Shared/Hooks/useDifficultyLock";
 import { ROUTES } from "../../routes";
 
@@ -15,7 +14,6 @@ function MathWarRegras() {
   const [aiDifficulty, setAiDifficulty] = useState<1 | 2 | 3 | 4>(1);
   const [showDetailedRules, setShowDetailedRules] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [tutorialCompleted, resetTutorial] = useTutorialCompleted("mathwar_v1");
   const { isUnlocked, unlockAll, resetProgress } = useDifficultyLock("mathwar");
 
   const difficultyUnlocked = isUnlocked(aiDifficulty);
@@ -37,13 +35,7 @@ function MathWarRegras() {
   };
 
   const startTutorial = () => {
-    resetTutorial(); // Clear the "completed" flag
-    if (gameMode === "ai") {
-      // If locked, maybe default to 1? Or let them try. Tutorial usually force guided.
-      navigate(ROUTES.MATH_WAR_AI, { state: { difficulty: aiDifficulty } });
-    } else {
-      navigate(ROUTES.MATH_WAR_GAME);
-    }
+    navigate(ROUTES.MATH_WAR_TUTORIAL, { state: { tutorialReturn: { destination: ROUTES.MATH_WAR_RULES } } });
   };
 
   const resetGameProgress = () => {

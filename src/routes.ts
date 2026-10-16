@@ -60,6 +60,7 @@ export const ROUTES = {
   CROWN_CHASE_MP_GAME: "/caca-coroa/online/partida",
 
   // Math War
+  MATH_WAR_TUTORIAL: "/guerra-matematica/tutorial",
   MATH_WAR_RULES: "/guerra-matematica/regras",
   MATH_WAR_GAME: "/guerra-matematica",
   MATH_WAR_AI: "/guerra-matematica/computador",
