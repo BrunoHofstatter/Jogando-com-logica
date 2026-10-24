@@ -37,8 +37,13 @@ export const DiceAnimation: React.FC<DiceAnimationProps> = ({ targetValue, onCom
         };
     }, [targetValue, onComplete]);
 
+    return <DiceReveal displayValue={displayValue} isFinal={isFinal} />;
+};
+
+// Shared presentation; tutorial timing is owned by its cancellable session.
+export const DiceReveal: React.FC<{ displayValue: number; isFinal: boolean; className?: string }> = ({ displayValue, isFinal, className }) => {
     return (
-        <div style={{
+        <div className={className} role="status" aria-label={isFinal ? "Resultado dos dados" : "Rolando dados"} style={{
             position: 'fixed',
             top: 0,
             left: 0,

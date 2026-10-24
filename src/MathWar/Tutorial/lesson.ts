@@ -12,18 +12,22 @@ export function fixture(placements: Array<{ position: Position; piece: MathWarPi
   placements.forEach(({ position, piece }) => { board[position.row][position.col] = piece; });
   return createState({ board, currentPlayer: 1, diceRoll });
 }
-export const firstFixture = () => fixture([{ position: at(3, 3), piece: piece("blue", 1) }], [1, 1]);
+// Hidden introductory dice allow every square on the four clear movement rays.
+export const firstFixture = () => fixture([{ position: at(3, 3), piece: piece("blue", 1) }], [5, 5]);
 export const diagonalFixture = () => fixture([{ position: at(3, 3), piece: piece("blue", 1, "sumDiag") }]);
 export const captureFixture = () => fixture([
   { position: at(3, 3), piece: piece("blue", 1) },
   { position: at(3, 5), piece: piece("near", 0) },
   { position: at(0, 3), piece: piece("far", 0) },
 ]);
-export const turnsFixture = () => fixture([
+export const turnsFixture = () => ({ ...fixture([
   { position: at(5, 2), piece: piece("blue", 1) },
   { position: at(2, 5), piece: piece("red", 0) },
-], [3, 4]);
-export const captainFixture = () => fixture([{ position: at(3, 3), piece: piece("blue", 1, "sum", 2, true) }], [3, 3]);
+], [3, 4]), currentPlayer: 0 as const });
+export const captainFixture = () => fixture([
+  { position: at(3, 3), piece: piece("blue", 1, "sum", 2, true) },
+  { position: at(3, 4), piece: piece("target", 0) },
+], [3, 3]);
 
 export function huntFixture(): MathWarState {
   const state = createInitialState({ startingPlayer: 1, rng: () => 0, startingDiceRoll: [3, 4] });
@@ -65,10 +69,7 @@ export function illegalFeedback(state: MathWarState, intent: MoveIntent): string
   const e = evaluateMove(state, intent, 1);
   switch (e.invalidReason) {
     case "insufficient_energy": return `Precisa de ${e.requiredEnergy} ⚡. Você tem ${e.availableEnergy}.`;
-    case "invalid_direction": return e.piece?.type === "sumDiag" ? "Essa peça só anda na diagonal." : "Essa peça só anda para cima, para baixo ou para os lados.";
-    case "path_blocked": return "Há uma peça no caminho.";
-    case "ally_on_destination": return "Essa casa já tem uma peça sua.";
-    default: return "Escolha uma peça azul.";
+    default: return "A peça não pode ir aí.";
   }
 }
 

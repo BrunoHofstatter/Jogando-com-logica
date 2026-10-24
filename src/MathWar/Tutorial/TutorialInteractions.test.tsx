@@ -6,6 +6,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import TutorialGate from "./TutorialGate";
 import TutorialPage from "../Pages/tutorialPage";
 import Board from "../Components/board-component";
+import { DiceAnimation } from "../Components/DiceAnimation";
 import { firstFixture } from "./lesson";
 import { ROUTES } from "../../routes";
 import { allowedDifficulty, menuReturn, readReturn, saveReturn, validateReturn } from "./navigation";
@@ -28,7 +29,6 @@ const button = (text: string) => [...container.querySelectorAll<HTMLButtonElemen
 const click = (node: HTMLElement) => { expect(node).toBeTruthy(); act(() => node.click()); };
 const cell = (r: number, c: number) => container.querySelector<HTMLElement>(`[data-square="${String.fromCharCode(97 + c)}${r + 1}"]`)!;
 const advance = () => act(() => vi.runAllTimers());
-const next = () => { click(button("Continuar")); advance(); };
 function NormalDestination() { const location = useLocation(); flags.mounted(); return <div data-normal>{location.pathname}:{location.state?.difficulty ?? ""}</div>; }
 function renderEntry(path = ROUTES.MATH_WAR_TUTORIAL as string, state?: object) {
   act(() => root.render(<StrictMode><MemoryRouter initialEntries={[{ pathname: path, state }]}><Routes>
@@ -38,8 +38,8 @@ function renderEntry(path = ROUTES.MATH_WAR_TUTORIAL as string, state?: object) 
   </Routes></MemoryRouter></StrictMode>));
 }
 function reachCapture() {
-  click(cell(3, 4)); advance(); click(cell(3, 5)); advance(); next();
-  click(cell(2, 2)); advance(); next();
+  click(cell(3, 4)); advance(); click(cell(3, 5)); advance();
+  click(cell(2, 2)); advance();
 }
 
 it.each([ROUTES.MATH_WAR_GAME, ROUTES.MATH_WAR_AI, ROUTES.MATH_WAR_MP_LOBBY])("gates %s before normal pages mount, and skipping retains the destination", path => {
@@ -62,31 +62,45 @@ it("hides values and directions at first, then shows cost labels with both affor
   expect(container.querySelectorAll("[data-piece-value]")).toHaveLength(0);
   expect(cell(3, 3).getAttribute("aria-label")).not.toContain("valor");
   expect(container.querySelector('[data-practice-board]')?.className).toContain("boardWrapper");
+  expect(cell(3, 7).className).toContain("squareHighlighted");
   click(cell(3, 4)); advance();
   expect(container.querySelector("[data-piece-value]")?.textContent).toBe("+2");
   expect(cell(3, 7).dataset.cost).toBe("6"); expect(cell(3, 0).dataset.affordable).toBe("false");
-  click(cell(3, 5)); advance(); expect(container.textContent).toContain("Gastou 2 ⚡");
-  advance(); expect(container.querySelector("[data-stage]")?.getAttribute("data-stage")).toBe("2");
+  expect(container.querySelector('[data-pointer="dice-term"] small')?.textContent).toBe("Dados");
+  expect(container.querySelector('[data-pointer="piece-term"] small')?.textContent).toBe("Valor da peça");
+  expect(container.querySelector('[class*="directionHintsLayer"]')).toBeNull();
+  click(cell(3, 5)); act(() => vi.advanceTimersByTime(350)); expect(container.textContent).toContain("Gastou 2 ⚡");
+  expect(button("Continuar")).toBeUndefined();
+  act(() => vi.advanceTimersByTime(2999)); expect(container.querySelector("[data-stage]")?.getAttribute("data-stage")).toBe("2");
+  act(() => vi.advanceTimersByTime(1)); expect(container.querySelector("[data-stage]")?.getAttribute("data-stage")).toBe("3");
+  expect(container.querySelector('[aria-label="Rolando dados"]')).toBeNull();
+  expect(cell(2, 2).dataset.cost).toBe("2");
 });
 
 it("runs the complete lesson in StrictMode, with a hidden Captain reveal and no real win side effects", () => {
+  vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue(new DOMRect(0, 0, 100, 100));
   renderEntry(ROUTES.MATH_WAR_AI, { difficulty: 1 }); reachCapture();
   expect(cell(0, 3).dataset.cost).toBe("8"); expect(cell(3, 5).dataset.cost).toBe("6");
-  click(cell(3, 5)); advance(); next();
+  click(cell(3, 5)); act(() => vi.advanceTimersByTime(12600));
   expect(container.textContent).toContain("A energia mudou!");
-  expect(container.querySelector('[data-pointer="dice-term"]')?.textContent).toBe("3");
-  click(button("Continuar"));
+  expect(container.querySelector('[data-pointer="dice-term"] > span')?.textContent).toBe("3");
+  act(() => vi.advanceTimersByTime(3000));
   expect(container.querySelectorAll("[data-piece]")).toHaveLength(10);
   expect(container.querySelectorAll("[data-captain]")).toHaveLength(0);
+  expect(container.querySelectorAll("svg line")).toHaveLength(0);
   expect(container.textContent).not.toContain("Se capturarem");
-  act(() => vi.advanceTimersByTime(2400)); expect(container.querySelectorAll("[data-captain]")).toHaveLength(1);
+  act(() => vi.advanceTimersByTime(3999)); expect(container.querySelectorAll("[data-captain]")).toHaveLength(0);
+  act(() => vi.advanceTimersByTime(1)); expect(container.querySelectorAll("[data-captain]")).toHaveLength(1);
+  expect(container.querySelectorAll("svg line")).toHaveLength(1);
   advance(); expect(container.querySelectorAll("[data-captain]")).toHaveLength(2);
   expect(container.textContent).toContain("Se capturarem seu Capitão, você perde");
-  click(cell(3, 3)); advance(); expect(container.textContent).toContain("Você venceu!");
+  click(cell(3, 3)); act(() => vi.advanceTimersByTime(350)); expect(container.textContent).toContain("Você venceu!");
   expect(flags.mounted).not.toHaveBeenCalled(); expect(localStorage.getItem("game_progress_mathwar")).toBeNull();
-  next(); click(cell(2, 3)); advance(); expect(container.textContent).toContain("Gastou 4 ⚡");
-  next(); expect(container.querySelectorAll("[data-piece]")).toHaveLength(2); expect(cell(2, 4).dataset.cost).toBe("8");
-  click(cell(2, 4)); advance(); expect(container.textContent).toContain("Gastou 8 ⚡"); next();
+  act(() => vi.advanceTimersByTime(3000));
+  expect(container.querySelectorAll("[data-piece]")).toHaveLength(2); expect(cell(3, 4).dataset.cost).toBe("8");
+  expect(container.textContent).not.toContain("Ande uma casa");
+  click(cell(3, 4)); act(() => vi.advanceTimersByTime(350)); expect(container.textContent).toContain("Gastou 8 ⚡");
+  act(() => vi.advanceTimersByTime(3000));
   expect(container.querySelectorAll("[data-piece]")).toHaveLength(20); expect(button("Repetir tutorial")).toBeTruthy();
   click(button("Repetir tutorial")); expect(container.querySelectorAll("[data-piece]")).toHaveLength(1);
   click(button("Pular")); advance(); expect(container.textContent).toContain(ROUTES.MATH_WAR_AI);
@@ -96,10 +110,49 @@ it("restores legal non-captures, provides numeric feedback, and escalates hints"
   renderEntry(); reachCapture();
   click(cell(4, 3)); expect(container.textContent).toContain("Capture a peça vermelha."); advance();
   expect(cell(3, 3).getAttribute("aria-pressed")).toBe("true"); expect(cell(3, 5).dataset.piece).toBe("red-sum");
-  click(cell(0, 3)); expect(container.textContent).toContain("Precisa de 8 ⚡. Você tem 6."); advance();
+  click(cell(0, 3)); expect(container.querySelector('[role="status"]')?.textContent).toBe("Precisa de 8 ⚡.Você tem 6 ⚡.");
+  expect(container.querySelector('[role="status"] strong')?.className).toContain("wrongNumber");
+  expect(container.querySelector('[role="status"] strong:last-child')?.className).toContain("rightNumber"); advance();
   expect(cell(3, 5).getAttribute("aria-label")).toContain("objetivo marcado");
   click(button("Dica")); expect(container.textContent).toContain("Vá até a casa marcada");
+  expect(container.querySelector('svg line[stroke="#d97706"]')).toBeNull();
   click(button("Pular")); advance(); expect(vi.getTimerCount()).toBe(0);
+});
+
+it("uses the shared centered dice presentation and keeps selection, turns, and countdown aligned", () => {
+  renderEntry(); click(cell(3, 4)); act(() => vi.advanceTimersByTime(350));
+  expect(container.querySelector('[aria-label="Rolando dados"]')).not.toBeNull();
+  act(() => vi.advanceTimersByTime(800)); expect(container.querySelector('[aria-label="Resultado dos dados"]')?.textContent).toContain("4");
+  advance(); click(cell(3, 5)); advance(); click(cell(2, 2)); advance(); click(cell(3, 5));
+  act(() => vi.advanceTimersByTime(3350));
+  expect(container.querySelector("[data-roll-countdown]")?.textContent).toBe("3");
+  expect(container.querySelector('[aria-label="Rolando dados"]')).not.toBeNull();
+  act(() => vi.advanceTimersByTime(3400));
+  expect(container.querySelector("[data-turn-player]")?.textContent).toBe("Turno 1 · Vermelho");
+  expect(cell(3, 5).getAttribute("aria-pressed")).toBe("true");
+  act(() => vi.advanceTimersByTime(350));
+  expect(container.querySelector("[data-turn-player]")?.textContent).toBe("Turno 2 · Azul");
+  expect(container.querySelector("[data-roll-countdown]")?.textContent).toBe("2");
+  expect(cell(5, 2).getAttribute("aria-pressed")).toBe("true");
+  act(() => vi.advanceTimersByTime(1650));
+  expect(container.querySelector("[data-turn-player]")?.textContent).toBe("Turno 3 · Vermelho");
+  expect(container.querySelector("[data-roll-countdown]")?.textContent).toBe("1");
+  act(() => vi.advanceTimersByTime(1650));
+  expect(container.querySelector('[aria-label="Rolando dados"]')).not.toBeNull();
+  expect(container.querySelector("[data-roll-countdown]")?.textContent).toBe("0");
+  act(() => vi.advanceTimersByTime(2200));
+  expect(container.querySelector('[data-pointer="dice-term"] > span')?.textContent).toBe("3");
+  expect(container.querySelector("[data-turn-player]")?.textContent).toBe("Turno 4 · Azul");
+  expect(container.querySelector("[data-roll-countdown]")?.textContent).toBe("3");
+});
+
+it("preserves the normal game's dice result and completion timing", () => {
+  const complete = vi.fn();
+  act(() => root.render(<DiceAnimation targetValue={[2, 4]} onComplete={complete} />));
+  act(() => vi.advanceTimersByTime(799)); expect(container.querySelector('[aria-label="Rolando dados"]')).not.toBeNull();
+  act(() => vi.advanceTimersByTime(1)); expect(container.querySelector('[aria-label="Resultado dos dados"]')?.textContent).toContain("6");
+  act(() => vi.advanceTimersByTime(1399)); expect(complete).not.toHaveBeenCalled();
+  act(() => vi.advanceTimersByTime(1)); expect(complete).toHaveBeenCalledOnce();
 });
 
 it("supports keyboard input and local interaction locking without changing normal move execution", () => {

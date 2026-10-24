@@ -1,5 +1,5 @@
 import { TutorialSession } from "../../Shared/Tutorial/TutorialSession";
-import { applyAction, createInitialState, getLegalActionsForPiece, resolveMoveIntent } from "../Logic/v2";
+import { applyAction, createInitialState, evaluateMove, getDiceTotal, getLegalActionsForPiece, resolveMoveIntent } from "../Logic/v2";
 import type { MathWarState, MoveIntent, Position } from "../Logic/v2";
 import { at, captainFixture, captureFixture, diagonalFixture, findCaptain, findPiece, firstFixture, huntFixture, huntHint, illegalFeedback, MATH_TUTORIAL, piece, turnsFixture } from "./lesson";
 
@@ -8,7 +8,9 @@ export interface LessonSnapshot {
   stage: number; phase: LessonPhase; board: MathWarState; selected: Position | null;
   revision: number; movement: MoveIntent | null; spawned: Position | null;
   attempts: number; guidance: number; feedback: string; spent: number;
-  captainVisible: boolean; enemyVisible: boolean; captainCapture: boolean;
+  captainVisible: boolean; enemyVisible: boolean;
+  rollDisplay: number; rollSettled: boolean;
+  feedbackEnergy: { required: number; available: number } | null;
 }
 
 export class MathWarTutorialController {
@@ -19,7 +21,7 @@ export class MathWarTutorialController {
   private snapshot: LessonSnapshot = this.initial();
   constructor(private reducedMotion: () => boolean = () => false) {}
   private initial(): LessonSnapshot {
-    return { stage: 1, phase: "active", board: this.canonical, selected: at(3, 3), revision: 0, movement: null, spawned: null, attempts: 0, guidance: 0, feedback: "", spent: 0, captainVisible: false, enemyVisible: false, captainCapture: false };
+    return { stage: 1, phase: "active", board: this.canonical, selected: at(3, 3), revision: 0, movement: null, spawned: null, attempts: 0, guidance: 0, feedback: "", spent: 0, captainVisible: false, enemyVisible: false, rollDisplay: 2, rollSettled: false, feedbackEnergy: null };
   }
   getSnapshot = () => this.snapshot;
   subscribe = (listener: () => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; };
@@ -39,15 +41,28 @@ export class MathWarTutorialController {
   private wait(ms: number, callback: () => void, reading = false) { this.session.wait(this.token, !reading && this.reducedMotion() ? 0 : ms, callback); }
   private exercise(stage: number, board: MathWarState, selected: Position | null) {
     this.canonical = board;
-    this.enter("active", { stage, board, selected, attempts: 0, guidance: 0, feedback: "", movement: null, spawned: null, spent: 0 });
+    this.enter("active", { stage, board, selected, attempts: 0, guidance: 0, feedback: "", movement: null, spawned: null, spent: 0, feedbackEnergy: null });
   }
-  private roll(stage: 2 | 3, board: MathWarState, selected: Position) {
+  private animateRoll(after: () => void) {
+    this.publish({ rollDisplay: 2, rollSettled: false });
+    if (!this.reducedMotion()) {
+      for (let i = 1; i < 10; i++) this.wait(i * 80, () => this.publish({ rollDisplay: 2 + (i * 7 % 9) }));
+    }
+    this.wait(800, () => this.publish({ rollDisplay: getDiceTotal(this.canonical), rollSettled: true }));
+    // Reading the landed result remains possible even with reduced motion.
+    this.wait(2200, after, true);
+  }
+  private roll(board: MathWarState, selected: Position) {
     this.canonical = { ...board, currentPlayer: 1, turnCount: 0, diceRoll: [2, 2] };
-    this.enter("rolling", { stage, board: this.canonical, selected, movement: null, spent: 0, attempts: 0, guidance: 0 });
-    this.wait(800, () => {
+    this.enter("rolling", { stage: 2, board: this.canonical, selected, movement: null, spent: 0, attempts: 0, guidance: 0 });
+    this.animateRoll(() => {
       this.enter("explaining");
       this.wait(1800, () => this.enter("active"), true);
     });
+  }
+  private observe(phase: "spent" | "updated" | "won", update: Partial<LessonSnapshot> = {}) {
+    this.enter(phase, { movement: null, ...update });
+    this.wait(3000, () => this.advance(), true);
   }
   select = (position: Position | null) => {
     if (this.snapshot.phase !== "active" || !this.session.current(this.token)) return;
@@ -59,70 +74,70 @@ export class MathWarTutorialController {
     this.publish({ guidance: Math.min(3, Math.max(2, this.snapshot.guidance + 1)), ...(objective ? { selected: objective.from } : {}) });
   };
   objective = (): MoveIntent | null => {
-    const { stage, selected, captainCapture } = this.snapshot;
+    const { stage, selected } = this.snapshot;
     if (stage === 6) return huntHint(this.canonical, selected);
     if (!selected) return null;
     if (stage === 4) return { from: at(3, 3), to: at(3, 5) };
-    if (stage === 7 && captainCapture) {
+    if (stage === 7) {
       const enemy = findPiece(this.canonical, "target"); return enemy ? { from: selected, to: enemy } : null;
     }
     const action = getLegalActionsForPiece(this.canonical, selected, 1)[0];
     return action ? { from: action.from, to: action.to } : null;
   };
-  private correction(message: string, preview?: MathWarState, movement?: MoveIntent) {
+  private correction(message: string, preview?: MathWarState, movement?: MoveIntent, feedbackEnergy: LessonSnapshot["feedbackEnergy"] = null) {
     const attempts = this.snapshot.attempts + 1;
     const selected = this.snapshot.selected;
-    this.enter("feedback", { board: preview ?? this.canonical, selected: movement?.to ?? selected, movement: movement ?? null, feedback: message, attempts, guidance: Math.max(this.snapshot.guidance, attempts >= 3 ? 3 : attempts >= 2 ? 2 : 0) });
+    this.enter("feedback", { board: preview ?? this.canonical, selected: movement?.to ?? selected, movement: movement ?? null, feedback: message, feedbackEnergy, attempts, guidance: Math.max(this.snapshot.guidance, attempts >= 3 ? 3 : attempts >= 2 ? 2 : 0) });
     this.wait(message.includes("⚡") ? 3200 : 2000, () => {
       const reverse = movement ? { from: movement.to, to: movement.from } : null;
       const recoverySelection = this.snapshot.stage === 6 && this.snapshot.guidance >= 2 ? this.objective()?.from ?? selected : selected;
-      this.enter(reverse ? "returning" : "active", { board: this.canonical, selected: recoverySelection, movement: reverse, feedback: "" });
+      this.enter(reverse ? "returning" : "active", { board: this.canonical, selected: recoverySelection, movement: reverse, feedback: "", feedbackEnergy: null });
       if (reverse) this.wait(350, () => this.enter("active", { movement: null }));
     }, true);
   }
   attempt = (intent: MoveIntent) => {
     if (this.snapshot.phase !== "active" || !this.session.current(this.token)) return;
-    const { stage, captainCapture } = this.snapshot;
+    const { stage } = this.snapshot;
     const action = resolveMoveIntent(this.canonical, intent, 1);
-    if (!action) { this.correction(illegalFeedback(this.canonical, intent)); return; }
+    if (!action) {
+      const evaluation = evaluateMove(this.canonical, intent, 1);
+      this.correction(illegalFeedback(this.canonical, intent), undefined, undefined, evaluation.invalidReason === "insufficient_energy" ? { required: evaluation.requiredEnergy, available: evaluation.availableEnergy } : null);
+      return;
+    }
     const result = applyAction({ ...this.canonical, currentPlayer: 1 }, action, { nextDiceRoll: this.canonical.diceRoll });
     if (!result.ok) return;
-    if (stage === 7 && !captainCapture && action.cost.distance !== 1) {
-      this.correction("Ande uma casa com o Capitão.", result.state, intent); return;
-    }
-    if ((stage === 4 || (stage === 7 && captainCapture)) && action.type !== "capture") {
+    if ((stage === 4 || stage === 7) && action.type !== "capture") {
       this.correction("Capture a peça vermelha.", result.state, intent); return;
     }
     this.canonical = result.state;
     this.enter("moving", { board: result.state, selected: intent.to, movement: intent, spent: action.cost.totalCost });
     this.wait(350, () => {
-      if (stage === 1) this.roll(2, result.state, intent.to);
+      if (stage === 1) this.roll(result.state, intent.to);
       else if (stage === 6) {
-        if (result.state.status === "ended") this.enter("won", { movement: null });
+        if (result.state.status === "ended") this.observe("won");
         else {
           // A practice turn, not a normal match: retain the move and offer another blue action.
           this.canonical = { ...result.state, currentPlayer: 1, turnCount: 0 };
           this.enter("active", { board: this.canonical, movement: null, attempts: 0, guidance: 0 });
         }
-      } else this.enter("spent", { movement: null });
+      } else this.observe("spent");
     });
   };
-  continue = () => {
+  private advance() {
     const { stage, phase } = this.snapshot;
     if (!this.session.current(this.token)) return;
     if (phase === "spent") {
-      if (stage === 2) this.roll(3, diagonalFixture(), at(3, 3));
+      if (stage === 2) this.exercise(3, { ...diagonalFixture(), diceRoll: this.canonical.diceRoll }, at(3, 3));
       else if (stage === 3) this.exercise(4, captureFixture(), at(3, 3));
       else if (stage === 4) this.demonstrate();
-      else if (stage === 7 && !this.snapshot.captainCapture) this.addCaptainTarget();
       else if (stage === 7) this.complete();
     } else if (stage === 5 && phase === "updated") this.introduceCaptain();
     else if (stage === 6 && phase === "won") this.exercise(7, captainFixture(), at(3, 3));
-  };
+  }
   private demonstrate() {
     this.canonical = turnsFixture();
-    this.enter("demonstrating", { stage: 5, board: this.canonical, selected: at(5, 2), spent: 0, movement: null, attempts: 0, guidance: 0 });
-    const moves = [{ from: at(5, 2), to: at(4, 2) }, { from: at(2, 5), to: at(3, 5) }, { from: at(4, 2), to: at(4, 3) }];
+    this.enter("rolling", { stage: 5, board: this.canonical, selected: at(2, 5), spent: 0, movement: null, attempts: 0, guidance: 0 });
+    const moves = [{ from: at(2, 5), to: at(3, 5) }, { from: at(5, 2), to: at(4, 2) }, { from: at(3, 5), to: at(3, 4) }];
     const play = (index: number) => {
       const action = resolveMoveIntent(this.canonical, moves[index]);
       if (!action) throw new Error("Illegal authored tutorial demonstration");
@@ -131,19 +146,24 @@ export class MathWarTutorialController {
       this.canonical = result.state;
       this.enter("demonstrating", { board: result.state, movement: moves[index], selected: moves[index].to });
       this.wait(350, () => {
-        this.enter(index === 2 ? "rolling" : "demonstrating", { movement: null });
-        this.wait(index === 2 ? 800 : 1300, () => {
-          if (index < 2) play(index + 1);
-          else this.enter("updated", { selected: at(4, 3) });
-        }, index !== 2);
+        if (index === 2) {
+          this.enter("rolling", { movement: null, selected: at(4, 2) });
+          this.animateRoll(() => this.observe("updated", { selected: at(4, 2) }));
+        } else {
+          this.enter("demonstrating", { movement: null, selected: moves[index + 1].from });
+          this.wait(1300, () => play(index + 1), true);
+        }
       });
     };
-    this.wait(2200, () => play(0), true);
+    this.animateRoll(() => {
+      this.enter("demonstrating");
+      this.wait(1200, () => play(0), true);
+    });
   }
   private introduceCaptain() {
     this.canonical = huntFixture();
     this.enter("introducing", { stage: 6, board: this.canonical, selected: null, movement: null, captainVisible: false, enemyVisible: false, guidance: 0, attempts: 0 });
-    this.wait(2400, () => {
+    this.wait(4000, () => {
       const captain = findCaptain(this.canonical, 1);
       this.enter("revealing", { captainVisible: true, spawned: captain });
       this.wait(2000, () => {
@@ -154,13 +174,6 @@ export class MathWarTutorialController {
         this.wait(350, () => this.enter("active", { spawned: null }));
       }, true);
     }, true);
-  }
-  private addCaptainTarget() {
-    const from = findPiece(this.canonical, "blue")!;
-    const to = [at(from.row, from.col + 1), at(from.row, from.col - 1), at(from.row + 1, from.col)].find(p => p.row < 8 && p.col >= 0 && p.col < 8)!;
-    const board = this.canonical.board.map(row => [...row]); board[to.row][to.col] = piece("target", 0);
-    this.canonical = { ...this.canonical, board, currentPlayer: 1, turnCount: 0 };
-    this.enter("active", { board: this.canonical, captainCapture: true, selected: from, spent: 0, attempts: 0, guidance: 0, spawned: to });
   }
   private complete() {
     if (!this.session.finish(this.token, "completed")) return;
